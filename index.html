@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CleanTrack — Facility Hygiene Management</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;
+  --border:#2e3248;--border-l:#3a3f5c;
+  --text:#e8eaf0;--muted:#8890a8;--dim:#555e7a;
+  --primary:#4f8ef7;--primary-d:#3a74dc;
+  --green:#34c97a;--yellow:#f5c842;--red:#f05252;--orange:#f57c42;--purple:#a78bfa;
+  --r:10px;--rs:6px;--sh:0 2px 12px rgba(0,0,0,.4);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:3px}
+
+/* ── layout ── */
+#app{display:flex;min-height:100vh}
+#sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.logo{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-name{font-weight:800;font-size:15px;letter-spacing:-.3px}
+.logo-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-section{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;padding:12px 12px 4px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);color:var(--muted);font-size:13.5px;transition:.15s}
+.nav a:hover{background:var(--surface2);color:var(--text)}
+.nav a.active{background:rgba(79,142,247,.14);color:var(--primary)}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+.user-box{padding:12px 8px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px;padding:8px 12px;margin-bottom:4px}
+.logout-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:none;background:none;color:var(--red);font-size:13px;cursor:pointer;border-radius:var(--rs);transition:.15s}
+.logout-btn:hover{background:rgba(240,82,82,.1)}
+
+#main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
+#page-title{font-size:16px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.alert-badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;font-weight:700}
+
+.page{padding:24px;flex:1;display:none}
+.page.active{display:block}
+.ph{margin-bottom:22px}
+.ph h1{font-size:20px;font-weight:800;margin-bottom:3px}
+.ph p{color:var(--muted);font-size:13px}
+.ph-row{display:flex;align-items:flex-start;justify-content:space-between}
+
+/* ── stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:7px}
+.stat-value{font-size:28px;font-weight:800;line-height:1;font-family:'Courier New',monospace}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.stat.green{border-color:rgba(52,201,122,.25)}.stat.green .stat-value{color:var(--green)}
+.stat.red{border-color:rgba(240,82,82,.25)}.stat.red .stat-value{color:var(--red)}
+.stat.yellow{border-color:rgba(245,200,66,.25)}.stat.yellow .stat-value{color:var(--yellow)}
+.stat.blue{border-color:rgba(79,142,247,.25)}.stat.blue .stat-value{color:var(--primary)}
+
+/* ── grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ── cards ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+
+/* ── tables ── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:9px 13px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* ── badges ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;text-transform:capitalize}
+.badge.cleaned,.badge.completed{background:rgba(52,201,122,.15);color:var(--green)}
+.badge.pending{background:rgba(245,200,66,.15);color:var(--yellow)}
+.badge.in-progress{background:rgba(79,142,247,.15);color:var(--primary)}
+.badge.overdue,.badge.missed{background:rgba(240,82,82,.15);color:var(--red)}
+.badge.warning{background:rgba(245,124,66,.15);color:var(--orange)}
+.badge.critical{background:rgba(240,82,82,.2);color:var(--red)}
+.badge.high{background:rgba(245,124,66,.2);color:var(--orange)}
+.badge.admin{background:rgba(167,139,250,.15);color:var(--purple)}
+.badge.supervisor{background:rgba(79,142,247,.15);color:var(--primary)}
+.badge.staff{background:rgba(136,144,168,.15);color:var(--muted)}
+
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-d)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--border-l)}
+.btn-danger{background:rgba(240,82,82,.13);color:var(--red);border:1px solid rgba(240,82,82,.3)}.btn-danger:hover{background:rgba(240,82,82,.22)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── forms ── */
+.fg{margin-bottom:15px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.fc{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-size:13px;font-family:inherit;transition:border-color .15s}
+.fc:focus{outline:none;border-color:var(--primary)}
+select.fc option{background:var(--surface)}
+
+/* ── modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:.2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:13px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:.2s}
+.overlay.open .modal{transform:none}
+.mh{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mh h2{font-size:16px;font-weight:800}
+.mb{padding:18px 22px}
+.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── alerts ── */
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-left:3px solid;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface2);margin-bottom:8px}
+.alert-item.warning{border-color:var(--yellow)}
+.alert-item.high{border-color:var(--orange)}
+.alert-item.critical{border-color:var(--red)}
+.ai-msg{font-size:13px}
+.ai-time{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── zone grid ── */
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px}
+.zcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:15px;cursor:pointer;transition:.15s;border-top:3px solid}
+.zcard:hover{border-color:var(--border-l);transform:translateY(-1px)}
+.zcard.cleaned{border-top-color:var(--green)}
+.zcard.pending{border-top-color:var(--yellow)}
+.zcard.overdue{border-top-color:var(--red)}
+.zcard.in-progress{border-top-color:var(--primary)}
+.zname{font-weight:700;font-size:14px;margin-bottom:3px}
+.zmeta{font-size:11px;color:var(--muted)}
+
+/* ── heatmap ── */
+.hm-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.hm-name{width:175px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-track{flex:1;height:7px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.hm-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.hm-lbl{width:35px;text-align:right;font-size:11px;color:var(--muted);font-family:'Courier New',monospace}
+
+/* ── progress ── */
+.pbar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px}
+
+/* ── avatar ── */
+.av{width:30px;height:30px;border-radius:50%;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:2px;background:var(--surface2);border-radius:var(--rs);padding:3px;margin-bottom:18px}
+.tab{flex:1;padding:6px 12px;border:none;background:none;color:var(--muted);font-size:13px;font-weight:600;border-radius:5px;cursor:pointer;transition:.15s}
+.tab.active{background:var(--surface);color:var(--text)}
+
+/* ── login ── */
+#login-page{display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:20px}
+#login-page.show{display:flex}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:38px;width:100%;max-width:370px}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .li{font-size:40px;display:block;margin-bottom:8px}
+.login-logo h1{font-size:22px;font-weight:900}
+.login-logo p{font-size:12px;color:var(--muted);margin-top:4px}
+.demo-hint{margin-top:18px;padding:13px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.7}
+
+/* ── toast ── */
+#toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;box-shadow:var(--sh);animation:slideIn .25s ease;max-width:340px}
+.toast.success{background:#1d3a2a;color:var(--green);border:1px solid rgba(52,201,122,.3)}
+.toast.error{background:#3a1d1d;color:var(--red);border:1px solid rgba(240,82,82,.3)}
+.toast.info{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── chart containers ── */
+.chart-wrap{height:240px;position:relative}
+
+/* ── responsive ── */
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%)}
+  #main{margin-left:0}
+  .g2,.g3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page" class="show">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="li">🧹</span>
+      <h1>CleanTrack</h1>
+      <p>Facility Hygiene Management System</p>
+    </div>
+    <div class="fg">
+      <label class="fl">Email</label>
+      <input class="fc" type="email" id="login-email" value="admin@cleantrack.demo" placeholder="you@example.com"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fc" type="password" id="login-password" value="Password123!" placeholder="••••••••"/>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" onclick="doLogin()">Sign in →</button>
+    <div class="demo-hint">
+      <strong style="color:var(--text)">Demo accounts:</strong><br>
+      admin@cleantrack.demo / Password123!<br>
+      supervisor@cleantrack.demo / Password123!<br>
+      raj@cleantrack.demo / Password123!
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🧹</div>
+      <div>
+        <div class="logo-name">CleanTrack</div>
+        <div class="logo-sub">Facility Mgmt</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#" onclick="showPage('dashboard')" data-page="dashboard" class="active"><span class="nav-icon">⬡</span>Dashboard</a>
+      <a href="#" onclick="showPage('zones')" data-page="zones"><span class="nav-icon">🚻</span>Zones</a>
+      <a href="#" onclick="showPage('tasks')" data-page="tasks"><span class="nav-icon">✓</span>Tasks</a>
+      <div class="nav-section">Management</div>
+      <a href="#" onclick="showPage('staff')" data-page="staff"><span class="nav-icon">👤</span>Staff</a>
+      <a href="#" onclick="showPage('locations')" data-page="locations"><span class="nav-icon">🏢</span>Locations</a>
+      <div class="nav-section">Reports</div>
+      <a href="#" onclick="showPage('logs')" data-page="logs"><span class="nav-icon">📷</span>Cleaning Logs</a>
+      <a href="#" onclick="showPage('analytics')" data-page="analytics"><span class="nav-icon">📊</span>Analytics</a>
+      <a href="#" onclick="showPage('reports')" data-page="reports"><span class="nav-icon">📋</span>Reports</a>
+      <div class="nav-section">Alerts</div>
+      <a href="#" onclick="showPage('alerts')" data-page="alerts"><span class="nav-icon">🔔</span>Alerts <span id="alert-badge" class="alert-badge" style="display:none"></span></a>
+    </nav>
+    <div class="user-box">
+      <div class="user-row">
+        <div class="av" id="user-av">A</div>
+        <div style="flex:1;overflow:hidden">
+          <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="user-name">Admin</div>
+          <div style="font-size:11px;color:var(--muted)" id="user-role">admin</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()"><span>↩</span>Sign out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div class="topbar">
+      <div id="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <span style="font-size:12px;color:var(--muted)" id="topbar-time"></span>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('alerts')">🔔 Alerts</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="ph">
+        <h1>Dashboard</h1>
+        <p id="dash-date">Live status across all facilities</p>
+      </div>
+      <div class="stats" id="dash-stats"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">14-Day Compliance Trend</div>
+          <div class="chart-wrap"><canvas id="chart-compliance"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Zone Status Distribution</div>
+          <div class="chart-wrap" style="height:200px"><canvas id="chart-pie"></canvas></div>
+          <div id="pie-legend" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:12px"></div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">Recent Alerts <span id="dash-alert-count" style="color:var(--red);font-weight:800"></span></div>
+          <div id="dash-alerts"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Zone Overview</div>
+          <div id="dash-zones"></div>
+        </div>
+      </div>
+      <div id="predictive-card" class="card" style="margin-top:16px;display:none">
+        <div class="card-title">⚠️ Predictive Alerts</div>
+        <div id="predictive-list"></div>
+      </div>
+    </div>
+
+    <!-- ZONES -->
+    <div id="page-zones" class="page">
+      <div class="ph ph-row">
+        <div><h1>Zones</h1><p>Manage bathrooms and restroom facilities</p></div>
+        <button class="btn btn-primary" onclick="openZoneModal()">+ Add Zone</button>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
+        <select class="fc" style="width:200px" id="zone-loc-filter" onchange="loadZones()">
+          <option value="">All Locations</option>
+        </select>
+        <div class="tabs" style="margin-bottom:0;flex:0 0 auto">
+          <button class="tab active" onclick="filterZones('all',this)">All</button>
+          <button class="tab" onclick="filterZones('cleaned',this)">Cleaned</button>
+          <button class="tab" onclick="filterZones('pending',this)">Pending</button>
+          <button class="tab" onclick="filterZones('overdue',this)">Overdue</button>
+        </div>
+      </div>
+      <div class="zone-grid" id="zones-grid"></div>
+    </div>
+
+    <!-- TASKS -->
+    <div id="page-tasks" class="page">
+      <div class="ph ph-row">
+        <div><h1>Cleaning Tasks</h1><p>Monitor and track all cleaning activities</p></div>
+        <button class="btn btn-primary" onclick="openTaskModal()">+ New Task</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="filterTasks('all',this)">All</button>
+        <button class="tab" onclick="filterTasks('pending',this)">Pending</button>
+        <button class="tab" onclick="filterTasks('in-progress',this)">In Progress</button>
+        <button class="tab" onclick="filterTasks('completed',this)">Completed</button>
+        <button class="tab" onclick="filterTasks('missed',this)">Missed</button>
+      </div>
+      <div class="card"><div class="tw"><table id="tasks-table">
+        <thead><tr><th>Zone</th><th>Location</th><th>Assigned To</th><th>Scheduled</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="tasks-body"></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- STAFF -->
+    <div id="page-staff" class="page">
+      <div class="ph ph-row">
+        <div><h1>Staff Management</h1><p>Housekeeping staff, roles, and performance</p></div>
+        <button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button>
+      </div>
+      <div class="card"><div class="tw"><table>
+        <thead><tr><th>Name</th><th>Role</th><th>Location</th><th>Tasks (30d)</th><th>Compliance</th><th>Avg Time</th><th>Actions</th></tr></thead>
+        <tbody id="staff-body"></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- LOCATIONS -->
+    <div id="page-locations" class="page">
+      <div class="ph ph-row">
+        <div><h1>Locations</h1><p>Buildings and facilities across your organization</p></div>
+        <button class="btn btn-primary" onclick="openLocModal()">+ Add Location</button>
+      </div>
+      <div class="g3" id="locations-grid"></div>
+    </div>
+
+    <!-- LOGS -->
+    <div id="page-logs" class="page">
+      <div class="ph"><h1>Cleaning Logs</h1><p>Photo proof with AI cleanliness scores</p></div>
+      <div style="margin-bottom:18px">
+        <select class="fc" style="width:220px" id="log-zone-filter" onchange="loadLogs()">
+          <option value="">All Zones</option>
+        </select>
+      </div>
+      <div class="card"><div class="tw"><table>
+        <thead><tr><th>Zone</th><th>Staff</th><th>AI Score</th><th>AI Feedback</th><th>Photos</th><th>Date</th></tr></thead>
+        <tbody id="logs-body"></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="page-analytics" class="page">
+      <div class="ph"><h1>Analytics & Insights</h1><p>KPIs, heatmaps, and performance metrics</p></div>
+      <div class="stats" id="kpi-stats"></div>
+      <div class="g2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="align-items:center">
+            Compliance Over Time
+            <div style="display:flex;gap:4px">
+              <button onclick="setReportPeriod('daily',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:var(--primary);color:#fff;font-size:11px;cursor:pointer;font-weight:600" id="rpd-daily">Daily</button>
+              <button onclick="setReportPeriod('weekly',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600" id="rpd-weekly">Weekly</button>
+              <button onclick="setReportPeriod('monthly',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600" id="rpd-monthly">Monthly</button>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-compliance2"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Staff Performance Ranking</div>
+          <div class="tw"><table>
+            <thead><tr><th>#</th><th>Staff</th><th>Tasks</th><th>Compliance</th><th>Avg</th></tr></thead>
+            <tbody id="staff-ranking"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Zone Miss Heatmap — Last 7 Days</div>
+        <div style="display:flex;gap:12px;margin-bottom:12px;font-size:11px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Low</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--yellow);display:inline-block"></span>Medium</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--orange);display:inline-block"></span>High</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Critical</span>
+        </div>
+        <div id="heatmap-list"></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="ph ph-row">
+        <div><h1>Reports</h1><p>Daily, weekly, and monthly cleaning compliance</p></div>
+        <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:18px;align-items:center">
+        <div class="tabs" style="margin-bottom:0">
+          <button class="tab active" onclick="setReportTab('daily',this)">Daily</button>
+          <button class="tab" onclick="setReportTab('weekly',this)">Weekly</button>
+          <button class="tab" onclick="setReportTab('monthly',this)">Monthly</button>
+        </div>
+        <select class="fc" style="width:200px" id="report-loc-filter" onchange="loadReports()">
+          <option value="">All Locations</option>
+        </select>
+      </div>
+      <div class="card"><div class="tw"><table>
+        <thead><tr><th>Period</th><th>Total</th><th>Completed</th><th>Missed</th><th>Compliance</th><th>Avg Duration</th></tr></thead>
+        <tbody id="reports-body"></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="page-alerts" class="page">
+      <div class="ph ph-row">
+        <div><h1>Alerts</h1><p>Notifications, overdue cleanings, and escalations</p></div>
+        <button class="btn btn-secondary" onclick="markAllRead()">Mark All Read</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="filterAlerts('unread',this)">Unread</button>
+        <button class="tab" onclick="filterAlerts('all',this)">All</button>
+        <button class="tab" onclick="filterAlerts('critical',this)">Critical</button>
+      </div>
+      <div id="alerts-list"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-zone">
+  <div class="modal">
+    <div class="mh"><h2 id="zone-modal-title">New Zone</h2><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-zone')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="zone-id"/>
+      <div class="fg"><label class="fl">Location</label><select class="fc" id="zone-location"></select></div>
+      <div class="fg"><label class="fl">Zone Name</label><input class="fc" id="zone-name" placeholder="e.g. Floor 12 – Bathroom C"/></div>
+      <div class="fg"><label class="fl">Floor</label><input class="fc" id="zone-floor" placeholder="e.g. 12, G, B1"/></div>
+      <div class="fg"><label class="fl">Type</label><select class="fc" id="zone-type"><option value="bathroom">Bathroom</option><option value="restroom">Restroom</option><option value="toilet">Toilet</option></select></div>
+      <div class="fg"><label class="fl">Cleaning Interval (minutes)</label><input class="fc" type="number" id="zone-interval" value="60" min="15"/></div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('modal-zone')">Cancel</button><button class="btn btn-primary" onclick="saveZone()">Save Zone</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-task">
+  <div class="modal">
+    <div class="mh"><h2>New Cleaning Task</h2><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-task')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Zone</label><select class="fc" id="task-zone"></select></div>
+      <div class="fg"><label class="fl">Assign To</label><select class="fc" id="task-staff"><option value="">Auto-assign</option></select></div>
+      <div class="fg"><label class="fl">Scheduled At</label><input class="fc" type="datetime-local" id="task-scheduled"/></div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('modal-task')">Cancel</button><button class="btn btn-primary" onclick="saveTask()">Create Task</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-staff">
+  <div class="modal">
+    <div class="mh"><h2 id="staff-modal-title">Add Staff</h2><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-staff')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="staff-id"/>
+      <div class="fg"><label class="fl">Full Name</label><input class="fc" id="staff-name" placeholder="Jane Doe"/></div>
+      <div class="fg"><label class="fl">Email</label><input class="fc" type="email" id="staff-email" placeholder="jane@example.com"/></div>
+      <div class="fg"><label class="fl">Phone</label><input class="fc" id="staff-phone" placeholder="+91-9876543210"/></div>
+      <div class="fg" id="staff-pw-group"><label class="fl">Password</label><input class="fc" type="password" id="staff-password" placeholder="••••••••"/></div>
+      <div class="fg"><label class="fl">Role</label><select class="fc" id="staff-role"><option value="staff">Staff</option><option value="supervisor">Supervisor</option><option value="admin">Admin</option></select></div>
+      <div class="fg"><label class="fl">Location</label><select class="fc" id="staff-location"><option value="">No location</option></select></div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('modal-staff')">Cancel</button><button class="btn btn-primary" onclick="saveStaff()">Save</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-loc">
+  <div class="modal">
+    <div class="mh"><h2>Add Location</h2><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-loc')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Building Name</label><input class="fc" id="loc-name" placeholder="Tower A HQ"/></div>
+      <div class="fg"><label class="fl">Address</label><input class="fc" id="loc-address" placeholder="123 Main Street"/></div>
+      <div class="fg"><label class="fl">City</label><input class="fc" id="loc-city" placeholder="Mumbai"/></div>
+      <div class="fg"><label class="fl">Country</label><input class="fc" id="loc-country" placeholder="India"/></div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('modal-loc')">Cancel</button><button class="btn btn-primary" onclick="saveLoc()">Add Location</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-qr">
+  <div class="modal" style="max-width:360px">
+    <div class="mh"><h2 id="qr-title">QR Code</h2><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-qr')">✕</button></div>
+    <div class="mb" style="text-align:center">
+      <img id="qr-img" src="" alt="QR" style="width:220px;height:220px;border:8px solid white;border-radius:8px"/>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted)">Staff scan this to start a cleaning task.</p>
+      <a id="qr-download" download="qr.png" class="btn btn-secondary" style="margin-top:12px;display:inline-flex">⬇ Download</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const API = 'http://127.0.0.1:5000/api';
+let token = localStorage.getItem('ct_token');
+let currentUser = JSON.parse(localStorage.getItem('ct_user') || 'null');
+let allZones = [], allZoneFilter = 'all';
+let allTasks = [], taskFilter = 'all';
+let allAlerts = [], alertFilter = 'unread';
+let locations = [];
+let reportPeriod = 'daily', reportPeriodAlt = 'daily';
+let compChart = null, pieChart = null, comp2Chart = null;
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(opts.headers || {}) },
+    ...opts
+  });
+  if (res.status === 401) { doLogout(); return; }
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Request failed'); }
+  return res.json();
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success: '✓', error: '✗', info: 'ℹ' };
+  el.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function fmtDate(dt) {
+  if (!dt) return '—';
+  const d = new Date(dt);
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+}
+
+function badge(status) {
+  return `<span class="badge ${status}">${status}</span>`;
+}
+
+function av(name) {
+  return `<div class="av">${(name||'?')[0].toUpperCase()}</div>`;
+}
+
+function pbar(pct, color) {
+  const col = color || (pct >= 80 ? 'var(--green)' : pct >= 60 ? 'var(--yellow)' : 'var(--red)');
+  return `<div style="display:flex;align-items:center;gap:8px">
+    <div class="pbar" style="width:60px"><div class="pfill" style="width:${pct}%;background:${col}"></div></div>
+    <span style="font-size:12px;font-family:'Courier New',monospace">${pct}%</span>
+  </div>`;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    token = data.token;
+    currentUser = data.user;
+    localStorage.setItem('ct_token', token);
+    localStorage.setItem('ct_user', JSON.stringify(data.user));
+    initApp();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('ct_token'); localStorage.removeItem('ct_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-page').classList.add('show');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function initApp() {
+  document.getElementById('login-page').classList.remove('show');
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('user-name').textContent = currentUser?.name || 'User';
+  document.getElementById('user-role').textContent = currentUser?.role || 'staff';
+  document.getElementById('user-av').textContent = (currentUser?.name || 'U')[0].toUpperCase();
+  document.getElementById('dash-date').textContent = 'Live status — ' + new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  setInterval(() => {
+    document.getElementById('topbar-time').textContent = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  }, 1000);
+  loadLocations().then(() => { showPage('dashboard'); loadAlertBadge(); });
+  setInterval(loadAlertBadge, 60000);
+}
+
+async function loadAlertBadge() {
+  try {
+    const data = await api('/alerts?is_read=false');
+    const cnt = data.length;
+    const badge = document.getElementById('alert-badge');
+    if (cnt > 0) { badge.style.display = 'inline'; badge.textContent = cnt; }
+    else { badge.style.display = 'none'; }
+  } catch(e) {}
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+const pageTitles = { dashboard:'Dashboard', zones:'Zones', tasks:'Cleaning Tasks', staff:'Staff Management', locations:'Locations', logs:'Cleaning Logs', analytics:'Analytics', reports:'Reports', alerts:'Alerts' };
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const navEl = document.querySelector(`.nav a[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[page] || page;
+  const loaders = { dashboard: loadDashboard, zones: loadZones, tasks: loadTasks, staff: loadStaff, locations: loadLocations, logs: loadLogs, analytics: loadAnalytics, reports: loadReports, alerts: loadAlerts };
+  if (loaders[page]) loaders[page]();
+  return false;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [dash, kpis, report] = await Promise.all([
+      api('/analytics/dashboard'),
+      api('/analytics/kpis'),
+      api('/analytics/reports?period=daily')
+    ]);
+    const z = dash.zones || {}, t = dash.today || {};
+    document.getElementById('dash-stats').innerHTML = `
+      <div class="stat green"><div class="stat-label">Cleaned Today</div><div class="stat-value">${t.completed||0}</div><div class="stat-sub">of ${t.total||0} scheduled</div></div>
+      <div class="stat red"><div class="stat-label">Overdue Zones</div><div class="stat-value">${z.overdue||0}</div><div class="stat-sub">need attention</div></div>
+      <div class="stat blue"><div class="stat-label">Today Compliance</div><div class="stat-value">${t.compliance_pct||0}%</div><div class="stat-sub">${kpis.compliance_7d||0}% last 7 days</div></div>
+      <div class="stat yellow"><div class="stat-label">Avg Clean Time</div><div class="stat-value">${dash.avg_cleaning_duration||'--'}<span style="font-size:14px">m</span></div><div class="stat-sub">per task (30-day)</div></div>
+      <div class="stat"><div class="stat-label">Total Zones</div><div class="stat-value">${z.total||0}</div><div class="stat-sub">${z.in_progress||0} in progress</div></div>
+    `;
+
+    // Line chart
+    const labels = report.slice(0,14).reverse().map(r => (r.period||'').slice(5));
+    const vals   = report.slice(0,14).reverse().map(r => r.compliance_pct||0);
+    if (compChart) compChart.destroy();
+    compChart = new Chart(document.getElementById('chart-compliance'), {
+      type: 'line',
+      data: { labels, datasets: [{ data: vals, borderColor: '#4f8ef7', borderWidth: 2, pointRadius: 3, fill: true, backgroundColor: 'rgba(79,142,247,.08)', tension: 0.4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8890a8', font: { size: 11 } }, grid: { color: '#2e3248' } }, y: { ticks: { color: '#8890a8', font: { size: 11 } }, grid: { color: '#2e3248' }, min: 0, max: 100 } } }
+    });
+
+    // Pie chart
+    const pieData = [
+      { label: 'Cleaned', value: z.cleaned||0, color: '#34c97a' },
+      { label: 'Pending', value: z.pending||0, color: '#f5c842' },
+      { label: 'In Progress', value: z.in_progress||0, color: '#4f8ef7' },
+      { label: 'Overdue', value: z.overdue||0, color: '#f05252' },
+    ].filter(d => d.value > 0);
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(document.getElementById('chart-pie'), {
+      type: 'doughnut',
+      data: { labels: pieData.map(d=>d.label), datasets: [{ data: pieData.map(d=>d.value), backgroundColor: pieData.map(d=>d.color), borderWidth: 0, hoverOffset: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: false } } }
+    });
+    document.getElementById('pie-legend').innerHTML = pieData.map(d =>
+      `<span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${d.color};display:inline-block"></span>${d.label} (${d.value})</span>`
+    ).join('');
+
+    // Alerts
+    const alertsDiv = document.getElementById('dash-alerts');
+    document.getElementById('dash-alert-count').textContent = (dash.recent_alerts||[]).length + ' unread';
+    alertsDiv.innerHTML = (dash.recent_alerts||[]).slice(0,5).map(a =>
+      `<div class="alert-item ${a.severity}"><div><div class="ai-msg">${a.message}</div><div class="ai-time">${a.zone_name||''} · ${fmtDate(a.created_at)}</div></div></div>`
+    ).join('') || '<p style="color:var(--muted);font-size:13px">No active alerts. ✓</p>';
+
+    // Zone list
+    const zonesDiv = document.getElementById('dash-zones');
+    const zl = await api('/zones');
+    zonesDiv.innerHTML = zl.slice(0,10).map(z =>
+      `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${z.status==='cleaned'?'var(--green)':z.status==='overdue'?'var(--red)':z.status==='in-progress'?'var(--primary)':'var(--yellow)'}"></span>
+          <div><div style="font-size:13px;font-weight:600">${z.name}</div><div style="font-size:11px;color:var(--muted)">${z.location_name||''} · Floor ${z.floor||'?'}</div></div>
+        </div>${badge(z.status)}
+      </div>`
+    ).join('');
+
+    // Predictive
+    if ((kpis.predictive_warnings||[]).length > 0) {
+      document.getElementById('predictive-card').style.display = 'block';
+      document.getElementById('predictive-list').innerHTML = kpis.predictive_warnings.map(w =>
+        `<div class="alert-item high"><div class="ai-msg">"${w.name}" has missed cleaning ${w.missed_count}× this week — check scheduling or staffing.</div></div>`
+      ).join('');
+    }
+  } catch(e) { toast('Dashboard load failed', 'error'); }
+}
+
+// ── ZONES ─────────────────────────────────────────────────────────────────────
+async function loadZones() {
+  const locId = document.getElementById('zone-loc-filter').value;
+  const q = locId ? `?location_id=${locId}` : '';
+  allZones = await api('/zones' + q);
+  renderZones();
+}
+
+function filterZones(f, btn) {
+  allZoneFilter = f;
+  document.querySelectorAll('#page-zones .tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderZones();
+}
+
+function renderZones() {
+  const filtered = allZoneFilter === 'all' ? allZones : allZones.filter(z => z.status === allZoneFilter);
+  const g = document.getElementById('zones-grid');
+  g.innerHTML = filtered.map(z => `
+    <div class="zcard ${z.status}" onclick="">
+      <div class="zname">${z.name}</div>
+      <div class="zmeta">${z.location_name||''} · Floor ${z.floor||'?'}</div>
+      <div style="margin:10px 0">${badge(z.status)}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Every ${z.cleaning_interval_minutes}min${z.last_cleaned_at?' · Last: '+fmtDate(z.last_cleaned_at):''}</div>
+      ${z.overdue_tasks > 0 ? `<div style="font-size:11px;color:var(--red);margin-bottom:8px">⚠️ ${z.overdue_tasks} overdue</div>` : ''}
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="showQR('${z.id}','${z.name}')">QR</button>
+        <button class="btn btn-secondary btn-sm" onclick="editZone(${JSON.stringify(z).split('"').join('&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteZone('${z.id}')">Del</button>
+      </div>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No zones found.</p>';
+}
+
+function openZoneModal(data) {
+  document.getElementById('zone-modal-title').textContent = data ? 'Edit Zone' : 'New Zone';
+  document.getElementById('zone-id').value = data?.id || '';
+  document.getElementById('zone-name').value = data?.name || '';
+  document.getElementById('zone-floor').value = data?.floor || '';
+  document.getElementById('zone-interval').value = data?.cleaning_interval_minutes || 60;
+  const sel = document.getElementById('zone-location');
+  sel.innerHTML = locations.map(l => `<option value="${l.id}"${data?.location_id===l.id?' selected':''}>${l.name}</option>`).join('');
+  openModal('modal-zone');
+}
+
+function editZone(z) {
+  openZoneModal(z);
+}
+
+async function saveZone() {
+  const id = document.getElementById('zone-id').value;
+  const payload = {
+    location_id: document.getElementById('zone-location').value,
+    name: document.getElementById('zone-name').value,
+    floor: document.getElementById('zone-floor').value,
+    type: document.getElementById('zone-type').value,
+    cleaning_interval_minutes: +document.getElementById('zone-interval').value
+  };
+  try {
+    if (id) await api('/zones/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    else await api('/zones', { method: 'POST', body: JSON.stringify(payload) });
+    toast(id ? 'Zone updated' : 'Zone created', 'success');
+    closeModal('modal-zone'); loadZones();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteZone(id) {
+  if (!confirm('Delete this zone?')) return;
+  await api('/zones/' + id, { method: 'DELETE' });
+  toast('Zone deleted', 'success'); loadZones();
+}
+
+async function showQR(id, name) {
+  const data = await api('/zones/' + id + '/qr');
+  document.getElementById('qr-title').textContent = 'QR Code — ' + name;
+  document.getElementById('qr-img').src = data.qr_code;
+  document.getElementById('qr-download').href = data.qr_code;
+  document.getElementById('qr-download').download = `qr-${name}.png`;
+  openModal('modal-qr');
+}
+
+// ── TASKS ─────────────────────────────────────────────────────────────────────
+async function loadTasks() {
+  const q = taskFilter !== 'all' ? `?status=${taskFilter}` : '';
+  allTasks = await api('/tasks' + q);
+  renderTasks();
+}
+
+function filterTasks(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('#page-tasks .tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadTasks();
+}
+
+function renderTasks() {
+  const body = document.getElementById('tasks-body');
+  body.innerHTML = allTasks.map(t => `
+    <tr>
+      <td><strong>${t.zone_name||'—'}</strong><div style="font-size:11px;color:var(--muted)">Floor ${t.floor||'?'}</div></td>
+      <td style="color:var(--muted);font-size:12px">${t.location_name||'—'}</td>
+      <td>${t.staff_name ? `<div style="display:flex;align-items:center;gap:7px">${av(t.staff_name)}<span style="font-size:12px">${t.staff_name}</span></div>` : '<span style="color:var(--muted);font-size:12px">Unassigned</span>'}</td>
+      <td style="font-size:12px">${fmtDate(t.scheduled_at)}</td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${t.duration_minutes ? Math.round(t.duration_minutes)+'m' : '—'}</td>
+      <td>${badge(t.status)}${t.is_overdue && t.status!=='completed' ? ' ⚠️' : ''}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          ${t.status==='pending' ? `<button class="btn btn-secondary btn-sm" onclick="taskAction('${t.id}','start')">Start</button>` : ''}
+          ${t.status==='in-progress' ? `<button class="btn btn-primary btn-sm" onclick="taskAction('${t.id}','complete')">Complete</button>` : ''}
+          ${(t.status==='pending'||t.status==='in-progress') ? `<button class="btn btn-danger btn-sm" onclick="taskAction('${t.id}','miss')">Miss</button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No tasks found.</td></tr>';
+}
+
+async function taskAction(id, act) {
+  try {
+    await api(`/tasks/${id}/${act}`, { method: 'PUT', body: JSON.stringify({}) });
+    toast(`Task ${act}ed`, 'success'); loadTasks();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function openTaskModal() {
+  const zones = await api('/zones');
+  const staff = await api('/users?role=staff');
+  document.getElementById('task-zone').innerHTML = `<option value="">Select zone…</option>` + zones.map(z => `<option value="${z.id}">${z.name} (${z.location_name||''})</option>`).join('');
+  document.getElementById('task-staff').innerHTML = `<option value="">Auto-assign</option>` + staff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  const now = new Date(); now.setMinutes(0,0,0);
+  document.getElementById('task-scheduled').value = now.toISOString().slice(0,16);
+  openModal('modal-task');
+}
+
+async function saveTask() {
+  try {
+    await api('/tasks', { method: 'POST', body: JSON.stringify({
+      zone_id: document.getElementById('task-zone').value,
+      assigned_to: document.getElementById('task-staff').value || null,
+      scheduled_at: document.getElementById('task-scheduled').value
+    })});
+    toast('Task created', 'success'); closeModal('modal-task'); loadTasks();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ── STAFF ─────────────────────────────────────────────────────────────────────
+let staffPerf = [];
+async function loadStaff() {
+  const [users, perf] = await Promise.all([ api('/users'), api('/analytics/staff') ]);
+  staffPerf = perf;
+  const body = document.getElementById('staff-body');
+  body.innerHTML = users.map(u => {
+    const p = perf.find(x => x.id === u.id) || {};
+    const loc = locations.find(l => l.id === u.location_id);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">${av(u.name)}<div>
+        <div style="font-weight:700;font-size:13px">${u.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${u.email}</div>
+        ${u.phone ? `<div style="font-size:11px;color:var(--muted)">${u.phone}</div>` : ''}
+      </div></div></td>
+      <td>${badge(u.role)}</td>
+      <td style="color:var(--muted);font-size:12px">${loc?.name||'—'}</td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${p.total_tasks||0}</td>
+      <td>${p.compliance_pct !== undefined ? pbar(p.compliance_pct) : '—'}</td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${p.avg_duration ? Math.round(p.avg_duration)+'m' : '—'}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-secondary btn-sm" onclick="editStaff(${JSON.stringify(u).split('"').join('&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="disableStaff('${u.id}')">Disable</button>
+      </div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No staff found.</td></tr>';
+}
+
+function openStaffModal() {
+  document.getElementById('staff-modal-title').textContent = 'Add Staff';
+  document.getElementById('staff-id').value = '';
+  ['staff-name','staff-email','staff-phone','staff-password'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('staff-role').value = 'staff';
+  document.getElementById('staff-pw-group').style.display = 'block';
+  document.getElementById('staff-location').innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+  openModal('modal-staff');
+}
+
+function editStaff(u) {
+  document.getElementById('staff-modal-title').textContent = 'Edit Staff';
+  document.getElementById('staff-id').value = u.id;
+  document.getElementById('staff-name').value = u.name;
+  document.getElementById('staff-email').value = u.email;
+  document.getElementById('staff-phone').value = u.phone||'';
+  document.getElementById('staff-role').value = u.role;
+  document.getElementById('staff-pw-group').style.display = 'none';
+  document.getElementById('staff-location').innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}"${u.location_id===l.id?' selected':''}>${l.name}</option>`).join('');
+  openModal('modal-staff');
+}
+
+async function saveStaff() {
+  const id = document.getElementById('staff-id').value;
+  const payload = {
+    name: document.getElementById('staff-name').value,
+    email: document.getElementById('staff-email').value,
+    phone: document.getElementById('staff-phone').value,
+    role: document.getElementById('staff-role').value,
+    location_id: document.getElementById('staff-location').value || null
+  };
+  if (!id) payload.password = document.getElementById('staff-password').value;
+  try {
+    if (id) await api('/users/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    else await api('/users', { method: 'POST', body: JSON.stringify(payload) });
+    toast(id ? 'Staff updated' : 'Staff added', 'success');
+    closeModal('modal-staff'); loadStaff();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function disableStaff(id) {
+  if (!confirm('Disable this staff member?')) return;
+  await api('/users/' + id, { method: 'DELETE' });
+  toast('Staff deactivated', 'success'); loadStaff();
+}
+
+// ── LOCATIONS ─────────────────────────────────────────────────────────────────
+async function loadLocations() {
+  locations = await api('/locations');
+  const g = document.getElementById('locations-grid');
+  if (!g) return;
+  g.innerHTML = locations.map(l => `
+    <div class="card">
+      <div style="font-size:32px;margin-bottom:12px">🏢</div>
+      <div style="font-weight:800;font-size:16px;margin-bottom:4px">${l.name}</div>
+      <div style="color:var(--muted);font-size:12px;margin-bottom:14px">${[l.address,l.city,l.country].filter(Boolean).join(', ')||'No address'}</div>
+      <div style="display:flex;gap:18px;margin-bottom:16px">
+        <div style="text-align:center"><div style="font-family:'Courier New',monospace;font-size:22px;font-weight:800;color:var(--primary)">${l.zone_count||0}</div><div style="font-size:11px;color:var(--muted)">Zones</div></div>
+        <div style="text-align:center"><div style="font-family:'Courier New',monospace;font-size:22px;font-weight:800;color:var(--green)">${l.staff_count||0}</div><div style="font-size:11px;color:var(--muted)">Staff</div></div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteLoc('${l.id}')">Remove</button>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No locations yet.</p>';
+
+  // Update dropdowns
+  const fillSelect = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const curr = el.value;
+    el.innerHTML = `<option value="">All Locations</option>` + locations.map(l => `<option value="${l.id}"${curr===l.id?' selected':''}>${l.name}</option>`).join('');
+  };
+  ['zone-loc-filter','report-loc-filter'].forEach(fillSelect);
+
+  const staffLocEl = document.getElementById('staff-location');
+  if (staffLocEl) staffLocEl.innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+function openLocModal() { ['loc-name','loc-address','loc-city','loc-country'].forEach(id => document.getElementById(id).value=''); openModal('modal-loc'); }
+
+async function saveLoc() {
+  try {
+    await api('/locations', { method:'POST', body: JSON.stringify({
+      name: document.getElementById('loc-name').value,
+      address: document.getElementById('loc-address').value,
+      city: document.getElementById('loc-city').value,
+      country: document.getElementById('loc-country').value
+    })});
+    toast('Location added', 'success'); closeModal('modal-loc'); loadLocations();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteLoc(id) {
+  if (!confirm('Delete this location?')) return;
+  await api('/locations/' + id, { method: 'DELETE' });
+  toast('Deleted', 'success'); loadLocations();
+}
+
+// ── LOGS ──────────────────────────────────────────────────────────────────────
+async function loadLogs() {
+  const zid = document.getElementById('log-zone-filter').value;
+  const q = zid ? `?zone_id=${zid}` : '';
+  const logs = await api('/logs' + q);
+  const zones = await api('/zones');
+  document.getElementById('log-zone-filter').innerHTML = `<option value="">All Zones</option>` + zones.map(z => `<option value="${z.id}"${zid===z.id?' selected':''}>${z.name}</option>`).join('');
+  document.getElementById('logs-body').innerHTML = logs.map(l => `
+    <tr>
+      <td><strong>${l.zone_name||'—'}</strong></td>
+      <td>${l.staff_name||'—'}</td>
+      <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
+      <td>${l.after_photo ? `<span style="font-size:12px;color:var(--green)">📷 After</span>` : '—'}${l.before_photo ? `<span style="font-size:12px;color:var(--muted);margin-left:6px">Before</span>` : ''}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No cleaning logs yet.</td></tr>';
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────────────────────
+async function loadAnalytics() {
+  const [kpis, heatmap, staff, report] = await Promise.all([
+    api('/analytics/kpis'), api('/analytics/heatmap?days=7'),
+    api('/analytics/staff'), api('/analytics/reports?period=' + reportPeriodAlt)
+  ]);
+  document.getElementById('kpi-stats').innerHTML = `
+    <div class="stat blue"><div class="stat-label">7-Day Compliance</div><div class="stat-value">${kpis.compliance_7d||0}%</div></div>
+    <div class="stat green"><div class="stat-label">30-Day Compliance</div><div class="stat-value">${kpis.compliance_30d||0}%</div></div>
+    <div class="stat yellow"><div class="stat-label">Avg Duration (30d)</div><div class="stat-value">${kpis.avg_duration_30d||'--'}<span style="font-size:14px">m</span></div></div>
+    <div class="stat red"><div class="stat-label">Predictive Warnings</div><div class="stat-value">${(kpis.predictive_warnings||[]).length}</div></div>
+  `;
+  // Compliance chart 2
+  const rdata = report.slice(0,20).reverse();
+  if (comp2Chart) comp2Chart.destroy();
+  comp2Chart = new Chart(document.getElementById('chart-compliance2'), {
+    type: 'bar',
+    data: { labels: rdata.map(r=>(r.period||'').slice(-5)), datasets:[{ data: rdata.map(r=>r.compliance_pct||0), backgroundColor:'rgba(79,142,247,.8)', borderRadius:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#8890a8',font:{size:10}},grid:{color:'#2e3248'}}, y:{ticks:{color:'#8890a8',font:{size:10}},grid:{color:'#2e3248'},min:0,max:100} } }
+  });
+  // Staff ranking
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('staff-ranking').innerHTML = staff.map((s,i) => `
+    <tr>
+      <td style="font-size:14px">${medals[i]||'#'+(i+1)}</td>
+      <td><div style="display:flex;align-items:center;gap:7px">${av(s.name)}<span style="font-size:13px">${s.name}</span></div></td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${s.total_tasks||0}</td>
+      <td>${pbar(s.compliance_pct||0)}</td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${s.avg_duration?Math.round(s.avg_duration)+'m':'—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No data.</td></tr>';
+  // Heatmap
+  const maxMiss = Math.max(...heatmap.map(z=>z.missed_count||0), 1);
+  document.getElementById('heatmap-list').innerHTML = heatmap.map(z => {
+    const pct = (z.missed_count||0)/maxMiss;
+    const col = pct>0.7?'var(--red)':pct>0.4?'var(--orange)':pct>0.2?'var(--yellow)':'var(--green)';
+    return `<div class="hm-row">
+      <div class="hm-name" title="${z.name} (${z.location_name||''})">${z.name}</div>
+      <div class="hm-track"><div class="hm-fill" style="width:${maxMiss>0?(z.missed_count||0)/maxMiss*100:0}%;background:${col}"></div></div>
+      <div class="hm-lbl">${z.missed_count||0}x</div>
+      ${badge(z.current_status||'pending')}
+      <span style="width:45px;text-align:right;font-size:11px;color:var(--muted);font-family:'Courier New',monospace">${z.compliance_pct??0}%</span>
+    </div>`;
+  }).join('') || '<p style="color:var(--muted);font-size:13px">No data yet.</p>';
+}
+
+function setReportPeriod(p, btn) {
+  reportPeriodAlt = p;
+  ['daily','weekly','monthly'].forEach(x => {
+    const el = document.getElementById('rpd-'+x);
+    el.style.background = x===p ? 'var(--primary)' : 'transparent';
+    el.style.color = x===p ? '#fff' : 'var(--muted)';
+  });
+  loadAnalytics();
+}
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+let reportData = [];
+async function loadReports() {
+  const loc = document.getElementById('report-loc-filter').value;
+  const q = [`period=${reportPeriod}`, loc ? `location_id=${loc}` : ''].filter(Boolean).join('&');
+  reportData = await api('/analytics/reports?' + q);
+  document.getElementById('reports-body').innerHTML = reportData.map(r => `
+    <tr>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${r.period}</td>
+      <td>${r.total}</td>
+      <td style="color:var(--green)">${r.completed}</td>
+      <td style="color:${(r.missed||0)>0?'var(--red)':'var(--muted)'}">${r.missed||0}</td>
+      <td>${pbar(r.compliance_pct||0)}</td>
+      <td style="font-family:'Courier New',monospace;font-size:12px">${r.avg_duration?Math.round(r.avg_duration)+'m':'—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No report data yet.</td></tr>';
+}
+
+function setReportTab(p, btn) {
+  reportPeriod = p;
+  document.querySelectorAll('#page-reports .tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadReports();
+}
+
+function exportCSV() {
+  const headers = ['Period','Total','Completed','Missed','Compliance %','Avg Duration (min)'];
+  const rows = reportData.map(r => [r.period,r.total,r.completed,r.missed||0,r.compliance_pct||0,r.avg_duration?Math.round(r.avg_duration):'']);
+  const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'cleantrack_report.csv'; a.click();
+  toast('CSV exported', 'success');
+}
+
+// ── ALERTS ────────────────────────────────────────────────────────────────────
+async function loadAlerts() {
+  const q = alertFilter==='unread' ? '?is_read=false' : alertFilter==='critical' ? '?severity=critical' : '';
+  allAlerts = await api('/alerts' + q);
+  const div = document.getElementById('alerts-list');
+  div.innerHTML = allAlerts.map(a => `
+    <div class="alert-item ${a.severity}" style="${a.is_read?'opacity:.6':''}">
+      <div style="flex:1">
+        <div class="ai-msg">${a.message}</div>
+        <div class="ai-time">${a.zone_name?a.zone_name+' · ':''}${fmtDate(a.created_at)} · ${badge(a.severity)}</div>
+      </div>
+      ${!a.is_read ? `<button class="btn btn-secondary btn-sm" onclick="markRead('${a.id}')">Dismiss</button>` : ''}
+    </div>
+  `).join('') || `<div class="card"><p style="color:var(--muted);text-align:center;padding:20px">No alerts. ✓</p></div>`;
+}
+
+function filterAlerts(f, btn) {
+  alertFilter = f;
+  document.querySelectorAll('#page-alerts .tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadAlerts();
+}
+
+async function markRead(id) {
+  await api('/alerts/'+id+'/read', { method:'PUT', body:'{}' });
+  loadAlerts(); loadAlertBadge();
+}
+
+async function markAllRead() {
+  await api('/alerts/read-all', { method:'PUT', body:'{}' });
+  toast('All alerts cleared', 'success'); loadAlerts(); loadAlertBadge();
+}
+
+// ── CLOSE OVERLAY ON BG CLICK ─────────────────────────────────────────────────
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-page').classList.contains('show')) doLogin(); });
+if (token && currentUser) initApp();
+</script>
+</body>
+</html>
