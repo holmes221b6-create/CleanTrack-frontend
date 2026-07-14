@@ -606,7 +606,7 @@ function initApp() {
 
 async function loadAlertBadge() {
   try {
-    const data = await api('/alerts?is_read=false');
+    const data = await api('/api/alerts?is_read=false');
     const cnt = data.length;
     const badge = document.getElementById('alert-badge');
     if (cnt > 0) { badge.style.display = 'inline'; badge.textContent = cnt; }
@@ -634,9 +634,9 @@ function showPage(page) {
 async function loadDashboard() {
   try {
     const [dash, kpis, report] = await Promise.all([
-      api('/analytics/dashboard'),
-      api('/analytics/kpis'),
-      api('/analytics/reports?period=daily')
+      api('/api/analytics/dashboard'),
+      api('/api/analytics/kpis'),
+      api('/api/analytics/reports?period=daily')
     ]);
     const z = dash.zones || {}, t = dash.today || {};
     document.getElementById('dash-stats').innerHTML = `
@@ -707,7 +707,7 @@ async function loadDashboard() {
 async function loadZones() {
   const locId = document.getElementById('zone-loc-filter').value;
   const q = locId ? `?location_id=${locId}` : '';
-  allZones = await api('/zones' + q);
+  allZones = await api('/api/zones' + q);
   renderZones();
 }
 
@@ -976,8 +976,8 @@ async function deleteLoc(id) {
 async function loadLogs() {
   const zid = document.getElementById('log-zone-filter').value;
   const q = zid ? `?zone_id=${zid}` : '';
-  const logs = await api('/logs' + q);
-  const zones = await api('/zones');
+  const logs = await api('/api/logs' + q);
+  const zones = await api('/api/zones');
   document.getElementById('log-zone-filter').innerHTML = `<option value="">All Zones</option>` + zones.map(z => `<option value="${z.id}"${zid===z.id?' selected':''}>${z.name}</option>`).join('');
   document.getElementById('logs-body').innerHTML = logs.map(l => `
     <tr>
@@ -1106,12 +1106,12 @@ function filterAlerts(f, btn) {
 }
 
 async function markRead(id) {
-  await api('/alerts/'+id+'/read', { method:'PUT', body:'{}' });
+  await api('/api/alerts/'+id+'/read', { method:'PUT', body:'{}' });
   loadAlerts(); loadAlertBadge();
 }
 
 async function markAllRead() {
-  await api('/alerts/read-all', { method:'PUT', body:'{}' });
+  await api('/api/alerts/read-all', { method:'PUT', body:'{}' });
   toast('All alerts cleared', 'success'); loadAlerts(); loadAlertBadge();
 }
 
