@@ -959,6 +959,7 @@ async function deleteLoc(id) {
 
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
+console.log("LOAD LOGS STARTED");
   const zid = document.getElementById('log-zone-filter').value;
   const q = zid ? `?zone_id=${zid}` : '';
   const logs = await api('/api/logs' + q);
