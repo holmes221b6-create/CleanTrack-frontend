@@ -525,7 +525,7 @@ let compChart = null, pieChart = null, comp2Chart = null;
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 async function api(path, opts = {}) {
-  const res = await fetch(API + path, {
+  const res = await fetch(API_URL + path, {
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(opts.headers || {}) },
     ...opts
   });
