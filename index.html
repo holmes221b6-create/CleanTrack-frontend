@@ -683,7 +683,7 @@ async function loadDashboard() {
 
     // Zone list
     const zonesDiv = document.getElementById('dash-zones');
-    const zl = await api('/zones');
+    const zl = await api('/api/zones');
     zonesDiv.innerHTML = zl.slice(0,10).map(z =>
       `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;align-items:center;gap:8px">
@@ -762,8 +762,8 @@ async function saveZone() {
     cleaning_interval_minutes: +document.getElementById('zone-interval').value
   };
   try {
-    if (id) await api('/zones/' + id, { method: 'PUT', body: JSON.stringify(payload) });
-    else await api('/zones', { method: 'POST', body: JSON.stringify(payload) });
+    if (id) await api('/api/zones/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    else await api('/api/zones', { method: 'POST', body: JSON.stringify(payload) });
     toast(id ? 'Zone updated' : 'Zone created', 'success');
     closeModal('modal-zone'); loadZones();
   } catch(e) { toast(e.message, 'error'); }
@@ -771,12 +771,12 @@ async function saveZone() {
 
 async function deleteZone(id) {
   if (!confirm('Delete this zone?')) return;
-  await api('/zones/' + id, { method: 'DELETE' });
+  await api('/api/zones/' + id, { method: 'DELETE' });
   toast('Zone deleted', 'success'); loadZones();
 }
 
 async function showQR(id, name) {
-  const data = await api('/zones/' + id + '/qr');
+  const data = await api('/api/zones/' + id + '/qr');
   document.getElementById('qr-title').textContent = 'QR Code — ' + name;
   document.getElementById('qr-img').src = data.qr_code;
   document.getElementById('qr-download').href = data.qr_code;
@@ -787,7 +787,7 @@ async function showQR(id, name) {
 // ── TASKS ─────────────────────────────────────────────────────────────────────
 async function loadTasks() {
   const q = taskFilter !== 'all' ? `?status=${taskFilter}` : '';
-  allTasks = await api('/tasks' + q);
+  allTasks = await api('/api/tasks' + q);
   renderTasks();
 }
 
@@ -821,14 +821,14 @@ function renderTasks() {
 
 async function taskAction(id, act) {
   try {
-    await api(`/tasks/${id}/${act}`, { method: 'PUT', body: JSON.stringify({}) });
+    await api(`/api/tasks/${id}/${act}`, { method: 'PUT', body: JSON.stringify({}) });
     toast(`Task ${act}ed`, 'success'); loadTasks();
   } catch(e) { toast(e.message, 'error'); }
 }
 
 async function openTaskModal() {
-  const zones = await api('/zones');
-  const staff = await api('/users?role=staff');
+  const zones = await api('/api/zones');
+  const staff = await api('/api/users?role=staff');
   document.getElementById('task-zone').innerHTML = `<option value="">Select zone…</option>` + zones.map(z => `<option value="${z.id}">${z.name} (${z.location_name||''})</option>`).join('');
   document.getElementById('task-staff').innerHTML = `<option value="">Auto-assign</option>` + staff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
   const now = new Date(); now.setMinutes(0,0,0);
@@ -838,7 +838,7 @@ async function openTaskModal() {
 
 async function saveTask() {
   try {
-    await api('/tasks', { method: 'POST', body: JSON.stringify({
+    await api('/api/tasks', { method: 'POST', body: JSON.stringify({
       zone_id: document.getElementById('task-zone').value,
       assigned_to: document.getElementById('task-staff').value || null,
       scheduled_at: document.getElementById('task-scheduled').value
@@ -850,7 +850,7 @@ async function saveTask() {
 // ── STAFF ─────────────────────────────────────────────────────────────────────
 let staffPerf = [];
 async function loadStaff() {
-  const [users, perf] = await Promise.all([ api('/users'), api('/analytics/staff') ]);
+  const [users, perf] = await Promise.all([ api('/api/users'), api('/api/analytics/staff') ]);
   staffPerf = perf;
   const body = document.getElementById('staff-body');
   body.innerHTML = users.map(u => {
@@ -1052,7 +1052,7 @@ let reportData = [];
 async function loadReports() {
   const loc = document.getElementById('report-loc-filter').value;
   const q = [`period=${reportPeriod}`, loc ? `location_id=${loc}` : ''].filter(Boolean).join('&');
-  reportData = await api('/analytics/reports?' + q);
+  reportData = await api('/api/analytics/reports?' + q);
   document.getElementById('reports-body').innerHTML = reportData.map(r => `
     <tr>
       <td style="font-family:'Courier New',monospace;font-size:12px">${r.period}</td>
@@ -1085,7 +1085,7 @@ function exportCSV() {
 // ── ALERTS ────────────────────────────────────────────────────────────────────
 async function loadAlerts() {
   const q = alertFilter==='unread' ? '?is_read=false' : alertFilter==='critical' ? '?severity=critical' : '';
-  allAlerts = await api('/alerts' + q);
+  allAlerts = await api('/api/alerts' + q);
   const div = document.getElementById('alerts-list');
   div.innerHTML = allAlerts.map(a => `
     <div class="alert-item ${a.severity}" style="${a.is_read?'opacity:.6':''}">
