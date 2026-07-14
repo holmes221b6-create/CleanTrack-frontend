@@ -908,8 +908,8 @@ async function saveStaff() {
   };
   if (!id) payload.password = document.getElementById('staff-password').value;
   try {
-    if (id) await api('/users/' + id, { method: 'PUT', body: JSON.stringify(payload) });
-    else await api('/users', { method: 'POST', body: JSON.stringify(payload) });
+    if (id) await api('/api/users/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    else await api('/api/users', { method: 'POST', body: JSON.stringify(payload) });
     toast(id ? 'Staff updated' : 'Staff added', 'success');
     closeModal('modal-staff'); loadStaff();
   } catch(e) { toast(e.message, 'error'); }
@@ -917,13 +917,13 @@ async function saveStaff() {
 
 async function disableStaff(id) {
   if (!confirm('Disable this staff member?')) return;
-  await api('/users/' + id, { method: 'DELETE' });
+  await api('/api/users/' + id, { method: 'DELETE' });
   toast('Staff deactivated', 'success'); loadStaff();
 }
 
 // ── LOCATIONS ─────────────────────────────────────────────────────────────────
 async function loadLocations() {
-  locations = await api('/locations');
+  locations = await api('/api/locations');
   const g = document.getElementById('locations-grid');
   if (!g) return;
   g.innerHTML = locations.map(l => `
@@ -956,7 +956,7 @@ function openLocModal() { ['loc-name','loc-address','loc-city','loc-country'].fo
 
 async function saveLoc() {
   try {
-    await api('/locations', { method:'POST', body: JSON.stringify({
+    await api('/api/locations', { method:'POST', body: JSON.stringify({
       name: document.getElementById('loc-name').value,
       address: document.getElementById('loc-address').value,
       city: document.getElementById('loc-city').value,
@@ -968,7 +968,7 @@ async function saveLoc() {
 
 async function deleteLoc(id) {
   if (!confirm('Delete this location?')) return;
-  await api('/locations/' + id, { method: 'DELETE' });
+  await api('/api/locations/' + id, { method: 'DELETE' });
   toast('Deleted', 'success'); loadLocations();
 }
 
