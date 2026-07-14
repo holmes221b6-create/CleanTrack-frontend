@@ -994,8 +994,8 @@ async function loadLogs() {
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 async function loadAnalytics() {
   const [kpis, heatmap, staff, report] = await Promise.all([
-    api('/analytics/kpis'), api('/analytics/heatmap?days=7'),
-    api('/analytics/staff'), api('/analytics/reports?period=' + reportPeriodAlt)
+    api('/api/analytics/kpis'), api('/api/analytics/heatmap?days=7'),
+    api('/api/analytics/staff'), api('/api/analytics/reports?period=' + reportPeriodAlt)
   ]);
   document.getElementById('kpi-stats').innerHTML = `
     <div class="stat blue"><div class="stat-label">7-Day Compliance</div><div class="stat-value">${kpis.compliance_7d||0}%</div></div>
