@@ -960,11 +960,15 @@ async function deleteLoc(id) {
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
 console.log("LOAD LOGS STARTED");
-  const zid = document.getElementById('log-zone-filter').value;
+  const filter = document.getElementById('log-zone-filter');
+const zid = filter ? filter.value : '';
   const q = zid ? `?zone_id=${zid}` : '';
   const logs = await api('/api/logs' + q);
   const zones = await api('/api/zones');
-  document.getElementById('log-zone-filter').innerHTML = `<option value="">All Zones</option>` + zones.map(z => `<option value="${z.id}"${zid===z.id?' selected':''}>${z.name}</option>`).join('');
+  if (filter) {
+  filter.innerHTML = `<option value="">All Zones</option>` +
+    zones.map(z => `<option value="${z.id}"${zid===z.id?' selected':''}>${z.name}</option>`).join('');
+}
   document.getElementById('logs-body').innerHTML = logs.map(l => `
     <tr>
       <td><strong>${l.zone_name||'—'}</strong></td>
