@@ -987,19 +987,37 @@ async function deleteLoc(id) {
   if (!confirm('Delete this location?')) return;
   await api('/api/locations/' + id, { method: 'DELETE' });
   toast('Deleted', 'success'); loadLocations();
-}
-
+  }
 // ── LOGS ──────────────────────────────────────────────────────────────────────
-logsBody.innerHTML = logs.map(l => `
-  <tr>
-    <td><strong>${l.zone_name||'—'}</strong></td>
-    <td>${l.staff_name||'—'}</td>
-    <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
-    <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
-    <td>${l.after_photo ? '📷 After' : '—'}${l.before_photo ? ' Before' : ''}</td>
-    <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
-  </tr>
-`).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
+async function loadLogs() {
+  console.log("LOAD LOGS STARTED");
+
+  const filter = document.getElementById('log-zone-filter');
+  const logsBody = document.getElementById('logs-body');
+
+  if (!filter || !logsBody) return;
+
+  const zid = filter.value;
+  const q = zid ? `?zone_id=${zid}` : '';
+
+  const logs = await api('/api/logs' + q);
+  const zones = await api('/api/zones');
+
+  filter.innerHTML =
+    `<option value="">All Zones</option>` +
+    zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+
+  logsBody.innerHTML = logs.map(l => `
+    <tr>
+      <td><strong>${l.zone_name||'—'}</strong></td>
+      <td>${l.staff_name||'—'}</td>
+      <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
+      <td>${l.after_photo ? '📷 After' : '—'}${l.before_photo ? ' Before' : ''}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
+}
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 async function loadAnalytics() {
