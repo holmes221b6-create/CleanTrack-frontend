@@ -351,6 +351,38 @@ select.fc option{background:var(--surface)}
       </div>
       <div class="g3" id="locations-grid"></div>
     </div>
+    <!-- LOGS -->
+<div id="page-logs" class="page">
+  <div class="ph">
+    <h1>Cleaning Logs</h1>
+    <p>View completed cleaning activities</p>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <select class="fc" id="log-zone-filter" onchange="loadLogs()">
+      <option value="">All Zones</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Staff</th>
+            <th>Score</th>
+            <th>Feedback</th>
+            <th>Photos</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="logs-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
     <!-- ANALYTICS -->
     <div id="page-analytics" class="page">
       <div class="ph"><h1>Analytics & Insights</h1><p>KPIs, heatmaps, and performance metrics</p></div>
