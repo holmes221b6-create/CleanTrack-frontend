@@ -959,26 +959,34 @@ async function deleteLoc(id) {
 
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
-console.log("LOAD LOGS STARTED");
+  console.log("LOAD LOGS STARTED");
+
   const filter = document.getElementById('log-zone-filter');
-const zid = filter ? filter.value : '';
+  const logsBody = document.getElementById('logs-body');
+
+  console.log("filter =", filter);
+  console.log("logsBody =", logsBody);
+
+  if (!filter) {
+    console.log("FILTER NOT FOUND");
+    return;
+  }
+
+  if (!logsBody) {
+    console.log("LOGS BODY NOT FOUND");
+    return;
+  }
+
+  const zid = filter.value;
   const q = zid ? `?zone_id=${zid}` : '';
+
   const logs = await api('/api/logs' + q);
   const zones = await api('/api/zones');
-  if (filter) {
+
   filter.innerHTML = `<option value="">All Zones</option>` +
-    zones.map(z => `<option value="${z.id}"${zid===z.id?' selected':''}>${z.name}</option>`).join('');
-}
-  document.getElementById('logs-body').innerHTML = logs.map(l => `
-    <tr>
-      <td><strong>${l.zone_name||'—'}</strong></td>
-      <td>${l.staff_name||'—'}</td>
-      <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
-      <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
-      <td>${l.after_photo ? `<span style="font-size:12px;color:var(--green)">📷 After</span>` : '—'}${l.before_photo ? `<span style="font-size:12px;color:var(--muted);margin-left:6px">Before</span>` : ''}</td>
-      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No cleaning logs yet.</td></tr>';
+    zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+
+  logsBody.innerHTML = "TEST";
 }
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
