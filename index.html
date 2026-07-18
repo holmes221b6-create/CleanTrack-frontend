@@ -421,6 +421,9 @@ select.fc option{background:var(--surface)}
 
     <!-- REPORTS -->
     <div id="page-reports" class="page">
+    <button onclick="downloadPDF()">
+    Download PDF Report
+</button>
       <div class="ph ph-row">
         <div><h1>Reports</h1><p>Daily, weekly, and monthly cleaning compliance</p></div>
         <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
@@ -1117,6 +1120,41 @@ function exportCSV() {
   toast('CSV exported', 'success');
 }
 
+async function downloadPDF() {
+    try {
+        const response = await fetch(
+            API_URL + "/api/reports/pdf",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            alert("Failed to generate PDF");
+            return;
+        }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "cleantrack_report.pdf";
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error(err);
+        alert("PDF download failed");
+    }
+}
 // ── ALERTS ────────────────────────────────────────────────────────────────────
 async function loadAlerts() {
   const q = alertFilter==='unread' ? '?is_read=false' : alertFilter==='critical' ? '?severity=critical' : '';
