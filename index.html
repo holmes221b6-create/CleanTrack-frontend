@@ -1113,12 +1113,21 @@ async function loadLogs() {
       <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
       <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
       <td>
-  ${l.after_photo
-    ? `<a href="${API_URL}/uploads/${l.after_photo}" target="_blank">📷 After</a>`
+  <td>
+  ${l.before_photo ?
+    `<img src="${API_URL}/uploads/${l.before_photo}"
+          width="60"
+          style="border-radius:6px;margin-right:5px;cursor:pointer"
+          onclick="window.open('${API_URL}/uploads/${l.before_photo}')">`
     : '—'}
-  ${l.before_photo
-    ? ` <a href="${API_URL}/uploads/${l.before_photo}" target="_blank">📷 Before</a>`
+
+  ${l.after_photo ?
+    `<img src="${API_URL}/uploads/${l.after_photo}"
+          width="60"
+          style="border-radius:6px;cursor:pointer"
+          onclick="window.open('${API_URL}/uploads/${l.after_photo}')">`
     : ''}
+</td>
 </td>
       <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
     </tr>
