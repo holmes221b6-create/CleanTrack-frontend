@@ -531,6 +531,40 @@ select.fc option{background:var(--surface)}
   </div>
 </div>
 
+<div class="overlay" id="modal-complete">
+  <div class="modal">
+    <div class="mh">
+      <h2>Complete Task</h2>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-complete')">✕</button>
+    </div>
+
+    <div class="mb">
+      <input type="hidden" id="complete-task-id">
+      <input type="hidden" id="complete-zone-id">
+
+      <div class="fg">
+        <label class="fl">Before Photo</label>
+        <input class="fc" type="file" id="before-photo" accept="image/*">
+      </div>
+
+      <div class="fg">
+        <label class="fl">After Photo</label>
+        <input class="fc" type="file" id="after-photo" accept="image/*">
+      </div>
+
+      <div class="fg">
+        <label class="fl">Notes</label>
+        <textarea class="fc" id="log-notes" rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeModal('modal-complete')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCleaningLog()">Submit</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const API_URL = "https://cleantrack-1tv6.onrender.com";
@@ -831,12 +865,74 @@ function renderTasks() {
       <td>
         <div style="display:flex;gap:4px">
           ${t.status==='pending' ? `<button class="btn btn-secondary btn-sm" onclick="taskAction('${t.id}','start')">Start</button>` : ''}
-          ${t.status==='in-progress' ? `<button class="btn btn-primary btn-sm" onclick="taskAction('${t.id}','complete')">Complete</button>` : ''}
+          ${t.status==='in-progress'
+ ? `<button class="btn btn-primary btn-sm" onclick="openCompleteModal('${t.id}','${t.zone_id}')">Complete</button>`
+ : ''}
           ${(t.status==='pending'||t.status==='in-progress') ? `<button class="btn btn-danger btn-sm" onclick="taskAction('${t.id}','miss')">Miss</button>` : ''}
         </div>
       </td>
     </tr>
   `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No tasks found.</td></tr>';
+}
+function openCompleteModal(taskId, zoneId) {
+  document.getElementById('complete-task-id').value = taskId;
+  document.getElementById('complete-zone-id').value = zoneId;
+
+  document.getElementById('before-photo').value = '';
+  document.getElementById('after-photo').value = '';
+  document.getElementById('log-notes').value = '';
+
+  openModal('modal-complete');
+}
+async function submitCleaningLog() {
+  try {
+    const fd = new FormData();
+
+    fd.append('task_id',
+      document.getElementById('complete-task-id').value);
+
+    fd.append('zone_id',
+      document.getElementById('complete-zone-id').value);
+
+    fd.append('notes',
+      document.getElementById('log-notes').value);
+
+    const before =
+      document.getElementById('before-photo').files[0];
+
+    const after =
+      document.getElementById('after-photo').files[0];
+
+    if (before)
+      fd.append('before_photo', before);
+
+    if (after)
+      fd.append('after_photo', after);
+
+    const res = await fetch(
+      API_URL + '/api/logs',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: fd
+      }
+    );
+
+    if (!res.ok)
+      throw new Error('Upload failed');
+
+    toast('Cleaning log saved', 'success');
+
+    closeModal('modal-complete');
+
+    loadTasks();
+    loadLogs();
+
+  } catch (e) {
+    toast(e.message, 'error');
+  }
 }
 
 async function taskAction(id, act) {
