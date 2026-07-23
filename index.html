@@ -564,6 +564,48 @@ select.fc option{background:var(--surface)}
     </div>
   </div>
 </div>
+<div class="overlay" id="modal-photos">
+  <div class="modal">
+
+    <div class="mh">
+      <h2>Cleaning Photos</h2>
+
+      <button
+      class="btn btn-secondary btn-sm"
+      onclick="closeModal('modal-photos')">
+      ✕
+      </button>
+
+    </div>
+
+    <div class="mb">
+
+      <p><strong>Before Photo</strong></p>
+
+      <a id="before-link"
+      target="_blank"
+      class="btn btn-secondary">
+
+      Open Before Photo
+
+      </a>
+
+      <br><br>
+
+      <p><strong>After Photo</strong></p>
+
+      <a id="after-link"
+      target="_blank"
+      class="btn btn-primary">
+
+      Open After Photo
+
+      </a>
+
+    </div>
+
+  </div>
+</div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -1114,19 +1156,17 @@ async function loadLogs() {
       <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
       <td>
   <td>
-  ${l.before_photo ?
-    `<img src="${API_URL}/uploads/${l.before_photo}"
-          width="60"
-          style="border-radius:6px;margin-right:5px;cursor:pointer"
-          onclick="window.open('${API_URL}/uploads/${l.before_photo}')">`
-    : '—'}
+${l.before_photo || l.after_photo ?
 
-  ${l.after_photo ?
-    `<img src="${API_URL}/uploads/${l.after_photo}"
-          width="60"
-          style="border-radius:6px;cursor:pointer"
-          onclick="window.open('${API_URL}/uploads/${l.after_photo}')">`
-    : ''}
+`<button class="btn btn-primary btn-sm"
+onclick="openPhotosModal(
+'${l.before_photo || ""}',
+'${l.after_photo || ""}'
+)">
+View Photos
+</button>`
+
+: '—'}
 </td>
 </td>
       <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
@@ -1301,6 +1341,22 @@ document.querySelectorAll('.overlay').forEach(o => {
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-page').classList.contains('show')) doLogin(); });
 if (token && currentUser) initApp();
+
+function openPhotosModal(before, after){
+
+if(before){
+document.getElementById("before-link").href =
+API_URL + "/uploads/" + before;
+}
+
+if(after){
+document.getElementById("after-link").href =
+API_URL + "/uploads/" + after;
+}
+
+openModal("modal-photos");
+
+}
 </script>
 </body>
 </html>
