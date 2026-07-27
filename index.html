@@ -1190,6 +1190,28 @@ Reject
 
   `).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
 }
+async function approveLog(taskId) {
+  await api(`/api/tasks/${taskId}/approve`, {
+    method: "PUT",
+    body: JSON.stringify({})
+  });
+
+  toast("Task approved", "success");
+  loadLogs();
+  loadTasks();
+}
+
+
+async function rejectLog(taskId) {
+  await api(`/api/tasks/${taskId}/reject`, {
+    method: "PUT",
+    body: JSON.stringify({})
+  });
+
+  toast("Task rejected", "success");
+  loadLogs();
+  loadTasks();
+}
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 async function loadAnalytics() {
