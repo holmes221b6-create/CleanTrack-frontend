@@ -1176,7 +1176,7 @@ ${fmtDate(l.logged_at)}
 
 <td>
 <button class="btn btn-primary btn-sm"
-onclick="alert('Approve button works')"
+onclick="approveLog('${l.task_id}')"
 Approve
 </button>
 
@@ -1191,6 +1191,7 @@ Reject
   `).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
 }
 async function approveLog(taskId) {
+alert("Approve clicked");
   await api(`/api/tasks/${taskId}/approve`, {
     method: "PUT",
     body: JSON.stringify({})
