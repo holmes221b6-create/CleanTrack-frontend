@@ -1167,7 +1167,7 @@ View Photos
 
 : '—'}
 </td>
-      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}
 </td>
 
 <td>
@@ -1368,13 +1368,6 @@ async function markAllRead() {
   toast('All alerts cleared', 'success'); loadAlerts(); loadAlertBadge();
 }
 
-async function approveLog(taskId, zoneId){
-
-}
-
-async function rejectLog(taskId, zoneId){
-
-}
 
 // ── CLOSE OVERLAY ON BG CLICK ─────────────────────────────────────────────────
 document.querySelectorAll('.overlay').forEach(o => {
