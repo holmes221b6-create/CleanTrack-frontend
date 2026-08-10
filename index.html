@@ -335,7 +335,10 @@ select.fc option{background:var(--surface)}
     <div id="page-staff" class="page">
       <div class="ph ph-row">
         <div><h1>Staff Management</h1><p>Housekeeping staff, roles, and performance</p></div>
-        <button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button>
+        <div style="display:flex;gap:8px">
+  <button class="btn btn-secondary" onclick="openEmailModal()">✉ Send Email</button>
+  <button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button>
+</div>
       </div>
       <div class="card"><div class="tw"><table>
         <thead><tr><th>Name</th><th>Role</th><th>Location</th><th>Tasks (30d)</th><th>Compliance</th><th>Avg Time</th><th>Actions</th></tr></thead>
@@ -663,6 +666,40 @@ function pbar(pct, color) {
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openEmailModal(to = '') {
+  document.getElementById('email-to').value = to;
+  document.getElementById('email-subject').value = '';
+  document.getElementById('email-body').value = '';
+  openModal('modal-email');
+}
+
+async function sendEmail() {
+  const to = document.getElementById('email-to').value.trim();
+  const subject = document.getElementById('email-subject').value.trim();
+  const message = document.getElementById('email-body').value.trim();
+
+  if (!to || !subject || !message) {
+    toast('Please fill in all email fields', 'error');
+    return;
+  }
+
+  try {
+    await api('/api/send-email', {
+      method: 'POST',
+      body: JSON.stringify({
+        to,
+        subject,
+        message
+      })
+    });
+
+    toast('Email sent successfully', 'success');
+    closeModal('modal-email');
+
+  } catch (e) {
+    toast(e.message || 'Failed to send email', 'error');
+  }
+}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 async function doLogin() {
@@ -1432,32 +1469,63 @@ openModal("modal-photos");
 }
 
 </script>
-<div id="modal-email" class="modal">
-  <div class="modal-content" style="max-width:650px">
-    <h3 id="email-title">Send Email</h3>
+<div class="overlay" id="modal-email">
+  <div class="modal" style="max-width:650px">
 
-    <label>To</label>
-    <input id="email-to" class="input">
-
-    <label>Subject</label>
-    <input id="email-subject" class="input">
-
-    <label>Message</label>
-    <textarea id="email-body"
-              class="input"
-              rows="10"></textarea>
-
-    <div style="display:flex;gap:10px;margin-top:15px">
-      <button class="btn btn-primary"
-              onclick="sendEmail()">
-        Send
-      </button>
-
-      <button class="btn btn-secondary"
-              onclick="closeModal('modal-email')">
-        Cancel
+    <div class="mh">
+      <h2 id="email-title">Send Email</h2>
+      <button
+        class="btn btn-secondary btn-sm"
+        onclick="closeModal('modal-email')">
+        ✕
       </button>
     </div>
+
+    <div class="mb">
+
+      <div class="fg">
+        <label class="fl">To</label>
+        <input
+          id="email-to"
+          class="fc"
+          type="email"
+          placeholder="recipient@example.com">
+      </div>
+
+      <div class="fg">
+        <label class="fl">Subject</label>
+        <input
+          id="email-subject"
+          class="fc"
+          type="text"
+          placeholder="Email subject">
+      </div>
+
+      <div class="fg">
+        <label class="fl">Message</label>
+        <textarea
+          id="email-body"
+          class="fc"
+          rows="10"
+          placeholder="Write your message..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="mf">
+      <button
+        class="btn btn-secondary"
+        onclick="closeModal('modal-email')">
+        Cancel
+      </button>
+
+      <button
+        class="btn btn-primary"
+        onclick="sendEmail()">
+        ✉ Send Email
+      </button>
+    </div>
+
   </div>
 </div>
 </body>
