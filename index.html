@@ -1209,7 +1209,7 @@ View Photos
 
 <td>
 <button class="btn btn-primary btn-sm"
-onclick="approveLog('${l.task_id}')">
+onclick='approveLog(${JSON.stringify(l.task_id)}, ${JSON.stringify(l.staff_email || "")})'>
 Approve
 </button>
 
@@ -1223,7 +1223,7 @@ Reject
 
   `).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
 }
-async function approveLog(taskId) {
+async function approveLog(taskId, staffEmail) {
 
     document.getElementById("email-title").innerText =
         "Approve Cleaning Log";
@@ -1241,7 +1241,7 @@ Thank you for your work.
 Regards,
 CleanTrack`;
 
-    document.getElementById("email-to").value = "";
+    document.getElementById("email-to").value = staffEmail || "";
 
     window.currentTaskId = taskId;
     window.currentAction = "approve";
@@ -1527,6 +1527,22 @@ openModal("modal-photos");
     </div>
 
   </div>
+# %%
 </div>
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+
 </body>
 </html>
