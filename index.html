@@ -500,7 +500,11 @@ select.fc option{background:var(--surface)}
     <div class="mb">
       <input type="hidden" id="staff-id"/>
       <div class="fg"><label class="fl">Full Name</label><input class="fc" id="staff-name" placeholder="Jane Doe"/></div>
-      <div class="fg"><label class="fl">Email</label><input class="fc" type="email" id="staff-email" placeholder="jane@example.com"/></div>
+      <div class="fg"><label class="fl">Email</label><input class="fc" type="email" id="staff-email" placeholder="Login email"/></div>
+<div class="fg">
+  <label class="fl">Notification Email</label>
+  <input class="fc" type="email" id="staff-notification-email" placeholder="staff.real@gmail.com"/>
+</div>
       <div class="fg"><label class="fl">Phone</label><input class="fc" id="staff-phone" placeholder="+91-9876543210"/></div>
       <div class="fg" id="staff-pw-group"><label class="fl">Password</label><input class="fc" type="password" id="staff-password" placeholder="••••••••"/></div>
       <div class="fg"><label class="fl">Role</label><select class="fc" id="staff-role"><option value="staff">Staff</option><option value="supervisor">Supervisor</option><option value="admin">Admin</option></select></div>
@@ -1073,7 +1077,7 @@ async function loadStaff() {
 function openStaffModal() {
   document.getElementById('staff-modal-title').textContent = 'Add Staff';
   document.getElementById('staff-id').value = '';
-  ['staff-name','staff-email','staff-phone','staff-password'].forEach(id => document.getElementById(id).value = '');
+  ['staff-name','staff-email','staff-notification-email','staff-phone','staff-password'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('staff-role').value = 'staff';
   document.getElementById('staff-pw-group').style.display = 'block';
   document.getElementById('staff-location').innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
@@ -1085,6 +1089,7 @@ function editStaff(u) {
   document.getElementById('staff-id').value = u.id;
   document.getElementById('staff-name').value = u.name;
   document.getElementById('staff-email').value = u.email;
+  document.getElementById('staff-notification-email').value = u.notification_email || '';
   document.getElementById('staff-phone').value = u.phone||'';
   document.getElementById('staff-role').value = u.role;
   document.getElementById('staff-pw-group').style.display = 'none';
@@ -1097,6 +1102,7 @@ async function saveStaff() {
   const payload = {
     name: document.getElementById('staff-name').value,
     email: document.getElementById('staff-email').value,
+    notification_email: document.getElementById('staff-notification-email').value,
     phone: document.getElementById('staff-phone').value,
     role: document.getElementById('staff-role').value,
     location_id: document.getElementById('staff-location').value || null
