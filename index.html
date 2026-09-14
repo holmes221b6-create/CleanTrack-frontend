@@ -2485,6 +2485,8 @@ document.querySelectorAll('.overlay').forEach(o => {
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-page').classList.contains('show')) doLogin(); });
+localStorage.removeItem('ct_token');
+localStorage.removeItem('ct_user');
 if (token && currentUser) initApp();
 
 function openPhotosModal(before, after){
