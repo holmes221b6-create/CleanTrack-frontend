@@ -1120,6 +1120,56 @@ select.fc option{background:var(--surface)}
   }
 }
 
+#login-page.facility-booting .login-card{
+  animation:loginCardAuth .7s ease forwards;
+}
+
+#login-page.facility-booting .facility-zone{
+  animation:zoneAuth .7s ease forwards;
+}
+
+#login-page.facility-booting .facility-scan-line{
+  animation:authScan .7s ease-in-out infinite;
+}
+
+#login-page.facility-authenticated .login-card{
+  box-shadow:
+    0 0 45px rgba(52,201,122,.18),
+    0 25px 80px rgba(0,0,0,.55);
+}
+
+#login-page.facility-authenticated .status-dot{
+  background:#34c97a;
+  box-shadow:0 0 18px rgba(52,201,122,1);
+}
+
+#login-page.facility-exit{
+  animation:facilityExit .6s ease forwards;
+}
+
+@keyframes loginCardAuth{
+  0%{transform:scale(1);filter:brightness(1)}
+  50%{transform:scale(1.02);filter:brightness(1.25)}
+  100%{transform:scale(.98);filter:brightness(1.1)}
+}
+
+@keyframes zoneAuth{
+  0%{filter:brightness(1)}
+  50%{filter:brightness(2)}
+  100%{filter:brightness(1.4)}
+}
+
+@keyframes authScan{
+  0%{transform:translateY(-40px);opacity:0}
+  50%{opacity:1}
+  100%{transform:translateY(40px);opacity:0}
+}
+
+@keyframes facilityExit{
+  0%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.04);filter:blur(8px)}
+}
+
 /* ── toast ── */
 #toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
 .toast{padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;box-shadow:var(--sh);animation:slideIn .25s ease;max-width:340px}
@@ -1735,6 +1785,21 @@ async function sendEmail() {
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+
+function startFacilityBoot() {
+  const loginPage = document.getElementById('login-page');
+
+  loginPage.classList.add('facility-booting');
+
+  setTimeout(() => {
+    loginPage.classList.add('facility-authenticated');
+  }, 700);
+
+  setTimeout(() => {
+    loginPage.classList.add('facility-exit');
+  }, 1500);
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
@@ -1744,7 +1809,11 @@ async function doLogin() {
     currentUser = data.user;
     localStorage.setItem('ct_token', token);
     localStorage.setItem('ct_user', JSON.stringify(data.user));
-    initApp();
+    startFacilityBoot();
+
+setTimeout(() => {
+  initApp();
+}, 1900);
   } catch (e) { toast(e.message, 'error'); }
 }
 
@@ -2564,21 +2633,8 @@ openModal("modal-photos");
     </div>
 
   </div>
-# %%
+
 </div>
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
 
 
 </body>
