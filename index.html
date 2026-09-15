@@ -5759,6 +5759,11 @@ if (predictiveWarnings.length > 0) {
   predictiveCard.style.display = 'none';
   predictiveList.innerHTML = '';
 }
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+    toast(e.message, 'error');
+  }
+}
 
 // ── Facility Atmosphere Parallax ─────────────────────────────────────────────
 
