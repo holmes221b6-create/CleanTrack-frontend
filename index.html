@@ -1181,6 +1181,3182 @@ select.fc option{background:var(--surface)}
 /* ── chart containers ── */
 .chart-wrap{height:240px;position:relative}
 
+/* ═════════════════════════════════════════════════════════════════════════════
+   CLEANTRACK COMMAND CENTER — DASHBOARD
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command{
+  position:relative;
+  overflow:hidden;
+}
+
+.dashboard-command::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:220px;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 20%,rgba(79,142,247,.08),transparent 35%),
+    radial-gradient(circle at 85% 15%,rgba(167,139,250,.055),transparent 32%);
+  mask-image:linear-gradient(to bottom,black,transparent);
+}
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+
+.dashboard-hero{
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid rgba(100,120,160,.12);
+}
+
+.dashboard-hero .ph{
+  margin-bottom:0;
+}
+
+.dashboard-kicker{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+  font-family:monospace;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:rgba(120,155,215,.65);
+}
+
+.kicker-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--primary);
+  box-shadow:0 0 12px rgba(79,142,247,.85);
+  animation:dashboardPulse 2s ease-in-out infinite;
+}
+
+.dashboard-hero h1{
+  margin:0;
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:-.8px;
+  color:#edf2ff;
+  text-shadow:0 0 30px rgba(79,142,247,.08);
+}
+
+.dashboard-hero #dash-date{
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.dashboard-live{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid rgba(52,201,122,.18);
+  background:rgba(52,201,122,.035);
+  border-radius:999px;
+  font-family:monospace;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:rgba(110,220,160,.75);
+  white-space:nowrap;
+}
+
+.live-pulse{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 10px rgba(52,201,122,.8);
+  animation:dashboardPulse 1.7s ease-in-out infinite;
+}
+
+/* ── MAIN CHART GRID ─────────────────────────────────────────────────────── */
+
+.dashboard-main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(300px,.85fr);
+  gap:16px;
+}
+
+.dashboard-chart-card,
+.dashboard-panel{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(100,120,160,.16);
+  background:
+    linear-gradient(145deg,rgba(27,32,46,.94),rgba(17,21,31,.97));
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.dashboard-chart-card::before,
+.dashboard-panel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:10%;
+  right:10%;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.35),
+    transparent
+  );
+  opacity:.7;
+}
+
+.dashboard-chart-card:hover,
+.dashboard-panel:hover{
+  transform:translateY(-2px);
+  border-color:rgba(79,142,247,.25);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.25),
+    0 0 25px rgba(79,142,247,.035);
+}
+
+/* ── CARD HEADERS ────────────────────────────────────────────────────────── */
+
+.card-heading-row,
+.panel-header{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.section-eyebrow{
+  margin-bottom:5px;
+  font-family:monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1.8px;
+  color:rgba(130,155,200,.48);
+}
+
+.card-title{
+  font-weight:650;
+}
+
+.chart-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:monospace;
+  font-size:8px;
+  letter-spacing:1.4px;
+  color:rgba(52,201,122,.62);
+}
+
+.chart-status span{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px rgba(52,201,122,.75);
+  animation:dashboardPulse 1.8s ease-in-out infinite;
+}
+
+/* ── CHART AREA ──────────────────────────────────────────────────────────── */
+
+.dashboard-chart-card .chart-wrap{
+  position:relative;
+  z-index:1;
+  margin-top:8px;
+}
+
+.compliance-card{
+  min-height:300px;
+}
+
+.zone-distribution-card{
+  min-height:300px;
+}
+
+/* ── LOWER GRID ──────────────────────────────────────────────────────────── */
+
+.dashboard-lower-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:16px;
+  margin-top:16px;
+}
+
+.dashboard-panel{
+  min-height:220px;
+}
+
+.dashboard-panel #dash-alerts,
+.dashboard-panel #dash-zones{
+  position:relative;
+  z-index:1;
+  margin-top:14px;
+}
+
+/* ── ALERT ORBIT ─────────────────────────────────────────────────────────── */
+
+.panel-orbit{
+  position:relative;
+  width:30px;
+  height:30px;
+  border:1px solid rgba(240,82,82,.16);
+  border-radius:50%;
+  opacity:.8;
+}
+
+.panel-orbit::before{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border:1px solid rgba(240,82,82,.22);
+  border-radius:50%;
+}
+
+.panel-orbit::after{
+  content:"";
+  position:absolute;
+  top:-2px;
+  left:50%;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:var(--red);
+  box-shadow:0 0 10px rgba(240,82,82,.8);
+  transform-origin:50% 17px;
+  animation:orbitSpin 3.5s linear infinite;
+}
+
+.panel-orbit span{
+  position:absolute;
+  inset:11px;
+  border-radius:50%;
+  background:rgba(240,82,82,.55);
+  box-shadow:0 0 10px rgba(240,82,82,.45);
+}
+
+/* ── ZONE SCANNER ────────────────────────────────────────────────────────── */
+
+.zone-scan-indicator{
+  position:relative;
+  padding:5px 8px;
+  border:1px solid rgba(79,142,247,.15);
+  background:rgba(79,142,247,.035);
+  font-family:monospace;
+  font-size:8px;
+  letter-spacing:1.4px;
+  color:rgba(110,155,225,.55);
+  overflow:hidden;
+}
+
+.zone-scan-indicator::before{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-35%;
+  width:30%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.35),
+    transparent
+  );
+  animation:zoneIndicatorScan 2.8s ease-in-out infinite;
+}
+
+/* ── PREDICTIVE INTELLIGENCE ─────────────────────────────────────────────── */
+
+.predictive-command-card{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(245,200,66,.16);
+  background:
+    linear-gradient(145deg,rgba(32,30,24,.92),rgba(19,21,28,.97));
+}
+
+.predictive-command-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:8%;
+  right:8%;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(245,200,66,.45),
+    transparent
+  );
+}
+
+.predictive-command-card .section-eyebrow{
+  color:rgba(245,200,66,.48);
+}
+
+/* ── MOTION ───────────────────────────────────────────────────────────────── */
+
+@keyframes dashboardPulse{
+  0%,100%{
+    opacity:.45;
+    transform:scale(.85);
+  }
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+@keyframes orbitSpin{
+  from{
+    transform:rotate(0deg);
+  }
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+@keyframes zoneIndicatorScan{
+  0%{
+    left:-35%;
+    opacity:0;
+  }
+  15%{
+    opacity:1;
+  }
+  75%{
+    opacity:1;
+  }
+  100%{
+    left:110%;
+    opacity:0;
+  }
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+
+@media(max-width:900px){
+  .dashboard-main-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dashboard-lower-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:600px){
+  .dashboard-hero{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .dashboard-live{
+    align-self:flex-start;
+  }
+
+  .dashboard-hero h1{
+    font-size:26px;
+  }
+
+  .dashboard-main-grid,
+  .dashboard-lower-grid{
+    gap:12px;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — INTELLIGENCE STAT CARDS
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command #dash-stats{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.dashboard-command #dash-stats .stat{
+  position:relative;
+  overflow:hidden;
+  min-height:112px;
+  padding:18px 18px 16px;
+  border:1px solid rgba(100,120,160,.16);
+  border-radius:var(--r);
+  background:
+    linear-gradient(145deg,rgba(27,32,46,.96),rgba(16,20,30,.98));
+  box-shadow:
+    0 5px 20px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.018);
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+/* top illumination */
+.dashboard-command #dash-stats .stat::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:14%;
+  right:14%;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.55),
+    transparent
+  );
+  opacity:.65;
+}
+
+/* subtle scanning field */
+.dashboard-command #dash-stats .stat::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:-100%;
+  height:80%;
+  background:linear-gradient(
+    to bottom,
+    transparent,
+    rgba(79,142,247,.045),
+    transparent
+  );
+  pointer-events:none;
+  animation:statScan 6s ease-in-out infinite;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(2)::after{
+  animation-delay:1.2s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(3)::after{
+  animation-delay:2.4s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(4)::after{
+  animation-delay:3.6s;
+}
+
+.dashboard-command #dash-stats .stat:hover{
+  transform:translateY(-3px);
+  border-color:rgba(79,142,247,.28);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.28),
+    0 0 25px rgba(79,142,247,.045);
+}
+
+/* preserve whatever stat HTML already exists */
+.dashboard-command #dash-stats .stat > *{
+  position:relative;
+  z-index:2;
+}
+
+/* common number treatment */
+.dashboard-command #dash-stats .stat .stat-value,
+.dashboard-command #dash-stats .stat .value{
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.5px;
+}
+
+/* label */
+.dashboard-command #dash-stats .stat .stat-label,
+.dashboard-command #dash-stats .stat .label{
+  letter-spacing:.8px;
+}
+
+/* individual system identities */
+.dashboard-command #dash-stats .stat:nth-child(1)::before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.65),
+    transparent
+  );
+}
+
+.dashboard-command #dash-stats .stat:nth-child(2)::before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(52,201,122,.65),
+    transparent
+  );
+}
+
+.dashboard-command #dash-stats .stat:nth-child(3)::before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(245,200,66,.65),
+    transparent
+  );
+}
+
+.dashboard-command #dash-stats .stat:nth-child(4)::before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(167,139,250,.65),
+    transparent
+  );
+}
+
+@keyframes statScan{
+  0%,20%{
+    top:-100%;
+    opacity:0;
+  }
+  35%{
+    opacity:1;
+  }
+  70%{
+    opacity:.8;
+  }
+  100%{
+    top:130%;
+    opacity:0;
+  }
+}
+
+@media(max-width:900px){
+  .dashboard-command #dash-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:600px){
+  .dashboard-command #dash-stats{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .dashboard-command #dash-stats .stat{
+    min-height:100px;
+    padding:14px;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — FACILITY INTELLIGENCE BACKDROP
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command{
+  isolation:isolate;
+}
+
+.dashboard-command::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:80px;
+  right:-180px;
+  width:520px;
+  height:520px;
+  border:1px solid rgba(79,142,247,.055);
+  border-radius:50%;
+  box-shadow:
+    0 0 80px rgba(79,142,247,.025),
+    inset 0 0 80px rgba(79,142,247,.018);
+  pointer-events:none;
+  animation:commandOrbit 18s linear infinite;
+}
+
+/* Fine facility grid */
+.dashboard-command > .dashboard-hero::before{
+  content:"";
+  position:absolute;
+  top:-35px;
+  left:-30px;
+  width:520px;
+  height:170px;
+  background:
+    linear-gradient(rgba(79,142,247,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,142,247,.025) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(
+    90deg,
+    black,
+    transparent
+  );
+  pointer-events:none;
+}
+
+/* Tiny command-center coordinates */
+.dashboard-command > .dashboard-hero::after{
+  content:"FACILITY // 01   •   CORE MONITORING   •   SECURE";
+  position:absolute;
+  right:0;
+  top:-28px;
+  font-family:monospace;
+  font-size:7px;
+  letter-spacing:1.4px;
+  color:rgba(110,135,175,.22);
+  pointer-events:none;
+}
+
+@keyframes commandOrbit{
+  from{
+    transform:
+      translate(var(--facility-mx, 0px), var(--facility-my, 0px))
+      rotate(0deg);
+  }
+
+  to{
+    transform:
+      translate(var(--facility-mx, 0px), var(--facility-my, 0px))
+      rotate(360deg);
+  }
+}
+
+@media(max-width:900px){
+  .dashboard-command::after{
+    right:-280px;
+    opacity:.6;
+  }
+
+  .dashboard-command > .dashboard-hero::after{
+    display:none;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — LIVE ZONE MONITORING
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command #dash-zones{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* Individual zone rows */
+.dashboard-command #dash-zones > *{
+  position:relative;
+  overflow:hidden;
+  transition:
+    background .25s ease,
+    border-color .25s ease,
+    transform .25s ease;
+}
+
+/*
+   Most existing zone rows use cards/divs generated by JS.
+   This gives them a monitoring-system appearance without
+   requiring any JS changes.
+*/
+.dashboard-command #dash-zones > div{
+  border-color:rgba(100,120,160,.12);
+  background:rgba(12,17,27,.42);
+}
+
+.dashboard-command #dash-zones > div:hover{
+  transform:translateX(3px);
+  border-color:rgba(79,142,247,.28);
+  background:rgba(22,30,45,.58);
+}
+
+/* Scanning beam across the active zone */
+.dashboard-command #dash-zones > div::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-25%;
+  width:18%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.10),
+    transparent
+  );
+  pointer-events:none;
+  animation:zoneRowScan 5s ease-in-out infinite;
+}
+
+.dashboard-command #dash-zones > div:nth-child(2)::after{
+  animation-delay:1.25s;
+}
+
+.dashboard-command #dash-zones > div:nth-child(3)::after{
+  animation-delay:2.5s;
+}
+
+.dashboard-command #dash-zones > div:nth-child(4)::after{
+  animation-delay:3.75s;
+}
+
+/* Status dots inside zone rows */
+.dashboard-command #dash-zones .dot,
+.dashboard-command #dash-zones .status-dot{
+  animation:zoneStatusPulse 2s ease-in-out infinite;
+}
+
+/* Make healthy green indicators feel alive */
+.dashboard-command #dash-zones [style*="green"],
+.dashboard-command #dash-zones [style*="#34c97a"]{
+  filter:drop-shadow(0 0 5px rgba(52,201,122,.35));
+}
+
+/* Numeric values */
+.dashboard-command #dash-zones strong,
+.dashboard-command #dash-zones b{
+  font-variant-numeric:tabular-nums;
+}
+
+/* Monitoring label */
+.dashboard-command #dash-zones::before{
+  content:"LIVE FACILITY TELEMETRY";
+  display:block;
+  margin:0 0 3px 2px;
+  font-family:monospace;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:1.6px;
+  color:rgba(110,140,185,.35);
+}
+
+@keyframes zoneRowScan{
+  0%,15%{
+    left:-25%;
+    opacity:0;
+  }
+  25%{
+    opacity:1;
+  }
+  75%{
+    opacity:.7;
+  }
+  100%{
+    left:115%;
+    opacity:0;
+  }
+}
+
+@keyframes zoneStatusPulse{
+  0%,100%{
+    opacity:.55;
+    transform:scale(.9);
+  }
+  50%{
+    opacity:1;
+    transform:scale(1.08);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — ALERT MONITOR
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command #dash-alerts{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+/* Alert rows generated by the existing JS */
+.dashboard-command #dash-alerts > *{
+  position:relative;
+  overflow:hidden;
+  transition:
+    transform .22s ease,
+    background .22s ease,
+    border-color .22s ease;
+}
+
+.dashboard-command #dash-alerts > div{
+  border-color:rgba(100,120,160,.12);
+  background:rgba(12,17,27,.42);
+}
+
+.dashboard-command #dash-alerts > div:hover{
+  transform:translateX(3px);
+  background:rgba(23,28,41,.62);
+  border-color:rgba(100,120,160,.24);
+}
+
+/* Alert activity line */
+.dashboard-command #dash-alerts > div::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:rgba(79,142,247,.45);
+  opacity:.7;
+}
+
+/* Subtle telemetry sweep */
+.dashboard-command #dash-alerts > div::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-30%;
+  width:20%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.025),
+    transparent
+  );
+  pointer-events:none;
+  animation:alertTelemetry 6s ease-in-out infinite;
+}
+
+.dashboard-command #dash-alerts > div:nth-child(2)::after{
+  animation-delay:1.2s;
+}
+
+.dashboard-command #dash-alerts > div:nth-child(3)::after{
+  animation-delay:2.4s;
+}
+
+.dashboard-command #dash-alerts > div:nth-child(4)::after{
+  animation-delay:3.6s;
+}
+
+/* Critical / red alerts */
+.dashboard-command #dash-alerts [style*="#f05252"],
+.dashboard-command #dash-alerts [style*="red"]{
+  filter:drop-shadow(0 0 4px rgba(240,82,82,.15));
+}
+
+/* Warning / yellow alerts */
+.dashboard-command #dash-alerts [style*="#f5c842"],
+.dashboard-command #dash-alerts [style*="yellow"]{
+  filter:drop-shadow(0 0 4px rgba(245,200,66,.12));
+}
+
+/* Alert count */
+#dash-alert-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:18px;
+  height:18px;
+  margin-left:5px;
+  padding:0 5px;
+  border:1px solid rgba(240,82,82,.18);
+  border-radius:999px;
+  background:rgba(240,82,82,.06);
+  font-family:monospace;
+  font-size:9px;
+  box-shadow:0 0 12px rgba(240,82,82,.04);
+}
+
+/* Empty state */
+.dashboard-command #dash-alerts:empty::after{
+  content:"NO ACTIVE ALERTS  •  FACILITY STATUS NOMINAL";
+  display:block;
+  padding:22px 12px;
+  text-align:center;
+  font-family:monospace;
+  font-size:8px;
+  letter-spacing:1.3px;
+  color:rgba(52,201,122,.42);
+  border:1px dashed rgba(52,201,122,.12);
+  background:rgba(52,201,122,.018);
+}
+
+@keyframes alertTelemetry{
+  0%,15%{
+    left:-30%;
+    opacity:0;
+  }
+  25%{
+    opacity:1;
+  }
+  75%{
+    opacity:.6;
+  }
+  100%{
+    left:115%;
+    opacity:0;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — PREDICTIVE INTELLIGENCE
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command .predictive-command-card{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(245,200,66,.18);
+}
+
+/* Intelligence sweep */
+.dashboard-command .predictive-command-card::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-20%;
+  width:12%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(245,200,66,.07),
+    transparent
+  );
+  pointer-events:none;
+  animation:intelligenceSweep 7s ease-in-out infinite;
+}
+
+/* Header */
+.dashboard-command .predictive-command-card .panel-header{
+  padding-bottom:13px;
+  border-bottom:1px solid rgba(245,200,66,.08);
+}
+
+/* Intelligence label */
+.dashboard-command .predictive-command-card .section-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.dashboard-command .predictive-command-card .section-eyebrow::before{
+  content:"";
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 9px rgba(245,200,66,.8);
+  animation:intelligencePulse 1.8s ease-in-out infinite;
+}
+
+/* Predictive result list */
+.dashboard-command #predictive-list{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:13px;
+}
+
+/* Individual predictions */
+.dashboard-command #predictive-list > *{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(245,200,66,.10);
+  background:rgba(245,200,66,.025);
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    background .22s ease;
+}
+
+.dashboard-command #predictive-list > *:hover{
+  transform:translateX(3px);
+  border-color:rgba(245,200,66,.25);
+  background:rgba(245,200,66,.045);
+}
+
+/* Prediction severity rail */
+.dashboard-command #predictive-list > *::before{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  width:2px;
+  background:var(--yellow);
+  box-shadow:0 0 10px rgba(245,200,66,.18);
+}
+
+/* Empty state */
+.dashboard-command #predictive-list:empty::after{
+  content:"INTELLIGENCE ENGINE STANDBY  •  NO PREDICTIVE EVENTS";
+  display:block;
+  padding:20px 12px;
+  text-align:center;
+  border:1px dashed rgba(100,120,160,.13);
+  background:rgba(79,142,247,.012);
+  font-family:monospace;
+  font-size:8px;
+  letter-spacing:1.3px;
+  color:rgba(130,150,185,.38);
+}
+
+@keyframes intelligenceSweep{
+  0%,15%{
+    left:-20%;
+    opacity:0;
+  }
+  25%{
+    opacity:1;
+  }
+  75%{
+    opacity:.7;
+  }
+  100%{
+    left:115%;
+    opacity:0;
+  }
+}
+
+@keyframes intelligencePulse{
+  0%,100%{
+    opacity:.4;
+    transform:scale(.8);
+  }
+  50%{
+    opacity:1;
+    transform:scale(1.25);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — CHART ENVIRONMENT
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-command .chart-wrap{
+  position:relative;
+  overflow:hidden;
+}
+
+/* Soft chart-floor glow */
+.dashboard-command .chart-wrap::before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  bottom:8px;
+  height:70px;
+  background:radial-gradient(
+    ellipse,
+    rgba(79,142,247,.055),
+    transparent 70%
+  );
+  pointer-events:none;
+}
+
+/* Fine scanning line beneath charts */
+.dashboard-command .chart-wrap::after{
+  content:"";
+  position:absolute;
+  left:5%;
+  right:5%;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.16),
+    transparent
+  );
+  pointer-events:none;
+}
+
+/* Compliance chart gets a stronger performance atmosphere */
+.dashboard-command .compliance-card .chart-wrap::before{
+  background:radial-gradient(
+    ellipse,
+    rgba(52,201,122,.045),
+    transparent 70%
+  );
+}
+
+/* Pie chart gets a central energy field */
+.dashboard-command .zone-distribution-card .chart-wrap::before{
+  left:25%;
+  right:25%;
+  bottom:20px;
+  height:150px;
+  background:radial-gradient(
+    circle,
+    rgba(79,142,247,.045),
+    transparent 68%
+  );
+}
+
+/* Legend becomes part of the monitoring system */
+.dashboard-command #pie-legend{
+  position:relative;
+  z-index:2;
+}
+
+.dashboard-command #pie-legend > *{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  opacity:.78;
+  transition:opacity .2s ease,transform .2s ease;
+}
+
+.dashboard-command #pie-legend > *:hover{
+  opacity:1;
+  transform:translateY(-1px);
+}
+
+/* ── Facility Status Legend ─────────────────────────────────────────────── */
+
+.facility-legend{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.facility-legend span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  padding:6px 9px;
+
+  border:1px solid rgba(255,255,255,.045);
+  border-radius:5px;
+
+  background:rgba(255,255,255,.018);
+
+  color:#7f8ba5;
+
+  font-family:monospace;
+  font-size:10px;
+  letter-spacing:.3px;
+
+  transition:
+    border-color .25s ease,
+    background .25s ease,
+    transform .25s ease;
+}
+
+.facility-legend span:hover{
+  transform:translateY(-1px);
+  border-color:rgba(79,142,247,.22);
+  background:rgba(79,142,247,.045);
+}
+
+.facility-legend span span{
+  width:6px !important;
+  height:6px !important;
+
+  min-width:6px;
+
+  padding:0 !important;
+
+  border:0 !important;
+  border-radius:50% !important;
+
+  background:var(--legend-color);
+
+  box-shadow:0 0 8px var(--legend-color);
+}
+
+/* ── Live Stat Telemetry ───────────────────────────────────────────────── */
+
+.dashboard-command .stat{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.dashboard-command .stat:hover{
+  transform:translateY(-3px);
+  border-color:rgba(79,142,247,.28);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.28),
+    0 0 22px rgba(79,142,247,.06);
+}
+
+/* Moving diagnostic scan */
+.dashboard-command .stat-scan{
+  position:absolute;
+  top:0;
+  left:-40%;
+  width:35%;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.055),
+    transparent
+  );
+
+  transform:skewX(-18deg);
+  animation:statTelemetryScan 5s ease-in-out infinite;
+
+  pointer-events:none;
+  z-index:0;
+}
+
+@keyframes statTelemetryScan{
+  0%{
+    left:-40%;
+    opacity:0;
+  }
+
+  12%{
+    opacity:1;
+  }
+
+  42%{
+    left:110%;
+    opacity:1;
+  }
+
+  43%,
+  100%{
+    left:110%;
+    opacity:0;
+  }
+}
+
+/* Bottom status rail */
+.dashboard-command .stat-accent{
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:0;
+
+  height:1px;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.55),
+    transparent
+  );
+
+  opacity:.45;
+}
+
+/* Color-specific telemetry rails */
+.dashboard-command .stat.green .stat-accent{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(52,201,122,.65),
+    transparent
+  );
+}
+
+.dashboard-command .stat.red .stat-accent{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(240,82,82,.65),
+    transparent
+  );
+}
+
+.dashboard-command .stat.yellow .stat-accent{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(245,200,66,.65),
+    transparent
+  );
+}
+
+/* Keep content above scan layer */
+.dashboard-command .stat-label,
+.dashboard-command .stat-value,
+.dashboard-command .stat-sub{
+  position:relative;
+  z-index:1;
+}
+
+/* Unit beside average-clean-time value */
+.dashboard-command .stat-unit{
+  margin-left:3px;
+  font-size:14px;
+  font-weight:600;
+  color:#7f8ba5;
+  vertical-align:middle;
+}
+
+/* ── KPI Identity System ───────────────────────────────────────────────── */
+
+.dashboard-command .stat.green{
+  --stat-color:rgba(52,201,122,.65);
+  --stat-glow:rgba(52,201,122,.12);
+}
+
+.dashboard-command .stat.red{
+  --stat-color:rgba(240,82,82,.65);
+  --stat-glow:rgba(240,82,82,.12);
+}
+
+.dashboard-command .stat.blue{
+  --stat-color:rgba(79,142,247,.65);
+  --stat-glow:rgba(79,142,247,.12);
+}
+
+.dashboard-command .stat.yellow{
+  --stat-color:rgba(245,200,66,.65);
+  --stat-glow:rgba(245,200,66,.12);
+}
+
+.dashboard-command .stat:not(.green):not(.red):not(.blue):not(.yellow){
+  --stat-color:rgba(167,139,250,.65);
+  --stat-glow:rgba(167,139,250,.10);
+}
+
+.dashboard-command .stat-accent{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--stat-color),
+    transparent
+  );
+}
+
+.dashboard-command .stat:hover{
+  border-color:var(--stat-color);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.28),
+    0 0 28px var(--stat-glow);
+}
+
+.dashboard-command .stat-value{
+  text-shadow:0 0 18px var(--stat-glow);
+}
+
+/* ── Dashboard Telemetry Timestamp ──────────────────────────────────────── */
+
+.dashboard-command #dash-date{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:7px;
+  color:#66718a;
+  font-family:monospace;
+  font-size:11px;
+  letter-spacing:.35px;
+}
+
+.dash-date-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 9px rgba(52,201,122,.75);
+  animation:dashDatePulse 2s ease-in-out infinite;
+}
+
+@keyframes dashDatePulse{
+  0%,100%{
+    opacity:.45;
+    transform:scale(.85);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+/* ── System Live Indicator ─────────────────────────────────────────────── */
+
+.dashboard-command .dashboard-live{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:8px 12px;
+
+  border:1px solid rgba(52,201,122,.14);
+  border-radius:6px;
+
+  background:rgba(52,201,122,.025);
+
+  color:#7f8ba5;
+
+  font-family:monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.2px;
+
+  box-shadow:
+    inset 0 0 18px rgba(52,201,122,.025);
+
+  transition:
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.dashboard-command .dashboard-live:hover{
+  border-color:rgba(52,201,122,.32);
+
+  box-shadow:
+    inset 0 0 18px rgba(52,201,122,.045),
+    0 0 20px rgba(52,201,122,.06);
+}
+
+.dashboard-command .live-pulse{
+  position:relative;
+
+  width:6px;
+  height:6px;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  box-shadow:
+    0 0 6px rgba(52,201,122,.9),
+    0 0 14px rgba(52,201,122,.35);
+
+  animation:systemPulse 1.8s ease-in-out infinite;
+}
+
+.dashboard-command .live-pulse::after{
+  content:"";
+
+  position:absolute;
+
+  top:50%;
+  left:50%;
+
+  width:6px;
+  height:6px;
+
+  border:1px solid rgba(52,201,122,.5);
+  border-radius:50%;
+
+  transform:translate(-50%,-50%) scale(1);
+
+  opacity:.8;
+
+  animation:systemPulseRing 1.8s ease-out infinite;
+}
+
+@keyframes systemPulse{
+  0%,100%{
+    opacity:.55;
+    transform:scale(.85);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+@keyframes systemPulseRing{
+  0%{
+    transform:translate(-50%,-50%) scale(1);
+    opacity:.7;
+  }
+
+  100%{
+    transform:translate(-50%,-50%) scale(3.2);
+    opacity:0;
+  }
+}
+
+/* ── Facility Intelligence Atmosphere ──────────────────────────────────── */
+
+.dashboard-command{
+  position:relative;
+  isolation:isolate;
+}
+
+.dashboard-command::before{
+  content:"";
+
+  position:absolute;
+
+  top:40px;
+  right:-180px;
+
+  width:520px;
+  height:520px;
+
+  border:1px solid rgba(79,142,247,.055);
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(79,142,247,.035) 0%,
+      rgba(79,142,247,.012) 35%,
+      transparent 68%
+    );
+
+  box-shadow:
+    0 0 80px rgba(79,142,247,.025);
+
+  animation:facilityOrbit 18s linear infinite;
+
+  pointer-events:none;
+  z-index:-1;
+}
+
+.dashboard-command::after{
+  content:"";
+
+  position:absolute;
+
+  top:300px;
+  right:80px;
+
+  width:260px;
+  height:1px;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.16),
+    transparent
+  );
+
+  transform-origin:right center;
+
+  animation:facilitySweep 7s ease-in-out infinite;
+
+  pointer-events:none;
+  z-index:-1;
+}
+
+@keyframes facilityOrbit{
+  from{
+    transform:
+      translate(var(--facility-mx, 0px), var(--facility-my, 0px))
+      rotate(0deg);
+  }
+
+  to{
+    transform:
+      translate(var(--facility-mx, 0px), var(--facility-my, 0px))
+      rotate(360deg);
+  }
+}
+@keyframes facilitySweep{
+  0%,100%{
+    transform:rotate(-28deg);
+    opacity:.15;
+  }
+
+  50%{
+    transform:rotate(28deg);
+    opacity:.55;
+  }
+}
+
+/* ── Zone Telemetry Interface ───────────────────────────────────────────── */
+
+.dashboard-command .zone-telemetry-row{
+  position:relative;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  min-height:52px;
+  padding:8px 4px 8px 6px;
+
+  border-bottom:1px solid rgba(255,255,255,.045);
+
+  overflow:hidden;
+
+  transition:
+    background .25s ease,
+    transform .25s ease,
+    border-color .25s ease;
+}
+
+.dashboard-command .zone-telemetry-row:last-child{
+  border-bottom:0;
+}
+
+.dashboard-command .zone-telemetry-row::before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  top:50%;
+
+  width:1px;
+  height:24px;
+
+  background:var(--zone-color);
+
+  box-shadow:0 0 10px var(--zone-color);
+
+  transform:translateY(-50%);
+
+  opacity:.65;
+}
+
+.dashboard-command .zone-telemetry-row:hover{
+  background:rgba(79,142,247,.025);
+  border-color:rgba(79,142,247,.10);
+
+  transform:translateX(2px);
+}
+
+.zone-telemetry-left{
+  display:flex;
+  align-items:center;
+  gap:11px;
+
+  min-width:0;
+}
+
+.zone-status-core{
+  position:relative;
+
+  width:9px;
+  height:9px;
+
+  flex-shrink:0;
+
+  border-radius:50%;
+
+  background:var(--zone-color);
+
+  box-shadow:
+    0 0 6px var(--zone-color),
+    0 0 13px color-mix(in srgb, var(--zone-color) 35%, transparent);
+}
+
+.zone-status-core::after{
+  content:"";
+
+  position:absolute;
+
+  inset:-4px;
+
+  border:1px solid var(--zone-color);
+  border-radius:50%;
+
+  opacity:0;
+
+  animation:zoneSignal 2.8s ease-out infinite;
+}
+
+@keyframes zoneSignal{
+  0%{
+    transform:scale(.65);
+    opacity:.55;
+  }
+
+  70%{
+    transform:scale(1.7);
+    opacity:0;
+  }
+
+  100%{
+    transform:scale(1.7);
+    opacity:0;
+  }
+}
+
+.zone-identity{
+  min-width:0;
+}
+
+.zone-name-line{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  min-width:0;
+}
+
+.zone-code{
+  flex-shrink:0;
+
+  color:var(--zone-color);
+
+  font-family:monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.6px;
+
+  opacity:.7;
+}
+
+.zone-name{
+  overflow:hidden;
+
+  color:#dfe5f4;
+
+  font-size:13px;
+  font-weight:600;
+
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.zone-meta{
+  display:flex;
+  align-items:center;
+  gap:5px;
+
+  margin-top:3px;
+
+  color:#66718a;
+
+  font-family:monospace;
+  font-size:9px;
+  letter-spacing:.25px;
+}
+
+.zone-telemetry-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  flex-shrink:0;
+}
+
+.zone-signal{
+  display:flex;
+  align-items:flex-end;
+  gap:2px;
+
+  height:12px;
+}
+
+.zone-signal span{
+  width:2px;
+
+  border-radius:2px;
+
+  background:var(--zone-color);
+
+  box-shadow:0 0 5px var(--zone-color);
+
+  opacity:.45;
+}
+
+.zone-signal span:nth-child(1){
+  height:4px;
+  animation:signalBar 1.2s ease-in-out infinite;
+}
+
+.zone-signal span:nth-child(2){
+  height:8px;
+  animation:signalBar 1.2s .15s ease-in-out infinite;
+}
+
+.zone-signal span:nth-child(3){
+  height:12px;
+  animation:signalBar 1.2s .3s ease-in-out infinite;
+}
+
+@keyframes signalBar{
+  0%,100%{
+    opacity:.3;
+    transform:scaleY(.55);
+  }
+
+  50%{
+    opacity:.9;
+    transform:scaleY(1);
+  }
+}
+
+/* ── Alert Intelligence Feed ────────────────────────────────────────────── */
+
+.dashboard-command .alert-telemetry{
+  position:relative;
+
+  display:flex;
+  align-items:center;
+  gap:11px;
+
+  min-height:60px;
+  padding:9px 7px;
+
+  border-bottom:1px solid rgba(255,255,255,.045);
+
+  overflow:hidden;
+
+  transition:
+    background .25s ease,
+    transform .25s ease,
+    border-color .25s ease;
+}
+
+.dashboard-command .alert-telemetry:last-child{
+  border-bottom:0;
+}
+
+.dashboard-command .alert-telemetry:hover{
+  transform:translateX(2px);
+  background:rgba(79,142,247,.025);
+}
+
+/* Severity rail */
+
+.dashboard-command .alert-telemetry::before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  top:9px;
+  bottom:9px;
+
+  width:2px;
+
+  background:var(--alert-color);
+
+  box-shadow:0 0 9px var(--alert-color);
+
+  opacity:.65;
+}
+
+/* Severity colors */
+
+.dashboard-command .alert-telemetry.warning{
+  --alert-color:var(--yellow);
+}
+
+.dashboard-command .alert-telemetry.critical{
+  --alert-color:var(--red);
+}
+
+.dashboard-command .alert-telemetry.info{
+  --alert-color:var(--primary);
+}
+
+/* Alert core */
+
+.alert-severity-core{
+  position:relative;
+
+  width:9px;
+  height:9px;
+
+  flex-shrink:0;
+
+  border-radius:50%;
+
+  background:var(--alert-color);
+
+  box-shadow:
+    0 0 7px var(--alert-color),
+    0 0 15px color-mix(
+      in srgb,
+      var(--alert-color) 30%,
+      transparent
+    );
+}
+
+.alert-severity-core::after{
+  content:"";
+
+  position:absolute;
+
+  inset:-4px;
+
+  border:1px solid var(--alert-color);
+  border-radius:50%;
+
+  animation:alertPulse 2.2s ease-out infinite;
+}
+
+@keyframes alertPulse{
+  0%{
+    transform:scale(.7);
+    opacity:.65;
+  }
+
+  75%{
+    transform:scale(1.8);
+    opacity:0;
+  }
+
+  100%{
+    transform:scale(1.8);
+    opacity:0;
+  }
+}
+
+/* Content */
+
+.alert-content{
+  min-width:0;
+  flex:1;
+}
+
+.alert-topline{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  margin-bottom:3px;
+}
+
+.alert-index{
+  color:#59647b;
+
+  font-family:monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.alert-severity-label{
+  color:var(--alert-color);
+
+  font-family:monospace;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.8px;
+}
+
+.alert-content .ai-msg{
+  overflow:hidden;
+
+  color:#dce2ef;
+
+  font-size:12px;
+  font-weight:600;
+
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.alert-content .ai-time{
+  display:flex;
+  align-items:center;
+  gap:5px;
+
+  margin-top:3px;
+
+  color:#66718a;
+
+  font-family:monospace;
+  font-size:9px;
+}
+
+/* Telemetry signal */
+
+.alert-signal{
+  display:flex;
+  align-items:flex-end;
+  gap:2px;
+
+  height:12px;
+
+  flex-shrink:0;
+}
+
+.alert-signal span{
+  width:2px;
+
+  border-radius:2px;
+
+  background:var(--alert-color);
+
+  box-shadow:0 0 5px var(--alert-color);
+
+  opacity:.4;
+}
+
+.alert-signal span:nth-child(1){
+  height:4px;
+  animation:alertSignal 1.1s ease-in-out infinite;
+}
+
+.alert-signal span:nth-child(2){
+  height:8px;
+  animation:alertSignal 1.1s .15s ease-in-out infinite;
+}
+
+.alert-signal span:nth-child(3){
+  height:12px;
+  animation:alertSignal 1.1s .3s ease-in-out infinite;
+}
+
+@keyframes alertSignal{
+  0%,100%{
+    opacity:.25;
+    transform:scaleY(.55);
+  }
+
+  50%{
+    opacity:.9;
+    transform:scaleY(1);
+  }
+}
+
+/* Empty state */
+
+.alert-empty-state{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  min-height:85px;
+
+  color:#69748c;
+}
+
+.alert-clear-core{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:27px;
+  height:27px;
+
+  border:1px solid rgba(52,201,122,.25);
+  border-radius:50%;
+
+  color:var(--green);
+
+  font-size:12px;
+
+  box-shadow:
+    0 0 14px rgba(52,201,122,.08);
+}
+
+.alert-clear-title{
+  color:#9aa6bc;
+
+  font-family:monospace;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.8px;
+}
+
+.alert-clear-sub{
+  margin-top:3px;
+
+  color:#5f6a81;
+
+  font-family:monospace;
+  font-size:9px;
+}
+
+/* ── Predictive Intelligence Engine ─────────────────────────────────────── */
+
+.dashboard-command .predictive-command-card{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  border-color:rgba(167,139,250,.12);
+  background:
+    radial-gradient(
+      circle at 92% 15%,
+      rgba(167,139,250,.055),
+      transparent 32%
+    ),
+    rgba(26,29,39,.94);
+}
+
+.dashboard-command .predictive-command-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(167,139,250,.55),
+    rgba(79,142,247,.25),
+    transparent
+  );
+  opacity:.65;
+}
+
+.dashboard-command .predictive-command-card::after{
+  content:"";
+  position:absolute;
+  top:-100px;
+  right:-100px;
+  width:260px;
+  height:260px;
+  border:1px solid rgba(167,139,250,.055);
+  border-radius:50%;
+  box-shadow:
+    0 0 50px rgba(167,139,250,.025),
+    inset 0 0 40px rgba(167,139,250,.02);
+  animation:predictiveOrbit 14s linear infinite;
+  pointer-events:none;
+  z-index:-1;
+}
+
+@keyframes predictiveOrbit{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+
+/* Predictive rows */
+
+.dashboard-command .predictive-telemetry{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:68px;
+  padding:11px 8px;
+  border-top:1px solid rgba(255,255,255,.045);
+  overflow:hidden;
+  transition:
+    background .25s ease,
+    transform .25s ease,
+    border-color .25s ease;
+}
+
+.dashboard-command .predictive-telemetry:first-child{
+  border-top:0;
+}
+
+.dashboard-command .predictive-telemetry:hover{
+  transform:translateX(2px);
+  background:rgba(167,139,250,.025);
+  border-color:rgba(167,139,250,.10);
+}
+
+
+/* Risk identity */
+
+.predictive-telemetry{
+  --predictive-color:var(--primary);
+  --predictive-glow:rgba(79,142,247,.12);
+}
+
+.predictive-telemetry.info{
+  --predictive-color:var(--primary);
+  --predictive-glow:rgba(79,142,247,.12);
+}
+
+.predictive-telemetry.warning{
+  --predictive-color:var(--yellow);
+  --predictive-glow:rgba(245,200,66,.12);
+}
+
+.predictive-telemetry.critical{
+  --predictive-color:var(--red);
+  --predictive-glow:rgba(240,82,82,.13);
+}
+
+
+/* Predictive core */
+
+.predictive-core{
+  position:relative;
+  width:10px;
+  height:10px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:var(--predictive-color);
+  box-shadow:
+    0 0 7px var(--predictive-color),
+    0 0 16px var(--predictive-glow);
+}
+
+.predictive-core::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border:1px solid var(--predictive-color);
+  border-radius:50%;
+  opacity:0;
+  animation:predictivePulse 2.5s ease-out infinite;
+}
+
+@keyframes predictivePulse{
+  0%{
+    transform:scale(.65);
+    opacity:.6;
+  }
+
+  70%{
+    transform:scale(1.8);
+    opacity:0;
+  }
+
+  100%{
+    transform:scale(1.8);
+    opacity:0;
+  }
+}
+
+
+/* Content */
+
+.predictive-content{
+  min-width:0;
+  flex:1;
+}
+
+.predictive-topline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:3px;
+}
+
+.predictive-index{
+  color:#59647b;
+  font-family:monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.predictive-risk{
+  color:var(--predictive-color);
+  font-family:monospace;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.8px;
+}
+
+.predictive-name{
+  overflow:hidden;
+  color:#e0e5f3;
+  font-size:13px;
+  font-weight:650;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.predictive-message{
+  margin-top:3px;
+  color:#69758d;
+  font-family:monospace;
+  font-size:9px;
+  line-height:1.5;
+}
+
+.predictive-message strong{
+  color:#aeb8cb;
+  font-weight:800;
+}
+
+
+/* Risk meter */
+
+.predictive-meter{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+  flex-shrink:0;
+}
+
+.predictive-meter-label{
+  color:#566178;
+  font-family:monospace;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.8px;
+}
+
+.predictive-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:3px;
+  height:15px;
+}
+
+.predictive-bars span{
+  width:3px;
+  border-radius:2px;
+  background:var(--predictive-color);
+  box-shadow:0 0 5px var(--predictive-color);
+  opacity:.3;
+}
+
+.predictive-bars span:nth-child(1){
+  height:4px;
+}
+
+.predictive-bars span:nth-child(2){
+  height:7px;
+}
+
+.predictive-bars span:nth-child(3){
+  height:11px;
+}
+
+.predictive-bars span:nth-child(4){
+  height:15px;
+}
+
+.predictive-telemetry.info .predictive-bars span:nth-child(4){
+  opacity:.25;
+}
+
+.predictive-telemetry.warning .predictive-bars span:nth-child(3),
+.predictive-telemetry.warning .predictive-bars span:nth-child(4){
+  opacity:.8;
+}
+
+.predictive-telemetry.critical .predictive-bars span{
+  opacity:.9;
+  animation:predictiveMeterPulse 1.4s ease-in-out infinite;
+}
+
+.predictive-telemetry.critical .predictive-bars span:nth-child(2){
+  animation-delay:.12s;
+}
+
+.predictive-telemetry.critical .predictive-bars span:nth-child(3){
+  animation-delay:.24s;
+}
+
+.predictive-telemetry.critical .predictive-bars span:nth-child(4){
+  animation-delay:.36s;
+}
+
+@keyframes predictiveMeterPulse{
+  0%,100%{
+    opacity:.45;
+  }
+
+  50%{
+    opacity:1;
+  }
+}
+
+ /* ── Command Section Headers ───────────────────────────────────────────── */
+
+.dashboard-command .section-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#59657d;
+  font-family:monospace;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:1.4px;
+  line-height:1;
+}
+
+.dashboard-command .section-eyebrow::before{
+  content:"";
+  width:4px;
+  height:4px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:var(--primary);
+  box-shadow:0 0 7px rgba(79,142,247,.65);
+  animation:sectionIndicator 2.4s ease-in-out infinite;
+}
+
+@keyframes sectionIndicator{
+  0%,100%{
+    opacity:.35;
+    transform:scale(.8);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+
+/* Card titles */
+
+.dashboard-command .card-title{
+  color:#dce3f2;
+  font-size:14px;
+  font-weight:650;
+  letter-spacing:.1px;
+}
+
+
+/* Heading separator */
+
+.dashboard-command .card-heading-row,
+.dashboard-command .panel-header{
+  position:relative;
+}
+
+.dashboard-command .card-heading-row::after,
+.dashboard-command .panel-header::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-11px;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    rgba(79,142,247,.12),
+    rgba(79,142,247,.035),
+    transparent 75%
+  );
+  pointer-events:none;
+}
+
+
+/* Chart live indicator */
+
+.dashboard-command .chart-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  border:1px solid rgba(52,201,122,.10);
+  border-radius:4px;
+  color:#64718a;
+  font-family:monospace;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.8px;
+  background:rgba(52,201,122,.018);
+}
+
+.dashboard-command .chart-status span{
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 7px rgba(52,201,122,.7);
+  animation:chartLivePulse 1.7s ease-in-out infinite;
+}
+
+@keyframes chartLivePulse{
+  0%,100%{
+    opacity:.4;
+    transform:scale(.8);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+
+/* Zone scanning indicator */
+
+.dashboard-command .zone-scan-indicator{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  border:1px solid rgba(79,142,247,.10);
+  border-radius:4px;
+  color:#62708a;
+  font-family:monospace;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.8px;
+  background:rgba(79,142,247,.018);
+  overflow:hidden;
+}
+
+.dashboard-command .zone-scan-indicator::before{
+  content:"";
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:var(--primary);
+  box-shadow:0 0 7px rgba(79,142,247,.8);
+  animation:zoneScanPulse 1.5s ease-in-out infinite;
+}
+
+.dashboard-command .zone-scan-indicator::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-40%;
+  width:35%;
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.18),
+    transparent
+  );
+  transform:skewX(-18deg);
+  animation:zoneHeaderScan 3.5s ease-in-out infinite;
+}
+
+@keyframes zoneScanPulse{
+  0%,100%{
+    opacity:.35;
+    transform:scale(.8);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.2);
+  }
+}
+
+@keyframes zoneHeaderScan{
+  0%,100%{
+    left:-40%;
+    opacity:0;
+  }
+
+  15%{
+    opacity:1;
+  }
+
+  55%{
+    left:115%;
+    opacity:1;
+  }
+
+  56%{
+    opacity:0;
+  }
+}
+
+/* ── Telemetry Chart Environment ─────────────────────────────────────────── */
+
+.dashboard-command .chart-wrap{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.035);
+  border-radius:7px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(79,142,247,.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      rgba(79,142,247,.018) 1px,
+      transparent 1px
+    ),
+    rgba(8,12,20,.22);
+  background-size:32px 32px;
+}
+
+
+/* Moving telemetry sweep */
+
+.dashboard-command .chart-wrap::before{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-1px;
+  width:1px;
+  background:linear-gradient(
+    180deg,
+    transparent,
+    rgba(79,142,247,.35),
+    transparent
+  );
+  box-shadow:0 0 12px rgba(79,142,247,.18);
+  animation:chartTelemetrySweep 7s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+
+@keyframes chartTelemetrySweep{
+  0%,100%{
+    left:0;
+    opacity:0;
+  }
+
+  12%{
+    opacity:.5;
+  }
+
+  48%{
+    left:100%;
+    opacity:.5;
+  }
+
+  49%,100%{
+    opacity:0;
+  }
+}
+
+
+/* Canvas sits above the atmosphere */
+
+.dashboard-command .chart-wrap canvas{
+  position:relative;
+  z-index:2;
+}
+
+
+/* Subtle chart-card depth */
+
+.dashboard-command .dashboard-chart-card{
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.dashboard-command .dashboard-chart-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(79,142,247,.16);
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.22),
+    0 0 25px rgba(79,142,247,.035);
+}
+
+
+/* Compliance card gets a slightly stronger telemetry edge */
+
+.dashboard-command .compliance-card{
+  position:relative;
+}
+
+.dashboard-command .compliance-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:18px;
+  bottom:18px;
+  width:1px;
+  background:linear-gradient(
+    180deg,
+    transparent,
+    rgba(79,142,247,.32),
+    transparent
+  );
+  opacity:.7;
+}
+
+
+/* Doughnut card gets a subtle radial command glow */
+
+.dashboard-command .zone-distribution-card{
+  position:relative;
+}
+
+.dashboard-command .zone-distribution-card::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:57%;
+  width:210px;
+  height:150px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(
+    ellipse,
+    rgba(79,142,247,.035),
+    transparent 68%
+  );
+  pointer-events:none;
+  z-index:0;
+}
+
+.dashboard-command .zone-distribution-card .chart-wrap,
+.dashboard-command .zone-distribution-card .facility-legend{
+  position:relative;
+  z-index:1;
+}
+
+ /* ── Command Module Depth ───────────────────────────────────────────────── */
+
+.dashboard-command .dashboard-panel{
+  position:relative;
+  overflow:hidden;
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.dashboard-command .dashboard-panel:hover{
+  transform:translateY(-2px);
+  border-color:rgba(79,142,247,.15);
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.22),
+    0 0 24px rgba(79,142,247,.035);
+}
+
+
+/* Top command rail */
+
+.dashboard-command .dashboard-panel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:18px;
+  right:18px;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(79,142,247,.28),
+    transparent
+  );
+  opacity:.65;
+}
+
+
+/* Side telemetry rail */
+
+.dashboard-command .dashboard-panel::after{
+  content:"";
+  position:absolute;
+  top:22px;
+  right:0;
+  width:1px;
+  height:42px;
+  background:linear-gradient(
+    180deg,
+    transparent,
+    rgba(79,142,247,.25),
+    transparent
+  );
+  box-shadow:0 0 10px rgba(79,142,247,.08);
+}
+
+
+/* Header spacing */
+
+.dashboard-command .dashboard-panel .panel-header{
+  padding-bottom:14px;
+}
+
+
+/* Orbit becomes a real status node */
+
+.dashboard-command .panel-orbit{
+  position:relative;
+  width:25px;
+  height:25px;
+  border:1px solid rgba(79,142,247,.16);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.dashboard-command .panel-orbit::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border:1px solid rgba(79,142,247,.12);
+  border-radius:50%;
+}
+
+.dashboard-command .panel-orbit::after{
+  content:"";
+  position:absolute;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--primary);
+  box-shadow:
+    0 0 6px rgba(79,142,247,.9),
+    0 0 12px rgba(79,142,247,.35);
+  animation:panelCorePulse 2s ease-in-out infinite;
+}
+
+@keyframes panelCorePulse{
+  0%,100%{
+    transform:scale(.75);
+    opacity:.55;
+  }
+
+  50%{
+    transform:scale(1.25);
+    opacity:1;
+  }
+}
+
+
+/* Give the zone scanner a little more command presence */
+
+.dashboard-command .zone-scan-indicator{
+  box-shadow:
+    inset 0 0 12px rgba(79,142,247,.025),
+    0 0 12px rgba(79,142,247,.025);
+}
+
+ /* ── Active Facility Scan ─────────────────────────────────────────────────── */
+
+.dashboard-command .zone-telemetry-row.zone-scan-active{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(79,142,247,.055),
+      rgba(79,142,247,.018),
+      transparent
+    );
+  border-color:rgba(79,142,247,.12);
+}
+
+.dashboard-command .zone-telemetry-row.zone-scan-active::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-30%;
+  width:22%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.12),
+    transparent
+  );
+  transform:skewX(-18deg);
+  animation:activeZoneSweep 1.1s ease-out forwards;
+  pointer-events:none;
+}
+
+.dashboard-command .zone-telemetry-row.zone-scan-active .zone-status-core{
+  box-shadow:
+    0 0 8px var(--zone-color),
+    0 0 20px var(--zone-color);
+}
+
+@keyframes activeZoneSweep{
+  from{
+    left:-30%;
+  }
+
+  to{
+    left:120%;
+  }
+}
+
+/* ── Facility Telemetry Grid ─────────────────────────────────────────────── */
+
+.dashboard-command{
+  --telemetry-opacity:0;
+}
+
+.dashboard-command::marker{
+  display:none;
+}
+
+.dashboard-command .dashboard-hero{
+  position:relative;
+  z-index:2;
+}
+
+.dashboard-command .dashboard-hero::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-18px;
+  width:180px;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    rgba(79,142,247,.35),
+    rgba(79,142,247,.06),
+    transparent
+  );
+  animation:heroTelemetryLine 4s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes heroTelemetryLine{
+  0%,100%{
+    width:80px;
+    opacity:.25;
+  }
+
+  50%{
+    width:220px;
+    opacity:.7;
+  }
+}
+
+
+/* Very subtle ambient grid */
+
+.dashboard-command .dashboard-main-grid,
+.dashboard-command .dashboard-lower-grid{
+  position:relative;
+}
+
+.dashboard-command .dashboard-main-grid::before{
+  content:"";
+  position:absolute;
+  inset:-30px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(79,142,247,.012) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      rgba(79,142,247,.012) 1px,
+      transparent 1px
+    );
+  background-size:48px 48px;
+  mask-image:linear-gradient(
+    to bottom,
+    transparent,
+    black 18%,
+    black 82%,
+    transparent
+  );
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* ── Command Center Initialization ───────────────────────────────────────── */
+
+.dashboard-command .dashboard-hero{
+  animation:commandHeroIn .75s cubic-bezier(.22,.8,.24,1) both;
+}
+
+.dashboard-command .dashboard-kicker{
+  animation:commandKickerIn .7s .08s ease-out both;
+}
+
+.dashboard-command .dashboard-hero h1{
+  animation:commandTitleIn .8s .16s cubic-bezier(.22,.8,.24,1) both;
+}
+
+.dashboard-command .dashboard-hero #dash-date{
+  animation:commandDateIn .7s .28s ease-out both;
+}
+
+.dashboard-command .dashboard-live{
+  animation:commandLiveIn .7s .22s ease-out both;
+}
+
+
+/* Hero entrance */
+
+@keyframes commandHeroIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes commandKickerIn{
+  from{
+    opacity:0;
+    transform:translateX(-8px);
+    letter-spacing:2.5px;
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(0);
+    letter-spacing:1.2px;
+  }
+}
+
+@keyframes commandTitleIn{
+  from{
+    opacity:0;
+    transform:translateY(12px);
+    filter:blur(4px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+}
+
+@keyframes commandDateIn{
+  from{
+    opacity:0;
+    transform:translateY(5px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes commandLiveIn{
+  from{
+    opacity:0;
+    transform:translateX(8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion:reduce){
+
+  .dashboard-command .dashboard-hero,
+  .dashboard-command .dashboard-kicker,
+  .dashboard-command .dashboard-hero h1,
+  .dashboard-command .dashboard-hero #dash-date,
+  .dashboard-command .dashboard-live{
+    animation:none;
+  }
+
+}
+
+/* ── KPI Deployment Sequence ─────────────────────────────────────────────── */
+
+.dashboard-command #dash-stats .stat{
+  opacity:0;
+  transform:translateY(12px) scale(.985);
+  animation:kpiDeploy .65s cubic-bezier(.22,.8,.24,1) forwards;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(1){
+  animation-delay:.12s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(2){
+  animation-delay:.20s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(3){
+  animation-delay:.28s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(4){
+  animation-delay:.36s;
+}
+
+.dashboard-command #dash-stats .stat:nth-child(5){
+  animation-delay:.44s;
+}
+
+@keyframes kpiDeploy{
+  0%{
+    opacity:0;
+    transform:translateY(12px) scale(.985);
+    filter:blur(2px);
+  }
+
+  65%{
+    opacity:1;
+    transform:translateY(-1px) scale(1);
+    filter:blur(0);
+  }
+
+  100%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+
+/* Prevent deployment animation from fighting hover */
+
+.dashboard-command #dash-stats .stat:hover{
+  transform:translateY(-3px);
+}
+
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion:reduce){
+
+  .dashboard-command #dash-stats .stat{
+    opacity:1;
+    transform:none;
+    animation:none;
+    filter:none;
+  }
+
+}
+
+/* ── Dashboard Module Deployment ─────────────────────────────────────────── */
+
+.dashboard-command .dashboard-main-grid{
+  opacity:0;
+  transform:translateY(14px);
+  animation:moduleDeploy .75s .52s cubic-bezier(.22,.8,.24,1) forwards;
+}
+
+.dashboard-command .dashboard-lower-grid{
+  opacity:0;
+  transform:translateY(14px);
+  animation:moduleDeploy .75s .66s cubic-bezier(.22,.8,.24,1) forwards;
+}
+
+.dashboard-command #predictive-card{
+  animation:predictiveDeploy .75s .80s cubic-bezier(.22,.8,.24,1) both;
+}
+
+@keyframes moduleDeploy{
+  from{
+    opacity:0;
+    transform:translateY(14px);
+    filter:blur(2px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+}
+
+@keyframes predictiveDeploy{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion:reduce){
+
+  .dashboard-command .dashboard-main-grid,
+  .dashboard-command .dashboard-lower-grid,
+  .dashboard-command #predictive-card{
+    opacity:1;
+    transform:none;
+    animation:none;
+    filter:none;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -1338,38 +4514,114 @@ select.fc option{background:var(--surface)}
     </div>
 
     <!-- DASHBOARD -->
-    <div id="page-dashboard" class="page active">
-      <div class="ph">
-        <h1>Dashboard</h1>
-        <p id="dash-date">Live status across all facilities</p>
+<div id="page-dashboard" class="page active dashboard-command">
+
+  <div class="dashboard-hero">
+    <div class="ph">
+      <div class="dashboard-kicker">
+        <span class="kicker-dot"></span>
+        CLEANTRACK FACILITY INTELLIGENCE
       </div>
-      <div class="stats" id="dash-stats"></div>
-      <div class="g2">
-        <div class="card">
+      <h1>Command Center</h1>
+      <p id="dash-date">
+  <span class="dash-date-dot"></span>
+  <span id="dash-date-text">Synchronizing facility telemetry...</span>
+</p>
+    </div>
+
+    <div class="dashboard-live">
+      <span class="live-pulse"></span>
+      SYSTEM LIVE
+    </div>
+  </div>
+
+  <div class="stats" id="dash-stats"></div>
+
+  <div class="dashboard-main-grid">
+
+    <div class="card dashboard-chart-card compliance-card">
+      <div class="card-heading-row">
+        <div>
+          <div class="section-eyebrow">PERFORMANCE</div>
           <div class="card-title">14-Day Compliance Trend</div>
-          <div class="chart-wrap"><canvas id="chart-compliance"></canvas></div>
         </div>
-        <div class="card">
-          <div class="card-title">Zone Status Distribution</div>
-          <div class="chart-wrap" style="height:200px"><canvas id="chart-pie"></canvas></div>
-          <div id="pie-legend" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:12px"></div>
+        <div class="chart-status">
+          <span></span>
+          LIVE
         </div>
       </div>
-      <div class="g2">
-        <div class="card">
-          <div class="card-title">Recent Alerts <span id="dash-alert-count" style="color:var(--red);font-weight:800"></span></div>
-          <div id="dash-alerts"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Zone Overview</div>
-          <div id="dash-zones"></div>
-        </div>
-      </div>
-      <div id="predictive-card" class="card" style="margin-top:16px;display:none">
-        <div class="card-title">⚠️ Predictive Alerts</div>
-        <div id="predictive-list"></div>
+
+      <div class="chart-wrap">
+        <canvas id="chart-compliance"></canvas>
       </div>
     </div>
+
+    <div class="card dashboard-chart-card zone-distribution-card">
+      <div class="card-heading-row">
+        <div>
+          <div class="section-eyebrow">FACILITY STATE</div>
+          <div class="card-title">Zone Status Distribution</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chart-pie"></canvas>
+      </div>
+
+      <div id="pie-legend" class="facility-legend"></div>
+    </div>
+
+  </div>
+
+  <div class="dashboard-lower-grid">
+
+    <div class="card dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <div class="section-eyebrow">ATTENTION REQUIRED</div>
+          <div class="card-title">
+            Recent Alerts
+            <span id="dash-alert-count" style="color:var(--red);font-weight:800"></span>
+          </div>
+        </div>
+
+        <div class="panel-orbit">
+          <span></span>
+        </div>
+      </div>
+
+      <div id="dash-alerts"></div>
+    </div>
+
+    <div class="card dashboard-panel">
+      <div class="panel-header">
+        <div>
+          <div class="section-eyebrow">FACILITY MAP</div>
+          <div class="card-title">Zone Overview</div>
+        </div>
+
+        <div class="zone-scan-indicator">
+          SCANNING
+        </div>
+      </div>
+
+      <div id="dash-zones"></div>
+    </div>
+
+  </div>
+
+  <div id="predictive-card" class="card predictive-command-card" style="margin-top:16px;display:none">
+    <div class="panel-header">
+      <div>
+        <div class="section-eyebrow">INTELLIGENCE ENGINE</div>
+        <div class="card-title">⚠️ Predictive Alerts</div>
+      </div>
+    </div>
+
+    <div id="predictive-list"></div>
+  </div>
+
+</div>
 
     <!-- ZONES -->
     <div id="page-zones" class="page">
@@ -1874,70 +5126,674 @@ async function loadDashboard() {
       api('/api/analytics/reports?period=daily')
     ]);
     const z = dash.zones || {}, t = dash.today || {};
-    document.getElementById('dash-stats').innerHTML = `
-      <div class="stat green"><div class="stat-label">Cleaned Today</div><div class="stat-value">${t.completed||0}</div><div class="stat-sub">of ${t.total||0} scheduled</div></div>
-      <div class="stat red"><div class="stat-label">Overdue Zones</div><div class="stat-value">${z.overdue||0}</div><div class="stat-sub">need attention</div></div>
-      <div class="stat blue"><div class="stat-label">Today Compliance</div><div class="stat-value">${t.compliance_pct||0}%</div><div class="stat-sub">${kpis.compliance_7d||0}% last 7 days</div></div>
-      <div class="stat yellow"><div class="stat-label">Avg Clean Time</div><div class="stat-value">${dash.avg_cleaning_duration||'--'}<span style="font-size:14px">m</span></div><div class="stat-sub">per task (30-day)</div></div>
-      <div class="stat"><div class="stat-label">Total Zones</div><div class="stat-value">${z.total||0}</div><div class="stat-sub">${z.in_progress||0} in progress</div></div>
-    `;
+    const dashDateText = document.getElementById('dash-date-text');
 
-    // Line chart
-    const labels = report.slice(0,14).reverse().map(r => (r.period||'').slice(5));
-    const vals   = report.slice(0,14).reverse().map(r => r.compliance_pct||0);
-    if (compChart) compChart.destroy();
-    compChart = new Chart(document.getElementById('chart-compliance'), {
-      type: 'line',
-      data: { labels, datasets: [{ data: vals, borderColor: '#4f8ef7', borderWidth: 2, pointRadius: 3, fill: true, backgroundColor: 'rgba(79,142,247,.08)', tension: 0.4 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8890a8', font: { size: 11 } }, grid: { color: '#2e3248' } }, y: { ticks: { color: '#8890a8', font: { size: 11 } }, grid: { color: '#2e3248' }, min: 0, max: 100 } } }
-    });
+if (dashDateText) {
+  const now = new Date();
 
-    // Pie chart
-    const pieData = [
-      { label: 'Cleaned', value: z.cleaned||0, color: '#34c97a' },
-      { label: 'Pending', value: z.pending||0, color: '#f5c842' },
-      { label: 'In Progress', value: z.in_progress||0, color: '#4f8ef7' },
-      { label: 'Overdue', value: z.overdue||0, color: '#f05252' },
-    ].filter(d => d.value > 0);
-    if (pieChart) pieChart.destroy();
-    pieChart = new Chart(document.getElementById('chart-pie'), {
-      type: 'doughnut',
-      data: { labels: pieData.map(d=>d.label), datasets: [{ data: pieData.map(d=>d.value), backgroundColor: pieData.map(d=>d.color), borderWidth: 0, hoverOffset: 6 }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: false } } }
-    });
-    document.getElementById('pie-legend').innerHTML = pieData.map(d =>
-      `<span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${d.color};display:inline-block"></span>${d.label} (${d.value})</span>`
-    ).join('');
+  dashDateText.textContent =
+    `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).toUpperCase()} · ${now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })}`;
+}
+   document.getElementById('dash-stats').innerHTML = `
+  <div class="stat green">
+    <div class="stat-scan"></div>
+    <div class="stat-label">CLEANED TODAY</div>
+    <div class="stat-value">${t.completed || 0}</div>
+    <div class="stat-sub">OF ${t.total || 0} SCHEDULED</div>
+    <div class="stat-accent"></div>
+  </div>
 
-    // Alerts
-    const alertsDiv = document.getElementById('dash-alerts');
-    document.getElementById('dash-alert-count').textContent = (dash.recent_alerts||[]).length + ' unread';
-    alertsDiv.innerHTML = (dash.recent_alerts||[]).slice(0,5).map(a =>
-      `<div class="alert-item ${a.severity}"><div><div class="ai-msg">${a.message}</div><div class="ai-time">${a.zone_name||''} · ${fmtDate(a.created_at)}</div></div></div>`
-    ).join('') || '<p style="color:var(--muted);font-size:13px">No active alerts. ✓</p>';
+  <div class="stat red">
+    <div class="stat-scan"></div>
+    <div class="stat-label">OVERDUE ZONES</div>
+    <div class="stat-value">${z.overdue || 0}</div>
+    <div class="stat-sub">REQUIRE ATTENTION</div>
+    <div class="stat-accent"></div>
+  </div>
 
-    // Zone list
-    const zonesDiv = document.getElementById('dash-zones');
-    const zl = await api('/api/zones');
-    zonesDiv.innerHTML = zl.slice(0,10).map(z =>
-      `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="width:8px;height:8px;border-radius:50%;background:${z.status==='cleaned'?'var(--green)':z.status==='overdue'?'var(--red)':z.status==='in-progress'?'var(--primary)':'var(--yellow)'}"></span>
-          <div><div style="font-size:13px;font-weight:600">${z.name}</div><div style="font-size:11px;color:var(--muted)">${z.location_name||''} · Floor ${z.floor||'?'}</div></div>
-        </div>${badge(z.status)}
-      </div>`
-    ).join('');
+  <div class="stat blue">
+    <div class="stat-scan"></div>
+    <div class="stat-label">TODAY COMPLIANCE</div>
+    <div class="stat-value">${t.compliance_pct || 0}%</div>
+    <div class="stat-sub">${kpis.compliance_7d || 0}% LAST 7 DAYS</div>
+    <div class="stat-accent"></div>
+  </div>
 
-    // Predictive
-    if ((kpis.predictive_warnings||[]).length > 0) {
-      document.getElementById('predictive-card').style.display = 'block';
-      document.getElementById('predictive-list').innerHTML = kpis.predictive_warnings.map(w =>
-        `<div class="alert-item high"><div class="ai-msg">"${w.name}" has missed cleaning ${w.missed_count}× this week — check scheduling or staffing.</div></div>`
-      ).join('');
+  <div class="stat yellow">
+    <div class="stat-scan"></div>
+    <div class="stat-label">AVG CLEAN TIME</div>
+    <div class="stat-value">
+      ${dash.avg_cleaning_duration || '--'}<span class="stat-unit">m</span>
+    </div>
+    <div class="stat-sub">PER TASK · 30 DAYS</div>
+    <div class="stat-accent"></div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-scan"></div>
+    <div class="stat-label">TOTAL ZONES</div>
+    <div class="stat-value">${z.total || 0}</div>
+    <div class="stat-sub">${z.in_progress || 0} IN PROGRESS</div>
+    <div class="stat-accent"></div>
+  </div>
+`;
+
+// ── KPI Telemetry Counter ────────────────────────────────────────────────────
+
+const animateTelemetryValue = (element, target, suffix = '') => {
+
+  if (!element) return;
+
+  const numericTarget = parseFloat(target);
+
+  if (!Number.isFinite(numericTarget)) {
+    element.textContent = target + suffix;
+    return;
+  }
+
+  const duration = 850;
+  const startTime = performance.now();
+
+  const tick = now => {
+
+    const progress = Math.min(
+      (now - startTime) / duration,
+      1
+    );
+
+    const eased =
+      1 - Math.pow(1 - progress, 3);
+
+    const current =
+      numericTarget * eased;
+
+    element.textContent =
+      Number.isInteger(numericTarget)
+        ? Math.round(current) + suffix
+        : current.toFixed(1) + suffix;
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
     }
-  } catch(e) { toast('Dashboard load failed', 'error'); }
+  };
+
+  requestAnimationFrame(tick);
+};
+
+// ── Start KPI Telemetry ──────────────────────────────────────────────────────
+
+const statValues = document.querySelectorAll(
+  '#dash-stats .stat-value'
+);
+
+if (statValues.length >= 5) {
+
+  animateTelemetryValue(
+    statValues[0],
+    t.completed || 0
+  );
+
+  animateTelemetryValue(
+    statValues[1],
+    z.overdue || 0
+  );
+
+  animateTelemetryValue(
+    statValues[2],
+    t.compliance_pct || 0,
+    '%'
+  );
+
+  animateTelemetryValue(
+    statValues[3],
+    dash.avg_cleaning_duration || '--'
+  );
+
+  animateTelemetryValue(
+    statValues[4],
+    z.total || 0
+  );
 }
 
+    // ── Compliance Chart ─────────────────────────────────────────────────────────
+
+const labels = report.slice(0,14).reverse().map(r => (r.period||'').slice(5));
+const vals   = report.slice(0,14).reverse().map(r => r.compliance_pct||0);
+
+if (compChart) compChart.destroy();
+
+const complianceCtx = document.getElementById('chart-compliance').getContext('2d');
+
+const complianceGradient = complianceCtx.createLinearGradient(0, 0, 0, 260);
+complianceGradient.addColorStop(0, 'rgba(79,142,247,.20)');
+complianceGradient.addColorStop(0.55, 'rgba(79,142,247,.055)');
+complianceGradient.addColorStop(1, 'rgba(79,142,247,0)');
+
+compChart = new Chart(document.getElementById('chart-compliance'), {
+  type: 'line',
+
+  data: {
+    labels,
+
+    datasets: [{
+      data: vals,
+
+      borderColor: '#4f8ef7',
+      borderWidth: 2,
+
+      pointRadius: function(context) {
+  return context.dataIndex === context.dataset.data.length - 1 ? 4 : 0;
+},
+
+pointHoverRadius: 5,
+
+pointBackgroundColor: function(context) {
+  return context.dataIndex === context.dataset.data.length - 1
+    ? '#34c97a'
+    : '#4f8ef7';
+},
+
+pointBorderColor: '#0f1117',
+pointBorderWidth: 2,
+
+    
+      borderCapStyle: 'round',
+borderJoinStyle: 'round',
+
+      fill: true,
+      backgroundColor: complianceGradient,
+
+      tension: 0.42
+    }]
+  },
+
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
+
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
+
+    plugins: {
+      legend: {
+        display: false
+      },
+
+      tooltip: {
+        backgroundColor: 'rgba(10,14,23,.94)',
+        borderColor: 'rgba(79,142,247,.25)',
+        borderWidth: 1,
+
+        titleColor: '#dce8ff',
+        bodyColor: '#aab6ce',
+
+        padding: 12,
+
+        displayColors: false,
+
+        callbacks: {
+          label: function(context) {
+            return ` Compliance: ${context.parsed.y.toFixed(1)}%`;
+          }
+        }
+      }
+    },
+
+    scales: {
+      x: {
+        ticks: {
+          color: '#66718a',
+          font: {
+            size: 10
+          }
+        },
+
+        grid: {
+          display: false
+        },
+
+        border: {
+          display: false
+        }
+      },
+
+      y: {
+        ticks: {
+          color: '#66718a',
+          font: {
+            size: 10
+          },
+
+          callback: value => value + '%'
+        },
+
+        grid: {
+          color: 'rgba(100,120,160,.10)',
+          drawBorder: false
+        },
+
+        border: {
+          display: false
+        },
+
+        min: 0,
+        max: 100
+      }
+    }
+  }
+});
+
+
+// ── Zone Distribution Chart ──────────────────────────────────────────────────
+
+const pieData = [
+  { label: 'Cleaned',     value: z.cleaned || 0,     color: '#34c97a' },
+  { label: 'Pending',     value: z.pending || 0,     color: '#f5c842' },
+  { label: 'In Progress', value: z.in_progress || 0, color: '#4f8ef7' },
+  { label: 'Overdue',     value: z.overdue || 0,     color: '#f05252' }
+].filter(d => d.value > 0);
+
+if (pieChart) pieChart.destroy();
+
+const totalZoneTasks = pieData.reduce((sum, item) => sum + item.value, 0);
+
+const centerReadoutPlugin = {
+  id: 'centerReadout',
+
+  afterDraw(chart) {
+    const { ctx } = chart;
+    const meta = chart.getDatasetMeta(0);
+
+    if (!meta || !meta.data || !meta.data.length) return;
+
+    const x = meta.data[0].x;
+    const y = meta.data[0].y;
+
+    ctx.save();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Main number
+    ctx.font = '700 23px monospace';
+    ctx.fillStyle = '#edf2ff';
+    ctx.shadowColor = 'rgba(79,142,247,.25)';
+    ctx.shadowBlur = 12;
+
+    ctx.fillText(totalZoneTasks, x, y - 5);
+
+    // Label
+    ctx.shadowBlur = 0;
+    ctx.font = '700 7px monospace';
+    ctx.fillStyle = 'rgba(130,150,185,.55)';
+
+    ctx.fillText('TOTAL TASKS', x, y + 17);
+
+    ctx.restore();
+  }
+};
+
+pieChart = new Chart(document.getElementById('chart-pie'), {
+
+  type: 'doughnut',
+
+  data: {
+    labels: pieData.map(d => d.label),
+
+    datasets: [{
+      data: pieData.map(d => d.value),
+
+      backgroundColor: pieData.map(d => d.color),
+
+      borderWidth: 0,
+
+      hoverOffset: 8,
+
+      spacing: 3
+    }]
+  },
+
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    cutout: '64%',
+
+    layout: {
+      padding: 8
+    },
+
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 1200,
+      easing: 'easeOutQuart'
+    },
+
+    plugins: {
+      legend: {
+        display: false
+      },
+
+      tooltip: {
+        backgroundColor: 'rgba(10,14,23,.94)',
+        borderColor: 'rgba(79,142,247,.20)',
+        borderWidth: 1,
+
+        titleColor: '#dce8ff',
+        bodyColor: '#aab6ce',
+
+        padding: 11,
+
+        callbacks: {
+          label: function(context) {
+            return ` ${context.label}: ${context.parsed}`;
+          }
+        }
+      }
+    }
+  },
+
+  plugins: [centerReadoutPlugin]
+});
+
+// ── Custom Legend ─────────────────────────────────────────────────────────────
+
+document.getElementById('pie-legend').innerHTML = pieData.map(d => `
+  <span style="--legend-color:${d.color}">
+    <span></span>
+    ${d.label}
+    <span class="legend-value">(${d.value})</span>
+  </span>
+`).join('');
+// ── Alert Intelligence Feed ──────────────────────────────────────────────────
+
+const alertsDiv = document.getElementById('dash-alerts');
+
+const recentAlerts = dash.recent_alerts || [];
+
+document.getElementById('dash-alert-count').textContent =
+  recentAlerts.length + ' unread';
+
+alertsDiv.innerHTML = recentAlerts.slice(0, 5).map((a, index) => {
+
+  const severity = a.severity || 'warning';
+
+  const severityLabel =
+    severity === 'critical'
+      ? 'CRITICAL'
+      : severity === 'warning'
+        ? 'WARNING'
+        : severity.toUpperCase();
+
+  return `
+    <div class="alert-telemetry ${severity}">
+
+      <div class="alert-severity-core">
+        <span></span>
+      </div>
+
+      <div class="alert-content">
+
+        <div class="alert-topline">
+          <span class="alert-index">ALERT-${String(index + 1).padStart(2, '0')}</span>
+          <span class="alert-severity-label">${severityLabel}</span>
+        </div>
+
+        <div class="ai-msg">
+          ${a.message}
+        </div>
+
+        <div class="ai-time">
+          ${a.zone_name || 'FACILITY-WIDE'}
+          <span>·</span>
+          ${fmtDate(a.created_at)}
+        </div>
+
+      </div>
+
+      <div class="alert-signal">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+    </div>
+  `;
+}).join('') || `
+  <div class="alert-empty-state">
+    <div class="alert-clear-core">✓</div>
+    <div>
+      <div class="alert-clear-title">FACILITY CLEAR</div>
+      <div class="alert-clear-sub">No active alerts detected</div>
+    </div>
+  </div>
+`;
+
+    // Zone list
+    // ── Zone Telemetry List ───────────────────────────────────────────────────────
+
+const zonesDiv = document.getElementById('dash-zones');
+const zl = await api('/api/zones');
+
+zonesDiv.innerHTML = zl.slice(0, 10).map(z => {
+
+  const zoneColor =
+    z.status === 'cleaned'
+      ? 'var(--green)'
+      : z.status === 'overdue'
+        ? 'var(--red)'
+        : z.status === 'in-progress'
+          ? 'var(--primary)'
+          : 'var(--yellow)';
+
+  const zoneCode = `ZONE-${String(z.id || '').padStart(2, '0')}`;
+
+  return `
+    <div class="zone-telemetry-row" style="--zone-color:${zoneColor}">
+
+      <div class="zone-telemetry-left">
+
+        <div class="zone-status-core">
+          <span></span>
+        </div>
+
+        <div class="zone-identity">
+
+          <div class="zone-name-line">
+            <span class="zone-code">${zoneCode}</span>
+            <span class="zone-name">${z.name}</span>
+          </div>
+
+          <div class="zone-meta">
+            ${z.location_name || 'Unassigned'}
+            <span>·</span>
+            FLOOR ${z.floor || '?'}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="zone-telemetry-right">
+
+        <div class="zone-signal">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        ${badge(z.status)}
+
+      </div>
+
+    </div>
+  `;
+}).join('');
+
+
+// ── Facility Zone Scan ──────────────────────────────────────────────────────
+
+const zoneRows = zonesDiv.querySelectorAll('.zone-telemetry-row');
+
+if (zoneRows.length > 0) {
+
+  let activeZoneScan = 0;
+
+  const runZoneScan = () => {
+
+    zoneRows.forEach(row => {
+      row.classList.remove('zone-scan-active');
+    });
+
+    zoneRows[activeZoneScan]?.classList.add('zone-scan-active');
+
+    activeZoneScan =
+      (activeZoneScan + 1) % zoneRows.length;
+  };
+
+  runZoneScan();
+
+  if (window.cleanTrackZoneScanTimer) {
+    clearInterval(window.cleanTrackZoneScanTimer);
+  }
+
+  window.cleanTrackZoneScanTimer =
+    setInterval(runZoneScan, 3200);
+}
+   // ── Predictive Intelligence Feed ─────────────────────────────────────────────
+
+const predictiveCard = document.getElementById('predictive-card');
+const predictiveList = document.getElementById('predictive-list');
+
+const predictiveWarnings = kpis.predictive_warnings || [];
+
+if (predictiveWarnings.length > 0) {
+
+  predictiveCard.style.display = 'block';
+
+  predictiveList.innerHTML = predictiveWarnings.map((w, index) => {
+
+    const riskLevel =
+      w.missed_count >= 4
+        ? 'HIGH'
+        : w.missed_count >= 2
+          ? 'MEDIUM'
+          : 'LOW';
+
+    const riskClass =
+      riskLevel === 'HIGH'
+        ? 'critical'
+        : riskLevel === 'MEDIUM'
+          ? 'warning'
+          : 'info';
+
+    return `
+      <div class="predictive-telemetry ${riskClass}">
+
+        <div class="predictive-core">
+          <span></span>
+        </div>
+
+        <div class="predictive-content">
+
+          <div class="predictive-topline">
+            <span class="predictive-index">
+              PREDICTION-${String(index + 1).padStart(2, '0')}
+            </span>
+
+            <span class="predictive-risk">
+              ${riskLevel} RISK
+            </span>
+          </div>
+
+          <div class="predictive-name">
+            ${w.name}
+          </div>
+
+          <div class="predictive-message">
+            Missed cleaning
+            <strong>${w.missed_count}×</strong>
+            this week.
+            Scheduling or staffing review recommended.
+          </div>
+
+        </div>
+
+        <div class="predictive-meter">
+
+          <div class="predictive-meter-label">
+            RISK
+          </div>
+
+          <div class="predictive-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }).join('');
+
+} else {
+
+  predictiveCard.style.display = 'none';
+  predictiveList.innerHTML = '';
+}
+
+// ── Facility Atmosphere Parallax ─────────────────────────────────────────────
+
+if (!window.cleanTrackParallaxBound) {
+
+  window.cleanTrackParallaxBound = true;
+
+  document.addEventListener('mousemove', e => {
+
+    const dashboard =
+      document.querySelector('.dashboard-command');
+
+    if (!dashboard) return;
+
+    const x =
+      (e.clientX / window.innerWidth - 0.5) * 2;
+
+    const y =
+      (e.clientY / window.innerHeight - 0.5) * 2;
+
+    dashboard.style.setProperty(
+      '--facility-mx',
+      `${x * 10}px`
+    );
+
+    dashboard.style.setProperty(
+      '--facility-my',
+      `${y * 10}px`
+    );
+  });
+}
+
+
+// ── ZONES ─────────────────────────────────────────────────────────────────────
+async function loadZones() {
 // ── ZONES ─────────────────────────────────────────────────────────────────────
 async function loadZones() {
   const locId = document.getElementById('zone-loc-filter').value;
@@ -2553,11 +6409,10 @@ document.querySelectorAll('.overlay').forEach(o => {
 });
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
+// ── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-page').classList.contains('show')) doLogin(); });
-token = null;
-currentUser = null;
-localStorage.removeItem('ct_token');
-localStorage.removeItem('ct_user');
+if (token && currentUser) initApp();
+
 function openPhotosModal(before, after){
 
 if(before){
