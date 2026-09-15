@@ -5794,8 +5794,6 @@ if (!window.cleanTrackParallaxBound) {
 
 // ── ZONES ─────────────────────────────────────────────────────────────────────
 async function loadZones() {
-// ── ZONES ─────────────────────────────────────────────────────────────────────
-async function loadZones() {
   const locId = document.getElementById('zone-loc-filter').value;
   const q = locId ? `?location_id=${locId}` : '';
   allZones = await api('/api/zones' + q);
