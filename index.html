@@ -5052,7 +5052,7 @@ function startFacilityBoot() {
   }, 1500);
 }
 
-async function doLogin() {
+window.doLogin = async function doLogin() {
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
   try {
