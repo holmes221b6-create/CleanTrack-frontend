@@ -6413,28 +6413,22 @@ document.querySelectorAll('.overlay').forEach(o => {
 });
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
-// ── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-page').classList.contains('show')) doLogin(); });
 if (token && currentUser) initApp();
-
+ 
 function openPhotosModal(before, after){
 
-console.log("SCRIPT REACHED BOTTOM");
+  if(before){
+    document.getElementById("before-link").href =
+      API_URL + "/uploads/" + before;
+  }
 
-function openPhotosModal(before, after){
+  if(after){
+    document.getElementById("after-link").href =
+      API_URL + "/uploads/" + after;
+  }
 
-if(before){
-document.getElementById("before-link").href =
-API_URL + "/uploads/" + before;
-}
-
-if(after){
-document.getElementById("after-link").href =
-API_URL + "/uploads/" + after;
-}
-
-openModal("modal-photos");
-
+  openModal("modal-photos");
 }
 
 </script>
