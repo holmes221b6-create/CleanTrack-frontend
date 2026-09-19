@@ -4357,6 +4357,835 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — ENHANCED ZONES
+   ============================================================ */
+
+.zone-card-enhanced {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79,142,247,.07), transparent 38%),
+    linear-gradient(145deg, rgba(26,29,39,.98), rgba(17,19,27,.98));
+  box-shadow: 0 8px 30px rgba(0,0,0,.16);
+  transform: translateY(8px);
+  opacity: 0;
+  animation: zoneCardIn .45s ease forwards;
+  animation-delay: var(--zone-delay);
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
+}
+
+/* subtle technical accent */
+.zone-card-enhanced::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--zone-accent, var(--blue));
+  opacity: .75;
+  transition: opacity .25s ease;
+}
+
+.zone-card-enhanced::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: -100px;
+  right: -90px;
+  border-radius: 50%;
+  background: var(--zone-glow, rgba(79,142,247,.08));
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.zone-card-enhanced:hover {
+  transform: translateY(-4px);
+  border-color: rgba(79,142,247,.24);
+  box-shadow:
+    0 14px 38px rgba(0,0,0,.25),
+    0 0 25px rgba(79,142,247,.05);
+}
+
+.zone-card-enhanced:hover::before {
+  opacity: 1;
+}
+
+
+/* STATUS THEMES */
+
+.zone-card-enhanced.cleaned {
+  --zone-accent: #43d17a;
+  --zone-glow: rgba(67,209,122,.08);
+}
+
+.zone-card-enhanced.pending {
+  --zone-accent: #f1c75b;
+  --zone-glow: rgba(241,199,91,.08);
+}
+
+.zone-card-enhanced.overdue {
+  --zone-accent: #ef6464;
+  --zone-glow: rgba(239,100,100,.09);
+}
+
+
+/* TOP SECTION */
+
+.zcard-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.zone-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.zone-identity > div:last-child {
+  min-width: 0;
+}
+
+.zone-status-orb {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.zone-status-orb span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--zone-accent);
+  box-shadow: 0 0 0 4px color-mix(
+    in srgb,
+    var(--zone-accent) 10%,
+    transparent
+  );
+  animation: zonePulse 2.4s ease-in-out infinite;
+}
+
+.zcard .zname {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: .01em;
+  color: var(--text);
+}
+
+.zcard .zmeta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.zone-dot {
+  margin: 0 4px;
+  opacity: .45;
+}
+
+
+/* STATUS BADGE */
+
+.zone-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.025);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.zone-status-badge.cleaned {
+  color: #69df93;
+  background: rgba(67,209,122,.07);
+  border-color: rgba(67,209,122,.14);
+}
+
+.zone-status-badge.pending {
+  color: #f1cf70;
+  background: rgba(241,199,91,.07);
+  border-color: rgba(241,199,91,.14);
+}
+
+.zone-status-badge.overdue {
+  color: #f17a7a;
+  background: rgba(239,100,100,.07);
+  border-color: rgba(239,100,100,.14);
+}
+
+
+/* DIVIDER */
+
+.zone-divider {
+  height: 1px;
+  margin: 17px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,.08),
+    rgba(255,255,255,.025),
+    transparent
+  );
+}
+
+
+/* CLEANING CYCLE */
+
+.zone-monitor {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 17px;
+}
+
+.zone-monitor-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.zone-monitor-label strong {
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.zone-cycle-track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255,255,255,.055);
+}
+
+.zone-cycle-fill {
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--zone-accent);
+  box-shadow: 0 0 12px color-mix(
+    in srgb,
+    var(--zone-accent) 35%,
+    transparent
+  );
+  transform-origin: left;
+  animation: zoneCycleLoad .9s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.zone-cycle-fill.cleaned {
+  width: 82%;
+}
+
+.zone-cycle-fill.pending {
+  width: 55%;
+}
+
+.zone-cycle-fill.overdue {
+  width: 28%;
+}
+
+.zone-cycle-points {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.zone-cycle-points span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+}
+
+
+/* INFO GRID */
+
+.zone-info-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.zone-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.045);
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.zone-info:hover {
+  background: rgba(255,255,255,.045);
+  border-color: rgba(255,255,255,.08);
+}
+
+.zone-info-icon {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(79,142,247,.08);
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.zone-info div {
+  min-width: 0;
+}
+
+.zone-info small {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.zone-info strong {
+  display: block;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ALERT */
+
+.zone-alert {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 13px;
+  padding: 9px 10px;
+  border: 1px solid rgba(239,100,100,.13);
+  border-radius: 9px;
+  background: rgba(239,100,100,.055);
+}
+
+.zone-alert-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(239,100,100,.12);
+  color: #f17a7a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.zone-alert strong,
+.zone-alert span {
+  display: block;
+}
+
+.zone-alert strong {
+  color: #f18a8a;
+  font-size: 10px;
+}
+
+.zone-alert span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* HEALTH */
+
+.zone-health {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 13px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.zone-health > span:first-child {
+  color: #62dc8e;
+  font-size: 11px;
+}
+
+
+/* ACTIONS */
+
+.zone-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.zone-actions .btn {
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    border-color .2s ease;
+}
+
+.zone-actions .btn:hover {
+  transform: translateY(-1px);
+}
+
+.zone-action-main {
+  flex: 1;
+}
+
+.zone-action-main span {
+  margin-right: 4px;
+}
+
+.zone-delete {
+  opacity: .72;
+}
+
+.zone-delete:hover {
+  opacity: 1;
+}
+
+
+/* EMPTY STATE */
+
+.zones-empty {
+  grid-column: 1 / -1;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px;
+  border: 1px dashed rgba(255,255,255,.09);
+  border-radius: 16px;
+  background: rgba(255,255,255,.015);
+  text-align: center;
+}
+
+.zones-empty-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  border: 1px solid rgba(79,142,247,.16);
+  border-radius: 12px;
+  background: rgba(79,142,247,.05);
+  color: var(--blue);
+  font-size: 22px;
+}
+
+.zones-empty-title {
+  margin-bottom: 5px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.zones-empty-text {
+  max-width: 280px;
+  margin-bottom: 17px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* ANIMATIONS */
+
+@keyframes zoneCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zonePulse {
+  0%, 100% {
+    opacity: .7;
+    transform: scale(.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoneCycleLoad {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+  .zone-card-enhanced {
+    padding: 16px;
+  }
+
+  .zcard-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .zone-status-badge {
+    margin-left: 46px;
+  }
+
+  .zone-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zone-actions {
+    flex-wrap: wrap;
+  }
+
+  .zone-action-main {
+    flex: 1 1 100%;
+  }
+}
+
+/* ============================================================
+   ZONES — HEADER & FILTER SYSTEM
+   ============================================================ */
+
+.zones-page-header {
+  position: relative;
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+
+.zones-heading {
+  position: relative;
+}
+
+.zones-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.zones-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.6);
+  animation: zoneEyebrowPulse 2.5s ease-in-out infinite;
+}
+
+.zones-heading h1 {
+  margin-bottom: 4px;
+}
+
+.zones-heading p {
+  margin: 0;
+}
+
+.zones-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zones-add-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+/* OVERVIEW */
+
+.zones-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.zone-overview-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 68px;
+  padding: 12px 14px;
+  overflow: hidden;
+
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.012)
+    );
+
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    background .22s ease;
+}
+
+.zone-overview-item::after {
+  content: "";
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  right: -45px;
+  bottom: -55px;
+  border-radius: 50%;
+  background: rgba(79,142,247,.045);
+  pointer-events: none;
+}
+
+.zone-overview-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.11);
+  background: rgba(255,255,255,.045);
+}
+
+.zone-overview-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(79,142,247,.13);
+  border-radius: 9px;
+
+  background: rgba(79,142,247,.07);
+  color: var(--blue);
+
+  font-size: 14px;
+}
+
+.zone-overview-icon.cleaned {
+  border-color: rgba(67,209,122,.13);
+  background: rgba(67,209,122,.07);
+  color: #69df93;
+}
+
+.zone-overview-icon.pending {
+  border-color: rgba(241,199,91,.13);
+  background: rgba(241,199,91,.07);
+  color: #f1cf70;
+}
+
+.zone-overview-icon.overdue {
+  border-color: rgba(239,100,100,.13);
+  background: rgba(239,100,100,.07);
+  color: #f17a7a;
+}
+
+.zone-overview-item span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.zone-overview-item strong {
+  display: block;
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+
+/* FILTER BAR */
+
+.zones-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+  padding: 9px;
+
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.018);
+}
+
+.zones-location-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.zones-filter-label {
+  padding-left: 5px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .11em;
+}
+
+.zones-location-select {
+  width: 190px !important;
+  margin: 0 !important;
+  min-height: 36px;
+}
+
+.zones-tabs {
+  margin: 0 !important;
+  flex: 0 0 auto;
+}
+
+
+/* HEADER ANIMATION */
+
+@keyframes zoneEyebrowPulse {
+  0%, 100% {
+    opacity: .55;
+    transform: scale(.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+
+  .zones-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .zones-filter-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .zones-location-control {
+    justify-content: space-between;
+  }
+
+  .zones-location-select {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .zones-tabs {
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 560px) {
+
+  .zones-page-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .zones-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .zones-overview {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+
+  .zone-overview-item {
+    min-height: 60px;
+    padding: 10px;
+  }
+
+  .zone-overview-icon {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+  }
+
+  .zones-location-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .zones-location-select {
+    width: 100% !important;
+    max-width: none;
+  }
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -4623,25 +5452,135 @@ select.fc option{background:var(--surface)}
 
 </div>
 
-    <!-- ZONES -->
-    <div id="page-zones" class="page">
-      <div class="ph ph-row">
-        <div><h1>Zones</h1><p>Manage bathrooms and restroom facilities</p></div>
-        <button class="btn btn-primary" onclick="openZoneModal()">+ Add Zone</button>
+   <!-- ZONES -->
+<div id="page-zones" class="page">
+
+  <div class="ph ph-row zones-page-header">
+
+    <div class="zones-heading">
+      <div class="zones-eyebrow">
+        <span class="zones-eyebrow-dot"></span>
+        FACILITY MONITORING
       </div>
-      <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
-        <select class="fc" style="width:200px" id="zone-loc-filter" onchange="loadZones()">
-          <option value="">All Locations</option>
-        </select>
-        <div class="tabs" style="margin-bottom:0;flex:0 0 auto">
-          <button class="tab active" onclick="filterZones('all',this)">All</button>
-          <button class="tab" onclick="filterZones('cleaned',this)">Cleaned</button>
-          <button class="tab" onclick="filterZones('pending',this)">Pending</button>
-          <button class="tab" onclick="filterZones('overdue',this)">Overdue</button>
-        </div>
-      </div>
-      <div class="zone-grid" id="zones-grid"></div>
+
+      <h1>Zones</h1>
+
+      <p>
+        Manage bathrooms and restroom facilities
+      </p>
     </div>
+
+    <button
+      class="btn btn-primary zones-add-btn"
+      onclick="openZoneModal()"
+    >
+      <span class="zones-add-icon">+</span>
+      Add Zone
+    </button>
+
+  </div>
+
+
+  <!-- ZONE OVERVIEW -->
+  <div class="zones-overview">
+
+    <div class="zone-overview-item">
+      <div class="zone-overview-icon">◫</div>
+      <div>
+        <span>Total Zones</span>
+        <strong id="zones-total-count">—</strong>
+      </div>
+    </div>
+
+    <div class="zone-overview-item">
+      <div class="zone-overview-icon cleaned">✓</div>
+      <div>
+        <span>Cleaned</span>
+        <strong id="zones-cleaned-count">—</strong>
+      </div>
+    </div>
+
+    <div class="zone-overview-item">
+      <div class="zone-overview-icon pending">◷</div>
+      <div>
+        <span>Pending</span>
+        <strong id="zones-pending-count">—</strong>
+      </div>
+    </div>
+
+    <div class="zone-overview-item">
+      <div class="zone-overview-icon overdue">!</div>
+      <div>
+        <span>Overdue</span>
+        <strong id="zones-overdue-count">—</strong>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- FILTER BAR -->
+  <div class="zones-filter-bar">
+
+    <div class="zones-location-control">
+
+      <span class="zones-filter-label">
+        LOCATION
+      </span>
+
+      <select
+        class="fc zones-location-select"
+        id="zone-loc-filter"
+        onchange="loadZones()"
+      >
+        <option value="">All Locations</option>
+      </select>
+
+    </div>
+
+
+    <div class="tabs zones-tabs">
+
+      <button
+        class="tab active"
+        onclick="filterZones('all',this)"
+      >
+        All
+      </button>
+
+      <button
+        class="tab"
+        onclick="filterZones('cleaned',this)"
+      >
+        Cleaned
+      </button>
+
+      <button
+        class="tab"
+        onclick="filterZones('pending',this)"
+      >
+        Pending
+      </button>
+
+      <button
+        class="tab"
+        onclick="filterZones('overdue',this)"
+      >
+        Overdue
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ZONE CARDS -->
+  <div
+    class="zone-grid"
+    id="zones-grid"
+  ></div>
+
+</div>
 
     <!-- TASKS -->
     <div id="page-tasks" class="page">
@@ -5814,24 +6753,222 @@ function filterZones(f, btn) {
 }
 
 function renderZones() {
-  const filtered = allZoneFilter === 'all' ? allZones : allZones.filter(z => z.status === allZoneFilter);
+
+  updateZoneOverview();
+
+  const filtered =
+    allZoneFilter === 'all'
+      ? allZones
+      : allZones.filter(z => z.status === allZoneFilter);
+
   const g = document.getElementById('zones-grid');
-  g.innerHTML = filtered.map(z => `
-    <div class="zcard ${z.status}" onclick="">
-      <div class="zname">${z.name}</div>
-      <div class="zmeta">${z.location_name||''} · Floor ${z.floor||'?'}</div>
-      <div style="margin:10px 0">${badge(z.status)}</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Every ${z.cleaning_interval_minutes}min${z.last_cleaned_at?' · Last: '+fmtDate(z.last_cleaned_at):''}</div>
-      ${z.overdue_tasks > 0 ? `<div style="font-size:11px;color:var(--red);margin-bottom:8px">⚠️ ${z.overdue_tasks} overdue</div>` : ''}
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-secondary btn-sm" onclick="showQR('${z.id}','${z.name}')">QR</button>
-        <button class="btn btn-secondary btn-sm" onclick="editZone(${JSON.stringify(z).split('"').join('&quot;')})">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteZone('${z.id}')">Del</button>
+
+  if (!filtered.length) {
+    g.innerHTML = `
+      <div class="zones-empty">
+        <div class="zones-empty-icon">◫</div>
+        <div class="zones-empty-title">No zones found</div>
+        <div class="zones-empty-text">
+          There are no zones matching the current filters.
+        </div>
+        <button class="btn btn-primary" onclick="openZoneModal()">
+          + Add Zone
+        </button>
       </div>
-    </div>
-  `).join('') || '<p style="color:var(--muted)">No zones found.</p>';
+    `;
+    return;
+  }
+
+  g.innerHTML = filtered.map((z, index) => {
+    const status = z.status || 'pending';
+
+    const statusLabel =
+      status === 'cleaned' ? 'Cleaned' :
+      status === 'pending' ? 'Pending' :
+      status === 'overdue' ? 'Overdue' :
+      status.charAt(0).toUpperCase() + status.slice(1);
+
+    const statusIcon =
+      status === 'cleaned' ? '✓' :
+      status === 'pending' ? '◷' :
+      status === 'overdue' ? '!' :
+      '•';
+
+    const location = z.location_name || 'Unassigned location';
+    const floor = z.floor || '?';
+    const interval = z.cleaning_interval_minutes || 60;
+
+    const lastCleaned = z.last_cleaned_at
+      ? fmtDate(z.last_cleaned_at)
+      : 'Not recorded';
+
+    const overdue = Number(z.overdue_tasks || 0);
+
+    return `
+      <article
+        class="zcard zone-card-enhanced ${status}"
+        style="--zone-delay:${index * 45}ms"
+      >
+
+        <div class="zcard-top">
+
+          <div class="zone-identity">
+            <div class="zone-status-orb">
+              <span></span>
+            </div>
+
+            <div>
+              <div class="zname">${z.name}</div>
+
+              <div class="zmeta">
+                ${location}
+                <span class="zone-dot">•</span>
+                Floor ${floor}
+              </div>
+            </div>
+          </div>
+
+          <div class="zone-status-badge ${status}">
+            <span>${statusIcon}</span>
+            ${statusLabel}
+          </div>
+
+        </div>
+
+        <div class="zone-divider"></div>
+
+        <div class="zone-monitor">
+
+          <div class="zone-monitor-label">
+            <span>Cleaning cycle</span>
+            <strong>${interval} min</strong>
+          </div>
+
+          <div class="zone-cycle">
+            <div class="zone-cycle-track">
+              <div class="zone-cycle-fill ${status}"></div>
+            </div>
+
+            <div class="zone-cycle-points">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="zone-info-grid">
+
+          <div class="zone-info">
+            <span class="zone-info-icon">↻</span>
+            <div>
+              <small>Last cleaned</small>
+              <strong>${lastCleaned}</strong>
+            </div>
+          </div>
+
+          <div class="zone-info">
+            <span class="zone-info-icon">⌁</span>
+            <div>
+              <small>Frequency</small>
+              <strong>Every ${interval}m</strong>
+            </div>
+          </div>
+
+        </div>
+
+        ${
+          overdue > 0
+            ? `
+              <div class="zone-alert">
+                <span class="zone-alert-icon">!</span>
+                <div>
+                  <strong>${overdue} overdue task${overdue > 1 ? 's' : ''}</strong>
+                  <span>Requires attention</span>
+                </div>
+              </div>
+            `
+            : `
+              <div class="zone-health">
+                <span>✓</span>
+                <span>Cleaning schedule operating normally</span>
+              </div>
+            `
+        }
+
+        <div class="zone-actions">
+
+          <button
+            class="btn btn-secondary btn-sm zone-action-main"
+            onclick="event.stopPropagation(); showQR('${z.id}','${z.name}')"
+          >
+            <span>⌗</span>
+            QR Code
+          </button>
+
+          <button
+            class="btn btn-secondary btn-sm"
+            onclick="event.stopPropagation(); editZone(${JSON.stringify(z).split('"').join('&quot;')})"
+          >
+            Edit
+          </button>
+
+          <button
+            class="btn btn-danger btn-sm zone-delete"
+            onclick="event.stopPropagation(); deleteZone('${z.id}')"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </article>
+    `;
+  }).join('');
 }
 
+
+function updateZoneOverview() {
+
+  const total = allZones.length;
+
+  const cleaned =
+    allZones.filter(z => z.status === 'cleaned').length;
+
+  const pending =
+    allZones.filter(z => z.status === 'pending').length;
+
+  const overdue =
+    allZones.filter(z => z.status === 'overdue').length;
+
+  document.getElementById('zones-total-count').textContent = total;
+  document.getElementById('zones-cleaned-count').textContent = cleaned;
+  document.getElementById('zones-pending-count').textContent = pending;
+  document.getElementById('zones-overdue-count').textContent = overdue;
+}
+
+
+function updateZoneOverview() {
+
+  const total = allZones.length;
+
+  const cleaned =
+    allZones.filter(z => z.status === 'cleaned').length;
+
+  const pending =
+    allZones.filter(z => z.status === 'pending').length;
+
+  const overdue =
+    allZones.filter(z => z.status === 'overdue').length;
+
+  document.getElementById('zones-total-count').textContent = total;
+  document.getElementById('zones-cleaned-count').textContent = cleaned;
+  document.getElementById('zones-pending-count').textContent = pending;
+  document.getElementById('zones-overdue-count').textContent = overdue;
+}
 function openZoneModal(data) {
   document.getElementById('zone-modal-title').textContent = data ? 'Edit Zone' : 'New Zone';
   document.getElementById('zone-id').value = data?.id || '';
