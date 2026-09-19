@@ -6825,6 +6825,484 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — ANALYTICS INTELLIGENCE
+   ============================================================ */
+
+.analytics-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.analytics-heading {
+  position: relative;
+}
+
+.analytics-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.analytics-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.55);
+}
+
+.analytics-heading h1 {
+  margin-bottom: 4px;
+}
+
+.analytics-heading p {
+  margin: 0;
+}
+
+.analytics-live-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .1em;
+}
+
+.analytics-live-status span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 7px rgba(67,209,122,.55);
+}
+
+
+/* KPI GRID */
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 17px;
+}
+
+.analytics-kpi {
+  position: relative;
+  min-height: 112px;
+  padding: 13px 14px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+  background: rgba(255,255,255,.018);
+}
+
+.analytics-kpi::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  bottom: -28px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .025;
+  pointer-events: none;
+}
+
+.analytics-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.analytics-kpi-label {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .1em;
+}
+
+.analytics-kpi-icon {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border: 1px solid rgba(79,142,247,.12);
+  border-radius: 7px;
+  background: rgba(79,142,247,.06);
+  color: var(--blue);
+  font-size: 11px;
+}
+
+.analytics-kpi.green .analytics-kpi-icon {
+  color: var(--green);
+  background: rgba(67,209,122,.06);
+  border-color: rgba(67,209,122,.12);
+}
+
+.analytics-kpi.yellow .analytics-kpi-icon {
+  color: var(--yellow);
+  background: rgba(241,199,91,.06);
+  border-color: rgba(241,199,91,.12);
+}
+
+.analytics-kpi.red .analytics-kpi-icon {
+  color: var(--red);
+  background: rgba(239,100,100,.06);
+  border-color: rgba(239,100,100,.12);
+}
+
+.analytics-kpi .stat-value {
+  margin-top: 10px;
+  font-size: 23px;
+}
+
+.analytics-kpi-unit {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.analytics-kpi-foot {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+
+/* MAIN GRID */
+
+.analytics-main-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(340px, .95fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+
+/* PANELS */
+
+.analytics-panel {
+  min-width: 0;
+  border-color: rgba(255,255,255,.055);
+  overflow: hidden;
+}
+
+.analytics-panel-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 16px 11px;
+}
+
+.analytics-panel-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.analytics-panel-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.analytics-panel-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* PERIOD BUTTONS */
+
+.analytics-periods {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 8px;
+  background: rgba(255,255,255,.018);
+}
+
+.analytics-period {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background .16s ease,
+    color .16s ease;
+}
+
+.analytics-period:hover {
+  color: var(--text);
+}
+
+.analytics-period.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+
+/* CHART */
+
+.analytics-chart-meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.analytics-chart {
+  height: 245px;
+  padding: 7px 12px 12px;
+}
+
+
+/* RANKING */
+
+.analytics-ranking-table {
+  border-top: 1px solid rgba(255,255,255,.045);
+}
+
+.analytics-ranking-table table {
+  width: 100%;
+}
+
+.analytics-ranking-table tbody tr {
+  transition: background .16s ease;
+}
+
+.analytics-ranking-table tbody tr:hover {
+  background: rgba(255,255,255,.018);
+}
+
+.analytics-rank {
+  width: 30px;
+  font-size: 12px;
+}
+
+.analytics-staff {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 110px;
+}
+
+.analytics-staff span {
+  color: var(--text);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-number {
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+}
+
+.analytics-empty {
+  padding: 30px !important;
+  text-align: center;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+
+/* HEATMAP */
+
+.heatmap-panel {
+  margin-bottom: 0;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 16px 12px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.heatmap-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.heatmap-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-low {
+  background: var(--green);
+}
+
+.legend-medium {
+  background: var(--yellow);
+}
+
+.legend-high {
+  background: var(--orange);
+}
+
+.legend-critical {
+  background: var(--red);
+}
+
+.analytics-heatmap-list {
+  border-top: 1px solid rgba(255,255,255,.045);
+}
+
+.analytics-hm-row {
+  min-height: 45px;
+  padding: 7px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.035);
+  transition: background .16s ease;
+}
+
+.analytics-hm-row:hover {
+  background: rgba(255,255,255,.018);
+}
+
+.analytics-hm-name {
+  width: 130px;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.analytics-hm-track {
+  height: 5px;
+  background: rgba(255,255,255,.055);
+}
+
+.analytics-hm-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .5s ease;
+}
+
+.analytics-hm-count {
+  width: 35px;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+}
+
+.analytics-hm-status {
+  width: 75px;
+}
+
+.analytics-hm-compliance {
+  width: 45px;
+  text-align: right;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+}
+
+.analytics-heatmap-empty {
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+
+  .analytics-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-kpi-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .analytics-page-header {
+    align-items: flex-start;
+  }
+
+  .analytics-live-status {
+    display: none;
+  }
+
+  .analytics-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-panel-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analytics-periods {
+    width: 100%;
+  }
+
+  .analytics-period {
+    flex: 1;
+  }
+
+  .analytics-chart {
+    height: 210px;
+  }
+
+  .heatmap-legend {
+    flex-wrap: wrap;
+  }
+
+  .analytics-hm-name {
+    width: 90px;
+  }
+
+}
+
+@media (max-width: 500px) {
+
+  .analytics-hm-row {
+    min-width: 560px;
+  }
+
+  .analytics-heatmap-list {
+    overflow-x: auto;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -7745,41 +8223,217 @@ select.fc option{background:var(--surface)}
   </div>
 
 </div>
-    <!-- ANALYTICS -->
-    <div id="page-analytics" class="page">
-      <div class="ph"><h1>Analytics & Insights</h1><p>KPIs, heatmaps, and performance metrics</p></div>
-      <div class="stats" id="kpi-stats"></div>
-      <div class="g2" style="margin-bottom:16px">
-        <div class="card">
-          <div class="card-title" style="align-items:center">
-            Compliance Over Time
-            <div style="display:flex;gap:4px">
-              <button onclick="setReportPeriod('daily',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:var(--primary);color:#fff;font-size:11px;cursor:pointer;font-weight:600" id="rpd-daily">Daily</button>
-              <button onclick="setReportPeriod('weekly',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600" id="rpd-weekly">Weekly</button>
-              <button onclick="setReportPeriod('monthly',this)" style="padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600" id="rpd-monthly">Monthly</button>
-            </div>
-          </div>
-          <div class="chart-wrap"><canvas id="chart-compliance2"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Staff Performance Ranking</div>
-          <div class="tw"><table>
-            <thead><tr><th>#</th><th>Staff</th><th>Tasks</th><th>Compliance</th><th>Avg</th></tr></thead>
-            <tbody id="staff-ranking"></tbody>
-          </table></div>
-        </div>
+   <!-- ANALYTICS -->
+<div id="page-analytics" class="page">
+
+  <div class="ph analytics-page-header">
+
+    <div class="analytics-heading">
+
+      <div class="analytics-eyebrow">
+        <span class="analytics-eyebrow-dot"></span>
+        PERFORMANCE INTELLIGENCE
       </div>
-      <div class="card">
-        <div class="card-title">Zone Miss Heatmap — Last 7 Days</div>
-        <div style="display:flex;gap:12px;margin-bottom:12px;font-size:11px;color:var(--muted)">
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Low</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--yellow);display:inline-block"></span>Medium</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--orange);display:inline-block"></span>High</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Critical</span>
-        </div>
-        <div id="heatmap-list"></div>
-      </div>
+
+      <h1>Analytics &amp; Insights</h1>
+
+      <p>
+        Operational KPIs, compliance trends, and facility performance
+      </p>
+
     </div>
+
+    <div class="analytics-live-status">
+      <span></span>
+      LIVE DATA
+    </div>
+
+  </div>
+
+
+  <!-- KPI COMMAND STRIP -->
+
+  <div
+    class="stats analytics-kpi-grid"
+    id="kpi-stats"
+  ></div>
+
+
+  <!-- MAIN ANALYTICS GRID -->
+
+  <div class="analytics-main-grid">
+
+
+    <!-- COMPLIANCE -->
+
+    <div class="card analytics-panel compliance-panel">
+
+      <div class="analytics-panel-head">
+
+        <div>
+
+          <span class="analytics-panel-eyebrow">
+            TREND ANALYSIS
+          </span>
+
+          <h3>Compliance Over Time</h3>
+
+        </div>
+
+        <div class="analytics-periods">
+
+          <button
+            onclick="setReportPeriod('daily',this)"
+            id="rpd-daily"
+            class="analytics-period active"
+          >
+            Daily
+          </button>
+
+          <button
+            onclick="setReportPeriod('weekly',this)"
+            id="rpd-weekly"
+            class="analytics-period"
+          >
+            Weekly
+          </button>
+
+          <button
+            onclick="setReportPeriod('monthly',this)"
+            id="rpd-monthly"
+            class="analytics-period"
+          >
+            Monthly
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="analytics-chart-meta">
+
+        <span>
+          Compliance percentage
+        </span>
+
+        <span>
+          0 — 100%
+        </span>
+
+      </div>
+
+      <div class="chart-wrap analytics-chart">
+        <canvas id="chart-compliance2"></canvas>
+      </div>
+
+    </div>
+
+
+    <!-- STAFF RANKING -->
+
+    <div class="card analytics-panel staff-ranking-panel">
+
+      <div class="analytics-panel-head">
+
+        <div>
+
+          <span class="analytics-panel-eyebrow">
+            PERSONNEL ANALYSIS
+          </span>
+
+          <h3>Staff Performance</h3>
+
+        </div>
+
+        <span class="analytics-panel-note">
+          Ranked
+        </span>
+
+      </div>
+
+      <div class="tw analytics-ranking-table">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>#</th>
+              <th>Staff</th>
+              <th>Tasks</th>
+              <th>Compliance</th>
+              <th>Avg</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="staff-ranking"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- HEATMAP -->
+
+  <div class="card analytics-panel heatmap-panel">
+
+    <div class="analytics-panel-head">
+
+      <div>
+
+        <span class="analytics-panel-eyebrow">
+          FACILITY RISK MONITOR
+        </span>
+
+        <h3>Zone Miss Heatmap</h3>
+
+      </div>
+
+      <span class="analytics-panel-note">
+        Last 7 days
+      </span>
+
+    </div>
+
+
+    <div class="heatmap-legend">
+
+      <span>
+        <i class="legend-low"></i>
+        Low
+      </span>
+
+      <span>
+        <i class="legend-medium"></i>
+        Medium
+      </span>
+
+      <span>
+        <i class="legend-high"></i>
+        High
+      </span>
+
+      <span>
+        <i class="legend-critical"></i>
+        Critical
+      </span>
+
+    </div>
+
+
+    <div
+      class="analytics-heatmap-list"
+      id="heatmap-list"
+    ></div>
+
+  </div>
+
+</div>
 
     <!-- REPORTS -->
     <div id="page-reports" class="page">
@@ -10457,58 +11111,322 @@ async function sendEmail() {
 }
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 async function loadAnalytics() {
-  const [kpis, heatmap, staff, report] = await Promise.all([
-    api('/api/analytics/kpis'), api('/api/analytics/heatmap?days=7'),
-    api('/api/analytics/staff'), api('/api/analytics/reports?period=' + reportPeriodAlt)
-  ]);
-  document.getElementById('kpi-stats').innerHTML = `
-    <div class="stat blue"><div class="stat-label">7-Day Compliance</div><div class="stat-value">${kpis.compliance_7d||0}%</div></div>
-    <div class="stat green"><div class="stat-label">30-Day Compliance</div><div class="stat-value">${kpis.compliance_30d||0}%</div></div>
-    <div class="stat yellow"><div class="stat-label">Avg Duration (30d)</div><div class="stat-value">${kpis.avg_duration_30d||'--'}<span style="font-size:14px">m</span></div></div>
-    <div class="stat red"><div class="stat-label">Predictive Warnings</div><div class="stat-value">${(kpis.predictive_warnings||[]).length}</div></div>
-  `;
-  // Compliance chart 2
-  const rdata = report.slice(0,20).reverse();
-  if (comp2Chart) comp2Chart.destroy();
-  comp2Chart = new Chart(document.getElementById('chart-compliance2'), {
-    type: 'bar',
-    data: { labels: rdata.map(r=>(r.period||'').slice(-5)), datasets:[{ data: rdata.map(r=>r.compliance_pct||0), backgroundColor:'rgba(79,142,247,.8)', borderRadius:5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#8890a8',font:{size:10}},grid:{color:'#2e3248'}}, y:{ticks:{color:'#8890a8',font:{size:10}},grid:{color:'#2e3248'},min:0,max:100} } }
-  });
-  // Staff ranking
-  const medals = ['🥇','🥈','🥉'];
-  document.getElementById('staff-ranking').innerHTML = staff.map((s,i) => `
-    <tr>
-      <td style="font-size:14px">${medals[i]||'#'+(i+1)}</td>
-      <td><div style="display:flex;align-items:center;gap:7px">${av(s.name)}<span style="font-size:13px">${s.name}</span></div></td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${s.total_tasks||0}</td>
-      <td>${pbar(s.compliance_pct||0)}</td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${s.avg_duration?Math.round(s.avg_duration)+'m':'—'}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No data.</td></tr>';
-  // Heatmap
-  const maxMiss = Math.max(...heatmap.map(z=>z.missed_count||0), 1);
-  document.getElementById('heatmap-list').innerHTML = heatmap.map(z => {
-    const pct = (z.missed_count||0)/maxMiss;
-    const col = pct>0.7?'var(--red)':pct>0.4?'var(--orange)':pct>0.2?'var(--yellow)':'var(--green)';
-    return `<div class="hm-row">
-      <div class="hm-name" title="${z.name} (${z.location_name||''})">${z.name}</div>
-      <div class="hm-track"><div class="hm-fill" style="width:${maxMiss>0?(z.missed_count||0)/maxMiss*100:0}%;background:${col}"></div></div>
-      <div class="hm-lbl">${z.missed_count||0}x</div>
-      ${badge(z.current_status||'pending')}
-      <span style="width:45px;text-align:right;font-size:11px;color:var(--muted);font-family:'Courier New',monospace">${z.compliance_pct??0}%</span>
-    </div>`;
-  }).join('') || '<p style="color:var(--muted);font-size:13px">No data yet.</p>';
-}
 
-function setReportPeriod(p, btn) {
-  reportPeriodAlt = p;
-  ['daily','weekly','monthly'].forEach(x => {
-    const el = document.getElementById('rpd-'+x);
-    el.style.background = x===p ? 'var(--primary)' : 'transparent';
-    el.style.color = x===p ? '#fff' : 'var(--muted)';
-  });
-  loadAnalytics();
+  const [kpis, heatmap, staff, report] =
+    await Promise.all([
+      api('/api/analytics/kpis'),
+      api('/api/analytics/heatmap?days=7'),
+      api('/api/analytics/staff'),
+      api('/api/analytics/reports?period=' + reportPeriodAlt)
+    ]);
+
+
+  /* KPI CARDS */
+
+  document.getElementById('kpi-stats').innerHTML = `
+
+    <div class="stat analytics-kpi blue">
+
+      <div class="analytics-kpi-top">
+        <span class="analytics-kpi-label">
+          7-DAY COMPLIANCE
+        </span>
+        <span class="analytics-kpi-icon">◈</span>
+      </div>
+
+      <div class="stat-value">
+        ${kpis.compliance_7d || 0}%
+      </div>
+
+      <div class="analytics-kpi-foot">
+        Recent operational compliance
+      </div>
+
+    </div>
+
+
+    <div class="stat analytics-kpi green">
+
+      <div class="analytics-kpi-top">
+        <span class="analytics-kpi-label">
+          30-DAY COMPLIANCE
+        </span>
+        <span class="analytics-kpi-icon">✓</span>
+      </div>
+
+      <div class="stat-value">
+        ${kpis.compliance_30d || 0}%
+      </div>
+
+      <div class="analytics-kpi-foot">
+        Long-term performance
+      </div>
+
+    </div>
+
+
+    <div class="stat analytics-kpi yellow">
+
+      <div class="analytics-kpi-top">
+        <span class="analytics-kpi-label">
+          AVG DURATION
+        </span>
+        <span class="analytics-kpi-icon">◷</span>
+      </div>
+
+      <div class="stat-value">
+        ${kpis.avg_duration_30d || '--'}
+        <span class="analytics-kpi-unit">m</span>
+      </div>
+
+      <div class="analytics-kpi-foot">
+        Average cleaning time · 30d
+      </div>
+
+    </div>
+
+
+    <div class="stat analytics-kpi red">
+
+      <div class="analytics-kpi-top">
+        <span class="analytics-kpi-label">
+          PREDICTIVE WARNINGS
+        </span>
+        <span class="analytics-kpi-icon">!</span>
+      </div>
+
+      <div class="stat-value">
+        ${(kpis.predictive_warnings || []).length}
+      </div>
+
+      <div class="analytics-kpi-foot">
+        Active operational warnings
+      </div>
+
+    </div>
+
+  `;
+
+
+  /* COMPLIANCE CHART */
+
+  const rdata =
+    report.slice(0, 20).reverse();
+
+  if (comp2Chart)
+    comp2Chart.destroy();
+
+  comp2Chart =
+    new Chart(
+      document.getElementById('chart-compliance2'),
+      {
+        type: 'bar',
+
+        data: {
+          labels:
+            rdata.map(
+              r => (r.period || '').slice(-5)
+            ),
+
+          datasets: [{
+            data:
+              rdata.map(
+                r => r.compliance_pct || 0
+              ),
+
+            backgroundColor:
+              'rgba(79,142,247,.8)',
+
+            borderRadius: 5,
+
+            borderSkipped: false
+          }]
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+
+          scales: {
+
+            x: {
+              ticks: {
+                color: '#8890a8',
+                font: {
+                  size: 10
+                }
+              },
+
+              grid: {
+                color: '#2e3248'
+              }
+            },
+
+            y: {
+              ticks: {
+                color: '#8890a8',
+                font: {
+                  size: 10
+                }
+              },
+
+              grid: {
+                color: '#2e3248'
+              },
+
+              min: 0,
+              max: 100
+            }
+
+          }
+        }
+      }
+    );
+
+
+  /* STAFF RANKING */
+
+  const medals =
+    ['🥇', '🥈', '🥉'];
+
+  document.getElementById(
+    'staff-ranking'
+  ).innerHTML = staff.map((s, i) => `
+
+    <tr>
+
+      <td class="analytics-rank">
+        ${medals[i] || '#' + (i + 1)}
+      </td>
+
+      <td>
+
+        <div class="analytics-staff">
+
+          ${av(s.name)}
+
+          <span>
+            ${s.name}
+          </span>
+
+        </div>
+
+      </td>
+
+      <td class="analytics-number">
+        ${s.total_tasks || 0}
+      </td>
+
+      <td>
+        ${pbar(s.compliance_pct || 0)}
+      </td>
+
+      <td class="analytics-number">
+        ${
+          s.avg_duration
+            ? Math.round(s.avg_duration) + 'm'
+            : '—'
+        }
+      </td>
+
+    </tr>
+
+  `).join('') ||
+
+  `
+    <tr>
+      <td
+        colspan="5"
+        class="analytics-empty"
+      >
+        No staff data available.
+      </td>
+    </tr>
+  `;
+
+
+  /* HEATMAP */
+
+  const maxMiss =
+    Math.max(
+      ...heatmap.map(
+        z => z.missed_count || 0
+      ),
+      1
+    );
+
+
+  document.getElementById(
+    'heatmap-list'
+  ).innerHTML = heatmap.map(z => {
+
+    const pct =
+      (z.missed_count || 0) /
+      maxMiss;
+
+    const col =
+      pct > 0.7
+        ? 'var(--red)'
+        : pct > 0.4
+          ? 'var(--orange)'
+          : pct > 0.2
+            ? 'var(--yellow)'
+            : 'var(--green)';
+
+
+    return `
+
+      <div class="hm-row analytics-hm-row">
+
+        <div
+          class="hm-name analytics-hm-name"
+          title="${z.name} (${z.location_name || ''})"
+        >
+          ${z.name}
+        </div>
+
+        <div class="hm-track analytics-hm-track">
+
+          <div
+            class="hm-fill analytics-hm-fill"
+            style="
+              width:${(z.missed_count || 0) /
+                maxMiss * 100}%;
+              background:${col}
+            "
+          ></div>
+
+        </div>
+
+        <div class="hm-lbl analytics-hm-count">
+          ${z.missed_count || 0}x
+        </div>
+
+        <div class="analytics-hm-status">
+          ${badge(z.current_status || 'pending')}
+        </div>
+
+        <span class="analytics-hm-compliance">
+          ${z.compliance_pct ?? 0}%
+        </span>
+
+      </div>
+
+    `;
+
+  }).join('') ||
+
+  `
+    <div class="analytics-heatmap-empty">
+      No zone data available.
+    </div>
+  `;
 }
 
 // ── REPORTS ───────────────────────────────────────────────────────────────────
