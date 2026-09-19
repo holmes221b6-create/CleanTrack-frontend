@@ -5511,6 +5511,379 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — STAFF COMMAND CENTER
+   ============================================================ */
+
+.staff-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.staff-heading {
+  position: relative;
+}
+
+.staff-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.staff-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.55);
+}
+
+.staff-heading h1 {
+  margin-bottom: 4px;
+}
+
+.staff-heading p {
+  margin: 0;
+}
+
+.staff-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.staff-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.staff-add-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+/* STAFF OVERVIEW */
+
+.staff-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 17px;
+}
+
+.staff-stat {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 64px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+  background: rgba(255,255,255,.018);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.staff-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.035);
+}
+
+.staff-stat-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(79,142,247,.12);
+  border-radius: 8px;
+  background: rgba(79,142,247,.065);
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.staff-stat.active .staff-stat-icon {
+  color: #69df93;
+  background: rgba(67,209,122,.065);
+  border-color: rgba(67,209,122,.12);
+}
+
+.staff-stat.tasks .staff-stat-icon {
+  color: #78a8ff;
+}
+
+.staff-stat.compliance .staff-stat-icon {
+  color: #f1cf70;
+  background: rgba(241,199,91,.065);
+  border-color: rgba(241,199,91,.12);
+}
+
+.staff-stat div {
+  min-width: 0;
+}
+
+.staff-stat div > span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.staff-stat strong {
+  display: block;
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+/* TABLE */
+
+.staff-table-card {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(26,29,39,.96),
+      rgba(17,19,27,.98)
+    );
+  box-shadow: 0 8px 28px rgba(0,0,0,.14);
+}
+
+.staff-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 66px;
+  padding: 13px 15px;
+  border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.staff-table-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.staff-table-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.staff-table-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* PERSON */
+
+.staff-person {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.staff-person-info {
+  min-width: 0;
+}
+
+.staff-person-name {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.staff-person-email,
+.staff-person-phone {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.staff-person-email {
+  margin-top: 1px;
+}
+
+
+/* TABLE DETAILS */
+
+#staff-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#staff-table thead th {
+  height: 42px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.018);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#staff-table tbody tr {
+  transition: background .16s ease;
+}
+
+#staff-table tbody tr:hover {
+  background: rgba(79,142,247,.035);
+}
+
+#staff-table tbody td {
+  height: 67px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.035);
+}
+
+#staff-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.staff-location {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.staff-number,
+.staff-duration {
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+}
+
+.staff-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.staff-muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.staff-compliance {
+  min-width: 100px;
+}
+
+
+/* EMPTY */
+
+.staff-empty {
+  height: 180px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.staff-empty-icon {
+  margin-bottom: 8px;
+  font-size: 22px;
+  opacity: .55;
+}
+
+.staff-empty strong,
+.staff-empty span {
+  display: block;
+}
+
+.staff-empty strong {
+  margin-bottom: 3px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.staff-empty span {
+  font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+  .staff-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .staff-page-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .staff-header-actions {
+    width: 100%;
+  }
+
+  .staff-header-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .staff-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .staff-table-head {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .staff-table-note {
+    display: none;
+  }
+
+  #page-staff .tw {
+    overflow-x: auto;
+  }
+
+  #staff-table {
+    min-width: 850px;
+  }
+
+}
+
+@media (max-width: 450px) {
+
+  .staff-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-header-actions {
+    flex-direction: column;
+  }
+
+  .staff-header-actions .btn {
+    width: 100%;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -6048,60 +6421,149 @@ select.fc option{background:var(--surface)}
 
 </div>
 
-    <!-- STAFF -->
-    <div id="page-staff" class="page">
-      <div class="ph ph-row">
-        <div><h1>Staff Management</h1><p>Housekeeping staff, roles, and performance</p></div>
-        <div style="display:flex;gap:8px">
-  <button class="btn btn-secondary" onclick="openEmailModal()">✉ Send Email</button>
-  <button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button>
-</div>
+  <!-- STAFF -->
+<div id="page-staff" class="page">
+
+  <div class="ph ph-row staff-page-header">
+
+    <div class="staff-heading">
+
+      <div class="staff-eyebrow">
+        <span class="staff-eyebrow-dot"></span>
+        PERSONNEL CONTROL
       </div>
-      <div class="card"><div class="tw"><table>
-        <thead><tr><th>Name</th><th>Role</th><th>Location</th><th>Tasks (30d)</th><th>Compliance</th><th>Avg Time</th><th>Actions</th></tr></thead>
-        <tbody id="staff-body"></tbody>
-      </table></div></div>
+
+      <h1>Staff Management</h1>
+
+      <p>Housekeeping staff, roles, and performance</p>
+
     </div>
 
-    <!-- LOCATIONS -->
-    <div id="page-locations" class="page">
-      <div class="ph ph-row">
-        <div><h1>Locations</h1><p>Buildings and facilities across your organization</p></div>
-        <button class="btn btn-primary" onclick="openLocModal()">+ Add Location</button>
-      </div>
-      <div class="g3" id="locations-grid"></div>
+    <div class="staff-header-actions">
+
+      <button
+        class="btn btn-secondary"
+        onclick="openEmailModal()"
+      >
+        <span>✉</span>
+        Send Email
+      </button>
+
+      <button
+        class="btn btn-primary staff-add-btn"
+        onclick="openStaffModal()"
+      >
+        <span class="staff-add-icon">+</span>
+        Add Staff
+      </button>
+
     </div>
-    <!-- LOGS -->
-<div id="page-logs" class="page">
-  <div class="ph">
-    <h1>Cleaning Logs</h1>
-    <p>View completed cleaning activities</p>
+
   </div>
 
-  <div style="margin-bottom:16px">
-    <select class="fc" id="log-zone-filter" onchange="loadLogs()">
-      <option value="">All Zones</option>
-    </select>
+
+  <!-- STAFF OVERVIEW -->
+
+  <div class="staff-overview">
+
+    <div class="staff-stat">
+
+      <span class="staff-stat-icon">♙</span>
+
+      <div>
+        <span>Total Personnel</span>
+        <strong id="staff-total-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="staff-stat active">
+
+      <span class="staff-stat-icon">●</span>
+
+      <div>
+        <span>Active Staff</span>
+        <strong id="staff-active-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="staff-stat tasks">
+
+      <span class="staff-stat-icon">◫</span>
+
+      <div>
+        <span>Tasks (30d)</span>
+        <strong id="staff-task-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="staff-stat compliance">
+
+      <span class="staff-stat-icon">✓</span>
+
+      <div>
+        <span>Avg Compliance</span>
+        <strong id="staff-compliance-count">—</strong>
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="card">
+
+  <!-- STAFF TABLE -->
+
+  <div class="card staff-table-card">
+
+    <div class="staff-table-head">
+
+      <div>
+
+        <span class="staff-table-eyebrow">
+          PERSONNEL DIRECTORY
+        </span>
+
+        <h3>Team Performance</h3>
+
+      </div>
+
+      <span class="staff-table-note">
+        Performance · Last 30 days
+      </span>
+
+    </div>
+
     <div class="tw">
-      <table>
+
+      <table id="staff-table">
+
         <thead>
+
           <tr>
-            <th>Zone</th>
-            <th>Staff</th>
-            <th>Score</th>
-            <th>Feedback</th>
-            <th>Photos</th>
-            <th>Date</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Location</th>
+            <th>Tasks (30d)</th>
+            <th>Compliance</th>
+            <th>Avg Time</th>
+            <th>Actions</th>
           </tr>
+
         </thead>
-        <tbody id="logs-body">
-        </tbody>
+
+        <tbody id="staff-body"></tbody>
+
       </table>
+
     </div>
+
   </div>
+
 </div>
     <!-- ANALYTICS -->
     <div id="page-analytics" class="page">
@@ -7812,79 +8274,435 @@ async function saveTask() {
   }
 }
 // ── STAFF ─────────────────────────────────────────────────────────────────────
+
 let staffPerf = [];
+
+
 async function loadStaff() {
-  const [users, perf] = await Promise.all([ api('/api/users'), api('/api/analytics/staff') ]);
+
+  const [users, perf] = await Promise.all([
+    api('/api/users'),
+    api('/api/analytics/staff')
+  ]);
+
   staffPerf = perf;
+
+  updateStaffOverview(users, perf);
+
   const body = document.getElementById('staff-body');
+
   body.innerHTML = users.map(u => {
-    const p = perf.find(x => x.id === u.id) || {};
-    const loc = locations.find(l => l.id === u.location_id);
-    return `<tr>
-      <td><div style="display:flex;align-items:center;gap:9px">${av(u.name)}<div>
-        <div style="font-weight:700;font-size:13px">${u.name}</div>
-        <div style="font-size:11px;color:var(--muted)">${u.email}</div>
-        ${u.phone ? `<div style="font-size:11px;color:var(--muted)">${u.phone}</div>` : ''}
-      </div></div></td>
-      <td>${badge(u.role)}</td>
-      <td style="color:var(--muted);font-size:12px">${loc?.name||'—'}</td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${p.total_tasks||0}</td>
-      <td>${p.compliance_pct !== undefined ? pbar(p.compliance_pct) : '—'}</td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${p.avg_duration ? Math.round(p.avg_duration)+'m' : '—'}</td>
-      <td><div style="display:flex;gap:4px">
-        <button class="btn btn-secondary btn-sm" onclick="editStaff(${JSON.stringify(u).split('"').join('&quot;')})">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="disableStaff('${u.id}')">Disable</button>
-      </div></td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No staff found.</td></tr>';
+
+    const p =
+      perf.find(x => x.id === u.id) || {};
+
+    const loc =
+      locations.find(l => l.id === u.location_id);
+
+    return `
+      <tr>
+
+        <td>
+
+          <div class="staff-person">
+
+            ${av(u.name)}
+
+            <div class="staff-person-info">
+
+              <div class="staff-person-name">
+                ${u.name}
+              </div>
+
+              <div class="staff-person-email">
+                ${u.email}
+              </div>
+
+              ${
+                u.phone
+                  ? `
+                    <div class="staff-person-phone">
+                      ${u.phone}
+                    </div>
+                  `
+                  : ''
+              }
+
+            </div>
+
+          </div>
+
+        </td>
+
+
+        <td>
+          <div class="staff-role">
+            ${badge(u.role)}
+          </div>
+        </td>
+
+
+        <td class="staff-location">
+          ${loc?.name || '—'}
+        </td>
+
+
+        <td class="staff-number">
+          ${p.total_tasks || 0}
+        </td>
+
+
+        <td>
+
+          ${
+            p.compliance_pct !== undefined
+              ? `
+                <div class="staff-compliance">
+                  ${pbar(p.compliance_pct)}
+                </div>
+              `
+              : '<span class="staff-muted">—</span>'
+          }
+
+        </td>
+
+
+        <td class="staff-duration">
+
+          ${
+            p.avg_duration
+              ? Math.round(p.avg_duration) + 'm'
+              : '—'
+          }
+
+        </td>
+
+
+        <td>
+
+          <div class="staff-actions">
+
+            <button
+              class="btn btn-secondary btn-sm"
+              onclick="editStaff(${JSON.stringify(u).split('"').join('&quot;')})"
+            >
+              Edit
+            </button>
+
+            <button
+              class="btn btn-danger btn-sm"
+              onclick="disableStaff('${u.id}')"
+            >
+              Disable
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+
+  }).join('') ||
+
+  `
+    <tr>
+      <td
+        colspan="7"
+        class="staff-empty"
+      >
+        <div class="staff-empty-icon">♙</div>
+        <strong>No staff found</strong>
+        <span>There are currently no personnel records to display.</span>
+      </td>
+    </tr>
+  `;
 }
+
+
+function updateStaffOverview(users, perf) {
+
+  const total = users.length;
+
+  const active =
+    users.filter(u => u.role !== 'disabled').length;
+
+  const taskTotal =
+    perf.reduce(
+      (sum, p) => sum + Number(p.total_tasks || 0),
+      0
+    );
+
+  const complianceValues =
+    perf
+      .map(p => Number(p.compliance_pct))
+      .filter(v => Number.isFinite(v));
+
+
+  const avgCompliance =
+    complianceValues.length
+      ? Math.round(
+          complianceValues.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / complianceValues.length
+        )
+      : null;
+
+
+  document.getElementById(
+    'staff-total-count'
+  ).textContent = total;
+
+
+  document.getElementById(
+    'staff-active-count'
+  ).textContent = active;
+
+
+  document.getElementById(
+    'staff-task-count'
+  ).textContent = taskTotal;
+
+
+  document.getElementById(
+    'staff-compliance-count'
+  ).textContent =
+    avgCompliance !== null
+      ? avgCompliance + '%'
+      : '—';
+}
+
 
 function openStaffModal() {
-  document.getElementById('staff-modal-title').textContent = 'Add Staff';
-  document.getElementById('staff-id').value = '';
-  ['staff-name','staff-email','staff-notification-email','staff-phone','staff-password'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('staff-role').value = 'staff';
-  document.getElementById('staff-pw-group').style.display = 'block';
-  document.getElementById('staff-location').innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+
+  document.getElementById(
+    'staff-modal-title'
+  ).textContent = 'Add Staff';
+
+  document.getElementById(
+    'staff-id'
+  ).value = '';
+
+  [
+    'staff-name',
+    'staff-email',
+    'staff-notification-email',
+    'staff-phone',
+    'staff-password'
+  ].forEach(
+    id =>
+      document.getElementById(id).value = ''
+  );
+
+
+  document.getElementById(
+    'staff-role'
+  ).value = 'staff';
+
+
+  document.getElementById(
+    'staff-pw-group'
+  ).style.display = 'block';
+
+
+  document.getElementById(
+    'staff-location'
+  ).innerHTML =
+    `<option value="">No location</option>` +
+    locations.map(
+      l =>
+        `<option value="${l.id}">
+          ${l.name}
+        </option>`
+    ).join('');
+
+
   openModal('modal-staff');
 }
+
 
 function editStaff(u) {
-  document.getElementById('staff-modal-title').textContent = 'Edit Staff';
-  document.getElementById('staff-id').value = u.id;
-  document.getElementById('staff-name').value = u.name;
-  document.getElementById('staff-email').value = u.email;
-  document.getElementById('staff-notification-email').value = u.notification_email || '';
-  document.getElementById('staff-phone').value = u.phone||'';
-  document.getElementById('staff-role').value = u.role;
-  document.getElementById('staff-pw-group').style.display = 'none';
-  document.getElementById('staff-location').innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}"${u.location_id===l.id?' selected':''}>${l.name}</option>`).join('');
+
+  document.getElementById(
+    'staff-modal-title'
+  ).textContent = 'Edit Staff';
+
+  document.getElementById(
+    'staff-id'
+  ).value = u.id;
+
+  document.getElementById(
+    'staff-name'
+  ).value = u.name;
+
+  document.getElementById(
+    'staff-email'
+  ).value = u.email;
+
+  document.getElementById(
+    'staff-notification-email'
+  ).value =
+    u.notification_email || '';
+
+  document.getElementById(
+    'staff-phone'
+  ).value =
+    u.phone || '';
+
+  document.getElementById(
+    'staff-role'
+  ).value = u.role;
+
+  document.getElementById(
+    'staff-pw-group'
+  ).style.display = 'none';
+
+
+  document.getElementById(
+    'staff-location'
+  ).innerHTML =
+    `<option value="">No location</option>` +
+    locations.map(
+      l =>
+        `<option
+          value="${l.id}"
+          ${u.location_id === l.id ? 'selected' : ''}
+        >
+          ${l.name}
+        </option>`
+    ).join('');
+
+
   openModal('modal-staff');
 }
 
+
 async function saveStaff() {
-  const id = document.getElementById('staff-id').value;
+
+  const id =
+    document.getElementById(
+      'staff-id'
+    ).value;
+
+
   const payload = {
-    name: document.getElementById('staff-name').value,
-    email: document.getElementById('staff-email').value,
-    notification_email: document.getElementById('staff-notification-email').value,
-    phone: document.getElementById('staff-phone').value,
-    role: document.getElementById('staff-role').value,
-    location_id: document.getElementById('staff-location').value || null
+
+    name:
+      document.getElementById(
+        'staff-name'
+      ).value,
+
+    email:
+      document.getElementById(
+        'staff-email'
+      ).value,
+
+    notification_email:
+      document.getElementById(
+        'staff-notification-email'
+      ).value,
+
+    phone:
+      document.getElementById(
+        'staff-phone'
+      ).value,
+
+    role:
+      document.getElementById(
+        'staff-role'
+      ).value,
+
+    location_id:
+      document.getElementById(
+        'staff-location'
+      ).value || null
+
   };
-  if (!id) payload.password = document.getElementById('staff-password').value;
+
+
+  if (!id) {
+
+    payload.password =
+      document.getElementById(
+        'staff-password'
+      ).value;
+
+  }
+
+
   try {
-    if (id) await api('/api/users/' + id, { method: 'PUT', body: JSON.stringify(payload) });
-    else await api('/api/users', { method: 'POST', body: JSON.stringify(payload) });
-    toast(id ? 'Staff updated' : 'Staff added', 'success');
-    closeModal('modal-staff'); loadStaff();
-  } catch(e) { toast(e.message, 'error'); }
+
+    if (id) {
+
+      await api(
+        '/api/users/' + id,
+        {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        }
+      );
+
+    } else {
+
+      await api(
+        '/api/users',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        }
+      );
+
+    }
+
+
+    toast(
+      id
+        ? 'Staff updated'
+        : 'Staff added',
+      'success'
+    );
+
+
+    closeModal('modal-staff');
+
+    loadStaff();
+
+  } catch (e) {
+
+    toast(
+      e.message,
+      'error'
+    );
+
+  }
 }
 
+
 async function disableStaff(id) {
-  if (!confirm('Disable this staff member?')) return;
-  await api('/api/users/' + id, { method: 'DELETE' });
-  toast('Staff deactivated', 'success'); loadStaff();
+
+  if (
+    !confirm(
+      'Disable this staff member?'
+    )
+  ) return;
+
+
+  await api(
+    '/api/users/' + id,
+    {
+      method: 'DELETE'
+    }
+  );
+
+
+  toast(
+    'Staff deactivated',
+    'success'
+  );
+
+
+  loadStaff();
 }
 
 // ── LOCATIONS ─────────────────────────────────────────────────────────────────
