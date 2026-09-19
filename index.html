@@ -5884,6 +5884,577 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — LOCATIONS FACILITY NETWORK
+   ============================================================ */
+
+.locations-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.locations-heading {
+  position: relative;
+}
+
+.locations-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.locations-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.55);
+}
+
+.locations-heading h1 {
+  margin-bottom: 4px;
+}
+
+.locations-heading p {
+  margin: 0;
+}
+
+.locations-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.locations-add-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+/* OVERVIEW */
+
+.locations-overview {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
+.location-stat {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  min-height: 64px;
+  padding: 11px 13px;
+
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+
+  background:
+    rgba(255,255,255,.018);
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.location-stat:hover {
+  transform: translateY(-2px);
+
+  border-color:
+    rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.035);
+}
+
+.location-stat-icon {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid
+    rgba(79,142,247,.12);
+
+  border-radius: 8px;
+
+  background:
+    rgba(79,142,247,.065);
+
+  color: var(--blue);
+
+  font-size: 13px;
+}
+
+.location-stat.zones
+.location-stat-icon {
+  color: #78a8ff;
+}
+
+.location-stat.staff
+.location-stat-icon {
+  color: #69df93;
+
+  background:
+    rgba(67,209,122,.065);
+
+  border-color:
+    rgba(67,209,122,.12);
+}
+
+.location-stat div {
+  min-width: 0;
+}
+
+.location-stat div > span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--muted);
+
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.location-stat strong {
+  display: block;
+
+  color: var(--text);
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+/* SECTION HEADER */
+
+.locations-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+.locations-section-eyebrow {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--muted);
+
+  font-size: 8px;
+  font-weight: 600;
+
+  letter-spacing: .12em;
+}
+
+.locations-section-head h3 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.locations-section-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* GRID */
+
+.locations-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+
+/* LOCATION CARD */
+
+.location-card-enhanced {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 16px;
+
+  border: 1px solid
+    rgba(255,255,255,.055);
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(26,29,39,.96),
+      rgba(17,19,27,.98)
+    );
+
+  box-shadow:
+    0 8px 28px
+    rgba(0,0,0,.14);
+
+  animation:
+    locationCardIn .4s ease both;
+
+  animation-delay:
+    var(--location-delay);
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.location-card-enhanced:hover {
+  transform: translateY(-3px);
+
+  border-color:
+    rgba(79,142,247,.18);
+
+  box-shadow:
+    0 12px 34px
+    rgba(0,0,0,.2);
+}
+
+
+@keyframes locationCardIn {
+
+  from {
+    opacity: 0;
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+/* CARD TOP */
+
+.location-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+}
+
+.location-building-icon {
+  width: 40px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(79,142,247,.14);
+
+  border-radius: 10px;
+
+  background:
+    rgba(79,142,247,.065);
+
+  color: var(--blue);
+
+  font-size: 20px;
+}
+
+.location-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  color: #69df93;
+
+  font-size: 8px;
+  font-weight: 650;
+
+  letter-spacing: .08em;
+}
+
+.location-status span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #69df93;
+
+  box-shadow:
+    0 0 7px
+    rgba(67,209,122,.55);
+}
+
+
+/* TITLE */
+
+.location-card-title h3 {
+  margin: 0 0 5px;
+
+  color: var(--text);
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.location-card-title p {
+  min-height: 30px;
+
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+
+/* DIVIDER */
+
+.location-divider {
+  height: 1px;
+
+  margin:
+    14px 0;
+
+  background:
+    rgba(255,255,255,.045);
+}
+
+
+/* METRICS */
+
+.location-metrics {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+}
+
+.location-metric {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.045);
+
+  border-radius: 9px;
+
+  background:
+    rgba(255,255,255,.018);
+}
+
+.location-metric-icon {
+  color: var(--blue);
+
+  font-size: 12px;
+}
+
+.location-metric-icon.staff-icon {
+  color: #69df93;
+}
+
+.location-metric small {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: var(--muted);
+
+  font-size: 8px;
+}
+
+.location-metric strong {
+  display: block;
+
+  color: var(--text);
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 14px;
+}
+
+
+/* HEALTH */
+
+.location-health {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 13px;
+
+  color: var(--muted);
+
+  font-size: 9px;
+}
+
+.location-health-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #69df93;
+
+  box-shadow:
+    0 0 6px
+    rgba(67,209,122,.45);
+}
+
+
+/* ACTION */
+
+.location-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  padding-top: 2px;
+}
+
+.location-actions .btn {
+  transition:
+    transform .16s ease,
+    background .16s ease;
+}
+
+.location-actions .btn:hover {
+  transform: translateY(-1px);
+}
+
+
+/* EMPTY */
+
+.locations-empty {
+  grid-column: 1 / -1;
+
+  min-height: 190px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px;
+
+  border:
+    1px dashed
+    rgba(255,255,255,.08);
+
+  border-radius: 13px;
+
+  color: var(--muted);
+
+  text-align: center;
+}
+
+.locations-empty-icon {
+  margin-bottom: 9px;
+
+  font-size: 25px;
+
+  opacity: .5;
+}
+
+.locations-empty strong {
+  margin-bottom: 4px;
+
+  color: var(--text);
+
+  font-size: 12px;
+}
+
+.locations-empty span {
+  margin-bottom: 13px;
+
+  font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+  .locations-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .locations-page-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .locations-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .locations-overview {
+    grid-template-columns:
+      1fr;
+  }
+
+  .locations-section-note {
+    display: none;
+  }
+
+}
+
+@media (max-width: 520px) {
+
+  .locations-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -6563,6 +7134,107 @@ select.fc option{background:var(--surface)}
     </div>
 
   </div>
+
+</div>
+
+<!-- LOCATIONS -->
+<div id="page-locations" class="page">
+
+  <div class="ph ph-row locations-page-header">
+
+    <div class="locations-heading">
+
+      <div class="locations-eyebrow">
+        <span class="locations-eyebrow-dot"></span>
+        FACILITY NETWORK
+      </div>
+
+      <h1>Locations</h1>
+
+      <p>
+        Buildings and facilities across your organization
+      </p>
+
+    </div>
+
+    <button
+      class="btn btn-primary locations-add-btn"
+      onclick="openLocModal()"
+    >
+      <span class="locations-add-icon">+</span>
+      Add Location
+    </button>
+
+  </div>
+
+
+  <!-- LOCATION OVERVIEW -->
+
+  <div class="locations-overview">
+
+    <div class="location-stat">
+
+      <span class="location-stat-icon">⌂</span>
+
+      <div>
+        <span>Total Locations</span>
+        <strong id="locations-total-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="location-stat zones">
+
+      <span class="location-stat-icon">◫</span>
+
+      <div>
+        <span>Total Zones</span>
+        <strong id="locations-zone-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="location-stat staff">
+
+      <span class="location-stat-icon">♙</span>
+
+      <div>
+        <span>Assigned Staff</span>
+        <strong id="locations-staff-count">—</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOCATION DIRECTORY -->
+
+  <div class="locations-section-head">
+
+    <div>
+
+      <span class="locations-section-eyebrow">
+        FACILITY DIRECTORY
+      </span>
+
+      <h3>Organization Locations</h3>
+
+    </div>
+
+    <span class="locations-section-note">
+      Active facilities
+    </span>
+
+  </div>
+
+
+  <div
+    class="locations-grid"
+    id="locations-grid"
+  ></div>
 
 </div>
     <!-- ANALYTICS -->
@@ -8707,54 +9379,222 @@ async function disableStaff(id) {
 
 // ── LOCATIONS ─────────────────────────────────────────────────────────────────
 async function loadLocations() {
+
   locations = await api('/api/locations');
-  const g = document.getElementById('locations-grid');
+
+  const g =
+    document.getElementById('locations-grid');
+
   if (!g) return;
-  g.innerHTML = locations.map(l => `
-    <div class="card">
-      <div style="font-size:32px;margin-bottom:12px">🏢</div>
-      <div style="font-weight:800;font-size:16px;margin-bottom:4px">${l.name}</div>
-      <div style="color:var(--muted);font-size:12px;margin-bottom:14px">${[l.address,l.city,l.country].filter(Boolean).join(', ')||'No address'}</div>
-      <div style="display:flex;gap:18px;margin-bottom:16px">
-        <div style="text-align:center"><div style="font-family:'Courier New',monospace;font-size:22px;font-weight:800;color:var(--primary)">${l.zone_count||0}</div><div style="font-size:11px;color:var(--muted)">Zones</div></div>
-        <div style="text-align:center"><div style="font-family:'Courier New',monospace;font-size:22px;font-weight:800;color:var(--green)">${l.staff_count||0}</div><div style="font-size:11px;color:var(--muted)">Staff</div></div>
+
+
+  updateLocationsOverview();
+
+
+  g.innerHTML = locations.map((l, index) => `
+
+    <article
+      class="location-card-enhanced"
+      style="--location-delay:${index * 45}ms"
+    >
+
+      <div class="location-card-top">
+
+        <div class="location-building-icon">
+          <span>⌂</span>
+        </div>
+
+        <div class="location-status">
+          <span></span>
+          ACTIVE
+        </div>
+
       </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteLoc('${l.id}')">Remove</button>
+
+
+      <div class="location-card-title">
+
+        <h3>${l.name}</h3>
+
+        <p>
+          ${
+            [l.address, l.city, l.country]
+              .filter(Boolean)
+              .join(', ')
+            || 'No address recorded'
+          }
+        </p>
+
+      </div>
+
+
+      <div class="location-divider"></div>
+
+
+      <div class="location-metrics">
+
+        <div class="location-metric">
+
+          <span class="location-metric-icon">◫</span>
+
+          <div>
+            <small>Zones</small>
+            <strong>${l.zone_count || 0}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="location-metric">
+
+          <span class="location-metric-icon staff-icon">♙</span>
+
+          <div>
+            <small>Staff</small>
+            <strong>${l.staff_count || 0}</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="location-health">
+
+        <span class="location-health-dot"></span>
+
+        <span>Facility operational</span>
+
+      </div>
+
+
+      <div class="location-actions">
+
+        <button
+          class="btn btn-danger btn-sm"
+          onclick="deleteLoc('${l.id}')"
+        >
+          Remove
+        </button>
+
+      </div>
+
+    </article>
+
+  `).join('') ||
+
+  `
+    <div class="locations-empty">
+
+      <div class="locations-empty-icon">⌂</div>
+
+      <strong>No locations yet</strong>
+
+      <span>
+        Add your first facility to begin managing zones and staff.
+      </span>
+
+      <button
+        class="btn btn-primary"
+        onclick="openLocModal()"
+      >
+        + Add Location
+      </button>
+
     </div>
-  `).join('') || '<p style="color:var(--muted)">No locations yet.</p>';
+  `;
+
 
   // Update dropdowns
+
   const fillSelect = (id) => {
-    const el = document.getElementById(id);
+
+    const el =
+      document.getElementById(id);
+
     if (!el) return;
+
     const curr = el.value;
-    el.innerHTML = `<option value="">All Locations</option>` + locations.map(l => `<option value="${l.id}"${curr===l.id?' selected':''}>${l.name}</option>`).join('');
+
+    el.innerHTML =
+      `<option value="">All Locations</option>` +
+
+      locations.map(l => `
+        <option
+          value="${l.id}"
+          ${curr === l.id ? 'selected' : ''}
+        >
+          ${l.name}
+        </option>
+      `).join('');
   };
-  ['zone-loc-filter','report-loc-filter'].forEach(fillSelect);
 
-  const staffLocEl = document.getElementById('staff-location');
-  if (staffLocEl) staffLocEl.innerHTML = `<option value="">No location</option>` + locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-}
 
-function openLocModal() { ['loc-name','loc-address','loc-city','loc-country'].forEach(id => document.getElementById(id).value=''); openModal('modal-loc'); }
+  [
+    'zone-loc-filter',
+    'report-loc-filter'
+  ].forEach(fillSelect);
 
-async function saveLoc() {
-  try {
-    await api('/api/locations', { method:'POST', body: JSON.stringify({
-      name: document.getElementById('loc-name').value,
-      address: document.getElementById('loc-address').value,
-      city: document.getElementById('loc-city').value,
-      country: document.getElementById('loc-country').value
-    })});
-    toast('Location added', 'success'); closeModal('modal-loc'); loadLocations();
-  } catch(e) { toast(e.message, 'error'); }
-}
 
-async function deleteLoc(id) {
-  if (!confirm('Delete this location?')) return;
-  await api('/api/locations/' + id, { method: 'DELETE' });
-  toast('Deleted', 'success'); loadLocations();
+  const staffLocEl =
+    document.getElementById(
+      'staff-location'
+    );
+
+
+  if (staffLocEl) {
+
+    staffLocEl.innerHTML =
+      `<option value="">No location</option>` +
+
+      locations.map(l => `
+        <option value="${l.id}">
+          ${l.name}
+        </option>
+      `).join('');
+
   }
+
+}
+
+
+function updateLocationsOverview() {
+
+  const total =
+    locations.length;
+
+
+  const zones =
+    locations.reduce(
+      (sum, l) =>
+        sum + Number(l.zone_count || 0),
+      0
+    );
+
+
+  const staff =
+    locations.reduce(
+      (sum, l) =>
+        sum + Number(l.staff_count || 0),
+      0
+    );
+
+
+  document.getElementById(
+    'locations-total-count'
+  ).textContent = total;
+
+
+  document.getElementById(
+    'locations-zone-count'
+  ).textContent = zones;
+
+
+  document.getElementById(
+    'locations-staff-count'
+  ).textContent = staff;
+
+}
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
   console.log("LOAD LOGS STARTED");
