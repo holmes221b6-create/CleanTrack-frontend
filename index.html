@@ -9595,6 +9595,47 @@ function updateLocationsOverview() {
   ).textContent = staff;
 
 }
+
+function openLocModal() {
+  ['loc-name', 'loc-address', 'loc-city', 'loc-country']
+    .forEach(id => {
+      document.getElementById(id).value = '';
+    });
+
+  openModal('modal-loc');
+}
+
+async function saveLoc() {
+  try {
+    await api('/api/locations', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: document.getElementById('loc-name').value,
+        address: document.getElementById('loc-address').value,
+        city: document.getElementById('loc-city').value,
+        country: document.getElementById('loc-country').value
+      })
+    });
+
+    toast('Location added', 'success');
+    closeModal('modal-loc');
+    loadLocations();
+
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function deleteLoc(id) {
+  if (!confirm('Delete this location?')) return;
+
+  await api('/api/locations/' + id, {
+    method: 'DELETE'
+  });
+
+  toast('Deleted', 'success');
+  loadLocations();
+}
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
   console.log("LOAD LOGS STARTED");
