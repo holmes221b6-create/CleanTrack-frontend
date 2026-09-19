@@ -6455,6 +6455,376 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — CLEANING LOGS / AUDIT
+   ============================================================ */
+
+.logs-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.logs-heading {
+  position: relative;
+}
+
+.logs-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.logs-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.55);
+}
+
+.logs-heading h1 {
+  margin-bottom: 4px;
+}
+
+.logs-heading p {
+  margin: 0;
+}
+
+
+/* OVERVIEW */
+
+.logs-overview {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 17px;
+}
+
+.log-stat {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 64px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+  background: rgba(255,255,255,.018);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.log-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.035);
+}
+
+.log-stat-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(79,142,247,.12);
+  border-radius: 8px;
+  background: rgba(79,142,247,.065);
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.log-stat.approved .log-stat-icon {
+  color: #69df93;
+  background: rgba(67,209,122,.065);
+  border-color: rgba(67,209,122,.12);
+}
+
+.log-stat.pending .log-stat-icon {
+  color: #f1cf70;
+  background: rgba(241,199,91,.065);
+  border-color: rgba(241,199,91,.12);
+}
+
+.log-stat div {
+  min-width: 0;
+}
+
+.log-stat div > span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.log-stat strong {
+  display: block;
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+/* FILTER */
+
+.logs-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 11px;
+  background: rgba(255,255,255,.018);
+}
+
+.logs-filter-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logs-filter-label {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .1em;
+  white-space: nowrap;
+}
+
+.logs-zone-select {
+  min-width: 180px;
+}
+
+.logs-filter-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* TABLE */
+
+.logs-table-card {
+  border-color: rgba(255,255,255,.06);
+  overflow: hidden;
+}
+
+.logs-table-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 15px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.045);
+}
+
+.logs-table-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.logs-table-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.logs-table-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* CELLS */
+
+.log-zone-cell strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.log-staff-cell {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.log-feedback {
+  max-width: 230px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.log-muted {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.log-date {
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+
+/* SCORE */
+
+.log-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 90px;
+}
+
+.log-score-value {
+  width: 25px;
+  flex: 0 0 25px;
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.log-score-value.good {
+  color: #69df93;
+}
+
+.log-score-value.medium {
+  color: #f1cf70;
+}
+
+.log-score-value.low {
+  color: #f17a7a;
+}
+
+.log-score-track {
+  width: 55px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+}
+
+.log-score-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.log-score-fill.good {
+  background: var(--green);
+}
+
+.log-score-fill.medium {
+  background: var(--yellow);
+}
+
+.log-score-fill.low {
+  background: var(--red);
+}
+
+
+/* ACTIONS */
+
+.log-actions {
+  display: flex;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.log-photo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+/* EMPTY */
+
+.logs-empty {
+  padding: 40px 20px !important;
+  text-align: center;
+}
+
+.logs-empty-icon {
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 25px;
+  opacity: .5;
+}
+
+.logs-empty strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.logs-empty span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+
+  .logs-overview {
+    grid-template-columns:
+      1fr;
+  }
+
+  .logs-filter-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .logs-filter-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .logs-zone-select {
+    width: 100%;
+  }
+
+  .logs-filter-note {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .logs-page-header {
+    align-items: flex-start;
+  }
+
+  .logs-table-head {
+    align-items: flex-start;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .logs-table-note {
+    display: none;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -7235,6 +7605,144 @@ select.fc option{background:var(--surface)}
     class="locations-grid"
     id="locations-grid"
   ></div>
+
+</div>
+
+<!-- LOGS -->
+<div id="page-logs" class="page">
+
+  <div class="ph ph-row logs-page-header">
+
+    <div class="logs-heading">
+
+      <div class="logs-eyebrow">
+        <span class="logs-eyebrow-dot"></span>
+        AUDIT &amp; VERIFICATION
+      </div>
+
+      <h1>Cleaning Logs</h1>
+
+      <p>
+        Review completed cleaning activities and verification records
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOG OVERVIEW -->
+
+  <div class="logs-overview">
+
+    <div class="log-stat">
+
+      <span class="log-stat-icon">◫</span>
+
+      <div>
+        <span>Total Records</span>
+        <strong id="logs-total-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="log-stat approved">
+
+      <span class="log-stat-icon">✓</span>
+
+      <div>
+        <span>Verified</span>
+        <strong id="logs-approved-count">—</strong>
+      </div>
+
+    </div>
+
+
+    <div class="log-stat pending">
+
+      <span class="log-stat-icon">◷</span>
+
+      <div>
+        <span>Awaiting Review</span>
+        <strong id="logs-pending-count">—</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FILTER -->
+
+  <div class="logs-filter-bar">
+
+    <div class="logs-filter-control">
+
+      <span class="logs-filter-label">
+        ZONE FILTER
+      </span>
+
+      <select
+        class="fc logs-zone-select"
+        id="log-zone-filter"
+        onchange="loadLogs()"
+      >
+        <option value="">All Zones</option>
+      </select>
+
+    </div>
+
+    <div class="logs-filter-note">
+      Cleaning verification records
+    </div>
+
+  </div>
+
+
+  <!-- LOG DIRECTORY -->
+
+  <div class="card logs-table-card">
+
+    <div class="logs-table-head">
+
+      <div>
+        <span class="logs-table-eyebrow">
+          ACTIVITY AUDIT
+        </span>
+
+        <h3>Cleaning Records</h3>
+      </div>
+
+      <span class="logs-table-note">
+        Review · Verify · Action
+      </span>
+
+    </div>
+
+    <div class="tw">
+
+      <table id="logs-table">
+
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Staff</th>
+            <th>AI Score</th>
+            <th>Feedback</th>
+            <th>Photos</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="logs-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
 
 </div>
     <!-- ANALYTICS -->
@@ -9666,60 +10174,226 @@ async function deleteLoc(id) {
 }
 // ── LOGS ──────────────────────────────────────────────────────────────────────
 async function loadLogs() {
+
   console.log("LOAD LOGS STARTED");
 
-  const filter = document.getElementById('log-zone-filter');
-  const logsBody = document.getElementById('logs-body');
+  const filter =
+    document.getElementById('log-zone-filter');
+
+  const logsBody =
+    document.getElementById('logs-body');
 
   if (!filter || !logsBody) return;
 
   const zid = filter.value;
   const q = zid ? `?zone_id=${zid}` : '';
 
-  const logs = await api('/api/logs' + q);
-  const zones = await api('/api/zones');
+  const logs =
+    await api('/api/logs' + q);
+
+  const zones =
+    await api('/api/zones');
+
+
+  /* UPDATE FILTER */
 
   filter.innerHTML =
     `<option value="">All Zones</option>` +
-    zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+    zones.map(z => `
+      <option
+        value="${z.id}"
+        ${z.id === zid ? 'selected' : ''}
+      >
+        ${z.name}
+      </option>
+    `).join('');
 
-  logsBody.innerHTML = logs.map(l => `
-    <tr>
-      <td><strong>${l.zone_name||'—'}</strong></td>
-      <td>${l.staff_name||'—'}</td>
-      <td>${l.ai_cleanliness_score ? `<div style="display:flex;align-items:center;gap:7px"><div class="pbar" style="width:50px"><div class="pfill" style="width:${l.ai_cleanliness_score}%;background:${l.ai_cleanliness_score>=80?'var(--green)':l.ai_cleanliness_score>=60?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:12px;font-family:'Courier New',monospace">${Math.round(l.ai_cleanliness_score)}</span></div>` : '—'}</td>
-      <td style="font-size:12px;color:var(--muted);max-width:200px">${l.ai_feedback||'—'}</td>
-  <td>
-${l.before_photo || l.after_photo ?
 
-`<button class="btn btn-primary btn-sm"
-onclick="openPhotosModal(
-'${l.before_photo || ""}',
-'${l.after_photo || ""}'
-)">
-View Photos
-</button>`
+  /* OVERVIEW */
 
-: '—'}
-</td>
-      <td style="font-size:12px;color:var(--muted)">${fmtDate(l.logged_at)}
-</td>
+  updateLogsOverview(logs);
 
-<td>
-<button class="btn btn-primary btn-sm"
-onclick='approveLog(${JSON.stringify(l.task_id)}, ${JSON.stringify(l.staff_email || "")})'>
-Approve
-</button>
 
-<button class="btn btn-danger btn-sm"
-onclick="rejectLog('${l.task_id}')">
-Reject
-</button>
-</td>
+  /* EMPTY STATE */
 
-</tr>
+  if (!logs.length) {
 
-  `).join('') || '<tr><td colspan="6">No cleaning logs yet.</td></tr>';
+    logsBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="logs-empty">
+
+          <div class="logs-empty-icon">◫</div>
+
+          <strong>No cleaning logs found</strong>
+
+          <span>
+            Completed cleaning records will appear here
+            once activities are logged.
+          </span>
+
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+
+  /* TABLE */
+
+  logsBody.innerHTML = logs.map(l => {
+
+    const score =
+      Number(l.ai_cleanliness_score || 0);
+
+    const scoreClass =
+      score >= 80
+        ? 'good'
+        : score >= 60
+          ? 'medium'
+          : 'low';
+
+
+    return `
+      <tr>
+
+        <td>
+          <div class="log-zone-cell">
+            <strong>${l.zone_name || '—'}</strong>
+          </div>
+        </td>
+
+
+        <td>
+          <div class="log-staff-cell">
+            ${l.staff_name || '—'}
+          </div>
+        </td>
+
+
+        <td>
+
+          ${
+            l.ai_cleanliness_score
+              ? `
+                <div class="log-score">
+
+                  <div class="log-score-value ${scoreClass}">
+                    ${Math.round(score)}
+                  </div>
+
+                  <div class="log-score-track">
+                    <div
+                      class="log-score-fill ${scoreClass}"
+                      style="width:${Math.min(score,100)}%"
+                    ></div>
+                  </div>
+
+                </div>
+              `
+              : '<span class="log-muted">—</span>'
+          }
+
+        </td>
+
+
+        <td>
+
+          <div class="log-feedback">
+            ${l.ai_feedback || 'No feedback recorded'}
+          </div>
+
+        </td>
+
+
+        <td>
+
+          ${
+            l.before_photo || l.after_photo
+              ? `
+                <button
+                  class="btn btn-primary btn-sm log-photo-btn"
+                  onclick="openPhotosModal(
+                    '${l.before_photo || ""}',
+                    '${l.after_photo || ""}'
+                  )"
+                >
+                  <span>◉</span>
+                  View Photos
+                </button>
+              `
+              : '<span class="log-muted">—</span>'
+          }
+
+        </td>
+
+
+        <td class="log-date">
+          ${fmtDate(l.logged_at)}
+        </td>
+
+
+        <td>
+
+          <div class="log-actions">
+
+            <button
+              class="btn btn-primary btn-sm"
+              onclick='approveLog(
+                ${JSON.stringify(l.task_id)},
+                ${JSON.stringify(l.staff_email || "")}
+              )'
+            >
+              Approve
+            </button>
+
+            <button
+              class="btn btn-danger btn-sm"
+              onclick="rejectLog('${l.task_id}')"
+            >
+              Reject
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+
+  }).join('');
+
+}
+
+
+function updateLogsOverview(logs) {
+
+  const total =
+    logs.length;
+
+  /*
+   * Logs do not currently expose a separate
+   * approval status, so "Awaiting Review"
+   * represents the records currently displayed.
+   */
+
+  const pending =
+    logs.length;
+
+  const approved = 0;
+
+
+  document.getElementById(
+    'logs-total-count'
+  ).textContent = total;
+
+  document.getElementById(
+    'logs-approved-count'
+  ).textContent = approved;
+
+  document.getElementById(
+    'logs-pending-count'
+  ).textContent = pending;
 }
 async function approveLog(taskId, staffEmail) {
 
