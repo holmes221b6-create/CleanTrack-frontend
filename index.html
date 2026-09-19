@@ -9677,11 +9677,14 @@ function showPage(page) {
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function loadDashboard() {
   try {
-    const [dash, kpis, report] = await Promise.all([
-      api('/api/analytics/dashboard'),
-      api('/api/analytics/kpis'),
-      api('/api/analytics/reports?period=daily')
-    ]);
+    const dash = await api('/api/analytics/dashboard');
+console.log('DASHBOARD API OK', dash);
+
+const kpis = await api('/api/analytics/kpis');
+console.log('KPIS API OK', kpis);
+
+const report = await api('/api/analytics/reports?period=daily');
+console.log('REPORT API OK', report);
     const z = dash.zones || {}, t = dash.today || {};
     const dashDateText = document.getElementById('dash-date-text');
 
