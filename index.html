@@ -7303,6 +7303,289 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — REPORTING CENTER
+   ============================================================ */
+
+.reports-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.reports-heading {
+  position: relative;
+}
+
+.reports-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.reports-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow:
+    0 0 8px
+    rgba(79,142,247,.55);
+}
+
+.reports-heading h1 {
+  margin-bottom: 4px;
+}
+
+.reports-heading p {
+  margin: 0;
+}
+
+
+/* HEADER ACTIONS */
+
+.reports-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reports-header-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reports-export-btn span,
+.reports-pdf-btn span {
+  font-size: 13px;
+}
+
+
+/* CONTROL BAR */
+
+.reports-control-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 11px;
+  background: rgba(255,255,255,.018);
+}
+
+.reports-period-control,
+.reports-location-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reports-control-label {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .1em;
+  white-space: nowrap;
+}
+
+.reports-tabs {
+  display: flex;
+  gap: 3px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 8px;
+  background: rgba(255,255,255,.018);
+}
+
+.reports-tabs .tab {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+
+.reports-location-select {
+  width: 200px;
+}
+
+
+/* TABLE */
+
+.reports-table-card {
+  overflow: hidden;
+  border-color: rgba(255,255,255,.06);
+}
+
+.reports-table-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 15px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.045);
+}
+
+.reports-table-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.reports-table-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.reports-table-note {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* TABLE CELLS */
+
+.report-period {
+  color: var(--text);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.report-number {
+  color: var(--muted);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 11px;
+}
+
+.report-completed {
+  color: var(--green);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 11px;
+}
+
+.report-missed {
+  color: var(--muted);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 11px;
+}
+
+.report-missed.has-missed {
+  color: var(--red);
+}
+
+.report-compliance {
+  min-width: 110px;
+}
+
+.report-duration {
+  color: var(--muted);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 10px;
+}
+
+
+/* EMPTY */
+
+.reports-empty {
+  padding: 40px 20px !important;
+  text-align: center;
+}
+
+.reports-empty-icon {
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 25px;
+  opacity: .5;
+}
+
+.reports-empty strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.reports-empty span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+
+  .reports-page-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .reports-header-actions {
+    width: 100%;
+  }
+
+  .reports-header-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .reports-control-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reports-period-control,
+  .reports-location-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reports-tabs {
+    width: 100%;
+  }
+
+  .reports-tabs .tab {
+    flex: 1;
+  }
+
+  .reports-location-select {
+    width: 100%;
+  }
+
+  .reports-table-head {
+    align-items: flex-start;
+    gap: 7px;
+    flex-direction: column;
+  }
+
+  .reports-table-note {
+    display: none;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -8435,30 +8718,158 @@ select.fc option{background:var(--surface)}
 
 </div>
 
-    <!-- REPORTS -->
-    <div id="page-reports" class="page">
-    <button onclick="downloadPDF()">
-    Download PDF Report
-</button>
-      <div class="ph ph-row">
-        <div><h1>Reports</h1><p>Daily, weekly, and monthly cleaning compliance</p></div>
-        <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+   <!-- REPORTS -->
+<div id="page-reports" class="page">
+
+  <div class="ph ph-row reports-page-header">
+
+    <div class="reports-heading">
+
+      <div class="reports-eyebrow">
+        <span class="reports-eyebrow-dot"></span>
+        REPORTING CENTER
       </div>
-      <div style="display:flex;gap:12px;margin-bottom:18px;align-items:center">
-        <div class="tabs" style="margin-bottom:0">
-          <button class="tab active" onclick="setReportTab('daily',this)">Daily</button>
-          <button class="tab" onclick="setReportTab('weekly',this)">Weekly</button>
-          <button class="tab" onclick="setReportTab('monthly',this)">Monthly</button>
-        </div>
-        <select class="fc" style="width:200px" id="report-loc-filter" onchange="loadReports()">
-          <option value="">All Locations</option>
-        </select>
-      </div>
-      <div class="card"><div class="tw"><table>
-        <thead><tr><th>Period</th><th>Total</th><th>Completed</th><th>Missed</th><th>Compliance</th><th>Avg Duration</th></tr></thead>
-        <tbody id="reports-body"></tbody>
-      </table></div></div>
+
+      <h1>Reports</h1>
+
+      <p>
+        Daily, weekly, and monthly cleaning compliance
+      </p>
+
     </div>
+
+
+    <div class="reports-header-actions">
+
+      <button
+        class="btn btn-secondary reports-export-btn"
+        onclick="exportCSV()"
+      >
+        <span>↓</span>
+        Export CSV
+      </button>
+
+      <button
+        class="btn btn-primary reports-pdf-btn"
+        onclick="downloadPDF()"
+      >
+        <span>▣</span>
+        Download PDF
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- REPORT CONTROL BAR -->
+
+  <div class="reports-control-bar">
+
+    <div class="reports-period-control">
+
+      <span class="reports-control-label">
+        REPORT PERIOD
+      </span>
+
+      <div class="tabs reports-tabs">
+
+        <button
+          class="tab active"
+          onclick="setReportTab('daily',this)"
+        >
+          Daily
+        </button>
+
+        <button
+          class="tab"
+          onclick="setReportTab('weekly',this)"
+        >
+          Weekly
+        </button>
+
+        <button
+          class="tab"
+          onclick="setReportTab('monthly',this)"
+        >
+          Monthly
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="reports-location-control">
+
+      <span class="reports-control-label">
+        LOCATION
+      </span>
+
+      <select
+        class="fc reports-location-select"
+        id="report-loc-filter"
+        onchange="loadReports()"
+      >
+        <option value="">
+          All Locations
+        </option>
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <!-- REPORT TABLE -->
+
+  <div class="card reports-table-card">
+
+    <div class="reports-table-head">
+
+      <div>
+
+        <span class="reports-table-eyebrow">
+          COMPLIANCE REPORT
+        </span>
+
+        <h3>Cleaning Performance</h3>
+
+      </div>
+
+      <span class="reports-table-note">
+        Operational summary
+      </span>
+
+    </div>
+
+
+    <div class="tw">
+
+      <table id="reports-table">
+
+        <thead>
+
+          <tr>
+            <th>Period</th>
+            <th>Total</th>
+            <th>Completed</th>
+            <th>Missed</th>
+            <th>Compliance</th>
+            <th>Avg Duration</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="reports-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
 
     <!-- ALERTS -->
     <div id="page-alerts" class="page">
@@ -11432,72 +11843,97 @@ async function loadAnalytics() {
 // ── REPORTS ───────────────────────────────────────────────────────────────────
 let reportData = [];
 async function loadReports() {
-  const loc = document.getElementById('report-loc-filter').value;
-  const q = [`period=${reportPeriod}`, loc ? `location_id=${loc}` : ''].filter(Boolean).join('&');
-  reportData = await api('/api/analytics/reports?' + q);
-  document.getElementById('reports-body').innerHTML = reportData.map(r => `
-    <tr>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${r.period}</td>
-      <td>${r.total}</td>
-      <td style="color:var(--green)">${r.completed}</td>
-      <td style="color:${(r.missed||0)>0?'var(--red)':'var(--muted)'}">${r.missed||0}</td>
-      <td>${pbar(r.compliance_pct||0)}</td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${r.avg_duration?Math.round(r.avg_duration)+'m':'—'}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No report data yet.</td></tr>';
-}
 
-function setReportTab(p, btn) {
-  reportPeriod = p;
-  document.querySelectorAll('#page-reports .tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  loadReports();
-}
+  const loc =
+    document.getElementById(
+      'report-loc-filter'
+    ).value;
 
-function exportCSV() {
-  const headers = ['Period','Total','Completed','Missed','Compliance %','Avg Duration (min)'];
-  const rows = reportData.map(r => [r.period,r.total,r.completed,r.missed||0,r.compliance_pct||0,r.avg_duration?Math.round(r.avg_duration):'']);
-  const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = 'cleantrack_report.csv'; a.click();
-  toast('CSV exported', 'success');
-}
+  const q = [
+    `period=${reportPeriod}`,
+    loc ? `location_id=${loc}` : ''
+  ]
+    .filter(Boolean)
+    .join('&');
 
-async function downloadPDF() {
-    try {
-        const response = await fetch(
-            API_URL + "/api/reports/pdf",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
 
-        if (!response.ok) {
-            alert("Failed to generate PDF");
-            return;
-        }
+  reportData =
+    await api(
+      '/api/analytics/reports?' + q
+    );
 
-        const blob = await response.blob();
 
-        const url = window.URL.createObjectURL(blob);
+  document.getElementById(
+    'reports-body'
+  ).innerHTML =
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "cleantrack_report.pdf";
+    reportData.map(r => `
 
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+      <tr>
 
-        window.URL.revokeObjectURL(url);
+        <td class="report-period">
+          ${r.period}
+        </td>
 
-    } catch (err) {
-        console.error(err);
-        alert("PDF download failed");
-    }
+        <td class="report-number">
+          ${r.total}
+        </td>
+
+        <td class="report-completed">
+          ${r.completed}
+        </td>
+
+        <td class="report-missed ${
+          (r.missed || 0) > 0
+            ? 'has-missed'
+            : ''
+        }">
+          ${r.missed || 0}
+        </td>
+
+        <td>
+          <div class="report-compliance">
+            ${pbar(r.compliance_pct || 0)}
+          </div>
+        </td>
+
+        <td class="report-duration">
+          ${
+            r.avg_duration
+              ? Math.round(r.avg_duration) + 'm'
+              : '—'
+          }
+        </td>
+
+      </tr>
+
+    `).join('') ||
+
+    `
+      <tr>
+
+        <td
+          colspan="6"
+          class="reports-empty"
+        >
+
+          <div class="reports-empty-icon">
+            ▤
+          </div>
+
+          <strong>
+            No report data available
+          </strong>
+
+          <span>
+            Report data will appear here
+            once cleaning activity is recorded.
+          </span>
+
+        </td>
+
+      </tr>
+    `;
 }
 // ── ALERTS ────────────────────────────────────────────────────────────────────
 async function loadAlerts() {
