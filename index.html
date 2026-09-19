@@ -5307,6 +5307,210 @@ select.fc option{background:var(--surface)}
   }
 }
 
+/* ============================================================
+   TASKS — COMMAND BAR
+   ============================================================ */
+
+.tasks-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.tasks-heading {
+  position: relative;
+}
+
+.tasks-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.tasks-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(79,142,247,.55);
+}
+
+.tasks-heading h1 {
+  margin-bottom: 4px;
+}
+
+.tasks-heading p {
+  margin: 0;
+}
+
+.tasks-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tasks-add-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+/* TASK OVERVIEW */
+
+.tasks-overview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 17px;
+}
+
+.task-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+  background: rgba(255,255,255,.018);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.task-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.035);
+}
+
+.task-stat-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(79,142,247,.12);
+  border-radius: 8px;
+  background: rgba(79,142,247,.065);
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.task-stat.pending .task-stat-icon {
+  color: #f1cf70;
+  background: rgba(241,199,91,.065);
+  border-color: rgba(241,199,91,.12);
+}
+
+.task-stat.progress .task-stat-icon {
+  color: #78a8ff;
+  background: rgba(79,142,247,.065);
+}
+
+.task-stat.completed .task-stat-icon {
+  color: #69df93;
+  background: rgba(67,209,122,.065);
+  border-color: rgba(67,209,122,.12);
+}
+
+.task-stat.missed .task-stat-icon {
+  color: #f17a7a;
+  background: rgba(239,100,100,.065);
+  border-color: rgba(239,100,100,.12);
+}
+
+.task-stat div {
+  min-width: 0;
+}
+
+.task-stat div > span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.task-stat strong {
+  display: block;
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+/* FILTERS */
+
+.tasks-tabs {
+  margin-bottom: 14px;
+  padding: 4px;
+  width: fit-content;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+
+/* TABLE */
+
+.tasks-table-card {
+  border-color: rgba(255,255,255,.06);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+  .tasks-overview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .tasks-page-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .tasks-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tasks-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tasks-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .tasks-tabs .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+}
+
+@media (max-width: 450px) {
+
+  .tasks-overview {
+    grid-template-columns: 1fr;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -5704,23 +5908,145 @@ select.fc option{background:var(--surface)}
 </div>
 
     <!-- TASKS -->
-    <div id="page-tasks" class="page">
-      <div class="ph ph-row">
-        <div><h1>Cleaning Tasks</h1><p>Monitor and track all cleaning activities</p></div>
-        <button class="btn btn-primary" onclick="openTaskModal()">+ New Task</button>
+<div id="page-tasks" class="page">
+
+  <div class="ph ph-row tasks-page-header">
+    <div class="tasks-heading">
+      <div class="tasks-eyebrow">
+        <span class="tasks-eyebrow-dot"></span>
+        OPERATIONS CONTROL
       </div>
-      <div class="tabs">
-        <button class="tab active" onclick="filterTasks('all',this)">All</button>
-        <button class="tab" onclick="filterTasks('pending',this)">Pending</button>
-        <button class="tab" onclick="filterTasks('in-progress',this)">In Progress</button>
-        <button class="tab" onclick="filterTasks('completed',this)">Completed</button>
-        <button class="tab" onclick="filterTasks('missed',this)">Missed</button>
-      </div>
-      <div class="card"><div class="tw"><table id="tasks-table">
-        <thead><tr><th>Zone</th><th>Location</th><th>Assigned To</th><th>Scheduled</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="tasks-body"></tbody>
-      </table></div></div>
+
+      <h1>Cleaning Tasks</h1>
+
+      <p>Monitor and track all cleaning activities</p>
     </div>
+
+    <button
+      class="btn btn-primary tasks-add-btn"
+      onclick="openTaskModal()"
+    >
+      <span class="tasks-add-icon">+</span>
+      New Task
+    </button>
+  </div>
+
+
+  <!-- TASK OVERVIEW -->
+  <div class="tasks-overview">
+
+    <div class="task-stat">
+      <span class="task-stat-icon">◫</span>
+      <div>
+        <span>Total Tasks</span>
+        <strong id="tasks-total-count">—</strong>
+      </div>
+    </div>
+
+    <div class="task-stat pending">
+      <span class="task-stat-icon">◷</span>
+      <div>
+        <span>Pending</span>
+        <strong id="tasks-pending-count">—</strong>
+      </div>
+    </div>
+
+    <div class="task-stat progress">
+      <span class="task-stat-icon">↻</span>
+      <div>
+        <span>In Progress</span>
+        <strong id="tasks-progress-count">—</strong>
+      </div>
+    </div>
+
+    <div class="task-stat completed">
+      <span class="task-stat-icon">✓</span>
+      <div>
+        <span>Completed</span>
+        <strong id="tasks-completed-count">—</strong>
+      </div>
+    </div>
+
+    <div class="task-stat missed">
+      <span class="task-stat-icon">!</span>
+      <div>
+        <span>Missed</span>
+        <strong id="tasks-missed-count">—</strong>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- FILTERS -->
+  <div class="tabs tasks-tabs">
+
+    <button
+      class="tab active"
+      onclick="filterTasks('all',this)"
+    >
+      All
+    </button>
+
+    <button
+      class="tab"
+      onclick="filterTasks('pending',this)"
+    >
+      Pending
+    </button>
+
+    <button
+      class="tab"
+      onclick="filterTasks('in-progress',this)"
+    >
+      In Progress
+    </button>
+
+    <button
+      class="tab"
+      onclick="filterTasks('completed',this)"
+    >
+      Completed
+    </button>
+
+    <button
+      class="tab"
+      onclick="filterTasks('missed',this)"
+    >
+      Missed
+    </button>
+
+  </div>
+
+
+  <!-- TASK TABLE -->
+  <div class="card tasks-table-card">
+
+    <div class="tw">
+
+      <table id="tasks-table">
+
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Location</th>
+            <th>Assigned To</th>
+            <th>Scheduled</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="tasks-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
 
     <!-- STAFF -->
     <div id="page-staff" class="page">
@@ -7138,63 +7464,221 @@ async function showQR(id, name) {
 }
 
 // ── TASKS ─────────────────────────────────────────────────────────────────────
+
 async function loadTasks() {
   const q = taskFilter !== 'all' ? `?status=${taskFilter}` : '';
   allTasks = await api('/api/tasks' + q);
   renderTasks();
 }
 
+
 function filterTasks(f, btn) {
   taskFilter = f;
-  document.querySelectorAll('#page-tasks .tab').forEach(b => b.classList.remove('active'));
+
+  document
+    .querySelectorAll('#page-tasks .tab')
+    .forEach(b => b.classList.remove('active'));
+
   btn.classList.add('active');
+
   loadTasks();
 }
 
+
 function renderTasks() {
+
+  updateTaskOverview();
+
   const body = document.getElementById('tasks-body');
+
   body.innerHTML = allTasks.map(t => `
     <tr>
-      <td><strong>${t.zone_name||'—'}</strong><div style="font-size:11px;color:var(--muted)">Floor ${t.floor||'?'}</div></td>
-      <td style="color:var(--muted);font-size:12px">${t.location_name||'—'}</td>
-      <td>${t.staff_name ? `<div style="display:flex;align-items:center;gap:7px">${av(t.staff_name)}<span style="font-size:12px">${t.staff_name}</span></div>` : '<span style="color:var(--muted);font-size:12px">Unassigned</span>'}</td>
-      <td style="font-size:12px">${fmtDate(t.scheduled_at)}</td>
-      <td style="font-family:'Courier New',monospace;font-size:12px">${t.duration_minutes ? Math.round(t.duration_minutes)+'m' : '—'}</td>
-      <td>${badge(t.status)}${t.is_overdue && t.status!=='completed' ? ' ⚠️' : ''}</td>
+
       <td>
-        <div style="display:flex;gap:4px">
-          ${t.status==='pending' ? `<button class="btn btn-secondary btn-sm" onclick="taskAction('${t.id}','start')">Start</button>` : ''}
-          ${t.status==='in-progress'
- ? `<button class="btn btn-primary btn-sm" onclick="openCompleteModal('${t.id}','${t.zone_id}')">Complete</button>`
- : ''}
-          ${(t.status==='pending'||t.status==='in-progress') ? `<button class="btn btn-danger btn-sm" onclick="taskAction('${t.id}','miss')">Miss</button>` : ''}
+        <strong>${t.zone_name || '—'}</strong>
+
+        <div style="font-size:11px;color:var(--muted)">
+          Floor ${t.floor || '?'}
         </div>
       </td>
+
+      <td style="color:var(--muted);font-size:12px">
+        ${t.location_name || '—'}
+      </td>
+
+      <td>
+        ${
+          t.staff_name
+            ? `
+              <div style="display:flex;align-items:center;gap:7px">
+                ${av(t.staff_name)}
+                <span style="font-size:12px">
+                  ${t.staff_name}
+                </span>
+              </div>
+            `
+            : `
+              <span style="color:var(--muted);font-size:12px">
+                Unassigned
+              </span>
+            `
+        }
+      </td>
+
+      <td style="font-size:12px">
+        ${fmtDate(t.scheduled_at)}
+      </td>
+
+      <td style="font-family:'Courier New',monospace;font-size:12px">
+        ${
+          t.duration_minutes
+            ? Math.round(t.duration_minutes) + 'm'
+            : '—'
+        }
+      </td>
+
+      <td>
+        ${badge(t.status)}
+
+        ${
+          t.is_overdue && t.status !== 'completed'
+            ? ' ⚠️'
+            : ''
+        }
+      </td>
+
+      <td>
+
+        <div style="display:flex;gap:4px">
+
+          ${
+            t.status === 'pending'
+              ? `
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="taskAction('${t.id}','start')"
+                >
+                  Start
+                </button>
+              `
+              : ''
+          }
+
+          ${
+            t.status === 'in-progress'
+              ? `
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="openCompleteModal('${t.id}','${t.zone_id}')"
+                >
+                  Complete
+                </button>
+              `
+              : ''
+          }
+
+          ${
+            t.status === 'pending' ||
+            t.status === 'in-progress'
+              ? `
+                <button
+                  class="btn btn-danger btn-sm"
+                  onclick="taskAction('${t.id}','miss')"
+                >
+                  Miss
+                </button>
+              `
+              : ''
+          }
+
+        </div>
+
+      </td>
+
     </tr>
-  `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No tasks found.</td></tr>';
+  `).join('') ||
+
+  `
+    <tr>
+      <td
+        colspan="7"
+        style="
+          text-align:center;
+          color:var(--muted);
+          padding:24px
+        "
+      >
+        No tasks found.
+      </td>
+    </tr>
+  `;
 }
+
+
+function updateTaskOverview() {
+
+  const total = allTasks.length;
+
+  const pending =
+    allTasks.filter(t => t.status === 'pending').length;
+
+  const progress =
+    allTasks.filter(t => t.status === 'in-progress').length;
+
+  const completed =
+    allTasks.filter(t => t.status === 'completed').length;
+
+  const missed =
+    allTasks.filter(t => t.status === 'missed').length;
+
+  document.getElementById('tasks-total-count').textContent = total;
+
+  document.getElementById('tasks-pending-count').textContent = pending;
+
+  document.getElementById('tasks-progress-count').textContent = progress;
+
+  document.getElementById('tasks-completed-count').textContent = completed;
+
+  document.getElementById('tasks-missed-count').textContent = missed;
+}
+
+
 function openCompleteModal(taskId, zoneId) {
+
   document.getElementById('complete-task-id').value = taskId;
+
   document.getElementById('complete-zone-id').value = zoneId;
 
   document.getElementById('before-photo').value = '';
+
   document.getElementById('after-photo').value = '';
+
   document.getElementById('log-notes').value = '';
 
   openModal('modal-complete');
 }
+
+
 async function submitCleaningLog() {
+
   try {
+
     const fd = new FormData();
 
-    fd.append('task_id',
-      document.getElementById('complete-task-id').value);
+    fd.append(
+      'task_id',
+      document.getElementById('complete-task-id').value
+    );
 
-    fd.append('zone_id',
-      document.getElementById('complete-zone-id').value);
+    fd.append(
+      'zone_id',
+      document.getElementById('complete-zone-id').value
+    );
 
-    fd.append('notes',
-      document.getElementById('log-notes').value);
+    fd.append(
+      'notes',
+      document.getElementById('log-notes').value
+    );
 
     const before =
       document.getElementById('before-photo').files[0];
@@ -7230,38 +7714,103 @@ async function submitCleaningLog() {
     loadLogs();
 
   } catch (e) {
+
     toast(e.message, 'error');
+
   }
 }
 
+
 async function taskAction(id, act) {
+
   try {
-    await api(`/api/tasks/${id}/${act}`, { method: 'PUT', body: JSON.stringify({}) });
-    toast(`Task ${act}ed`, 'success'); loadTasks();
-  } catch(e) { toast(e.message, 'error'); }
+
+    await api(
+      `/api/tasks/${id}/${act}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({})
+      }
+    );
+
+    toast(`Task ${act}ed`, 'success');
+
+    loadTasks();
+
+  } catch (e) {
+
+    toast(e.message, 'error');
+
+  }
 }
 
+
 async function openTaskModal() {
+
   const zones = await api('/api/zones');
+
   const staff = await api('/api/users?role=staff');
-  document.getElementById('task-zone').innerHTML = `<option value="">Select zone…</option>` + zones.map(z => `<option value="${z.id}">${z.name} (${z.location_name||''})</option>`).join('');
-  document.getElementById('task-staff').innerHTML = `<option value="">Auto-assign</option>` + staff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  const now = new Date(); now.setMinutes(0,0,0);
-  document.getElementById('task-scheduled').value = now.toISOString().slice(0,16);
+
+  document.getElementById('task-zone').innerHTML =
+    `<option value="">Select zone…</option>` +
+    zones.map(z =>
+      `<option value="${z.id}">
+        ${z.name} (${z.location_name || ''})
+      </option>`
+    ).join('');
+
+  document.getElementById('task-staff').innerHTML =
+    `<option value="">Auto-assign</option>` +
+    staff.map(s =>
+      `<option value="${s.id}">
+        ${s.name}
+      </option>`
+    ).join('');
+
+  const now = new Date();
+
+  now.setMinutes(0, 0, 0);
+
+  document.getElementById('task-scheduled').value =
+    now.toISOString().slice(0, 16);
+
   openModal('modal-task');
 }
 
-async function saveTask() {
-  try {
-    await api('/api/tasks', { method: 'POST', body: JSON.stringify({
-      zone_id: document.getElementById('task-zone').value,
-      assigned_to: document.getElementById('task-staff').value || null,
-      scheduled_at: document.getElementById('task-scheduled').value
-    })});
-    toast('Task created', 'success'); closeModal('modal-task'); loadTasks();
-  } catch(e) { toast(e.message, 'error'); }
-}
 
+async function saveTask() {
+
+  try {
+
+    await api(
+      '/api/tasks',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          zone_id:
+            document.getElementById('task-zone').value,
+
+          assigned_to:
+            document.getElementById('task-staff').value || null,
+
+          scheduled_at:
+            document.getElementById('task-scheduled').value
+        })
+      }
+    );
+
+    toast('Task created', 'success');
+
+    closeModal('modal-task');
+
+    loadTasks();
+
+  } catch (e) {
+
+    toast(e.message, 'error');
+
+  }
+}
 // ── STAFF ─────────────────────────────────────────────────────────────────────
 let staffPerf = [];
 async function loadStaff() {
