@@ -5186,6 +5186,127 @@ select.fc option{background:var(--surface)}
   }
 }
 
+
+/* ============================================================
+   CLEANTRACK — TASKS UPGRADE
+   Lightweight visual pass
+   ============================================================ */
+
+#page-tasks .ph {
+  margin-bottom: 20px;
+}
+
+#page-tasks .tabs {
+  width: fit-content;
+  margin-bottom: 14px;
+  padding: 4px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+#page-tasks .tab {
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease;
+}
+
+#page-tasks .card {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(26,29,39,.96),
+      rgba(17,19,27,.98)
+    );
+  box-shadow: 0 8px 28px rgba(0,0,0,.14);
+}
+
+#tasks-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#tasks-table thead th {
+  height: 42px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.018);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#tasks-table tbody tr {
+  transition: background .16s ease;
+}
+
+#tasks-table tbody tr:hover {
+  background: rgba(79,142,247,.035);
+}
+
+#tasks-table tbody td {
+  height: 62px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.035);
+}
+
+#tasks-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#tasks-table tbody td:first-child strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+#tasks-table tbody td:nth-child(4),
+#tasks-table tbody td:nth-child(5) {
+  color: var(--muted);
+}
+
+#tasks-table tbody td:last-child {
+  white-space: nowrap;
+}
+
+#tasks-table .btn-sm {
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background .16s ease;
+}
+
+#tasks-table .btn-sm:hover {
+  transform: translateY(-1px);
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+
+  #page-tasks .tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  #page-tasks .tabs .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  #page-tasks .tw {
+    overflow-x: auto;
+  }
+
+  #tasks-table {
+    min-width: 760px;
+  }
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
