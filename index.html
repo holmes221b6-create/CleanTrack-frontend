@@ -11841,7 +11841,9 @@ async function loadAnalytics() {
 }
 
 // ── REPORTS ───────────────────────────────────────────────────────────────────
+
 let reportData = [];
+
 async function loadReports() {
 
   const loc =
@@ -11934,6 +11936,219 @@ async function loadReports() {
 
       </tr>
     `;
+}
+
+
+/* REPORT PERIOD */
+
+function setReportTab(p, btn) {
+
+  reportPeriod = p;
+
+  document
+    .querySelectorAll(
+      '#page-reports .tab'
+    )
+    .forEach(b =>
+      b.classList.remove('active')
+    );
+
+  btn.classList.add('active');
+
+  loadReports();
+}
+
+
+/* EXPORT CSV */
+
+function exportCSV() {
+
+  if (!reportData.length) {
+    toast(
+      'No report data to export',
+      'error'
+    );
+    return;
+  }
+
+
+  const headers = [
+    'Period',
+    'Total',
+    'Completed',
+    'Missed',
+    'Compliance %',
+    'Avg Duration (min)'
+  ];
+
+
+  const rows =
+    reportData.map(r => [
+
+      r.period,
+
+      r.total,
+
+      r.completed,
+
+      r.missed || 0,
+
+      r.compliance_pct || 0,
+
+      r.avg_duration
+        ? Math.round(r.avg_duration)
+        : ''
+
+    ]);
+
+
+  const csv =
+    [headers, ...rows]
+      .map(row =>
+        row.map(value => {
+
+          const text =
+            String(value ?? '');
+
+          return `"${text.replace(
+            /"/g,
+            '""'
+          )}"`;
+
+        }).join(',')
+      )
+      .join('\n');
+
+
+  const blob =
+    new Blob(
+      [csv],
+      {
+        type:
+          'text/csv;charset=utf-8;'
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const a =
+    document.createElement('a');
+
+  a.href = url;
+  a.download =
+    'cleantrack_report.csv';
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+
+  toast(
+    'CSV exported',
+    'success'
+  );
+}
+
+
+/* DOWNLOAD PDF */
+
+async function downloadPDF() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        '/api/reports/pdf',
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+
+    if (!response.ok) {
+
+      let message =
+        'Failed to generate PDF';
+
+      try {
+
+        const data =
+          await response.json();
+
+        if (data.error) {
+          message = data.error;
+        }
+
+      } catch (_) {}
+
+      toast(
+        message,
+        'error'
+      );
+
+      return;
+    }
+
+
+    const blob =
+      await response.blob();
+
+
+    const url =
+      window.URL.createObjectURL(
+        blob
+      );
+
+
+    const a =
+      document.createElement('a');
+
+    a.href = url;
+
+    a.download =
+      'cleantrack_report.pdf';
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    window.URL.revokeObjectURL(
+      url
+    );
+
+
+    toast(
+      'PDF report downloaded',
+      'success'
+    );
+
+  } catch (err) {
+
+    console.error(
+      'PDF download error:',
+      err
+    );
+
+    toast(
+      'PDF download failed',
+      'error'
+    );
+
+  }
 }
 // ── ALERTS ────────────────────────────────────────────────────────────────────
 async function loadAlerts() {
