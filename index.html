@@ -12150,6 +12150,12 @@ async function downloadPDF() {
 
   }
 }
+
+window.loadReports = loadReports;
+window.setReportTab = setReportTab;
+window.exportCSV = exportCSV;
+window.downloadPDF = downloadPDF;
+
 // ── ALERTS ────────────────────────────────────────────────────────────────────
 async function loadAlerts() {
   const q = alertFilter==='unread' ? '?is_read=false' : alertFilter==='critical' ? '?severity=critical' : '';
