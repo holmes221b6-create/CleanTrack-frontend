@@ -9676,6 +9676,7 @@ function showPage(page) {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function loadDashboard() {
+console.log("DASHBOARD FUNCTION STARTED");
   try {
     const dash = await api('/api/analytics/dashboard');
 console.log('DASHBOARD API OK', dash);
