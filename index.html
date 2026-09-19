@@ -7586,6 +7586,360 @@ select.fc option{background:var(--surface)}
 
 }
 
+/* ============================================================
+   CLEANTRACK — ALERT CONTROL
+   ============================================================ */
+
+.alerts-page-header {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.alerts-heading {
+  position: relative;
+}
+
+.alerts-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+}
+
+.alerts-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow:
+    0 0 8px
+    rgba(255,80,80,.55);
+}
+
+.alerts-heading h1 {
+  margin-bottom: 4px;
+}
+
+.alerts-heading p {
+  margin: 0;
+}
+
+.alerts-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+
+/* OVERVIEW */
+
+.alerts-overview {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.alert-stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 67px;
+  padding: 12px 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.012)
+    );
+}
+
+.alert-stat::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  top: -18px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(79,142,247,.08),
+      transparent 70%
+    );
+  pointer-events: none;
+}
+
+.alert-stat.warning::after {
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,184,76,.08),
+      transparent 70%
+    );
+}
+
+.alert-stat.muted::after {
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,.045),
+      transparent 70%
+    );
+}
+
+.alert-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  border: 1px solid rgba(79,142,247,.18);
+  border-radius: 8px;
+  color: var(--blue);
+  background: rgba(79,142,247,.07);
+  font-size: 13px;
+}
+
+.alert-stat.warning .alert-stat-icon {
+  border-color: rgba(255,184,76,.18);
+  color: var(--yellow);
+  background: rgba(255,184,76,.07);
+}
+
+.alert-stat.muted .alert-stat-icon {
+  border-color: rgba(255,255,255,.08);
+  color: var(--muted);
+  background: rgba(255,255,255,.035);
+}
+
+.alert-stat div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.alert-stat div span {
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.alert-stat div strong {
+  color: var(--text);
+  font-family:
+    "Courier New",
+    monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+
+/* FILTER */
+
+.alerts-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+.alerts-filter-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.alerts-filter-eyebrow {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.alerts-filter-heading strong {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.alerts-tabs {
+  margin: 0;
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.018);
+  border: 1px solid rgba(255,255,255,.05);
+}
+
+.alerts-tabs .tab {
+  padding: 5px 11px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+
+
+/* ALERT LIST */
+
+.alerts-list-enhanced {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+
+/* Existing alert-item elements are generated
+   by loadAlerts(), so we style those directly. */
+
+.alerts-list-enhanced .alert-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px 12px 17px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.032),
+      rgba(255,255,255,.012)
+    );
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.alerts-list-enhanced .alert-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(79,142,247,.16);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79,142,247,.045),
+      rgba(255,255,255,.012)
+    );
+}
+
+
+/* Severity rail */
+
+.alerts-list-enhanced .alert-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 0 3px 3px 0;
+  background: var(--blue);
+  opacity: .75;
+}
+
+.alerts-list-enhanced .alert-item.critical::before {
+  background: var(--red);
+  box-shadow:
+    0 0 9px
+    rgba(255,80,80,.35);
+}
+
+.alerts-list-enhanced .alert-item.warning::before {
+  background: var(--yellow);
+}
+
+.alerts-list-enhanced .alert-item.info::before {
+  background: var(--blue);
+}
+
+
+/* Message */
+
+.alerts-list-enhanced .ai-msg {
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.alerts-list-enhanced .ai-time {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+
+/* Dismiss button */
+
+.alerts-list-enhanced .btn {
+  flex-shrink: 0;
+}
+
+
+/* Empty state */
+
+.alerts-list-enhanced > .card {
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+
+  .alerts-page-header {
+    align-items: flex-start;
+    gap: 13px;
+  }
+
+  .alerts-clear-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .alerts-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-filter-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .alerts-tabs {
+    width: 100%;
+  }
+
+  .alerts-tabs .tab {
+    flex: 1;
+  }
+
+  .alerts-list-enhanced .alert-item {
+    align-items: flex-start;
+  }
+
+}
+
 /* ── responsive ── */
 @media(max-width:768px){
   #sidebar{transform:translateX(-100%)}
@@ -8871,20 +9225,129 @@ select.fc option{background:var(--surface)}
 
 </div>
 
-    <!-- ALERTS -->
-    <div id="page-alerts" class="page">
-      <div class="ph ph-row">
-        <div><h1>Alerts</h1><p>Notifications, overdue cleanings, and escalations</p></div>
-        <button class="btn btn-secondary" onclick="markAllRead()">Mark All Read</button>
+  <!-- ALERTS -->
+<div id="page-alerts" class="page">
+
+  <div class="ph ph-row alerts-page-header">
+
+    <div class="alerts-heading">
+
+      <div class="alerts-eyebrow">
+        <span class="alerts-eyebrow-dot"></span>
+        NOTIFICATION CONTROL
       </div>
-      <div class="tabs">
-        <button class="tab active" onclick="filterAlerts('unread',this)">Unread</button>
-        <button class="tab" onclick="filterAlerts('all',this)">All</button>
-        <button class="tab" onclick="filterAlerts('critical',this)">Critical</button>
-      </div>
-      <div id="alerts-list"></div>
+
+      <h1>Alerts</h1>
+
+      <p>
+        Notifications, overdue cleanings, and escalations
+      </p>
+
     </div>
-  </main>
+
+    <button
+      class="btn btn-secondary alerts-clear-btn"
+      onclick="markAllRead()"
+    >
+      <span>✓</span>
+      Mark All Read
+    </button>
+
+  </div>
+
+
+  <!-- ALERT STATUS STRIP -->
+
+  <div class="alerts-overview">
+
+    <div class="alert-stat">
+
+      <span class="alert-stat-icon">◉</span>
+
+      <div>
+        <span>Notification Center</span>
+        <strong>ACTIVE</strong>
+      </div>
+
+    </div>
+
+    <div class="alert-stat warning">
+
+      <span class="alert-stat-icon">!</span>
+
+      <div>
+        <span>Operational Monitoring</span>
+        <strong>LIVE</strong>
+      </div>
+
+    </div>
+
+    <div class="alert-stat muted">
+
+      <span class="alert-stat-icon">↻</span>
+
+      <div>
+        <span>Alert Stream</span>
+        <strong>REAL-TIME</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FILTER BAR -->
+
+  <div class="alerts-filter-bar">
+
+    <div class="alerts-filter-heading">
+
+      <span class="alerts-filter-eyebrow">
+        ALERT STREAM
+      </span>
+
+      <strong>
+        Notification Records
+      </strong>
+
+    </div>
+
+
+    <div class="tabs alerts-tabs">
+
+      <button
+        class="tab active"
+        onclick="filterAlerts('unread',this)"
+      >
+        Unread
+      </button>
+
+      <button
+        class="tab"
+        onclick="filterAlerts('all',this)"
+      >
+        All
+      </button>
+
+      <button
+        class="tab"
+        onclick="filterAlerts('critical',this)"
+      >
+        Critical
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ALERT LIST -->
+
+  <div
+    id="alerts-list"
+    class="alerts-list-enhanced"
+  ></div>
+
 </div>
 
 <!-- Toast container -->
