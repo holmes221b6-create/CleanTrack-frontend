@@ -9718,12 +9718,14 @@ function showPage(page) {
   if (loaders[page]) loaders[page]();
   return false;
 }
+
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 
 async function loadDashboard() {
   try {
 
-    // 1. GET DASHBOARD DATA
+    // ── 1. GET DASHBOARD DATA ────────────────────────────────────────────────
+
     const dash = await api('/api/analytics/dashboard');
     const kpis = await api('/api/analytics/kpis');
     const report = await api('/api/analytics/reports?period=daily');
@@ -9731,7 +9733,9 @@ async function loadDashboard() {
     const z = dash.zones || {};
     const t = dash.today || {};
 
-    // 2. KPI CARDS
+
+    // ── 2. KPI CARDS ─────────────────────────────────────────────────────────
+
     document.getElementById('dash-stats').innerHTML = `
       <div class="stat green">
         <div class="stat-label">Cleaned Today</div>
@@ -9768,807 +9772,904 @@ async function loadDashboard() {
     `;
 
 
-    // 3. COMPLIANCE CHART
-    const labels = report.slice(0, 14).reverse()
-      .map(r => (r.period || '').slice(5));
+    // ── 3. KPI TELEMETRY ANIMATION ──────────────────────────────────────────
 
-    const vals = report.slice(0, 14).reverse()
-      .map(r => r.compliance_pct || 0);
+    const animateTelemetryValue = (element, target, suffix = '') => {
 
-    if (compChart) compChart.destroy();
+      if (!element) return;
 
-    compChart = new Chart(
-      document.getElementById('chart-compliance'),
-      {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            data: vals,
-            borderColor: '#4f8ef7',
-            borderWidth: 2,
-            pointRadius: 3,
-            fill: true,
-            backgroundColor: 'rgba(79,142,247,.08)',
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: '#8890a8',
-                font: { size: 11 }
+      const numericTarget = parseFloat(target);
+
+      if (!Number.isFinite(numericTarget)) {
+        element.textContent = target + suffix;
+        return;
+      }
+
+      const duration = 850;
+      const startTime = performance.now();
+
+      const tick = now => {
+
+        const progress = Math.min(
+          (now - startTime) / duration,
+          1
+        );
+
+        const eased =
+          1 - Math.pow(1 - progress, 3);
+
+        const current =
+          numericTarget * eased;
+
+        element.textContent =
+          Number.isInteger(numericTarget)
+            ? Math.round(current) + suffix
+            : current.toFixed(1) + suffix;
+
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        }
+      };
+
+      requestAnimationFrame(tick);
+    };
+
+
+    const statValues =
+      document.querySelectorAll('#dash-stats .stat-value');
+
+    if (statValues.length >= 5) {
+
+      animateTelemetryValue(
+        statValues[0],
+        t.completed || 0
+      );
+
+      animateTelemetryValue(
+        statValues[1],
+        z.overdue || 0
+      );
+
+      animateTelemetryValue(
+        statValues[2],
+        t.compliance_pct || 0,
+        '%'
+      );
+
+      animateTelemetryValue(
+        statValues[3],
+        dash.avg_cleaning_duration || '--'
+      );
+
+      animateTelemetryValue(
+        statValues[4],
+        z.total || 0
+      );
+    }
+
+
+    // ── 4. COMPLIANCE CHART ─────────────────────────────────────────────────
+
+    const complianceLabels =
+      report
+        .slice(0, 14)
+        .reverse()
+        .map(r => (r.period || '').slice(5));
+
+    const complianceValues =
+      report
+        .slice(0, 14)
+        .reverse()
+        .map(r => r.compliance_pct || 0);
+
+    if (compChart) {
+      compChart.destroy();
+    }
+
+    const complianceCanvas =
+      document.getElementById('chart-compliance');
+
+    if (complianceCanvas) {
+
+      const complianceCtx =
+        complianceCanvas.getContext('2d');
+
+      const complianceGradient =
+        complianceCtx.createLinearGradient(
+          0,
+          0,
+          0,
+          260
+        );
+
+      complianceGradient.addColorStop(
+        0,
+        'rgba(79,142,247,.20)'
+      );
+
+      complianceGradient.addColorStop(
+        0.55,
+        'rgba(79,142,247,.055)'
+      );
+
+      complianceGradient.addColorStop(
+        1,
+        'rgba(79,142,247,0)'
+      );
+
+      compChart = new Chart(
+        complianceCanvas,
+        {
+          type: 'line',
+
+          data: {
+            labels: complianceLabels,
+
+            datasets: [{
+              data: complianceValues,
+
+              borderColor: '#4f8ef7',
+              borderWidth: 2,
+
+              pointRadius: function(context) {
+                return context.dataIndex ===
+                  context.dataset.data.length - 1
+                  ? 4
+                  : 0;
               },
-              grid: {
-                color: '#2e3248'
+
+              pointHoverRadius: 5,
+
+              pointBackgroundColor: function(context) {
+                return context.dataIndex ===
+                  context.dataset.data.length - 1
+                  ? '#34c97a'
+                  : '#4f8ef7';
+              },
+
+              pointBorderColor: '#0f1117',
+              pointBorderWidth: 2,
+
+              borderCapStyle: 'round',
+              borderJoinStyle: 'round',
+
+              fill: true,
+              backgroundColor: complianceGradient,
+
+              tension: 0.42
+            }]
+          },
+
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            animation: {
+              duration: 1400,
+              easing: 'easeOutQuart'
+            },
+
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+
+            plugins: {
+              legend: {
+                display: false
+              },
+
+              tooltip: {
+                backgroundColor: 'rgba(10,14,23,.94)',
+                borderColor: 'rgba(79,142,247,.25)',
+                borderWidth: 1,
+
+                titleColor: '#dce8ff',
+                bodyColor: '#aab6ce',
+
+                padding: 12,
+
+                displayColors: false,
+
+                callbacks: {
+                  label: function(context) {
+                    return ` Compliance: ${context.parsed.y.toFixed(1)}%`;
+                  }
+                }
               }
             },
-            y: {
-              ticks: {
-                color: '#8890a8',
-                font: { size: 11 }
+
+            scales: {
+
+              x: {
+                ticks: {
+                  color: '#66718a',
+                  font: {
+                    size: 10
+                  }
+                },
+
+                grid: {
+                  display: false
+                },
+
+                border: {
+                  display: false
+                }
               },
-              grid: {
-                color: '#2e3248'
-              },
-              min: 0,
-              max: 100
+
+              y: {
+                ticks: {
+                  color: '#66718a',
+
+                  font: {
+                    size: 10
+                  },
+
+                  callback: value => value + '%'
+                },
+
+                grid: {
+                  color: 'rgba(100,120,160,.10)',
+                  drawBorder: false
+                },
+
+                border: {
+                  display: false
+                },
+
+                min: 0,
+                max: 100
+              }
             }
           }
         }
-      }
-    );
+      );
+    }
 
 
-    // 4. ZONE DISTRIBUTION
-    const pieData = [
+    // ── 5. ZONE DISTRIBUTION ────────────────────────────────────────────────
+
+    const zoneDistributionData = [
       {
         label: 'Cleaned',
         value: z.cleaned || 0,
         color: '#34c97a'
       },
+
       {
         label: 'Pending',
         value: z.pending || 0,
         color: '#f5c842'
       },
+
       {
         label: 'In Progress',
         value: z.in_progress || 0,
         color: '#4f8ef7'
       },
+
       {
         label: 'Overdue',
         value: z.overdue || 0,
         color: '#f05252'
       }
+
     ].filter(d => d.value > 0);
 
-    if (pieChart) pieChart.destroy();
 
-    pieChart = new Chart(
-      document.getElementById('chart-pie'),
-      {
-        type: 'doughnut',
-        data: {
-          labels: pieData.map(d => d.label),
-          datasets: [{
-            data: pieData.map(d => d.value),
-            backgroundColor: pieData.map(d => d.color),
-            borderWidth: 0,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '60%',
-          plugins: {
-            legend: { display: false }
-          }
+    if (pieChart) {
+      pieChart.destroy();
+    }
+
+
+    const totalZoneTasks =
+      zoneDistributionData.reduce(
+        (sum, item) => sum + item.value,
+        0
+      );
+
+
+    const centerReadoutPlugin = {
+
+      id: 'cleanTrackCenterReadout',
+
+      afterDraw(chart) {
+
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+
+        if (
+          !meta ||
+          !meta.data ||
+          !meta.data.length
+        ) {
+          return;
         }
+
+        const x = meta.data[0].x;
+        const y = meta.data[0].y;
+
+        ctx.save();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.font = '700 23px monospace';
+        ctx.fillStyle = '#edf2ff';
+
+        ctx.shadowColor =
+          'rgba(79,142,247,.25)';
+
+        ctx.shadowBlur = 12;
+
+        ctx.fillText(
+          totalZoneTasks,
+          x,
+          y - 5
+        );
+
+        ctx.shadowBlur = 0;
+
+        ctx.font = '700 7px monospace';
+        ctx.fillStyle =
+          'rgba(130,150,185,.55)';
+
+        ctx.fillText(
+          'TOTAL TASKS',
+          x,
+          y + 17
+        );
+
+        ctx.restore();
       }
-    );
+    };
 
 
-    // 5. PIE LEGEND
-    document.getElementById('pie-legend').innerHTML =
-      pieData.map(d => `
-        <span style="display:flex;align-items:center;gap:5px">
-          <span style="
-            width:8px;
-            height:8px;
-            border-radius:50%;
-            background:${d.color};
-            display:inline-block
-          "></span>
-          ${d.label} (${d.value})
-        </span>
-      `).join('');
+    const pieCanvas =
+      document.getElementById('chart-pie');
 
 
-    // 6. ALERTS
-    const alertsDiv = document.getElementById('dash-alerts');
+    if (pieCanvas) {
 
-    document.getElementById('dash-alert-count').textContent =
-      (dash.recent_alerts || []).length + ' unread';
+      pieChart = new Chart(
+        pieCanvas,
+        {
+          type: 'doughnut',
 
-    alertsDiv.innerHTML =
-      (dash.recent_alerts || []).slice(0, 5).map(a => `
-        <div class="alert-item ${a.severity}">
-          <div>
-            <div class="ai-msg">${a.message}</div>
-            <div class="ai-time">
-              ${a.zone_name || ''} · ${fmtDate(a.created_at)}
+          data: {
+            labels:
+              zoneDistributionData.map(
+                d => d.label
+              ),
+
+            datasets: [{
+              data:
+                zoneDistributionData.map(
+                  d => d.value
+                ),
+
+              backgroundColor:
+                zoneDistributionData.map(
+                  d => d.color
+                ),
+
+              borderWidth: 0,
+
+              hoverOffset: 8,
+
+              spacing: 3
+            }]
+          },
+
+          options: {
+
+            responsive: true,
+            maintainAspectRatio: false,
+
+            cutout: '64%',
+
+            layout: {
+              padding: 8
+            },
+
+            animation: {
+              animateRotate: true,
+              animateScale: true,
+              duration: 1200,
+              easing: 'easeOutQuart'
+            },
+
+            plugins: {
+
+              legend: {
+                display: false
+              },
+
+              tooltip: {
+
+                backgroundColor:
+                  'rgba(10,14,23,.94)',
+
+                borderColor:
+                  'rgba(79,142,247,.20)',
+
+                borderWidth: 1,
+
+                titleColor: '#dce8ff',
+
+                bodyColor: '#aab6ce',
+
+                padding: 11,
+
+                callbacks: {
+
+                  label: function(context) {
+                    return ` ${context.label}: ${context.parsed}`;
+                  }
+
+                }
+              }
+            }
+          },
+
+          plugins: [
+            centerReadoutPlugin
+          ]
+        }
+      );
+    }
+
+
+    // ── 6. CUSTOM PIE LEGEND ────────────────────────────────────────────────
+
+    const pieLegend =
+      document.getElementById('pie-legend');
+
+    if (pieLegend) {
+
+      pieLegend.innerHTML =
+        zoneDistributionData.map(d => `
+          <span style="--legend-color:${d.color}">
+            <span></span>
+            ${d.label}
+            <span class="legend-value">
+              (${d.value})
+            </span>
+          </span>
+        `).join('');
+    }
+
+
+    // ── 7. ALERT INTELLIGENCE ───────────────────────────────────────────────
+
+    const alertsDiv =
+      document.getElementById('dash-alerts');
+
+    const recentAlerts =
+      dash.recent_alerts || [];
+
+
+    const alertCount =
+      document.getElementById('dash-alert-count');
+
+    if (alertCount) {
+
+      alertCount.textContent =
+        recentAlerts.length + ' unread';
+    }
+
+
+    if (alertsDiv) {
+
+      alertsDiv.innerHTML =
+        recentAlerts
+          .slice(0, 5)
+          .map((a, index) => {
+
+            const severity =
+              a.severity || 'warning';
+
+            const severityLabel =
+              severity === 'critical'
+                ? 'CRITICAL'
+                : severity === 'warning'
+                  ? 'WARNING'
+                  : severity.toUpperCase();
+
+            return `
+              <div class="alert-telemetry ${severity}">
+
+                <div class="alert-severity-core">
+                  <span></span>
+                </div>
+
+                <div class="alert-content">
+
+                  <div class="alert-topline">
+
+                    <span class="alert-index">
+                      ALERT-${String(index + 1).padStart(2, '0')}
+                    </span>
+
+                    <span class="alert-severity-label">
+                      ${severityLabel}
+                    </span>
+
+                  </div>
+
+                  <div class="ai-msg">
+                    ${a.message}
+                  </div>
+
+                  <div class="ai-time">
+                    ${a.zone_name || 'FACILITY-WIDE'}
+                    <span>·</span>
+                    ${fmtDate(a.created_at)}
+                  </div>
+
+                </div>
+
+                <div class="alert-signal">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+              </div>
+            `;
+
+          })
+          .join('')
+
+        ||
+
+        `
+          <div class="alert-empty-state">
+
+            <div class="alert-clear-core">
+              ✓
             </div>
+
+            <div>
+
+              <div class="alert-clear-title">
+                FACILITY CLEAR
+              </div>
+
+              <div class="alert-clear-sub">
+                No active alerts detected
+              </div>
+
+            </div>
+
           </div>
-        </div>
-      `).join('')
-      || '<p style="color:var(--muted);font-size:13px">No active alerts. ✓</p>';
+        `;
+    }
 
 
-    // 7. ZONE LIST
-    const zonesDiv = document.getElementById('dash-zones');
-    const zl = await api('/api/zones');
+    // ── 8. ZONE TELEMETRY ──────────────────────────────────────────────────
 
-    zonesDiv.innerHTML = zl.slice(0, 10).map(zone => `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        padding:8px 0;
-        border-bottom:1px solid var(--border)
-      ">
-        <div style="display:flex;align-items:center;gap:8px">
+    const zonesDiv =
+      document.getElementById('dash-zones');
 
-          <span style="
-            width:8px;
-            height:8px;
-            border-radius:50%;
-            background:${
+    const zoneList =
+      await api('/api/zones');
+
+
+    if (zonesDiv) {
+
+      zonesDiv.innerHTML =
+        zoneList
+          .slice(0, 10)
+          .map(zone => {
+
+            const zoneColor =
               zone.status === 'cleaned'
                 ? 'var(--green)'
                 : zone.status === 'overdue'
-                ? 'var(--red)'
-                : zone.status === 'in-progress'
-                ? 'var(--primary)'
-                : 'var(--yellow)'
-            }
-          "></span>
-
-          <div>
-            <div style="font-size:13px;font-weight:600">
-              ${zone.name}
-            </div>
-
-            <div style="font-size:11px;color:var(--muted)">
-              ${zone.location_name || ''} · Floor ${zone.floor || '?'}
-            </div>
-          </div>
-
-        </div>
-
-        ${badge(zone.status)}
-      </div>
-    `).join('');
+                  ? 'var(--red)'
+                  : zone.status === 'in-progress'
+                    ? 'var(--primary)'
+                    : 'var(--yellow)';
 
 
+            const zoneCode =
+              `ZONE-${String(zone.id || '').padStart(2, '0')}`;
 
-// ── KPI Telemetry Counter ────────────────────────────────────────────────────
 
-const animateTelemetryValue = (element, target, suffix = '') => {
+            return `
+              <div
+                class="zone-telemetry-row"
+                style="--zone-color:${zoneColor}"
+              >
 
-  if (!element) return;
+                <div class="zone-telemetry-left">
 
-  const numericTarget = parseFloat(target);
+                  <div class="zone-status-core">
+                    <span></span>
+                  </div>
 
-  if (!Number.isFinite(numericTarget)) {
-    element.textContent = target + suffix;
-    return;
-  }
+                  <div class="zone-identity">
 
-  const duration = 850;
-  const startTime = performance.now();
+                    <div class="zone-name-line">
 
-  const tick = now => {
+                      <span class="zone-code">
+                        ${zoneCode}
+                      </span>
 
-    const progress = Math.min(
-      (now - startTime) / duration,
-      1
+                      <span class="zone-name">
+                        ${zone.name}
+                      </span>
+
+                    </div>
+
+                    <div class="zone-meta">
+
+                      ${zone.location_name || 'Unassigned'}
+
+                      <span>·</span>
+
+                      FLOOR ${zone.floor || '?'}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="zone-telemetry-right">
+
+                  <div class="zone-signal">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                  </div>
+
+                  ${badge(zone.status)}
+
+                </div>
+
+              </div>
+            `;
+
+          })
+          .join('');
+    }
+
+
+    // ── 9. FACILITY ZONE SCAN ──────────────────────────────────────────────
+
+    if (zonesDiv) {
+
+      const zoneRows =
+        zonesDiv.querySelectorAll(
+          '.zone-telemetry-row'
+        );
+
+
+      if (zoneRows.length > 0) {
+
+        let activeZoneScan = 0;
+
+
+        const runZoneScan = () => {
+
+          zoneRows.forEach(row => {
+            row.classList.remove(
+              'zone-scan-active'
+            );
+          });
+
+
+          zoneRows[activeZoneScan]
+            ?.classList.add(
+              'zone-scan-active'
+            );
+
+
+          activeZoneScan =
+            (activeZoneScan + 1) %
+            zoneRows.length;
+        };
+
+
+        runZoneScan();
+
+
+        if (window.cleanTrackZoneScanTimer) {
+
+          clearInterval(
+            window.cleanTrackZoneScanTimer
+          );
+        }
+
+
+        window.cleanTrackZoneScanTimer =
+          setInterval(
+            runZoneScan,
+            3200
+          );
+      }
+    }
+
+
+    // ── 10. PREDICTIVE INTELLIGENCE ────────────────────────────────────────
+
+    const predictiveCard =
+      document.getElementById(
+        'predictive-card'
+      );
+
+    const predictiveList =
+      document.getElementById(
+        'predictive-list'
+      );
+
+
+    const predictiveWarnings =
+      kpis.predictive_warnings || [];
+
+
+    if (
+      predictiveCard &&
+      predictiveList
+    ) {
+
+      if (predictiveWarnings.length > 0) {
+
+        predictiveCard.style.display =
+          'block';
+
+
+        predictiveList.innerHTML =
+          predictiveWarnings
+            .map((w, index) => {
+
+              const riskLevel =
+                w.missed_count >= 4
+                  ? 'HIGH'
+                  : w.missed_count >= 2
+                    ? 'MEDIUM'
+                    : 'LOW';
+
+
+              const riskClass =
+                riskLevel === 'HIGH'
+                  ? 'critical'
+                  : riskLevel === 'MEDIUM'
+                    ? 'warning'
+                    : 'info';
+
+
+              return `
+                <div class="predictive-telemetry ${riskClass}">
+
+                  <div class="predictive-core">
+                    <span></span>
+                  </div>
+
+                  <div class="predictive-content">
+
+                    <div class="predictive-topline">
+
+                      <span class="predictive-index">
+                        PREDICTION-${String(index + 1).padStart(2, '0')}
+                      </span>
+
+                      <span class="predictive-risk">
+                        ${riskLevel} RISK
+                      </span>
+
+                    </div>
+
+                    <div class="predictive-name">
+                      ${w.name}
+                    </div>
+
+                    <div class="predictive-message">
+
+                      Missed cleaning
+                      <strong>${w.missed_count}×</strong>
+                      this week.
+                      Scheduling or staffing review recommended.
+
+                    </div>
+
+                  </div>
+
+                  <div class="predictive-meter">
+
+                    <div class="predictive-meter-label">
+                      RISK
+                    </div>
+
+                    <div class="predictive-bars">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join('');
+
+      } else {
+
+        predictiveCard.style.display =
+          'none';
+
+        predictiveList.innerHTML =
+          '';
+      }
+    }
+
+
+  } catch (e) {
+
+    console.error(
+      'Dashboard load error:',
+      e
     );
 
-    const eased =
-      1 - Math.pow(1 - progress, 3);
-
-    const current =
-      numericTarget * eased;
-
-    element.textContent =
-      Number.isInteger(numericTarget)
-        ? Math.round(current) + suffix
-        : current.toFixed(1) + suffix;
-
-    if (progress < 1) {
-      requestAnimationFrame(tick);
-    }
-  };
-
-  requestAnimationFrame(tick);
-};
-
-// ── Start KPI Telemetry ──────────────────────────────────────────────────────
-
-const statValues = document.querySelectorAll(
-  '#dash-stats .stat-value'
-);
-
-if (statValues.length >= 5) {
-
-  animateTelemetryValue(
-    statValues[0],
-    t.completed || 0
-  );
-
-  animateTelemetryValue(
-    statValues[1],
-    z.overdue || 0
-  );
-
-  animateTelemetryValue(
-    statValues[2],
-    t.compliance_pct || 0,
-    '%'
-  );
-
-  animateTelemetryValue(
-    statValues[3],
-    dash.avg_cleaning_duration || '--'
-  );
-
-  animateTelemetryValue(
-    statValues[4],
-    z.total || 0
-  );
-}
-
-    // ── Compliance Chart ─────────────────────────────────────────────────────────
-
-const labels = report.slice(0,14).reverse().map(r => (r.period||'').slice(5));
-const vals   = report.slice(0,14).reverse().map(r => r.compliance_pct||0);
-
-if (compChart) compChart.destroy();
-
-const complianceCtx = document.getElementById('chart-compliance').getContext('2d');
-
-const complianceGradient = complianceCtx.createLinearGradient(0, 0, 0, 260);
-complianceGradient.addColorStop(0, 'rgba(79,142,247,.20)');
-complianceGradient.addColorStop(0.55, 'rgba(79,142,247,.055)');
-complianceGradient.addColorStop(1, 'rgba(79,142,247,0)');
-
-compChart = new Chart(document.getElementById('chart-compliance'), {
-  type: 'line',
-
-  data: {
-    labels,
-
-    datasets: [{
-      data: vals,
-
-      borderColor: '#4f8ef7',
-      borderWidth: 2,
-
-      pointRadius: function(context) {
-  return context.dataIndex === context.dataset.data.length - 1 ? 4 : 0;
-},
-
-pointHoverRadius: 5,
-
-pointBackgroundColor: function(context) {
-  return context.dataIndex === context.dataset.data.length - 1
-    ? '#34c97a'
-    : '#4f8ef7';
-},
-
-pointBorderColor: '#0f1117',
-pointBorderWidth: 2,
-
-    
-      borderCapStyle: 'round',
-borderJoinStyle: 'round',
-
-      fill: true,
-      backgroundColor: complianceGradient,
-
-      tension: 0.42
-    }]
-  },
-
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-
-    animation: {
-      duration: 1400,
-      easing: 'easeOutQuart'
-    },
-
-    interaction: {
-      intersect: false,
-      mode: 'index'
-    },
-
-    plugins: {
-      legend: {
-        display: false
-      },
-
-      tooltip: {
-        backgroundColor: 'rgba(10,14,23,.94)',
-        borderColor: 'rgba(79,142,247,.25)',
-        borderWidth: 1,
-
-        titleColor: '#dce8ff',
-        bodyColor: '#aab6ce',
-
-        padding: 12,
-
-        displayColors: false,
-
-        callbacks: {
-          label: function(context) {
-            return ` Compliance: ${context.parsed.y.toFixed(1)}%`;
-          }
-        }
-      }
-    },
-
-    scales: {
-      x: {
-        ticks: {
-          color: '#66718a',
-          font: {
-            size: 10
-          }
-        },
-
-        grid: {
-          display: false
-        },
-
-        border: {
-          display: false
-        }
-      },
-
-      y: {
-        ticks: {
-          color: '#66718a',
-          font: {
-            size: 10
-          },
-
-          callback: value => value + '%'
-        },
-
-        grid: {
-          color: 'rgba(100,120,160,.10)',
-          drawBorder: false
-        },
-
-        border: {
-          display: false
-        },
-
-        min: 0,
-        max: 100
-      }
-    }
-  }
-});
-
-
-// ── Zone Distribution Chart ──────────────────────────────────────────────────
-
-const pieData = [
-  { label: 'Cleaned',     value: z.cleaned || 0,     color: '#34c97a' },
-  { label: 'Pending',     value: z.pending || 0,     color: '#f5c842' },
-  { label: 'In Progress', value: z.in_progress || 0, color: '#4f8ef7' },
-  { label: 'Overdue',     value: z.overdue || 0,     color: '#f05252' }
-].filter(d => d.value > 0);
-
-if (pieChart) pieChart.destroy();
-
-const totalZoneTasks = pieData.reduce((sum, item) => sum + item.value, 0);
-
-const centerReadoutPlugin = {
-  id: 'centerReadout',
-
-  afterDraw(chart) {
-    const { ctx } = chart;
-    const meta = chart.getDatasetMeta(0);
-
-    if (!meta || !meta.data || !meta.data.length) return;
-
-    const x = meta.data[0].x;
-    const y = meta.data[0].y;
-
-    ctx.save();
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Main number
-    ctx.font = '700 23px monospace';
-    ctx.fillStyle = '#edf2ff';
-    ctx.shadowColor = 'rgba(79,142,247,.25)';
-    ctx.shadowBlur = 12;
-
-    ctx.fillText(totalZoneTasks, x, y - 5);
-
-    // Label
-    ctx.shadowBlur = 0;
-    ctx.font = '700 7px monospace';
-    ctx.fillStyle = 'rgba(130,150,185,.55)';
-
-    ctx.fillText('TOTAL TASKS', x, y + 17);
-
-    ctx.restore();
-  }
-};
-
-pieChart = new Chart(document.getElementById('chart-pie'), {
-
-  type: 'doughnut',
-
-  data: {
-    labels: pieData.map(d => d.label),
-
-    datasets: [{
-      data: pieData.map(d => d.value),
-
-      backgroundColor: pieData.map(d => d.color),
-
-      borderWidth: 0,
-
-      hoverOffset: 8,
-
-      spacing: 3
-    }]
-  },
-
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-
-    cutout: '64%',
-
-    layout: {
-      padding: 8
-    },
-
-    animation: {
-      animateRotate: true,
-      animateScale: true,
-      duration: 1200,
-      easing: 'easeOutQuart'
-    },
-
-    plugins: {
-      legend: {
-        display: false
-      },
-
-      tooltip: {
-        backgroundColor: 'rgba(10,14,23,.94)',
-        borderColor: 'rgba(79,142,247,.20)',
-        borderWidth: 1,
-
-        titleColor: '#dce8ff',
-        bodyColor: '#aab6ce',
-
-        padding: 11,
-
-        callbacks: {
-          label: function(context) {
-            return ` ${context.label}: ${context.parsed}`;
-          }
-        }
-      }
-    }
-  },
-
-  plugins: [centerReadoutPlugin]
-});
-
-// ── Custom Legend ─────────────────────────────────────────────────────────────
-
-document.getElementById('pie-legend').innerHTML = pieData.map(d => `
-  <span style="--legend-color:${d.color}">
-    <span></span>
-    ${d.label}
-    <span class="legend-value">(${d.value})</span>
-  </span>
-`).join('');
-// ── Alert Intelligence Feed ──────────────────────────────────────────────────
-
-const alertsDiv = document.getElementById('dash-alerts');
-
-const recentAlerts = dash.recent_alerts || [];
-
-document.getElementById('dash-alert-count').textContent =
-  recentAlerts.length + ' unread';
-
-alertsDiv.innerHTML = recentAlerts.slice(0, 5).map((a, index) => {
-
-  const severity = a.severity || 'warning';
-
-  const severityLabel =
-    severity === 'critical'
-      ? 'CRITICAL'
-      : severity === 'warning'
-        ? 'WARNING'
-        : severity.toUpperCase();
-
-  return `
-    <div class="alert-telemetry ${severity}">
-
-      <div class="alert-severity-core">
-        <span></span>
-      </div>
-
-      <div class="alert-content">
-
-        <div class="alert-topline">
-          <span class="alert-index">ALERT-${String(index + 1).padStart(2, '0')}</span>
-          <span class="alert-severity-label">${severityLabel}</span>
-        </div>
-
-        <div class="ai-msg">
-          ${a.message}
-        </div>
-
-        <div class="ai-time">
-          ${a.zone_name || 'FACILITY-WIDE'}
-          <span>·</span>
-          ${fmtDate(a.created_at)}
-        </div>
-
-      </div>
-
-      <div class="alert-signal">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-    </div>
-  `;
-}).join('') || `
-  <div class="alert-empty-state">
-    <div class="alert-clear-core">✓</div>
-    <div>
-      <div class="alert-clear-title">FACILITY CLEAR</div>
-      <div class="alert-clear-sub">No active alerts detected</div>
-    </div>
-  </div>
-`;
-
-    // Zone list
-    // ── Zone Telemetry List ───────────────────────────────────────────────────────
-
-const zonesDiv = document.getElementById('dash-zones');
-const zl = await api('/api/zones');
-
-zonesDiv.innerHTML = zl.slice(0, 10).map(z => {
-
-  const zoneColor =
-    z.status === 'cleaned'
-      ? 'var(--green)'
-      : z.status === 'overdue'
-        ? 'var(--red)'
-        : z.status === 'in-progress'
-          ? 'var(--primary)'
-          : 'var(--yellow)';
-
-  const zoneCode = `ZONE-${String(z.id || '').padStart(2, '0')}`;
-
-  return `
-    <div class="zone-telemetry-row" style="--zone-color:${zoneColor}">
-
-      <div class="zone-telemetry-left">
-
-        <div class="zone-status-core">
-          <span></span>
-        </div>
-
-        <div class="zone-identity">
-
-          <div class="zone-name-line">
-            <span class="zone-code">${zoneCode}</span>
-            <span class="zone-name">${z.name}</span>
-          </div>
-
-          <div class="zone-meta">
-            ${z.location_name || 'Unassigned'}
-            <span>·</span>
-            FLOOR ${z.floor || '?'}
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="zone-telemetry-right">
-
-        <div class="zone-signal">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-
-        ${badge(z.status)}
-
-      </div>
-
-    </div>
-  `;
-}).join('');
-
-
-// ── Facility Zone Scan ──────────────────────────────────────────────────────
-
-const zoneRows = zonesDiv.querySelectorAll('.zone-telemetry-row');
-
-if (zoneRows.length > 0) {
-
-  let activeZoneScan = 0;
-
-  const runZoneScan = () => {
-
-    zoneRows.forEach(row => {
-      row.classList.remove('zone-scan-active');
-    });
-
-    zoneRows[activeZoneScan]?.classList.add('zone-scan-active');
-
-    activeZoneScan =
-      (activeZoneScan + 1) % zoneRows.length;
-  };
-
-  runZoneScan();
-
-  if (window.cleanTrackZoneScanTimer) {
-    clearInterval(window.cleanTrackZoneScanTimer);
-  }
-
-  window.cleanTrackZoneScanTimer =
-    setInterval(runZoneScan, 3200);
-}
-   // ── Predictive Intelligence Feed ─────────────────────────────────────────────
-
-const predictiveCard = document.getElementById('predictive-card');
-const predictiveList = document.getElementById('predictive-list');
-
-const predictiveWarnings = kpis.predictive_warnings || [];
-
-if (predictiveWarnings.length > 0) {
-
-  predictiveCard.style.display = 'block';
-
-  predictiveList.innerHTML = predictiveWarnings.map((w, index) => {
-
-    const riskLevel =
-      w.missed_count >= 4
-        ? 'HIGH'
-        : w.missed_count >= 2
-          ? 'MEDIUM'
-          : 'LOW';
-
-    const riskClass =
-      riskLevel === 'HIGH'
-        ? 'critical'
-        : riskLevel === 'MEDIUM'
-          ? 'warning'
-          : 'info';
-
-    return `
-      <div class="predictive-telemetry ${riskClass}">
-
-        <div class="predictive-core">
-          <span></span>
-        </div>
-
-        <div class="predictive-content">
-
-          <div class="predictive-topline">
-            <span class="predictive-index">
-              PREDICTION-${String(index + 1).padStart(2, '0')}
-            </span>
-
-            <span class="predictive-risk">
-              ${riskLevel} RISK
-            </span>
-          </div>
-
-          <div class="predictive-name">
-            ${w.name}
-          </div>
-
-          <div class="predictive-message">
-            Missed cleaning
-            <strong>${w.missed_count}×</strong>
-            this week.
-            Scheduling or staffing review recommended.
-          </div>
-
-        </div>
-
-        <div class="predictive-meter">
-
-          <div class="predictive-meter-label">
-            RISK
-          </div>
-
-          <div class="predictive-bars">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
-
-} else {
-
-  predictiveCard.style.display = 'none';
-  predictiveList.innerHTML = '';
-}
-  } catch(e) {
-    console.error('Dashboard load error:', e);
-    toast(e.message, 'error');
+    toast(
+      'Dashboard load failed: ' +
+      e.message,
+      'error'
+    );
   }
 }
 
-// ── Facility Atmosphere Parallax ─────────────────────────────────────────────
+
+// ── FACILITY ATMOSPHERE PARALLAX ─────────────────────────────────────────────
 
 if (!window.cleanTrackParallaxBound) {
 
   window.cleanTrackParallaxBound = true;
 
-  document.addEventListener('mousemove', e => {
 
-    const dashboard =
-      document.querySelector('.dashboard-command');
+  document.addEventListener(
+    'mousemove',
+    e => {
 
-    if (!dashboard) return;
+      const dashboard =
+        document.querySelector(
+          '.dashboard-command'
+        );
 
-    const x =
-      (e.clientX / window.innerWidth - 0.5) * 2;
 
-    const y =
-      (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!dashboard) return;
 
-    dashboard.style.setProperty(
-      '--facility-mx',
-      `${x * 10}px`
-    );
 
-    dashboard.style.setProperty(
-      '--facility-my',
-      `${y * 10}px`
-    );
-  });
+      const x =
+        (e.clientX / window.innerWidth - 0.5) * 2;
+
+
+      const y =
+        (e.clientY / window.innerHeight - 0.5) * 2;
+
+
+      dashboard.style.setProperty(
+        '--facility-mx',
+        `${x * 10}px`
+      );
+
+
+      dashboard.style.setProperty(
+        '--facility-my',
+        `${y * 10}px`
+      );
+
+    }
+  );
 }
 
 
