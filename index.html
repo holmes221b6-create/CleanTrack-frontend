@@ -9676,18 +9676,20 @@ function showPage(page) {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function loadDashboard() {
-console.log("DASHBOARD FUNCTION STARTED");
+  console.log("🔥 DASHBOARD STARTED");
+
   try {
     const dash = await api('/api/analytics/dashboard');
-console.log('DASHBOARD API OK', dash);
+    console.log("✅ DASH API:", dash);
 
-const kpis = await api('/api/analytics/kpis');
-console.log('KPIS API OK', kpis);
+    const kpis = await api('/api/analytics/kpis');
+    console.log("✅ KPI API:", kpis);
 
-const report = await api('/api/analytics/reports?period=daily');
-console.log('REPORT API OK', report);
-    const z = dash.zones || {}, t = dash.today || {};
-    const dashDateText = document.getElementById('dash-date-text');
+    const report = await api('/api/analytics/reports?period=daily');
+    console.log("✅ REPORT API:", report);
+
+    const z = dash.zones || {};
+    const t = dash.today || {};
 
 if (dashDateText) {
   const now = new Date();
