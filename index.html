@@ -9680,10 +9680,10 @@ async function loadDashboard() {
 
   try {
     const dash = await api('/api/analytics/dashboard');
-    console.log("✅ DASH API:", dash);
+    console.log("✅ DASH API:", JSON.stringify(dash, null, 2));
 
     const kpis = await api('/api/analytics/kpis');
-    console.log("✅ KPI API:", kpis);
+    console.log("✅ KPI API:", JSON.stringify(kpis, null, 2));
 
     const report = await api('/api/analytics/reports?period=daily');
     console.log("✅ REPORT API:", report);
