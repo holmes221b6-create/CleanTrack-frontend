@@ -9718,29 +9718,20 @@ function showPage(page) {
   if (loaders[page]) loaders[page]();
   return false;
 }
-
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
+
 async function loadDashboard() {
-  console.log("========== DASHBOARD LOAD START ==========");
-
   try {
-    console.log("1. Calling dashboard API...");
+
+    // 1. GET DASHBOARD DATA
     const dash = await api('/api/analytics/dashboard');
-    console.log("Dashboard response:", dash);
-
-    console.log("2. Calling KPIs API...");
     const kpis = await api('/api/analytics/kpis');
-    console.log("KPIs response:", kpis);
-
-    console.log("3. Calling reports API...");
     const report = await api('/api/analytics/reports?period=daily');
-    console.log("Reports response:", report);
-
-    console.log("4. All APIs successful. Rendering cards...");
 
     const z = dash.zones || {};
     const t = dash.today || {};
 
+    // 2. KPI CARDS
     document.getElementById('dash-stats').innerHTML = `
       <div class="stat green">
         <div class="stat-label">Cleaned Today</div>
@@ -9776,9 +9767,8 @@ async function loadDashboard() {
       </div>
     `;
 
-    console.log("5. Dashboard cards rendered successfully.");
 
-    // Line chart
+    // 3. COMPLIANCE CHART
     const labels = report.slice(0, 14).reverse()
       .map(r => (r.period || '').slice(5));
 
@@ -9815,14 +9805,18 @@ async function loadDashboard() {
                 color: '#8890a8',
                 font: { size: 11 }
               },
-              grid: { color: '#2e3248' }
+              grid: {
+                color: '#2e3248'
+              }
             },
             y: {
               ticks: {
                 color: '#8890a8',
                 font: { size: 11 }
               },
-              grid: { color: '#2e3248' },
+              grid: {
+                color: '#2e3248'
+              },
               min: 0,
               max: 100
             }
@@ -9831,14 +9825,29 @@ async function loadDashboard() {
       }
     );
 
-    console.log("6. Line chart rendered.");
 
-    // Pie chart
+    // 4. ZONE DISTRIBUTION
     const pieData = [
-      { label: 'Cleaned', value: z.cleaned || 0, color: '#34c97a' },
-      { label: 'Pending', value: z.pending || 0, color: '#f5c842' },
-      { label: 'In Progress', value: z.in_progress || 0, color: '#4f8ef7' },
-      { label: 'Overdue', value: z.overdue || 0, color: '#f05252' }
+      {
+        label: 'Cleaned',
+        value: z.cleaned || 0,
+        color: '#34c97a'
+      },
+      {
+        label: 'Pending',
+        value: z.pending || 0,
+        color: '#f5c842'
+      },
+      {
+        label: 'In Progress',
+        value: z.in_progress || 0,
+        color: '#4f8ef7'
+      },
+      {
+        label: 'Overdue',
+        value: z.overdue || 0,
+        color: '#f05252'
+      }
     ].filter(d => d.value > 0);
 
     if (pieChart) pieChart.destroy();
@@ -9867,6 +9876,8 @@ async function loadDashboard() {
       }
     );
 
+
+    // 5. PIE LEGEND
     document.getElementById('pie-legend').innerHTML =
       pieData.map(d => `
         <span style="display:flex;align-items:center;gap:5px">
@@ -9881,9 +9892,8 @@ async function loadDashboard() {
         </span>
       `).join('');
 
-    console.log("7. Pie chart rendered.");
 
-    // Alerts
+    // 6. ALERTS
     const alertsDiv = document.getElementById('dash-alerts');
 
     document.getElementById('dash-alert-count').textContent =
@@ -9902,17 +9912,12 @@ async function loadDashboard() {
       `).join('')
       || '<p style="color:var(--muted);font-size:13px">No active alerts. ✓</p>';
 
-    console.log("8. Alerts rendered.");
 
-    // Zones
+    // 7. ZONE LIST
     const zonesDiv = document.getElementById('dash-zones');
-
-    console.log("9. Calling zones API...");
     const zl = await api('/api/zones');
 
-    console.log("Zones response:", zl);
-
-    zonesDiv.innerHTML = zl.slice(0, 10).map(z => `
+    zonesDiv.innerHTML = zl.slice(0, 10).map(zone => `
       <div style="
         display:flex;
         align-items:center;
@@ -9921,16 +9926,17 @@ async function loadDashboard() {
         border-bottom:1px solid var(--border)
       ">
         <div style="display:flex;align-items:center;gap:8px">
+
           <span style="
             width:8px;
             height:8px;
             border-radius:50%;
             background:${
-              z.status === 'cleaned'
+              zone.status === 'cleaned'
                 ? 'var(--green)'
-                : z.status === 'overdue'
+                : zone.status === 'overdue'
                 ? 'var(--red)'
-                : z.status === 'in-progress'
+                : zone.status === 'in-progress'
                 ? 'var(--primary)'
                 : 'var(--yellow)'
             }
@@ -9938,28 +9944,29 @@ async function loadDashboard() {
 
           <div>
             <div style="font-size:13px;font-weight:600">
-              ${z.name}
+              ${zone.name}
             </div>
 
             <div style="font-size:11px;color:var(--muted)">
-              ${z.location_name || ''} · Floor ${z.floor || '?'}
+              ${zone.location_name || ''} · Floor ${zone.floor || '?'}
             </div>
           </div>
+
         </div>
 
-        ${badge(z.status)}
+        ${badge(zone.status)}
       </div>
     `).join('');
 
-    console.log("10. Zone list rendered.");
-    console.log("========== DASHBOARD LOAD COMPLETE ==========");
 
-  } catch (e) {
-    console.error("========== DASHBOARD LOAD ERROR ==========");
-    console.error(e);
-    console.error("Message:", e.message);
+  } catch(e) {
 
-    toast('Dashboard load failed: ' + e.message, 'error');
+    console.error('Dashboard load error:', e);
+
+    toast(
+      'Dashboard load failed: ' + e.message,
+      'error'
+    );
   }
 }
 
