@@ -9691,20 +9691,23 @@ async function loadDashboard() {
     const z = dash.zones || {};
     const t = dash.today || {};
 
-if (dashDateText) {
-  const now = new Date();
+    const dashDateText = document.getElementById('dash-date-text');
 
-  dashDateText.textContent =
-    `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    }).toUpperCase()} · ${now.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    })}`;
-}
-   document.getElementById('dash-stats').innerHTML = `
+    if (dashDateText) {
+      const now = new Date();
+
+      dashDateText.textContent =
+        `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }).toUpperCase()} · ${now.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`;
+    }
+
+    document.getElementById('dash-stats').innerHTML = `
   <div class="stat green">
     <div class="stat-scan"></div>
     <div class="stat-label">CLEANED TODAY</div>
