@@ -9707,7 +9707,20 @@ if (dateElement) {
       minute: '2-digit'
     })}`;
 }
-    document.getElementById('dash-stats').innerHTML = `
+    const dashStats = document.getElementById('dash-stats');
+
+if (!dashStats) {
+  console.error('❌ dash-stats NOT FOUND');
+  throw new Error('dash-stats element not found');
+}
+
+console.log('✅ dash-stats FOUND');
+
+dashStats.style.display = 'grid';
+dashStats.style.visibility = 'visible';
+dashStats.style.opacity = '1';
+
+dashStats.innerHTML = `
   <div class="stat green">
     <div class="stat-scan"></div>
     <div class="stat-label">CLEANED TODAY</div>
