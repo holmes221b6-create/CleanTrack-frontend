@@ -9690,23 +9690,21 @@ async function loadDashboard() {
 
     const z = dash.zones || {};
     const t = dash.today || {};
+const dateElement = document.getElementById('dash-date-text');
 
-    const dashDateText = document.getElementById('dash-date-text');
+if (dateElement) {
+  const now = new Date();
 
-    if (dashDateText) {
-      const now = new Date();
-
-      dashDateText.textContent =
-        `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
-        }).toUpperCase()} · ${now.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}`;
-    }
-
+  dateElement.textContent =
+    `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).toUpperCase()} · ${now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })}`;
+}
     document.getElementById('dash-stats').innerHTML = `
   <div class="stat green">
     <div class="stat-scan"></div>
