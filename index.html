@@ -9721,93 +9721,249 @@ function showPage(page) {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function loadDashboard() {
-  console.log("🔥 DASHBOARD STARTED");
+  console.log("========== DASHBOARD LOAD START ==========");
 
   try {
+    console.log("1. Calling dashboard API...");
     const dash = await api('/api/analytics/dashboard');
-    console.log("✅ DASH API:", JSON.stringify(dash, null, 2));
+    console.log("Dashboard response:", dash);
 
+    console.log("2. Calling KPIs API...");
     const kpis = await api('/api/analytics/kpis');
-    console.log("✅ KPI API:", JSON.stringify(kpis, null, 2));
+    console.log("KPIs response:", kpis);
 
+    console.log("3. Calling reports API...");
     const report = await api('/api/analytics/reports?period=daily');
-    console.log("✅ REPORT API:", report);
+    console.log("Reports response:", report);
+
+    console.log("4. All APIs successful. Rendering cards...");
 
     const z = dash.zones || {};
     const t = dash.today || {};
-    console.log("ZONE DATA:", z);
-console.log("TODAY DATA:", t);
-const dateElement = document.getElementById('dash-date-text');
 
-if (dateElement) {
-  const now = new Date();
+    document.getElementById('dash-stats').innerHTML = `
+      <div class="stat green">
+        <div class="stat-label">Cleaned Today</div>
+        <div class="stat-value">${t.completed || 0}</div>
+        <div class="stat-sub">of ${t.total || 0} scheduled</div>
+      </div>
 
-  dateElement.textContent =
-    `TELEMETRY SYNCHRONIZED · ${now.toLocaleDateString([], {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    }).toUpperCase()} · ${now.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    })}`;
+      <div class="stat red">
+        <div class="stat-label">Overdue Zones</div>
+        <div class="stat-value">${z.overdue || 0}</div>
+        <div class="stat-sub">need attention</div>
+      </div>
+
+      <div class="stat blue">
+        <div class="stat-label">Today Compliance</div>
+        <div class="stat-value">${t.compliance_pct || 0}%</div>
+        <div class="stat-sub">${kpis.compliance_7d || 0}% last 7 days</div>
+      </div>
+
+      <div class="stat yellow">
+        <div class="stat-label">Avg Clean Time</div>
+        <div class="stat-value">
+          ${dash.avg_cleaning_duration || '--'}
+          <span style="font-size:14px">m</span>
+        </div>
+        <div class="stat-sub">per task (30-day)</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Total Zones</div>
+        <div class="stat-value">${z.total || 0}</div>
+        <div class="stat-sub">${z.in_progress || 0} in progress</div>
+      </div>
+    `;
+
+    console.log("5. Dashboard cards rendered successfully.");
+
+    // Line chart
+    const labels = report.slice(0, 14).reverse()
+      .map(r => (r.period || '').slice(5));
+
+    const vals = report.slice(0, 14).reverse()
+      .map(r => r.compliance_pct || 0);
+
+    if (compChart) compChart.destroy();
+
+    compChart = new Chart(
+      document.getElementById('chart-compliance'),
+      {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data: vals,
+            borderColor: '#4f8ef7',
+            borderWidth: 2,
+            pointRadius: 3,
+            fill: true,
+            backgroundColor: 'rgba(79,142,247,.08)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#8890a8',
+                font: { size: 11 }
+              },
+              grid: { color: '#2e3248' }
+            },
+            y: {
+              ticks: {
+                color: '#8890a8',
+                font: { size: 11 }
+              },
+              grid: { color: '#2e3248' },
+              min: 0,
+              max: 100
+            }
+          }
+        }
+      }
+    );
+
+    console.log("6. Line chart rendered.");
+
+    // Pie chart
+    const pieData = [
+      { label: 'Cleaned', value: z.cleaned || 0, color: '#34c97a' },
+      { label: 'Pending', value: z.pending || 0, color: '#f5c842' },
+      { label: 'In Progress', value: z.in_progress || 0, color: '#4f8ef7' },
+      { label: 'Overdue', value: z.overdue || 0, color: '#f05252' }
+    ].filter(d => d.value > 0);
+
+    if (pieChart) pieChart.destroy();
+
+    pieChart = new Chart(
+      document.getElementById('chart-pie'),
+      {
+        type: 'doughnut',
+        data: {
+          labels: pieData.map(d => d.label),
+          datasets: [{
+            data: pieData.map(d => d.value),
+            backgroundColor: pieData.map(d => d.color),
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '60%',
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      }
+    );
+
+    document.getElementById('pie-legend').innerHTML =
+      pieData.map(d => `
+        <span style="display:flex;align-items:center;gap:5px">
+          <span style="
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:${d.color};
+            display:inline-block
+          "></span>
+          ${d.label} (${d.value})
+        </span>
+      `).join('');
+
+    console.log("7. Pie chart rendered.");
+
+    // Alerts
+    const alertsDiv = document.getElementById('dash-alerts');
+
+    document.getElementById('dash-alert-count').textContent =
+      (dash.recent_alerts || []).length + ' unread';
+
+    alertsDiv.innerHTML =
+      (dash.recent_alerts || []).slice(0, 5).map(a => `
+        <div class="alert-item ${a.severity}">
+          <div>
+            <div class="ai-msg">${a.message}</div>
+            <div class="ai-time">
+              ${a.zone_name || ''} · ${fmtDate(a.created_at)}
+            </div>
+          </div>
+        </div>
+      `).join('')
+      || '<p style="color:var(--muted);font-size:13px">No active alerts. ✓</p>';
+
+    console.log("8. Alerts rendered.");
+
+    // Zones
+    const zonesDiv = document.getElementById('dash-zones');
+
+    console.log("9. Calling zones API...");
+    const zl = await api('/api/zones');
+
+    console.log("Zones response:", zl);
+
+    zonesDiv.innerHTML = zl.slice(0, 10).map(z => `
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:8px 0;
+        border-bottom:1px solid var(--border)
+      ">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:${
+              z.status === 'cleaned'
+                ? 'var(--green)'
+                : z.status === 'overdue'
+                ? 'var(--red)'
+                : z.status === 'in-progress'
+                ? 'var(--primary)'
+                : 'var(--yellow)'
+            }
+          "></span>
+
+          <div>
+            <div style="font-size:13px;font-weight:600">
+              ${z.name}
+            </div>
+
+            <div style="font-size:11px;color:var(--muted)">
+              ${z.location_name || ''} · Floor ${z.floor || '?'}
+            </div>
+          </div>
+        </div>
+
+        ${badge(z.status)}
+      </div>
+    `).join('');
+
+    console.log("10. Zone list rendered.");
+    console.log("========== DASHBOARD LOAD COMPLETE ==========");
+
+  } catch (e) {
+    console.error("========== DASHBOARD LOAD ERROR ==========");
+    console.error(e);
+    console.error("Message:", e.message);
+
+    toast('Dashboard load failed: ' + e.message, 'error');
+  }
 }
-    const dashStats = document.getElementById('dash-stats');
 
-if (!dashStats) {
-  console.error('❌ dash-stats NOT FOUND');
-  throw new Error('dash-stats element not found');
-}
 
-console.log('✅ dash-stats FOUND');
-
-dashStats.style.display = 'grid';
-dashStats.style.visibility = 'visible';
-dashStats.style.opacity = '1';
-
-dashStats.innerHTML = `
-  <div class="stat green">
-    <div class="stat-scan"></div>
-    <div class="stat-label">CLEANED TODAY</div>
-    <div class="stat-value">${t.completed || 0}</div>
-    <div class="stat-sub">OF ${t.total || 0} SCHEDULED</div>
-    <div class="stat-accent"></div>
-  </div>
-
-  <div class="stat red">
-    <div class="stat-scan"></div>
-    <div class="stat-label">OVERDUE ZONES</div>
-    <div class="stat-value">${z.overdue || 0}</div>
-    <div class="stat-sub">REQUIRE ATTENTION</div>
-    <div class="stat-accent"></div>
-  </div>
-
-  <div class="stat blue">
-    <div class="stat-scan"></div>
-    <div class="stat-label">TODAY COMPLIANCE</div>
-    <div class="stat-value">${t.compliance_pct || 0}%</div>
-    <div class="stat-sub">${kpis.compliance_7d || 0}% LAST 7 DAYS</div>
-    <div class="stat-accent"></div>
-  </div>
-
-  <div class="stat yellow">
-    <div class="stat-scan"></div>
-    <div class="stat-label">AVG CLEAN TIME</div>
-    <div class="stat-value">
-      ${dash.avg_cleaning_duration || '--'}<span class="stat-unit">m</span>
-    </div>
-    <div class="stat-sub">PER TASK · 30 DAYS</div>
-    <div class="stat-accent"></div>
-  </div>
-
-  <div class="stat">
-    <div class="stat-scan"></div>
-    <div class="stat-label">TOTAL ZONES</div>
-    <div class="stat-value">${z.total || 0}</div>
-    <div class="stat-sub">${z.in_progress || 0} IN PROGRESS</div>
-    <div class="stat-accent"></div>
-  </div>
-`;
 
 // ── KPI Telemetry Counter ────────────────────────────────────────────────────
 
