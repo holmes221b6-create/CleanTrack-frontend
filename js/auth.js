@@ -20,36 +20,35 @@ CleanTrack.auth = (() => {
     function getApplication() {
         return document.getElementById("application");
     }
+function showAuth() {
+    const authContainer = getAuthContainer();
+    const application = getApplication();
 
-    function showAuth() {
-        const auth = getAuthContainer();
-        const application = getApplication();
-
-        if (auth) {
-            auth.hidden = false;
-            auth.style.display = "";
-        }
-
-        if (application) {
-            application.hidden = true;
-            application.style.display = "none";
-        }
+    if (authContainer) {
+        authContainer.classList.remove("hidden");
+        authContainer.style.display = "block";
     }
 
-    function showApplication() {
-        const auth = getAuthContainer();
-        const application = getApplication();
-
-        if (auth) {
-            auth.hidden = true;
-            auth.style.display = "none";
-        }
-
-        if (application) {
-            application.hidden = false;
-            application.style.display = "";
-        }
+    if (application) {
+        application.classList.add("hidden");
+        application.style.display = "none";
     }
+}
+
+function showApplication() {
+    const authContainer = getAuthContainer();
+    const application = getApplication();
+
+    if (authContainer) {
+        authContainer.classList.add("hidden");
+        authContainer.style.display = "none";
+    }
+
+    if (application) {
+        application.classList.remove("hidden");
+        application.style.display = "block";
+    }
+}
 
     function escapeHtml(value) {
         const div = document.createElement("div");
