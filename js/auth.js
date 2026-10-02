@@ -403,38 +403,24 @@ function showApplication() {
                 renderLogin
             );
     }
+function updateRegistrationFields() {
+    const role = document.getElementById("register-role").value;
 
+    const organizationName = document.getElementById("organization-name-group");
+    const organizationCode = document.getElementById("organization-code-group");
+    const employeeId = document.getElementById("employee-id-group");
 
-    function updateRegistrationFields() {
+    organizationName.style.display =
+        role === "admin" ? "block" : "none";
 
-        const role =
-            document.getElementById("register-role").value;
+    organizationCode.style.display =
+        role === "supervisor" || role === "employee"
+            ? "block"
+            : "none";
 
-        const organizationName =
-            document.getElementById(
-                "organization-name-group"
-            );
-
-        const organizationCode =
-            document.getElementById(
-                "organization-code-group"
-            );
-
-        const employeeId =
-            document.getElementById(
-                "employee-id-group"
-            );
-
-        organizationName.hidden = role !== "admin";
-
-        organizationCode.hidden =
-            role !== "supervisor" &&
-            role !== "employee";
-
-        employeeId.hidden =
-            role !== "employee";
-    }
-
+    employeeId.style.display =
+        role === "employee" ? "block" : "none";
+}
 
     // --------------------------------------------------------
     // Login

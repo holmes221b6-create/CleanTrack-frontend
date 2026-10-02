@@ -153,19 +153,21 @@ CleanTrack.api = (() => {
         // ----------------------------------------------------
         // Handle Unauthorized
         // ----------------------------------------------------
+if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
 
-        if (response.status === 401) {
+    if (response.status === 401 && !path.includes("/api/auth/login")) {
+        clearAuthToken();
+        window.dispatchEvent(new CustomEvent("cleantrack:unauthorized"));
+        throw new Error("Your session has expired. Please log in again.");
+    }
 
-            clearAuthToken();
-
-            window.dispatchEvent(
-                new CustomEvent("cleantrack:unauthorized")
-            );
-
-            throw new Error(
-                "Your session has expired. Please log in again."
-            );
-        }
+    throw new Error(
+        errorData.error ||
+        errorData.message ||
+        `Request failed (${response.status})`
+    );
+}
 
 
         // ----------------------------------------------------
