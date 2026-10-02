@@ -14,163 +14,189 @@ CleanTrack.navigation = (() => {
 
         const role = getRole();
 
+        const commonStart = [
+            {
+                id: "home",
+                label: "Home",
+                icon: "\u2302"
+            }
+        ];
+
+        const commonEnd = [
+            {
+                id: "profile",
+                label: "Profile",
+                icon: "\u25c9"
+            }
+        ];
+
         if (role === "admin") {
             return [
+                ...commonStart,
+
                 {
                     id: "dashboard",
                     label: "Dashboard",
-                    icon: "▣"
+                    icon: "\u25a3"
                 },
                 {
                     id: "tasks",
                     label: "Tasks",
-                    icon: "✓"
+                    icon: "\u2713"
                 },
                 {
                     id: "staff",
                     label: "Staff",
-                    icon: "♙"
+                    icon: "\u2659"
                 },
                 {
                     id: "teams",
                     label: "Teams",
-                    icon: "♟"
+                    icon: "\u265f"
                 },
                 {
                     id: "zones",
                     label: "Zones",
-                    icon: "⌂"
+                    icon: "\u25ab"
                 },
                 {
                     id: "locations",
                     label: "Locations",
-                    icon: "⌖"
+                    icon: "\u2306"
                 },
                 {
                     id: "logs",
                     label: "Cleaning Logs",
-                    icon: "▤"
+                    icon: "\u25a4"
                 },
                 {
                     id: "analytics",
                     label: "Analytics",
-                    icon: "◈"
+                    icon: "\u25c8"
                 },
                 {
                     id: "reports",
                     label: "Reports",
-                    icon: "▥"
+                    icon: "\u25a5"
                 },
                 {
                     id: "alerts",
                     label: "Alerts",
                     icon: "!"
-                }
+                },
+
+                ...commonEnd
             ];
         }
 
         if (role === "supervisor") {
             return [
+                ...commonStart,
+
                 {
                     id: "dashboard",
                     label: "Team Dashboard",
-                    icon: "▣"
+                    icon: "\u25a3"
                 },
                 {
                     id: "team",
                     label: "My Team",
-                    icon: "♟"
+                    icon: "\u265f"
                 },
                 {
                     id: "tasks",
                     label: "Team Tasks",
-                    icon: "✓"
+                    icon: "\u2713"
                 },
                 {
                     id: "staff",
                     label: "Team Staff",
-                    icon: "♙"
+                    icon: "\u2659"
                 },
                 {
                     id: "zones",
                     label: "Zones",
-                    icon: "⌂"
+                    icon: "\u25ab"
                 },
                 {
                     id: "locations",
                     label: "Locations",
-                    icon: "⌖"
+                    icon: "\u2306"
                 },
                 {
                     id: "logs",
                     label: "Cleaning Logs",
-                    icon: "▤"
+                    icon: "\u25a4"
                 },
                 {
                     id: "analytics",
                     label: "Team Analytics",
-                    icon: "◈"
+                    icon: "\u25c8"
                 },
                 {
                     id: "reports",
                     label: "Team Reports",
-                    icon: "▥"
+                    icon: "\u25a5"
                 },
                 {
                     id: "alerts",
                     label: "Alerts",
                     icon: "!"
-                }
+                },
+
+                ...commonEnd
             ];
         }
 
         if (role === "employee" || role === "staff") {
             return [
+                ...commonStart,
+
                 {
                     id: "dashboard",
                     label: "My Dashboard",
-                    icon: "▣"
+                    icon: "\u25a3"
                 },
                 {
                     id: "tasks",
                     label: "My Tasks",
-                    icon: "✓"
+                    icon: "\u2713"
                 },
                 {
                     id: "activity",
                     label: "My Activity",
-                    icon: "◷"
+                    icon: "\u25c7"
                 },
                 {
                     id: "performance",
                     label: "My Performance",
-                    icon: "◈"
+                    icon: "\u25c8"
                 },
                 {
                     id: "zones",
                     label: "My Zones",
-                    icon: "⌂"
+                    icon: "\u25ab"
                 },
                 {
                     id: "alerts",
                     label: "Alerts",
                     icon: "!"
-                }
+                },
+
+                ...commonEnd
             ];
         }
 
         return [
-            {
-                id: "dashboard",
-                label: "Dashboard",
-                icon: "▣"
-            }
+            ...commonStart,
+            ...commonEnd
         ];
     }
 
     function render() {
 
-        const navigation = document.getElementById("main-navigation");
+        const navigation =
+            document.getElementById("main-navigation");
 
         if (!navigation) {
             return;
@@ -189,24 +215,29 @@ CleanTrack.navigation = (() => {
             </button>
         `).join("");
 
-        navigation.querySelectorAll(".nav-item").forEach(button => {
+        navigation
+            .querySelectorAll(".nav-item")
+            .forEach(button => {
 
-            button.addEventListener("click", () => {
+                button.addEventListener("click", () => {
 
-                const page = button.dataset.page;
+                    const page =
+                        button.dataset.page;
 
-                setActive(page);
+                    setActive(page);
 
-                if (CleanTrack.app &&
-                    typeof CleanTrack.app.loadPage === "function") {
+                    if (
+                        CleanTrack.app &&
+                        typeof CleanTrack.app.loadPage === "function"
+                    ) {
+                        CleanTrack.app.loadPage(page);
+                    }
 
-                    CleanTrack.app.loadPage(page);
-                }
+                });
+
             });
 
-        });
-
-        setActive("dashboard");
+        setActive("home");
     }
 
     function setActive(pageId) {
@@ -221,6 +252,7 @@ CleanTrack.navigation = (() => {
                 );
 
             });
+
     }
 
     return {

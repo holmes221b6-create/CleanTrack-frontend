@@ -156,7 +156,7 @@ CleanTrack.api = (() => {
 if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
 
-    if (response.status === 401 && !path.includes("/api/auth/login")) {
+   if (response.status === 401 && !endpoint.includes("/api/auth/login")) { 
         clearAuthToken();
         window.dispatchEvent(new CustomEvent("cleantrack:unauthorized"));
         throw new Error("Your session has expired. Please log in again.");
