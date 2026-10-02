@@ -388,6 +388,8 @@ function showApplication() {
             "change",
             updateRegistrationFields
         );
+        updateRegistrationFields();
+        
 
         document
             .getElementById("register-form")
@@ -406,20 +408,23 @@ function showApplication() {
 function updateRegistrationFields() {
     const role = document.getElementById("register-role").value;
 
-    const organizationName = document.getElementById("organization-name-group");
-    const organizationCode = document.getElementById("organization-code-group");
-    const employeeId = document.getElementById("employee-id-group");
+    const organizationName =
+        document.getElementById("organization-name-group");
 
-    organizationName.style.display =
-        role === "admin" ? "block" : "none";
+    const organizationCode =
+        document.getElementById("organization-code-group");
 
-    organizationCode.style.display =
-        role === "supervisor" || role === "employee"
-            ? "block"
-            : "none";
+    const employeeId =
+        document.getElementById("employee-id-group");
 
-    employeeId.style.display =
-        role === "employee" ? "block" : "none";
+    const showOrganizationName = role === "admin";
+    const showOrganizationCode =
+        role === "supervisor" || role === "employee";
+    const showEmployeeId = role === "employee";
+
+    organizationName.hidden = !showOrganizationName;
+    organizationCode.hidden = !showOrganizationCode;
+    employeeId.hidden = !showEmployeeId;
 }
 
     // --------------------------------------------------------
