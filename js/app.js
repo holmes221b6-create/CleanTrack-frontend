@@ -3047,100 +3047,115 @@ if (
      * different navigation.
      */
 
-    function getSearchItems() {
+  function getSearchItems() {
 
-        const navigation =
-            document.getElementById(
-                "main-navigation"
-            );
+    const elements =
+        document.querySelectorAll(
+            "nav button[data-page], " +
+            "nav a[data-page], " +
+            "aside button[data-page], " +
+            "aside a[data-page]"
+        );
 
 
-        if (!navigation) {
-            return [];
+    const pageLabels = {
+
+        home: "Home",
+        dashboard: "Dashboard",
+        tasks: "Tasks",
+        staff: "Staff",
+        teams: "Teams",
+        zones: "Zones",
+        locations: "Locations",
+        logs: "Cleaning Logs",
+        analytics: "Analytics",
+        reports: "Reports",
+        alerts: "Alerts",
+        profile: "Profile"
+
+    };
+
+
+    const items = [];
+
+
+    elements.forEach(element => {
+
+        const page =
+            element.dataset.page;
+
+
+        if (!page) {
+            return;
         }
 
 
-        const elements =
-            navigation.querySelectorAll(
-                "button, a, [role='button']"
+        const label =
+            pageLabels[page] ||
+            page;
+
+
+        const exists =
+            items.some(
+                item =>
+                    item.page === page
             );
 
 
-        const items = [];
+        if (exists) {
+            return;
+        }
 
 
-        elements.forEach(element => {
-
-            const label =
-                element.textContent
-                    .replace(/\s+/g, " ")
-                    .trim();
-
-
-            if (!label) {
-                return;
-            }
-
-
-            const exists =
-                items.some(
-                    item =>
-                        item.label.toLowerCase() ===
-                        label.toLowerCase()
-                );
-
-
-            if (exists) {
-                return;
-            }
-
-
-            items.push({
-                label,
-                element
-            });
-
+        items.push({
+            label,
+            page,
+            element
         });
 
-
-        /*
-         * Global account destinations.
-         * These are not role-specific navigation
-         * pages but are always available.
-         */
-
-        const accountItems = [
-            {
-                label: "My Profile",
-                action: () => loadPage("profile")
-            },
-            {
-                label: "Settings",
-                action: () => loadPage("settings")
-            }
-        ];
+    });
 
 
-        accountItems.forEach(item => {
+    /*
+     * Global account destinations.
+     */
 
-            const exists =
-                items.some(
-                    existing =>
-                        existing.label.toLowerCase() ===
-                        item.label.toLowerCase()
-                );
+    const accountItems = [
+
+        {
+            label: "My Profile",
+            page: "profile",
+            action: () => loadPage("profile")
+        },
+
+        {
+            label: "Settings",
+            page: "settings",
+            action: () => loadPage("settings")
+        }
+
+    ];
 
 
-            if (!exists) {
-                items.push(item);
-            }
+    accountItems.forEach(item => {
 
-        });
+        const exists =
+            items.some(
+                existing =>
+                    existing.page === item.page
+            );
 
 
-        return items;
+        if (!exists) {
+            items.push(item);
+        }
 
-    }
+    });
+
+
+    return items;
+
+}
 
 
     function renderSearchResults(query) {
