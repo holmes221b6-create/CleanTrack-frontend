@@ -1,0 +1,577 @@
+/* =========================================================
+   CLEANTRACK HOME
+   ========================================================= */
+
+.cleantrack-home {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-content {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 34px 34px 54px;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+.home-welcome {
+    margin-bottom: 34px;
+}
+
+.home-label {
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.home-welcome h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 36px;
+    line-height: 1.12;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.home-welcome p {
+    margin: 9px 0 0;
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 13px;
+}
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.home-section {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.home-section-title {
+    margin-bottom: 11px;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   ORGANIZATION
+   ========================================================= */
+
+.home-organization {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.045),
+            rgba(255, 255, 255, 0.018)
+        );
+    box-sizing: border-box;
+}
+
+.home-organization-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.home-organization-symbol {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(86, 145, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(86, 145, 255, 0.1);
+    color: #9bbcff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+
+.home-organization h2 {
+    margin: 0 0 4px;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.home-organization p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.43);
+    font-size: 11px;
+}
+
+.home-active-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    padding: 7px 11px;
+    border: 1px solid rgba(53, 210, 120, 0.16);
+    border-radius: 999px;
+    background: rgba(53, 210, 120, 0.07);
+    color: #8ee4b0;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.home-active-status span {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    border-radius: 50%;
+    background: #35d278;
+    box-shadow: 0 0 0 3px rgba(53, 210, 120, 0.09);
+}
+
+/* =========================================================
+   ORGANIZATION DETAILS
+   ========================================================= */
+
+.home-detail-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.home-detail-card {
+    min-height: 132px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.025);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+        transform 0.16s ease,
+        border-color 0.16s ease,
+        background 0.16s ease;
+}
+
+.home-detail-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(86, 145, 255, 0.2);
+    background: rgba(255, 255, 255, 0.042);
+}
+
+.home-detail-card:active {
+    transform: translateY(0);
+}
+
+.home-detail-card span {
+    display: block;
+    margin-bottom: 18px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.home-detail-card strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #ffffff;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 650;
+}
+
+.home-detail-card small {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+}
+
+/* =========================================================
+   ORGANIZATION SETTINGS
+   ========================================================= */
+
+.home-settings-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.home-settings-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 102px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.025);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+        transform 0.16s ease,
+        border-color 0.16s ease,
+        background 0.16s ease;
+}
+
+.home-settings-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(86, 145, 255, 0.18);
+    background: rgba(255, 255, 255, 0.042);
+}
+
+.home-card-icon {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.045);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.home-settings-card strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.home-settings-card span {
+    display: block;
+    max-width: 205px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.home-settings-card em {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.34);
+    font-size: 15px;
+    font-style: normal;
+}
+
+/* =========================================================
+   OVERVIEW
+   ========================================================= */
+
+.home-overview-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.home-overview-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 108px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.025);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+        transform 0.16s ease,
+        border-color 0.16s ease,
+        background 0.16s ease;
+}
+
+.home-overview-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(86, 145, 255, 0.18);
+    background: rgba(255, 255, 255, 0.042);
+}
+
+.home-overview-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(86, 145, 255, 0.08);
+    color: #9bbcff;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.home-overview-card strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.home-overview-card span {
+    display: block;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.home-overview-card em {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 15px;
+    font-style: normal;
+}
+
+/* =========================================================
+   ORGANIZATION CODE
+   ========================================================= */
+
+.home-code {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 21px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.025);
+    box-sizing: border-box;
+}
+
+.home-code strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+}
+
+.home-code span {
+    display: block;
+    color: rgba(255, 255, 255, 0.41);
+    font-size: 10px;
+}
+
+.home-code button {
+    flex: 0 0 auto;
+    padding: 9px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.045);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease;
+}
+
+.home-code button:hover {
+    border-color: rgba(86, 145, 255, 0.22);
+    background: rgba(255, 255, 255, 0.075);
+}
+
+/* =========================================================
+   NEED HELP
+   ========================================================= */
+
+.home-help {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 20px 21px;
+    border: 1px solid rgba(86, 145, 255, 0.15);
+    border-radius: 15px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(86, 145, 255, 0.07),
+            rgba(86, 145, 255, 0.025)
+        );
+    box-sizing: border-box;
+}
+
+.home-help-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.home-help-icon {
+    width: 35px;
+    height: 35px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(86, 145, 255, 0.14);
+    border-radius: 10px;
+    background: rgba(86, 145, 255, 0.09);
+    color: #9bbcff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.home-help-main strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.home-help-main p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+}
+
+.home-help-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.home-help-actions button {
+    padding: 9px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.home-help-actions button:hover {
+    background: rgba(255, 255, 255, 0.075);
+}
+
+/* =========================================================
+   HIDDEN HOME AI PANEL
+   Kept only for backward compatibility.
+   Global AI Help is now in the site header.
+   ========================================================= */
+
+.home-ai-panel {
+    display: none;
+}
+
+/* =========================================================
+   FOCUS STATES
+   ========================================================= */
+
+.home-detail-card:focus-visible,
+.home-settings-card:focus-visible,
+.home-overview-card:focus-visible,
+.home-code button:focus-visible,
+.home-help-actions button:focus-visible {
+    outline: 2px solid rgba(86, 145, 255, 0.65);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .home-content {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .home-detail-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .home-settings-grid,
+    .home-overview-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+
+    .home-content {
+        padding: 26px 18px 40px;
+    }
+
+    .home-welcome h1 {
+        font-size: 30px;
+    }
+
+    .home-organization,
+    .home-help {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .home-active-status {
+        align-self: flex-start;
+    }
+
+    .home-help-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .home-detail-grid,
+    .home-settings-grid,
+    .home-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-code {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .home-code button {
+        width: 100%;
+    }
+
+    .home-help-actions {
+        display: grid;
+        width: 100%;
+    }
+
+    .home-help-actions button {
+        width: 100%;
+    }
+}

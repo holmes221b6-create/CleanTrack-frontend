@@ -41,6 +41,12 @@
         rel="stylesheet"
         href="css/responsive.css"
     >
+    
+    <link
+    rel="stylesheet"
+    href="css/home.css"
+    
+    >
 
 </head>
 
@@ -194,114 +200,175 @@
             <!-- =========================================
                  TOPBAR
             ========================================== -->
-
+            
             <header class="topbar">
 
-
-                <!-- Mobile menu -->
-
-                <button
-                    id="mobile-menu-button"
-                    class="icon-button mobile-menu-button"
-                    type="button"
-                    aria-label="Open menu"
-                >
-                    ☰
-                </button>
+    <!-- Mobile menu -->
+    <button
+        id="mobile-menu-button"
+        class="icon-button mobile-menu-button"
+        type="button"
+        aria-label="Open menu"
+    >
+        &#9776;
+    </button>
 
 
-                <!-- Page information -->
+    <!-- Current page -->
+    <div class="topbar-page">
 
-                <div class="topbar-page">
+        <div
+            id="topbar-title"
+            class="topbar-title"
+        >
+            Home
+        </div>
 
-                    <div
-                        id="topbar-title"
-                        class="topbar-title"
-                    >
-                        Dashboard
-                    </div>
+        <div
+            id="topbar-subtitle"
+            class="topbar-subtitle"
+        >
+            CleanTrack
+        </div>
 
-                    <div
-                        id="topbar-subtitle"
-                        class="topbar-subtitle"
-                    >
-                        CleanTrack
-                    </div>
-
-                </div>
-
-
-                <!-- Right side -->
-
-                <div class="topbar-actions">
+    </div>
 
 
-                    <!-- Organization -->
+    <!-- Global search -->
+    <div class="global-search">
 
-                    <div
-                        id="topbar-organization"
-                        class="organization-display"
-                    >
+        <span class="global-search-icon">
+            &#128269;
+        </span>
 
-                        <span class="organization-dot"></span>
+        <input
+            id="global-search-input"
+            type="search"
+            placeholder="Search CleanTrack..."
+            autocomplete="off"
+            aria-label="Search CleanTrack"
+        />
 
-                        <span id="organization-name">
-                            Organization
-                        </span>
+        <span class="global-search-key">
+            /
+        </span>
 
-                    </div>
-
-
-                    <!-- Notifications -->
-
-                    <button
-                        id="notification-button"
-                        class="icon-button notification-button"
-                        type="button"
-                        aria-label="Notifications"
-                    >
-
-                        <span>
-                            ♢
-                        </span>
-
-                        <span
-                            id="notification-count"
-                            class="notification-count hidden"
-                        >
-                            0
-                        </span>
-
-                    </button>
+    </div>
 
 
-                    <!-- Profile -->
+    <!-- Right side -->
+    <div class="topbar-actions">
 
-                    <button
-                        id="profile-button"
-                        class="profile-button"
-                        type="button"
-                    >
+        <!-- Notifications -->
+        <button
+            id="notification-button"
+            class="icon-button notification-button"
+            type="button"
+            aria-label="Notifications"
+            title="Notifications"
+        >
+            &#128276;
 
-                        <span
-                            id="topbar-avatar"
-                            class="avatar avatar-sm"
-                        >
-                            ?
-                        </span>
+            <span
+                id="notification-count"
+                class="notification-count hidden"
+            >
+                0
+            </span>
+        </button>
 
-                        <span
-                            id="topbar-user-name"
-                            class="profile-name"
-                        >
-                            User
-                        </span>
 
-                    </button>
+        <!-- AI Help -->
+        <button
+            id="ai-help-button"
+            class="icon-button ai-help-button"
+            type="button"
+            aria-label="AI Help"
+            title="AI Help"
+        >
+            &#10024;
+        </button>
 
-                </div>
 
-            </header>
+        <!-- Profile -->
+        <button
+            id="profile-button"
+            class="profile-button"
+            type="button"
+            aria-expanded="false"
+            aria-label="Open profile menu"
+        >
+
+            <span
+                id="topbar-avatar"
+                class="avatar avatar-sm"
+            >
+                ?
+            </span>
+
+            <span
+                id="topbar-user-name"
+                class="profile-name"
+            >
+                User
+            </span>
+
+            <span class="profile-chevron">
+                &#9662;
+            </span>
+
+        </button>
+
+
+        <!-- Profile dropdown -->
+        <div
+            id="global-profile-menu"
+            class="global-profile-menu hidden"
+        >
+
+            <div class="global-profile-header">
+
+                <strong id="global-profile-name">
+                    User
+                </strong>
+
+                <span id="global-profile-role">
+                    Administrator
+                </span>
+
+            </div>
+
+            <div class="global-profile-divider"></div>
+
+            <button
+                type="button"
+                data-global-profile="profile"
+            >
+                My Profile
+            </button>
+
+            <button
+                type="button"
+                data-global-profile="settings"
+            >
+                Settings
+            </button>
+
+            <div class="global-profile-divider"></div>
+
+            <button
+                type="button"
+                class="global-profile-logout"
+                data-global-profile="logout"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
 
 
             <!-- =========================================
