@@ -2162,3 +2162,50 @@ ol {
     }
 
 }
+
+.staff-attention-strip {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 13px;
+}
+
+.staff-attention-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 11px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 9px;
+    background: rgba(255,255,255,.018);
+    color: rgba(255,255,255,.55);
+    font-size: 9px;
+}
+
+button.staff-attention-item {
+    cursor: pointer;
+}
+
+button.staff-attention-item:hover {
+    background: rgba(255,255,255,.04);
+}
+
+.staff-attention-item strong {
+    color: #fff;
+    font-size: 12px;
+}
+
+.staff-attention-item em {
+    color: rgba(255,255,255,.32);
+    font-style: normal;
+}
+
+.staff-attention-clear {
+    padding: 9px 11px;
+    border: 1px solid rgba(103,213,154,.10);
+    border-radius: 9px;
+    background: rgba(103,213,154,.025);
+    color: #83d8a4;
+    font-size: 9px;
+}

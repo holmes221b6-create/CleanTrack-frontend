@@ -3887,6 +3887,11 @@ async function renderAdminStaff() {
                 </div>
 
             </section>
+            
+            <section
+    id="admin-staff-attention"
+    class="staff-attention-strip"
+></section>
 
 
             <section
@@ -4074,6 +4079,123 @@ function renderAdminStaffData(data) {
     renderAdminUnassignedStaff(
         data.unassigned_employees || []
     );
+    
+    renderAdminStaffAttention(data);
+
+}
+
+function renderAdminStaffAttention(data) {
+
+    const container =
+        document.getElementById(
+            "admin-staff-attention"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    const summary =
+        data.summary || {};
+
+    const unassigned =
+        (data.unassigned_employees || []).length;
+
+    const pending =
+        summary.pending || 0;
+
+    const inactive =
+        summary.inactive || 0;
+
+
+    const items = [];
+
+
+    if (unassigned) {
+
+        items.push(`
+            <button
+                type="button"
+                class="staff-attention-item"
+                onclick="
+                    document
+                        .getElementById('admin-unassigned-panel')
+                        ?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                "
+            >
+                <strong>
+                    ${unassigned}
+                </strong>
+
+                <span>
+                    unassigned employee${
+                        unassigned === 1 ? "" : "s"
+                    }
+                </span>
+
+                <em>Review →</em>
+            </button>
+        `);
+
+    }
+
+
+    if (pending) {
+
+        items.push(`
+            <div class="staff-attention-item">
+                <strong>
+                    ${pending}
+                </strong>
+
+                <span>
+                    pending staff account${
+                        pending === 1 ? "" : "s"
+                    }
+                </span>
+            </div>
+        `);
+
+    }
+
+
+    if (inactive) {
+
+        items.push(`
+            <div class="staff-attention-item">
+                <strong>
+                    ${inactive}
+                </strong>
+
+                <span>
+                    inactive staff member${
+                        inactive === 1 ? "" : "s"
+                    }
+                </span>
+            </div>
+        `);
+
+    }
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+            <div class="staff-attention-clear">
+                Staff structure is healthy
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        items.join("");
 
 }
 
@@ -5327,16 +5449,39 @@ function editAdminStaff(id) {
     const person =
         findAdminStaffPerson(id);
 
-    if (!person) {
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!person || !data) {
         return;
     }
+
+
+    const teams =
+        data.teams || [];
+
+    const locations =
+        data.locations || [];
+
+
+    const currentTeamId =
+        (
+            person.team_ids ||
+            []
+        )[0] || "";
+
+
+    const currentLocationId =
+        person.location_id || "";
 
 
     openAdminStaffDrawer(
         person.name,
         person.role === "supervisor"
             ? "Supervisor"
-            : "Employee",
+            : person.role === "admin"
+                ? "Administrator"
+                : "Employee",
         `
             <form
                 class="staff-edit-form"
@@ -5353,7 +5498,6 @@ function editAdminStaff(id) {
                         )}"
                         required
                     />
-
                 </label>
 
 
@@ -5367,7 +5511,6 @@ function editAdminStaff(id) {
                             person.email || ""
                         )}"
                     />
-
                 </label>
 
 
@@ -5380,7 +5523,6 @@ function editAdminStaff(id) {
                             person.phone || ""
                         )}"
                     />
-
                 </label>
 
 
@@ -5393,7 +5535,6 @@ function editAdminStaff(id) {
                             person.employee_id || ""
                         )}"
                     />
-
                 </label>
 
 
@@ -5430,7 +5571,86 @@ function editAdminStaff(id) {
                         </option>
 
                     </select>
+                </label>
 
+
+                <label>
+                    Team
+
+                    <select name="team_id">
+
+                        <option value="">
+                            No team
+                        </option>
+
+                        ${teams
+                            .map(
+                                team => `
+                                    <option
+                                        value="${escapeHtml(
+                                            String(team.id)
+                                        )}"
+                                        ${
+                                            String(
+                                                team.id
+                                            ) ===
+                                            String(
+                                                currentTeamId
+                                            )
+                                                ? "selected"
+                                                : ""
+                                        }
+                                    >
+                                        ${escapeHtml(
+                                            team.name
+                                        )}
+                                    </option>
+                                `
+                            )
+                            .join("")}
+
+                    </select>
+                </label>
+
+
+                <label>
+                    Location
+
+                    <select name="location_id">
+
+                        <option value="">
+                            No location
+                        </option>
+
+                        ${locations
+                            .map(
+                                location => `
+                                    <option
+                                        value="${escapeHtml(
+                                            String(
+                                                location.id
+                                            )
+                                        )}"
+                                        ${
+                                            String(
+                                                location.id
+                                            ) ===
+                                            String(
+                                                currentLocationId
+                                            )
+                                                ? "selected"
+                                                : ""
+                                        }
+                                    >
+                                        ${escapeHtml(
+                                            location.name
+                                        )}
+                                    </option>
+                                `
+                            )
+                            .join("")}
+
+                    </select>
                 </label>
 
 
@@ -5479,13 +5699,45 @@ function editAdminStaff(id) {
                 new FormData(form);
 
 
+            const nextRole =
+                String(
+                    formData.get("role") || ""
+                );
+
+
+            const roleChanged =
+                nextRole !==
+                String(person.role || "");
+
+
+            if (
+                nextRole === "admin" &&
+                person.role !== "admin"
+            ) {
+
+                const confirmed =
+                    window.confirm(
+                        "Grant this person Administrator access? " +
+                        "This gives them organization-wide admin permissions."
+                    );
+
+
+                if (!confirmed) {
+                    return;
+                }
+
+            }
+
+
             try {
 
                 await CleanTrack.api.request(
                     `/api/users/${encodeURIComponent(id)}`,
                     {
                         method: "PUT",
+
                         body: JSON.stringify({
+
                             name:
                                 formData.get("name"),
 
@@ -5501,14 +5753,24 @@ function editAdminStaff(id) {
                                 ),
 
                             role:
-                                formData.get("role")
+                                nextRole,
+
+                            team_id:
+                                formData.get(
+                                    "team_id"
+                                ) || null,
+
+                            location_id:
+                                formData.get(
+                                    "location_id"
+                                ) || null
+
                         })
                     }
                 );
 
 
                 await loadAdminStaffData();
-
 
                 closeAdminStaffDrawer();
 
