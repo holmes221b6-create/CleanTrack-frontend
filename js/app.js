@@ -804,8 +804,1554 @@ const zoneCount =
 
 }
 
+function renderAdminDashboard() {
+
+    const pageView =
+        document.getElementById("page-view");
+
+    if (!pageView) {
+        return;
+    }
+
+
+    const user =
+        CleanTrack.currentUser || {};
+
+    const name =
+        user.name || "User";
+
+    const organization =
+        user.organization_name ||
+        "CleanTrack";
+
+
+    if (!CleanTrack.adminDashboardPeriod) {
+
+        const today =
+            new Date();
+
+        const from =
+            new Date(today);
+
+        from.setDate(
+            from.getDate() - 6
+        );
+
+        CleanTrack.adminDashboardPeriod = {
+            key: "7d",
+            from: formatDashboardDate(from),
+            to: formatDashboardDate(today),
+            label: "Last 7 days"
+        };
+
+    }
+
+
+    const period =
+        CleanTrack.adminDashboardPeriod;
+
+
+    pageView.innerHTML = `
+
+        <section class="admin-dashboard">
+
+            <header class="admin-dashboard-header">
+
+                <div>
+
+                    <div class="admin-dashboard-eyebrow">
+                        CLEANTRACK DASHBOARD
+                    </div>
+
+                    <h1>
+                        Welcome back, ${escapeHtml(name)}
+                    </h1>
+
+                    <p>
+                        ${escapeHtml(organization)}
+                    </p>
+
+                </div>
+
+                <div class="admin-dashboard-period-label">
+                    ${escapeHtml(period.label)}
+                </div>
+
+            </header>
+
+
+            <!-- =================================================
+                 SUMMARY
+                 ================================================= -->
+
+            <section class="admin-dashboard-summary">
+
+                <article class="admin-summary-card">
+
+                    <span>
+                        CLEANED
+                    </span>
+
+                    <strong id="admin-kpi-completed">
+                        —
+                    </strong>
+
+                    <small id="admin-kpi-completed-detail">
+                        Selected period
+                    </small>
+
+                </article>
+
+
+                <article class="admin-summary-card">
+
+                    <span>
+                        COMPLIANCE
+                    </span>
+
+                    <strong id="admin-kpi-compliance">
+                        —
+                    </strong>
+
+                    <small>
+                        Completion rate
+                    </small>
+
+                </article>
+
+
+                <article class="admin-summary-card admin-summary-warning">
+
+                    <span>
+                        OVERDUE ZONES
+                    </span>
+
+                    <strong id="admin-kpi-overdue">
+                        —
+                    </strong>
+
+                    <small>
+                        Current status
+                    </small>
+
+                </article>
+
+
+                <article class="admin-summary-card">
+
+                    <span>
+                        AVG CLEAN TIME
+                    </span>
+
+                    <strong id="admin-kpi-duration">
+                        —
+                    </strong>
+
+                    <small>
+                        Completed tasks
+                    </small>
+
+                </article>
+
+            </section>
+
+
+            <!-- =================================================
+                 MAIN ANALYTICS
+                 ================================================= -->
+
+            <section class="admin-dashboard-grid">
+
+                <!-- Trend -->
+
+                <article class="admin-dashboard-panel admin-trend-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                PERFORMANCE TREND
+                            </span>
+
+                            <h2>
+                                Cleaning compliance
+                            </h2>
+
+                        </div>
+
+
+                        <div class="admin-range-controls">
+
+                            <button
+                                type="button"
+                                data-admin-range="7d"
+                            >
+                                7D
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="14d"
+                            >
+                                14D
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="30d"
+                            >
+                                30D
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="3m"
+                            >
+                                3M
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="6m"
+                            >
+                                6M
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="1y"
+                            >
+                                1Y
+                            </button>
+
+                            <button
+                                type="button"
+                                data-admin-range="custom"
+                            >
+                                Custom
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="admin-custom-range"
+                        id="admin-custom-range"
+                        hidden
+                    >
+
+                        <label>
+                            From
+
+                            <input
+                                type="date"
+                                id="admin-from-date"
+                                value="${period.from}"
+                            />
+
+                        </label>
+
+
+                        <label>
+                            To
+
+                            <input
+                                type="date"
+                                id="admin-to-date"
+                                value="${period.to}"
+                            />
+
+                        </label>
+
+
+                        <button
+                            type="button"
+                            id="admin-apply-range"
+                        >
+                            Apply
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="admin-trend-chart"
+                        class="admin-trend-chart"
+                    >
+
+                        <div class="admin-dashboard-loading">
+                            Loading trend...
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Donut -->
+
+                <article class="admin-dashboard-panel admin-zone-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                ZONE STATUS
+                            </span>
+
+                            <h2>
+                                Current distribution
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="admin-donut-layout">
+
+                        <div
+                            id="admin-zone-donut"
+                            class="admin-zone-donut"
+                        >
+
+                            <div>
+                                <strong id="admin-zone-total">
+                                    0
+                                </strong>
+
+                                <span>
+                                    zones
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="admin-zone-legend"
+                            class="admin-zone-legend"
+                        ></div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Needs attention -->
+
+                <article class="admin-dashboard-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                NEEDS ATTENTION
+                            </span>
+
+                            <h2>
+                                What needs action
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="admin-attention-list"
+                        class="admin-attention-list"
+                    >
+                        <div class="admin-dashboard-loading">
+                            Loading...
+                        </div>
+                    </div>
+
+                </article>
+
+
+                <!-- Location pulse -->
+
+                <article class="admin-dashboard-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                LOCATION PULSE
+                            </span>
+
+                            <h2>
+                                Location performance
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="admin-location-list"
+                        class="admin-location-list"
+                    >
+                        <div class="admin-dashboard-loading">
+                            Loading...
+                        </div>
+                    </div>
+
+                </article>
+
+
+                <!-- Staff -->
+
+                <article class="admin-dashboard-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                STAFF OVERVIEW
+                            </span>
+
+                            <h2>
+                                Organization staffing
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="admin-staff-grid">
+
+                        <div>
+                            <strong id="admin-staff-supervisors">
+                                0
+                            </strong>
+
+                            <span>
+                                Supervisors
+                            </span>
+                        </div>
+
+
+                        <div>
+                            <strong id="admin-staff-employees">
+                                0
+                            </strong>
+
+                            <span>
+                                Employees
+                            </span>
+                        </div>
+
+
+                        <div>
+                            <strong id="admin-staff-total">
+                                0
+                            </strong>
+
+                            <span>
+                                Total staff
+                            </span>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Activity -->
+
+                <article class="admin-dashboard-panel">
+
+                    <div class="admin-panel-header">
+
+                        <div>
+
+                            <span>
+                                RECENT ACTIVITY
+                            </span>
+
+                            <h2>
+                                Latest organization events
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="admin-activity-list"
+                        class="admin-activity-list"
+                    >
+                        <div class="admin-dashboard-loading">
+                            Loading...
+                        </div>
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- =================================================
+                 QUICK ACTIONS
+                 ================================================= -->
+
+            <section class="admin-dashboard-actions">
+
+                <button
+                    type="button"
+                    data-admin-action="tasks"
+                >
+                    + Create Task
+                </button>
+
+                <button
+                    type="button"
+                    data-admin-action="staff"
+                >
+                    Manage Staff
+                </button>
+
+                <button
+                    type="button"
+                    data-admin-action="locations"
+                >
+                    Manage Locations
+                </button>
+
+                <button
+                    type="button"
+                    data-admin-action="reports"
+                    class="primary"
+                >
+                    Export Report
+                </button>
+
+            </section>
+
+        </section>
+    `;
+
+
+    setupAdminDashboardEvents();
+
+    loadAdminDashboardData();
+
+}
+
+function formatDashboardDate(date) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+function getAdminDashboardRange(key) {
+
+    const today =
+        new Date();
+
+    const from =
+        new Date(today);
+
+
+    const ranges = {
+        "7d": 7,
+        "14d": 14,
+        "30d": 30,
+        "3m": 90,
+        "6m": 180,
+        "1y": 365
+    };
+
+
+    const days =
+        ranges[key] || 7;
+
+
+    from.setDate(
+        from.getDate() - days + 1
+    );
+
+
+    const labels = {
+        "7d": "Last 7 days",
+        "14d": "Last 14 days",
+        "30d": "Last 30 days",
+        "3m": "Last 3 months",
+        "6m": "Last 6 months",
+        "1y": "Last year"
+    };
+
+
+    return {
+        key,
+        from: formatDashboardDate(from),
+        to: formatDashboardDate(today),
+        label: labels[key]
+    };
+
+}
+
+
+function setupAdminDashboardEvents() {
+
+    document
+        .querySelectorAll("[data-admin-range]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const key =
+                        button.dataset.adminRange;
+
+
+                    if (key === "custom") {
+
+                        const custom =
+                            document.getElementById(
+                                "admin-custom-range"
+                            );
+
+                        custom.hidden =
+                            !custom.hidden;
+
+                        return;
+                    }
+
+
+                    CleanTrack.adminDashboardPeriod =
+                        getAdminDashboardRange(key);
+
+
+                    renderAdminDashboard();
+
+                }
+            );
+
+        });
+
+
+    const applyButton =
+        document.getElementById(
+            "admin-apply-range"
+        );
+
+
+    if (applyButton) {
+
+        applyButton.addEventListener(
+            "click",
+            () => {
+
+                const from =
+                    document.getElementById(
+                        "admin-from-date"
+                    ).value;
+
+                const to =
+                    document.getElementById(
+                        "admin-to-date"
+                    ).value;
+
+
+                if (!from || !to || from > to) {
+                    return;
+                }
+
+
+                CleanTrack.adminDashboardPeriod = {
+                    key: "custom",
+                    from,
+                    to,
+                    label:
+                        `${from} → ${to}`
+                };
+
+
+                renderAdminDashboard();
+
+            }
+        );
+
+    }
+
+
+    document
+        .querySelectorAll("[data-admin-action]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const action =
+                        button.dataset.adminAction;
+
+
+                    CleanTrack.dashboardPeriod =
+                        CleanTrack.adminDashboardPeriod;
+
+
+                    if (action === "reports") {
+                        loadPage("reports");
+                        return;
+                    }
+
+
+                    loadPage(action);
+
+                }
+            );
+
+        });
+
+}
+
+
+async function loadAdminDashboardData() {
+
+    const period =
+        CleanTrack.adminDashboardPeriod;
+
+
+    if (!period) {
+        return;
+    }
+
+
+    try {
+
+        const query =
+            new URLSearchParams({
+                from: period.from,
+                to: period.to
+            });
+
+
+        const data =
+            await CleanTrack.api.request(
+                `/api/admin/dashboard?${query.toString()}`
+            );
+
+
+        if (
+            !document.querySelector(
+                ".admin-dashboard"
+            )
+        ) {
+            return;
+        }
+
+
+        renderAdminDashboardData(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Admin Dashboard loading error:",
+            error
+        );
+
+
+        const attention =
+            document.getElementById(
+                "admin-attention-list"
+            );
+
+        if (attention) {
+
+            attention.innerHTML = `
+                <div class="admin-dashboard-empty">
+                    Unable to load dashboard data.
+                </div>
+            `;
+
+        }
+
+    }
+
+}
+
+
+function renderAdminDashboardData(data) {
+
+    const summary =
+        data.summary || {};
+
+    const staff =
+        data.staff || {};
+
+    const zones =
+        data.zone_status || {};
+
+
+    setAdminText(
+        "admin-kpi-completed",
+        summary.completed_tasks ?? 0
+    );
+
+
+    setAdminText(
+        "admin-kpi-completed-detail",
+        `${summary.total_tasks ?? 0} scheduled in selected period`
+    );
+
+
+    setAdminText(
+        "admin-kpi-compliance",
+        `${summary.compliance_pct ?? 0}%`
+    );
+
+
+    setAdminText(
+        "admin-kpi-overdue",
+        zones.overdue ?? 0
+    );
+
+
+    setAdminText(
+        "admin-kpi-duration",
+        summary.avg_clean_time != null
+            ? `${summary.avg_clean_time} min`
+            : "—"
+    );
+
+
+    renderAdminTrendChart(
+        data.trend || []
+    );
+
+
+    renderAdminZoneDonut(
+        zones
+    );
+
+
+    renderAdminAttention(
+        data.needs_attention || []
+    );
+
+
+    renderAdminLocations(
+        data.locations || []
+    );
+
+
+    setAdminText(
+        "admin-staff-supervisors",
+        staff.supervisors ?? 0
+    );
+
+    setAdminText(
+        "admin-staff-employees",
+        staff.employees ?? 0
+    );
+
+    setAdminText(
+        "admin-staff-total",
+        staff.total ?? 0
+    );
+
+
+    renderAdminActivity(
+        data.recent_activity || []
+    );
+
+}
+
+
+function setAdminText(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+
+}
+
+
+function renderAdminTrendChart(rows) {
+
+    const container =
+        document.getElementById(
+            "admin-trend-chart"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!rows.length) {
+
+        container.innerHTML = `
+            <div class="admin-chart-empty">
+                <strong>No trend data yet</strong>
+                <span>
+                    Completed tasks will appear here once
+                    your organization has operational data.
+                </span>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const width = 760;
+    const height = 270;
+
+    const left = 46;
+    const right = 20;
+    const top = 20;
+    const bottom = 38;
+
+
+    const plotWidth =
+        width - left - right;
+
+    const plotHeight =
+        height - top - bottom;
+
+
+    const points =
+        rows.map((row, index) => {
+
+            const x =
+                left +
+                (
+                    rows.length === 1
+                        ? plotWidth / 2
+                        : index *
+                          (
+                            plotWidth /
+                            (rows.length - 1)
+                          )
+                );
+
+
+            const value =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        Number(
+                            row.compliance_pct
+                        ) || 0
+                    )
+                );
+
+
+            const y =
+                top +
+                plotHeight -
+                (
+                    value / 100 *
+                    plotHeight
+                );
+
+
+            return {
+                x,
+                y,
+                value,
+                label: row.label
+            };
+
+        });
+
+
+    const line =
+        points
+            .map(
+                (point, index) =>
+                    `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+            )
+            .join(" ");
+
+
+    const area =
+        `${line} L ${points[points.length - 1].x} ${top + plotHeight} L ${points[0].x} ${top + plotHeight} Z`;
+
+
+    const labels =
+        points
+            .map((point, index) => {
+
+                const show =
+                    points.length <= 8 ||
+                    index === 0 ||
+                    index === points.length - 1 ||
+                    index % Math.ceil(
+                        points.length / 6
+                    ) === 0;
+
+
+                if (!show) {
+                    return "";
+                }
+
+
+                return `
+                    <text
+                        x="${point.x}"
+                        y="${height - 11}"
+                        text-anchor="middle"
+                        class="admin-chart-label"
+                    >
+                        ${escapeHtml(point.label)}
+                    </text>
+                `;
+
+            })
+            .join("");
+
+
+    container.innerHTML = `
+
+        <svg
+            viewBox="0 0 ${width} ${height}"
+            preserveAspectRatio="none"
+            class="admin-trend-svg"
+        >
+
+            <defs>
+
+                <linearGradient
+                    id="adminTrendFill"
+                    x1="0"
+                    x2="0"
+                    y1="0"
+                    y2="1"
+                >
+
+                    <stop
+                        offset="0%"
+                        stop-color="rgba(79,142,247,0.20)"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="rgba(79,142,247,0)"
+                    />
+
+                </linearGradient>
+
+            </defs>
+
+
+            <line
+                x1="${left}"
+                x2="${width - right}"
+                y1="${top + plotHeight * 0.1}"
+                y2="${top + plotHeight * 0.1}"
+                class="admin-chart-gridline"
+            />
+
+            <line
+                x1="${left}"
+                x2="${width - right}"
+                y1="${top + plotHeight * 0.5}"
+                y2="${top + plotHeight * 0.5}"
+                class="admin-chart-gridline"
+            />
+
+            <line
+                x1="${left}"
+                x2="${width - right}"
+                y1="${top + plotHeight * 0.9}"
+                y2="${top + plotHeight * 0.9}"
+                class="admin-chart-gridline"
+            />
+
+
+            <line
+                x1="${left}"
+                x2="${width - right}"
+                y1="${top + plotHeight * 0.1}"
+                y2="${top + plotHeight * 0.1}"
+                class="admin-chart-target"
+            />
+
+
+            <path
+                d="${area}"
+                class="admin-chart-area"
+            />
+
+            <path
+                d="${line}"
+                class="admin-chart-line"
+            />
+
+
+            ${points
+                .map(point => `
+                    <circle
+                        cx="${point.x}"
+                        cy="${point.y}"
+                        r="3.5"
+                        class="admin-chart-point"
+                    >
+                        <title>
+                            ${escapeHtml(point.label)}
+                            · ${point.value}%
+                        </title>
+                    </circle>
+                `)
+                .join("")}
+
+
+            ${labels}
+
+        </svg>
+
+        <div class="admin-chart-target-label">
+            Target 90%
+        </div>
+    `;
+
+}
+
+
+function renderAdminZoneDonut(zones) {
+
+    const donut =
+        document.getElementById(
+            "admin-zone-donut"
+        );
+
+    const legend =
+        document.getElementById(
+            "admin-zone-legend"
+        );
+
+
+    if (!donut || !legend) {
+        return;
+    }
+
+
+    const values = [
+
+        ["Cleaned", zones.cleaned || 0, "cleaned"],
+        ["In Progress", zones.in_progress || 0, "progress"],
+        ["Pending", zones.pending || 0, "pending"],
+        ["Overdue", zones.overdue || 0, "overdue"]
+
+    ];
+
+
+    const total =
+        values.reduce(
+            (sum, item) =>
+                sum + item[1],
+            0
+        );
+
+
+    setAdminText(
+        "admin-zone-total",
+        total
+    );
+
+
+    if (!total) {
+
+        donut.style.background =
+            "conic-gradient(#252c38 0deg 360deg)";
+
+    } else {
+
+        let start = 0;
+
+
+        const segments =
+            values.map(item => {
+
+                const degrees =
+                    item[1] /
+                    total *
+                    360;
+
+
+                const end =
+                    start + degrees;
+
+
+                const colorMap = {
+                    cleaned: "#4f8ef7",
+                    progress: "#8b7cf6",
+                    pending: "#f1b24a",
+                    overdue: "#ed6670"
+                };
+
+
+                const segment =
+                    `${colorMap[item[2]]} ${start}deg ${end}deg`;
+
+
+                start = end;
+
+                return segment;
+
+            });
+
+
+        donut.style.background =
+            `conic-gradient(${segments.join(",")})`;
+
+    }
+
+
+    legend.innerHTML =
+        values
+            .map(item => `
+
+                <div class="admin-zone-legend-row">
+
+                    <span
+                        class="admin-zone-dot ${item[2]}"
+                    ></span>
+
+                    <span>
+                        ${item[0]}
+                    </span>
+
+                    <strong>
+                        ${item[1]}
+                    </strong>
+
+                </div>
+
+            `)
+            .join("");
+
+}
+
+
+function renderAdminAttention(items) {
+
+    const container =
+        document.getElementById(
+            "admin-attention-list"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+            <div class="admin-dashboard-empty positive">
+                <strong>
+                    Everything looks healthy
+                </strong>
+                <span>
+                    No current attention items were detected.
+                </span>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        items
+            .map(item => `
+
+                <button
+                    type="button"
+                    class="admin-attention-item ${escapeHtml(item.severity || "medium")}"
+                >
+
+                    <span
+                        class="admin-attention-indicator"
+                    ></span>
+
+                    <span>
+
+                        <strong>
+                            ${escapeHtml(item.title)}
+                        </strong>
+
+                        <small>
+                            ${escapeHtml(item.detail)}
+                        </small>
+
+                    </span>
+
+                    <em>
+                        →
+                    </em>
+
+                </button>
+
+            `)
+            .join("");
+
+}
+
+
+function renderAdminLocations(rows) {
+
+    const container =
+        document.getElementById(
+            "admin-location-list"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!rows.length) {
+
+        container.innerHTML = `
+            <div class="admin-dashboard-empty">
+                No locations have been added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        rows
+            .map(row => {
+
+                const score =
+                    row.compliance_pct;
+
+
+                const displayScore =
+                    score == null
+                        ? "—"
+                        : `${score}%`;
+
+
+                return `
+
+                    <div class="admin-location-row">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHtml(row.name)}
+                            </strong>
+
+                            <span>
+                                ${row.zone_count || 0}
+                                zones
+                            </span>
+
+                        </div>
+
+
+                        <div class="admin-location-score">
+
+                            <div class="admin-location-track">
+
+                                <span
+                                    style="width:${Math.min(
+                                        100,
+                                        Math.max(
+                                            0,
+                                            Number(score) || 0
+                                        )
+                                    )}%"
+                                ></span>
+
+                            </div>
+
+
+                            <strong>
+                                ${displayScore}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
+
+}
+
+
+function renderAdminActivity(rows) {
+
+    const container =
+        document.getElementById(
+            "admin-activity-list"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!rows.length) {
+
+        container.innerHTML = `
+            <div class="admin-dashboard-empty">
+                No recent activity yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        rows
+            .map(row => `
+
+                <div class="admin-activity-row">
+
+                    <span class="admin-activity-dot">
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            ${escapeHtml(row.title || "Activity")}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(row.detail || "")}
+                        </span>
+
+                    </div>
+
+                    <time>
+                        ${formatAdminActivityTime(
+                            row.activity_time
+                        )}
+                    </time>
+
+                </div>
+
+            `)
+            .join("");
+
+}
+
+
+function formatAdminActivityTime(value) {
+
+    if (!value) {
+        return "";
+    }
+
+
+    const date =
+        new Date(
+            String(value).replace(" ", "T")
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "";
+    }
+
+
+    const seconds =
+        Math.floor(
+            (Date.now() - date.getTime()) /
+            1000
+        );
+
+
+    if (seconds < 60) {
+        return "Just now";
+    }
+
+
+    if (seconds < 3600) {
+
+        return (
+            `${Math.floor(seconds / 60)} min ago`
+        );
+
+    }
+
+
+    if (seconds < 86400) {
+
+        return (
+            `${Math.floor(seconds / 3600)} hr ago`
+        );
+
+    }
+
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "numeric",
+            month: "short"
+        }
+    );
+
+}
+
     
     function renderDashboard() {
+    
+        const role =
+        String(
+            getUser().role || ""
+        ).toLowerCase();
+
+    if (role === "admin") {
+        renderAdminDashboard();
+        return;
+    }
+    
     const pageView = document.getElementById("page-view");
 
     if (!pageView) {
