@@ -6,8 +6,6 @@ window.CleanTrack = window.CleanTrack || {};
 
 CleanTrack.app = (() => {
 
-let homeLoadVersion = 0;
-
     function getUser() {
         return CleanTrack.currentUser || {};
     }
@@ -625,11 +623,8 @@ function renderHome() {
 
         </section>
     `;
-
-
-    const thisHomeVersion = ++homeLoadVersion;
-
-loadHomeData(thisHomeVersion);
+    
+    loadHomeData();
 
 
     /* =====================================================
@@ -774,8 +769,7 @@ loadHomeData(thisHomeVersion);
         );
 
 }
-
-async function loadHomeData(version) {
+async function loadHomeData() {
 
     try {
 
@@ -784,25 +778,15 @@ async function loadHomeData(version) {
                 "/api/home/admin"
             );
 
-
-        /*
-         * Ignore an older request if Home has been
-         * rendered again since this request started.
-         */
-        if (
-            version !== homeLoadVersion ||
-            !document.querySelector(".cleantrack-home")
-        ) {
+        if (!document.querySelector(".cleantrack-home")) {
             return;
         }
-
 
         const organization =
             data.organization || {};
 
         const counts =
             data.counts || {};
-
 
         const organizationName =
             document.getElementById(
@@ -839,12 +823,10 @@ async function loadHomeData(version) {
                 "home-zone-count"
             );
 
-
         if (organizationName) {
             organizationName.textContent =
                 organization.name || "—";
         }
-
 
         if (welcomeSubtitle) {
             welcomeSubtitle.textContent =
@@ -853,36 +835,30 @@ async function loadHomeData(version) {
                     : "Administrator";
         }
 
-
         if (organizationCode) {
             organizationCode.textContent =
                 organization.organization_code || "—";
         }
-
 
         if (staffCount) {
             staffCount.textContent =
                 counts.staff ?? 0;
         }
 
-
         if (teamCount) {
             teamCount.textContent =
                 counts.teams ?? 0;
         }
-
 
         if (locationCount) {
             locationCount.textContent =
                 counts.locations ?? 0;
         }
 
-
         if (zoneCount) {
             zoneCount.textContent =
                 counts.zones ?? 0;
         }
-
 
     } catch (error) {
 
@@ -890,9 +866,7 @@ async function loadHomeData(version) {
             "Home data loading error:",
             error
         );
-
     }
-
 }
     
     function renderDashboard() {
