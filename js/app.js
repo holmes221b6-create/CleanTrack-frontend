@@ -2972,9 +2972,6 @@ function renderDashboardAlerts(alerts) {
     
     function setupGlobalHeader() {
 
-    const searchInput =
-        document.getElementById("global-search-input");
-
     const notificationButton =
         document.getElementById("notification-button");
 
@@ -2989,93 +2986,527 @@ function renderDashboardAlerts(alerts) {
 
 
     /* ==============================================
-       Search
-       ============================================== */
+   Global Search
+   ============================================== */
 
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "keydown",
-            event => {
-
-                if (event.key !== "Enter") {
-                    return;
-                }
-
-                const query =
-                    searchInput.value
-                        .trim()
-                        .toLowerCase();
-
-                const routes = {
-
-                    home: "home",
-                    dashboard: "dashboard",
-
-                    task: "tasks",
-                    tasks: "tasks",
-
-                    staff: "staff",
-
-                    team: "teams",
-                    teams: "teams",
-
-                    zone: "zones",
-                    zones: "zones",
-
-                    location: "locations",
-                    locations: "locations",
-
-                    "cleaning log": "cleaning-logs",
-                    "cleaning logs": "cleaning-logs",
-
-                    analytics: "analytics",
-                    reports: "reports",
-                    alerts: "alerts",
-                    profile: "profile",
-                    settings: "settings"
-
-                };
-
-                const page =
-                    routes[query];
-
-                if (page) {
-
-                    searchInput.value = "";
-
-                    loadPage(page);
-
-                    return;
-                }
-
-                searchInput.value = "";
-
-            }
-        );
+const searchInput =
+    document.getElementById(
+        "global-search-input"
+    );
 
 
-        document.addEventListener(
-            "keydown",
-            event => {
+const searchContainer =
+    document.querySelector(
+        ".global-search"
+    );
 
-                if (
-                    event.key === "/" &&
-                    document.activeElement !== searchInput
-                ) {
 
-                    event.preventDefault();
+let searchResults =
+    document.getElementById(
+        "global-search-results"
+    );
 
-                    searchInput.focus();
 
-                }
+if (
+    searchInput &&
+    searchContainer
+) {
 
-            }
+    /*
+     * Create the results panel once.
+     * It stays hidden until the user types.
+     */
+
+    if (!searchResults) {
+
+        searchResults =
+            document.createElement("div");
+
+        searchResults.id =
+            "global-search-results";
+
+        searchResults.className =
+            "global-search-results";
+
+        searchResults.hidden = true;
+
+        searchContainer.appendChild(
+            searchResults
         );
 
     }
 
 
+    /*
+     * Build the search index from the
+     * navigation currently available
+     * to this logged-in user.
+     *
+     * This is important because Admin,
+     * Supervisor and Employee have
+     * different navigation.
+     */
+
+    function getSearchItems() {
+
+        const navigation =
+            document.getElementById(
+                "main-navigation"
+            );
+
+
+        if (!navigation) {
+            return [];
+        }
+
+
+        const elements =
+            navigation.querySelectorAll(
+                "button, a, [role='button']"
+            );
+
+
+        const items = [];
+
+
+        elements.forEach(element => {
+
+            const label =
+                element.textContent
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+
+            if (!label) {
+                return;
+            }
+
+
+            const exists =
+                items.some(
+                    item =>
+                        item.label.toLowerCase() ===
+                        label.toLowerCase()
+                );
+
+
+            if (exists) {
+                return;
+            }
+
+
+            items.push({
+                label,
+                element
+            });
+
+        });
+
+
+        /*
+         * Global account destinations.
+         * These are not role-specific navigation
+         * pages but are always available.
+         */
+
+        const accountItems = [
+            {
+                label: "My Profile",
+                action: () => loadPage("profile")
+            },
+            {
+                label: "Settings",
+                action: () => loadPage("settings")
+            }
+        ];
+
+
+        accountItems.forEach(item => {
+
+            const exists =
+                items.some(
+                    existing =>
+                        existing.label.toLowerCase() ===
+                        item.label.toLowerCase()
+                );
+
+
+            if (!exists) {
+                items.push(item);
+            }
+
+        });
+
+
+        return items;
+
+    }
+
+
+    function renderSearchResults(query) {
+
+        const search =
+            query.trim().toLowerCase();
+
+
+        if (!search) {
+
+            searchResults.hidden = true;
+            searchResults.innerHTML = "";
+
+            return;
+
+        }
+
+
+        const items =
+            getSearchItems();
+
+
+        const matches =
+            items.filter(item =>
+                item.label
+                    .toLowerCase()
+                    .includes(search)
+            );
+
+
+        searchResults.innerHTML = `
+
+            <div class="global-search-result-count">
+
+                <span>
+                    ${matches.length}
+                    ${matches.length === 1
+                        ? "result"
+                        : "results"}
+                </span>
+
+            </div>
+
+
+            ${
+                matches.length
+                    ? matches
+                        .map(
+                            (item, index) => `
+                                <button
+                                    type="button"
+                                    class="global-search-result"
+                                    data-search-index="${index}"
+                                >
+
+                                    <span
+                                        class="global-search-result-icon"
+                                    >
+                                        ${getSearchIcon(
+                                            item.label
+                                        )}
+                                    </span>
+
+                                    <span
+                                        class="global-search-result-label"
+                                    >
+                                        ${escapeHtml(
+                                            item.label
+                                        )}
+                                    </span>
+
+                                    <span
+                                        class="global-search-result-arrow"
+                                    >
+                                        →
+                                    </span>
+
+                                </button>
+                            `
+                        )
+                        .join("")
+                    :
+                        `
+                            <div
+                                class="global-search-no-results"
+                            >
+                                No matches found
+                            </div>
+                        `
+            }
+
+        `;
+
+
+        searchResults.hidden = false;
+
+
+        if (!matches.length) {
+            return;
+        }
+
+
+        searchResults
+            .querySelectorAll(
+                ".global-search-result"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const index =
+                            Number(
+                                button.dataset
+                                    .searchIndex
+                            );
+
+                        const item =
+                            matches[index];
+
+
+                        searchInput.value = "";
+
+                        searchResults.hidden =
+                            true;
+
+
+                        /*
+                         * Use the real navigation
+                         * element when available.
+                         *
+                         * That guarantees the search
+                         * follows the same route and
+                         * permissions as the sidebar.
+                         */
+
+                        if (
+                            item.element &&
+                            typeof item.element.click ===
+                                "function"
+                        ) {
+
+                            item.element.click();
+
+                        }
+
+                        else if (
+                            item.action
+                        ) {
+
+                            item.action();
+
+                        }
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    function getSearchIcon(label) {
+
+        const value =
+            label.toLowerCase();
+
+
+        if (value.includes("task")) {
+            return "✓";
+        }
+
+        if (value.includes("team")) {
+            return "T";
+        }
+
+        if (
+            value.includes("location") ||
+            value.includes("zone")
+        ) {
+            return "⌖";
+        }
+
+        if (value.includes("report")) {
+            return "▤";
+        }
+
+        if (value.includes("analytic")) {
+            return "◫";
+        }
+
+        if (
+            value.includes("alert") ||
+            value.includes("notification")
+        ) {
+            return "!";
+        }
+
+        if (value.includes("profile")) {
+            return "●";
+        }
+
+        if (value.includes("setting")) {
+            return "⚙";
+        }
+
+        return "•";
+
+    }
+
+
+    /*
+     * Live search.
+     */
+
+    searchInput.addEventListener(
+        "input",
+        () => {
+
+            renderSearchResults(
+                searchInput.value
+            );
+
+        }
+    );
+
+
+    /*
+     * Enter opens the first matching result.
+     */
+
+    searchInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key !== "Enter") {
+                return;
+            }
+
+
+            const search =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!search) {
+                return;
+            }
+
+
+            const items =
+                getSearchItems();
+
+
+            const matches =
+                items.filter(item =>
+                    item.label
+                        .toLowerCase()
+                        .includes(search)
+                );
+
+
+            if (!matches.length) {
+                return;
+            }
+
+
+            searchInput.value = "";
+
+            searchResults.hidden =
+                true;
+
+
+            const first =
+                matches[0];
+
+
+            if (
+                first.element &&
+                typeof first.element.click ===
+                    "function"
+            ) {
+
+                first.element.click();
+
+            }
+
+            else if (first.action) {
+
+                first.action();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * "/" focuses the global search.
+     */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "/" &&
+                document.activeElement !== searchInput
+            ) {
+
+                event.preventDefault();
+
+                searchInput.focus();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Escape closes results.
+     */
+
+    searchInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Escape") {
+
+                searchResults.hidden =
+                    true;
+
+                searchInput.blur();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Close when clicking outside search.
+     */
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !searchContainer.contains(
+                    event.target
+                )
+            ) {
+
+                searchResults.hidden =
+                    true;
+
+            }
+
+        }
+    );
+
+}
     /* ==============================================
        Notifications
        ============================================== */
