@@ -6,6 +6,8 @@ window.CleanTrack = window.CleanTrack || {};
 
 CleanTrack.app = (() => {
 
+let homeLoadVersion = 0;
+
     function getUser() {
         return CleanTrack.currentUser || {};
     }
@@ -625,7 +627,9 @@ function renderHome() {
     `;
 
 
-    loadHomeData();
+    const thisHomeVersion = ++homeLoadVersion;
+
+loadHomeData(thisHomeVersion);
 
 
     /* =====================================================
@@ -771,8 +775,7 @@ function renderHome() {
 
 }
 
-
-async function loadHomeData() {
+async function loadHomeData(version) {
 
     try {
 
@@ -780,13 +783,18 @@ async function loadHomeData() {
             await CleanTrack.api.request(
                 "/api/home/admin"
             );
-            
-            const dashboardRoot =
-    document.querySelector(".dashboard-page");
 
-if (!dashboardRoot) {
-    return;
-}
+
+        /*
+         * Ignore an older request if Home has been
+         * rendered again since this request started.
+         */
+        if (
+            version !== homeLoadVersion ||
+            !document.querySelector(".cleantrack-home")
+        ) {
+            return;
+        }
 
 
         const organization =
@@ -796,48 +804,84 @@ if (!dashboardRoot) {
             data.counts || {};
 
 
-        document.getElementById(
-            "home-organization-name"
-        ).textContent =
-            organization.name || "—";
+        const organizationName =
+            document.getElementById(
+                "home-organization-name"
+            );
+
+        const welcomeSubtitle =
+            document.getElementById(
+                "home-welcome-subtitle"
+            );
+
+        const organizationCode =
+            document.getElementById(
+                "home-organization-code"
+            );
+
+        const staffCount =
+            document.getElementById(
+                "home-staff-count"
+            );
+
+        const teamCount =
+            document.getElementById(
+                "home-team-count"
+            );
+
+        const locationCount =
+            document.getElementById(
+                "home-location-count"
+            );
+
+        const zoneCount =
+            document.getElementById(
+                "home-zone-count"
+            );
 
 
-        document.getElementById(
-            "home-welcome-subtitle"
-        ).textContent =
-            organization.name
-                ? `${organization.name} · Administrator`
-                : "Administrator";
+        if (organizationName) {
+            organizationName.textContent =
+                organization.name || "—";
+        }
 
 
-        document.getElementById(
-            "home-organization-code"
-        ).textContent =
-            organization.organization_code || "—";
+        if (welcomeSubtitle) {
+            welcomeSubtitle.textContent =
+                organization.name
+                    ? `${organization.name} · Administrator`
+                    : "Administrator";
+        }
 
 
-        document.getElementById(
-            "home-staff-count"
-        ).textContent =
-            counts.staff ?? 0;
+        if (organizationCode) {
+            organizationCode.textContent =
+                organization.organization_code || "—";
+        }
 
 
-        document.getElementById(
-            "home-team-count"
-        ).textContent =
-            counts.teams ?? 0;
+        if (staffCount) {
+            staffCount.textContent =
+                counts.staff ?? 0;
+        }
 
 
-        document.getElementById(
-            "home-location-count"
-        ).textContent =
-            counts.locations ?? 0;
+        if (teamCount) {
+            teamCount.textContent =
+                counts.teams ?? 0;
+        }
 
 
-        document.getElementById(
-            "home-zone-count"
-        ).textContent =
-            counts.zones ?? 0;
+        if (locationCount) {
+            locationCount.textContent =
+                counts.locations ?? 0;
+        }
+
+
+        if (zoneCount) {
+            zoneCount.textContent =
+                counts.zones ?? 0;
+        }
 
 
     } catch (error) {
