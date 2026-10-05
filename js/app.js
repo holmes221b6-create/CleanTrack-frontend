@@ -125,13 +125,47 @@ if (globalProfileRole) {
     }
 
 
-function renderHome() {
+async function renderHome() {
 
     const pageView = document.getElementById("page-view");
 
     if (!pageView) {
         return;
     }
+    
+    let homeData = {};
+
+try {
+    homeData = await CleanTrack.api.request(
+        "/api/home/admin"
+    );
+} catch (error) {
+    console.error("Home data loading error:", error);
+}
+
+const organization =
+    homeData.organization || {};
+
+const counts =
+    homeData.counts || {};
+
+const organizationName =
+    organization.name || "Organization";
+
+const organizationCode =
+    organization.organization_code || "—";
+
+const staffCount =
+    counts.staff ?? 0;
+
+const teamCount =
+    counts.teams ?? 0;
+
+const locationCount =
+    counts.locations ?? 0;
+
+const zoneCount =
+    counts.zones ?? 0;
 
     const user = CleanTrack.currentUser || {};
 
@@ -165,9 +199,9 @@ function renderHome() {
                         Welcome, ${escapeHtml(name)}
                     </h1>
 
-                    <p id="home-welcome-subtitle">
-                        Loading organization...
-                    </p>
+                  <p id="home-welcome-subtitle">
+    ${escapeHtml(organizationName)} · Administrator
+</p>
 
                 </div>
 
@@ -189,9 +223,9 @@ function renderHome() {
 
                             <div>
 
-                                <h2 id="home-organization-name">
-                                    —
-                                </h2>
+                               <h2 id="home-organization-name">
+    ${escapeHtml(organizationName)}
+</h2>
 
                                 <p>
                                     Your active CleanTrack organization
@@ -222,9 +256,9 @@ function renderHome() {
                                 ACTIVE STAFF
                             </span>
 
-                            <strong id="home-staff-count">
-                                —
-                            </strong>
+                           <strong id="home-staff-count">
+    ${staffCount}
+</strong>
 
                             <small>
                                 Staff members
@@ -243,9 +277,9 @@ function renderHome() {
                                 TEAMS
                             </span>
 
-                            <strong id="home-team-count">
-                                —
-                            </strong>
+                          <strong id="home-team-count">
+    ${teamCount}
+</strong>
 
                             <small>
                                 Organization teams
@@ -264,9 +298,9 @@ function renderHome() {
                                 LOCATIONS
                             </span>
 
-                            <strong id="home-location-count">
-                                —
-                            </strong>
+                           <strong id="home-location-count">
+    ${locationCount}
+</strong>
 
                             <small>
                                 Managed locations
@@ -285,9 +319,9 @@ function renderHome() {
                                 ZONES
                             </span>
 
-                            <strong id="home-zone-count">
-                                —
-                            </strong>
+                           <strong id="home-zone-count">
+    ${zoneCount}
+</strong>
 
                             <small>
                                 Operational zones
@@ -505,9 +539,9 @@ function renderHome() {
 
                         <div>
 
-                            <strong id="home-organization-code">
-                                —
-                            </strong>
+                          <strong id="home-organization-code">
+    ${escapeHtml(organizationCode)}
+</strong>
 
                             <span>
                                 Share this code with people joining
@@ -624,7 +658,7 @@ function renderHome() {
         </section>
     `;
     
-    loadHomeData();
+
 
 
     /* =====================================================
@@ -769,105 +803,7 @@ function renderHome() {
         );
 
 }
-async function loadHomeData() {
 
-    try {
-
-        const data =
-            await CleanTrack.api.request(
-                "/api/home/admin"
-            );
-
-        if (!document.querySelector(".cleantrack-home")) {
-            return;
-        }
-
-        const organization =
-            data.organization || {};
-
-        const counts =
-            data.counts || {};
-
-        const organizationName =
-            document.getElementById(
-                "home-organization-name"
-            );
-
-        const welcomeSubtitle =
-            document.getElementById(
-                "home-welcome-subtitle"
-            );
-
-        const organizationCode =
-            document.getElementById(
-                "home-organization-code"
-            );
-
-        const staffCount =
-            document.getElementById(
-                "home-staff-count"
-            );
-
-        const teamCount =
-            document.getElementById(
-                "home-team-count"
-            );
-
-        const locationCount =
-            document.getElementById(
-                "home-location-count"
-            );
-
-        const zoneCount =
-            document.getElementById(
-                "home-zone-count"
-            );
-
-        if (organizationName) {
-            organizationName.textContent =
-                organization.name || "—";
-        }
-
-        if (welcomeSubtitle) {
-            welcomeSubtitle.textContent =
-                organization.name
-                    ? `${organization.name} · Administrator`
-                    : "Administrator";
-        }
-
-        if (organizationCode) {
-            organizationCode.textContent =
-                organization.organization_code || "—";
-        }
-
-        if (staffCount) {
-            staffCount.textContent =
-                counts.staff ?? 0;
-        }
-
-        if (teamCount) {
-            teamCount.textContent =
-                counts.teams ?? 0;
-        }
-
-        if (locationCount) {
-            locationCount.textContent =
-                counts.locations ?? 0;
-        }
-
-        if (zoneCount) {
-            zoneCount.textContent =
-                counts.zones ?? 0;
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Home data loading error:",
-            error
-        );
-    }
-}
     
     function renderDashboard() {
     const pageView = document.getElementById("page-view");
