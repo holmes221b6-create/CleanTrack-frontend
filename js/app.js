@@ -3731,6 +3731,1957 @@ if (
 
 }
 
+async function renderAdminStaff() {
+
+    const view =
+        document.getElementById("page-view");
+
+    if (!view) {
+        return;
+    }
+
+    view.innerHTML = `
+        <section class="admin-staff-page">
+
+            <header class="staff-page-header">
+
+                <div>
+                    <div class="staff-page-eyebrow">
+                        PEOPLE MANAGEMENT
+                    </div>
+
+                    <h1>
+                        Staff
+                    </h1>
+
+                    <p>
+                        Manage supervisors and organization staff
+                    </p>
+                </div>
+
+                <div class="staff-page-actions">
+
+                    <button
+                        type="button"
+                        data-staff-action="export"
+                    >
+                        Export
+                    </button>
+
+                    <button
+                        type="button"
+                        class="primary"
+                        data-staff-action="invite"
+                    >
+                        + Invite Staff
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <section class="staff-health-summary">
+
+                <div>
+                    <span>TOTAL STAFF</span>
+                    <strong id="staff-summary-total">0</strong>
+                </div>
+
+                <div>
+                    <span>SUPERVISORS</span>
+                    <strong id="staff-summary-supervisors">0</strong>
+                </div>
+
+                <div>
+                    <span>EMPLOYEES</span>
+                    <strong id="staff-summary-employees">0</strong>
+                </div>
+
+                <div>
+                    <span>ACTIVE</span>
+                    <strong id="staff-summary-active">0</strong>
+                </div>
+
+                <div>
+                    <span>PENDING</span>
+                    <strong id="staff-summary-pending">0</strong>
+                </div>
+
+                <div>
+                    <span>INACTIVE</span>
+                    <strong id="staff-summary-inactive">0</strong>
+                </div>
+
+            </section>
+
+
+            <section class="staff-page-panel">
+
+                <div class="staff-directory-header">
+
+                    <div>
+                        <span class="staff-panel-label">
+                            SUPERVISORS
+                        </span>
+
+                        <h2>
+                            Supervisor directory
+                        </h2>
+                    </div>
+
+                    <div class="staff-filter-row">
+
+                        <button
+                            type="button"
+                            class="active"
+                            data-staff-status="all"
+                        >
+                            All
+                        </button>
+
+                        <button
+                            type="button"
+                            data-staff-status="active"
+                        >
+                            Active
+                        </button>
+
+                        <button
+                            type="button"
+                            data-staff-status="inactive"
+                        >
+                            Inactive
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="staff-search-row">
+
+                    <div class="staff-search-box">
+                        <span>⌕</span>
+
+                        <input
+                            id="admin-staff-search"
+                            type="search"
+                            placeholder="Search supervisors..."
+                            autocomplete="off"
+                        />
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="admin-supervisor-list"
+                    class="admin-supervisor-list"
+                >
+
+                    <div class="staff-loading">
+                        Loading staff...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="admin-unassigned-panel"
+                class="staff-page-panel staff-unassigned-panel"
+                hidden
+            >
+
+                <div class="staff-directory-header">
+
+                    <div>
+                        <span class="staff-panel-label">
+                            ATTENTION
+                        </span>
+
+                        <h2>
+                            Unassigned staff
+                        </h2>
+
+                        <p>
+                            Employees who are not currently
+                            connected to a supervisor team.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div
+                    id="admin-unassigned-list"
+                    class="admin-unassigned-list"
+                ></div>
+
+            </section>
+
+
+            <div
+                id="admin-staff-drawer-backdrop"
+                class="staff-drawer-backdrop"
+                hidden
+            ></div>
+
+
+            <aside
+                id="admin-staff-drawer"
+                class="admin-staff-drawer"
+                aria-hidden="true"
+            >
+
+                <div class="staff-drawer-header">
+
+                    <div>
+                        <span>
+                            STAFF PROFILE
+                        </span>
+
+                        <h2 id="staff-drawer-name">
+                            Staff
+                        </h2>
+
+                        <p id="staff-drawer-role">
+                            —
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="staff-drawer-close"
+                        id="staff-drawer-close"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="staff-drawer-content"
+                    class="staff-drawer-content"
+                ></div>
+
+            </aside>
+
+        </section>
+    `;
+
+
+    setupAdminStaffEvents();
+
+    await loadAdminStaffData();
+
+}
+
+
+async function loadAdminStaffData() {
+
+    try {
+
+        const data =
+            await CleanTrack.api.request(
+                "/api/admin/staff"
+            );
+
+        if (
+            !document.querySelector(
+                ".admin-staff-page"
+            )
+        ) {
+            return;
+        }
+
+        CleanTrack.adminStaffData =
+            data;
+
+        renderAdminStaffData(data);
+
+    } catch (error) {
+
+        console.error(
+            "Admin Staff loading error:",
+            error
+        );
+
+        const list =
+            document.getElementById(
+                "admin-supervisor-list"
+            );
+
+        if (list) {
+
+            list.innerHTML = `
+                <div class="staff-empty">
+                    Unable to load staff data.
+                </div>
+            `;
+
+        }
+
+    }
+
+}
+
+
+function renderAdminStaffData(data) {
+
+    const summary =
+        data.summary || {};
+
+    setAdminStaffText(
+        "staff-summary-total",
+        summary.total_staff ?? 0
+    );
+
+    setAdminStaffText(
+        "staff-summary-supervisors",
+        summary.supervisors ?? 0
+    );
+
+    setAdminStaffText(
+        "staff-summary-employees",
+        summary.employees ?? 0
+    );
+
+    setAdminStaffText(
+        "staff-summary-active",
+        summary.active ?? 0
+    );
+
+    setAdminStaffText(
+        "staff-summary-pending",
+        summary.pending ?? 0
+    );
+
+    setAdminStaffText(
+        "staff-summary-inactive",
+        summary.inactive ?? 0
+    );
+
+
+    renderAdminSupervisorList(
+        data.supervisors || [],
+        "all"
+    );
+
+
+    renderAdminUnassignedStaff(
+        data.unassigned_employees || []
+    );
+
+}
+
+
+function setAdminStaffText(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+
+}
+
+
+function renderAdminSupervisorList(
+    supervisors,
+    status
+) {
+
+    const container =
+        document.getElementById(
+            "admin-supervisor-list"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    const query =
+        (
+            document.getElementById(
+                "admin-staff-search"
+            )?.value || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    let filtered =
+        supervisors.filter(
+            supervisor => {
+
+                const active =
+                    Boolean(
+                        supervisor.is_active
+                    );
+
+                if (
+                    status === "active" &&
+                    !active
+                ) {
+                    return false;
+                }
+
+                if (
+                    status === "inactive" &&
+                    active
+                ) {
+                    return false;
+                }
+
+                if (!query) {
+                    return true;
+                }
+
+                return [
+                    supervisor.name,
+                    supervisor.email,
+                    ...(supervisor.teams || [])
+                        .map(team => team.name),
+                    ...(supervisor.location_names || [])
+                ]
+                    .filter(Boolean)
+                    .some(value =>
+                        String(value)
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+            }
+        );
+
+
+    if (!filtered.length) {
+
+        container.innerHTML = `
+            <div class="staff-empty">
+                <strong>No supervisors found</strong>
+                <span>
+                    Try a different search or filter.
+                </span>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        filtered
+            .map(supervisor => {
+
+                const teamNames =
+                    supervisor.teams || [];
+
+                const employeeCount =
+                    supervisor.employee_count || 0;
+
+                const locationCount =
+                    (
+                        supervisor.location_names || []
+                    ).length;
+
+                const statusLabel =
+                    supervisor.is_active
+                        ? "Active"
+                        : "Inactive";
+
+                return `
+                    <button
+                        type="button"
+                        class="admin-supervisor-card"
+                        data-supervisor-id="${escapeHtml(
+                            String(supervisor.id)
+                        )}"
+                    >
+
+                        <div class="staff-person-avatar">
+                            ${escapeHtml(
+                                getStaffInitials(
+                                    supervisor.name
+                                )
+                            )}
+                        </div>
+
+                        <div class="admin-supervisor-main">
+
+                            <strong>
+                                ${escapeHtml(
+                                    supervisor.name ||
+                                    "Unnamed"
+                                )}
+                            </strong>
+
+                            <span>
+                                Supervisor
+                            </span>
+
+                            <div class="admin-supervisor-meta">
+
+                                <span>
+                                    ${teamNames.length || 0}
+                                    ${teamNames.length === 1
+                                        ? "team"
+                                        : "teams"}
+                                </span>
+
+                                <span>·</span>
+
+                                <span>
+                                    ${employeeCount}
+                                    ${employeeCount === 1
+                                        ? "employee"
+                                        : "employees"}
+                                </span>
+
+                                <span>·</span>
+
+                                <span>
+                                    ${locationCount}
+                                    ${locationCount === 1
+                                        ? "location"
+                                        : "locations"}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="admin-supervisor-status">
+
+                            <span
+                                class="
+                                    staff-status-dot
+                                    ${supervisor.is_active
+                                        ? "active"
+                                        : "inactive"}
+                                "
+                            ></span>
+
+                            <span>
+                                ${statusLabel}
+                            </span>
+
+                            <em>
+                                →
+                            </em>
+
+                        </div>
+
+                    </button>
+                `;
+
+            })
+            .join("");
+
+
+    container
+        .querySelectorAll(
+            "[data-supervisor-id]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openAdminSupervisorDrawer(
+                        button.dataset.supervisorId
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+function renderAdminUnassignedStaff(employees) {
+
+    const panel =
+        document.getElementById(
+            "admin-unassigned-panel"
+        );
+
+    const list =
+        document.getElementById(
+            "admin-unassigned-list"
+        );
+
+    if (!panel || !list) {
+        return;
+    }
+
+
+    if (!employees.length) {
+
+        panel.hidden = true;
+        return;
+
+    }
+
+
+    panel.hidden = false;
+
+
+    list.innerHTML =
+        employees
+            .map(employee => `
+
+                <button
+                    type="button"
+                    class="admin-unassigned-row"
+                    data-employee-id="${escapeHtml(
+                        String(employee.id)
+                    )}"
+                >
+
+                    <div class="staff-person-avatar small">
+                        ${escapeHtml(
+                            getStaffInitials(
+                                employee.name
+                            )
+                        )}
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            ${escapeHtml(
+                                employee.name ||
+                                "Unnamed"
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(
+                                employee.email || ""
+                            )}
+                        </span>
+
+                    </div>
+
+                    <em>
+                        Review →
+                    </em>
+
+                </button>
+
+            `)
+            .join("");
+
+
+    list
+        .querySelectorAll(
+            "[data-employee-id]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openAdminEmployeeDrawer(
+                        button.dataset.employeeId
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+function setupAdminStaffEvents() {
+
+    const search =
+        document.getElementById(
+            "admin-staff-search"
+        );
+
+
+    const backdrop =
+        document.getElementById(
+            "admin-staff-drawer-backdrop"
+        );
+
+
+    const close =
+        document.getElementById(
+            "staff-drawer-close"
+        );
+
+
+    if (search) {
+
+        search.addEventListener(
+            "input",
+            () => {
+
+                const data =
+                    CleanTrack.adminStaffData;
+
+                if (!data) {
+                    return;
+                }
+
+                const activeFilter =
+                    document.querySelector(
+                        "[data-staff-status].active"
+                    )?.dataset.staffStatus ||
+                    "all";
+
+
+                renderAdminSupervisorList(
+                    data.supervisors || [],
+                    activeFilter
+                );
+
+            }
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-staff-status]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            "[data-staff-status]"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList
+                                    .remove(
+                                        "active"
+                                    )
+                        );
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    const data =
+                        CleanTrack.adminStaffData;
+
+                    if (data) {
+
+                        renderAdminSupervisorList(
+                            data.supervisors || [],
+                            button.dataset.staffStatus
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    if (close) {
+
+        close.addEventListener(
+            "click",
+            closeAdminStaffDrawer
+        );
+
+    }
+
+
+    if (backdrop) {
+
+        backdrop.addEventListener(
+            "click",
+            closeAdminStaffDrawer
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-staff-action]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const action =
+                        button.dataset.staffAction;
+
+
+                    if (action === "export") {
+                        exportAdminStaffCsv();
+                        return;
+                    }
+
+
+                    if (action === "invite") {
+                        loadPage("invitations");
+                    }
+
+                }
+            );
+
+        });
+
+}
+
+
+function getStaffInitials(name) {
+
+    return String(
+        name || "U"
+    )
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(
+            part =>
+                part.charAt(0).toUpperCase()
+        )
+        .join("");
+
+}
+
+
+function openAdminSupervisorDrawer(id) {
+
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!data) {
+        return;
+    }
+
+
+    const supervisor =
+        (data.supervisors || [])
+            .find(
+                item =>
+                    String(item.id) ===
+                    String(id)
+            );
+
+
+    if (!supervisor) {
+        return;
+    }
+
+
+    openAdminStaffDrawer(
+        supervisor.name,
+        "Supervisor",
+        renderSupervisorDrawer(
+            supervisor
+        )
+    );
+
+}
+
+
+function renderSupervisorDrawer(
+    supervisor
+) {
+
+    const teams =
+        supervisor.teams || [];
+
+    const locations =
+        supervisor.location_names || [];
+
+    const employees =
+        supervisor.employees || [];
+
+
+    return `
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                ACCOUNT
+            </span>
+
+            <div class="staff-detail-grid">
+
+                <div>
+                    <span>Email</span>
+                    <strong>
+                        ${escapeHtml(
+                            supervisor.email || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Phone</span>
+                    <strong>
+                        ${escapeHtml(
+                            supervisor.phone || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Employee ID</span>
+                    <strong>
+                        ${escapeHtml(
+                            supervisor.employee_id || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Status</span>
+                    <strong>
+                        ${supervisor.is_active
+                            ? "Active"
+                            : "Inactive"}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                TEAMS
+            </span>
+
+            ${
+                teams.length
+                    ? `
+                        <div class="staff-chip-row">
+                            ${teams
+                                .map(
+                                    team => `
+                                        <span class="staff-chip">
+                                            ${escapeHtml(
+                                                team.name
+                                            )}
+                                        </span>
+                                    `
+                                )
+                                .join("")}
+                        </div>
+                    `
+                    : `
+                        <div class="staff-detail-empty">
+                            No team assigned.
+                        </div>
+                    `
+            }
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                LOCATIONS
+            </span>
+
+            ${
+                locations.length
+                    ? `
+                        <div class="staff-chip-row">
+                            ${locations
+                                .map(
+                                    location => `
+                                        <span class="staff-chip">
+                                            ${escapeHtml(
+                                                location
+                                            )}
+                                        </span>
+                                    `
+                                )
+                                .join("")}
+                        </div>
+                    `
+                    : `
+                        <div class="staff-detail-empty">
+                            No location activity yet.
+                        </div>
+                    `
+            }
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <div class="staff-detail-label-row">
+
+                <span class="staff-detail-label">
+                    EMPLOYEES
+                </span>
+
+                <span class="staff-detail-count">
+                    ${employees.length}
+                </span>
+
+            </div>
+
+
+            ${
+                employees.length
+                    ? `
+                        <div class="staff-employee-list">
+
+                            ${employees
+                                .map(
+                                    employee => `
+
+                                        <button
+                                            type="button"
+                                            class="staff-employee-row"
+                                            data-employee-id="${escapeHtml(
+                                                String(
+                                                    employee.id
+                                                )
+                                            )}"
+                                        >
+
+                                            <div
+                                                class="
+                                                    staff-person-avatar
+                                                    small
+                                                "
+                                            >
+                                                ${escapeHtml(
+                                                    getStaffInitials(
+                                                        employee.name
+                                                    )
+                                                )}
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    ${escapeHtml(
+                                                        employee.name ||
+                                                        "Unnamed"
+                                                    )}
+                                                </strong>
+
+                                                <span>
+                                                    ${escapeHtml(
+                                                        (
+                                                            employee.team_names || []
+                                                        )[0] ||
+                                                        "No team"
+                                                    )}
+                                                </span>
+
+                                            </div>
+
+                                            <em>
+                                                →
+                                            </em>
+
+                                        </button>
+                                    `
+                                )
+                                .join("")}
+
+                        </div>
+                    `
+                    : `
+                        <div class="staff-detail-empty">
+                            This supervisor has no employees yet.
+                        </div>
+                    `
+            }
+
+        </div>
+
+
+        <div class="staff-detail-actions">
+
+            <button
+                type="button"
+                data-staff-edit-id="${escapeHtml(
+                    String(supervisor.id)
+                )}"
+            >
+                Edit Staff
+            </button>
+
+            <button
+                type="button"
+                data-staff-toggle-id="${escapeHtml(
+                    String(supervisor.id)
+                )}"
+                class="danger"
+            >
+                ${
+                    supervisor.is_active
+                        ? "Deactivate"
+                        : "Activate"
+                }
+            </button>
+
+        </div>
+    `;
+
+}
+
+
+function openAdminEmployeeDrawer(id) {
+
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!data) {
+        return;
+    }
+
+
+    let employee = null;
+
+
+    (data.supervisors || [])
+        .some(
+            supervisor => {
+
+                employee =
+                    (supervisor.employees || [])
+                        .find(
+                            item =>
+                                String(item.id) ===
+                                String(id)
+                        );
+
+                return Boolean(employee);
+
+            }
+        );
+
+
+    if (!employee) {
+
+        employee =
+            (data.unassigned_employees || [])
+                .find(
+                    item =>
+                        String(item.id) ===
+                        String(id)
+                );
+
+    }
+
+
+    if (!employee) {
+        return;
+    }
+
+
+    openAdminStaffDrawer(
+        employee.name,
+        "Employee",
+        renderEmployeeDrawer(employee)
+    );
+
+}
+
+
+function renderEmployeeDrawer(employee) {
+
+    const teamNames =
+        employee.team_names || [];
+
+
+    return `
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                PROFILE
+            </span>
+
+            <div class="staff-detail-grid">
+
+                <div>
+                    <span>Email</span>
+                    <strong>
+                        ${escapeHtml(
+                            employee.email || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Phone</span>
+                    <strong>
+                        ${escapeHtml(
+                            employee.phone || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Employee ID</span>
+                    <strong>
+                        ${escapeHtml(
+                            employee.employee_id || "—"
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Status</span>
+                    <strong>
+                        ${employee.is_active
+                            ? "Active"
+                            : "Inactive"}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                TEAM
+            </span>
+
+            <div class="staff-chip-row">
+
+                ${
+                    teamNames.length
+                        ? teamNames
+                            .map(
+                                team => `
+                                    <span class="staff-chip">
+                                        ${escapeHtml(
+                                            team
+                                        )}
+                                    </span>
+                                `
+                            )
+                            .join("")
+                        : `
+                            <span class="staff-detail-empty">
+                                No team assigned.
+                            </span>
+                        `
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                LOCATION
+            </span>
+
+            <div class="staff-chip-row">
+
+                <span class="staff-chip">
+                    ${escapeHtml(
+                        employee.location_name ||
+                        "No location assigned"
+                    )}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="staff-detail-block">
+
+            <span class="staff-detail-label">
+                LAST ACTIVITY
+            </span>
+
+            <div class="staff-detail-empty">
+                Activity tracking will appear here
+                when the audit system is connected.
+            </div>
+
+        </div>
+
+
+        <div class="staff-detail-actions">
+
+            <button
+                type="button"
+                data-staff-edit-id="${escapeHtml(
+                    String(employee.id)
+                )}"
+            >
+                Edit Staff
+            </button>
+
+            <button
+                type="button"
+                data-staff-toggle-id="${escapeHtml(
+                    String(employee.id)
+                )}"
+                class="danger"
+            >
+                ${
+                    employee.is_active
+                        ? "Deactivate"
+                        : "Activate"
+                }
+            </button>
+
+        </div>
+    `;
+
+}
+
+
+function openAdminStaffDrawer(
+    name,
+    role,
+    content
+) {
+
+    const drawer =
+        document.getElementById(
+            "admin-staff-drawer"
+        );
+
+    const backdrop =
+        document.getElementById(
+            "admin-staff-drawer-backdrop"
+        );
+
+    const drawerName =
+        document.getElementById(
+            "staff-drawer-name"
+        );
+
+    const drawerRole =
+        document.getElementById(
+            "staff-drawer-role"
+        );
+
+    const drawerContent =
+        document.getElementById(
+            "staff-drawer-content"
+        );
+
+
+    if (
+        !drawer ||
+        !backdrop ||
+        !drawerContent
+    ) {
+        return;
+    }
+
+
+    drawerName.textContent =
+        name || "Staff";
+
+    drawerRole.textContent =
+        role || "—";
+
+    drawerContent.innerHTML =
+        content;
+
+
+    drawer.classList.add(
+        "open"
+    );
+
+    drawer.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    backdrop.hidden = false;
+
+
+    drawerContent
+        .querySelectorAll(
+            "[data-employee-id]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openAdminEmployeeDrawer(
+                        button.dataset.employeeId
+                    );
+
+                }
+            );
+
+        });
+
+
+    drawerContent
+        .querySelectorAll(
+            "[data-staff-edit-id]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    editAdminStaff(
+                        button.dataset.staffEditId
+                    );
+
+                }
+            );
+
+        });
+
+
+    drawerContent
+        .querySelectorAll(
+            "[data-staff-toggle-id]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    toggleAdminStaff(
+                        button.dataset.staffToggleId
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+function closeAdminStaffDrawer() {
+
+    const drawer =
+        document.getElementById(
+            "admin-staff-drawer"
+        );
+
+    const backdrop =
+        document.getElementById(
+            "admin-staff-drawer-backdrop"
+        );
+
+
+    if (drawer) {
+
+        drawer.classList.remove(
+            "open"
+        );
+
+        drawer.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    }
+
+
+    if (backdrop) {
+        backdrop.hidden = true;
+    }
+
+}
+
+
+async function toggleAdminStaff(id) {
+
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!data) {
+        return;
+    }
+
+
+    const person =
+        findAdminStaffPerson(id);
+
+    if (!person) {
+        return;
+    }
+
+
+    try {
+
+        await CleanTrack.api.request(
+            `/api/users/${encodeURIComponent(id)}`,
+            {
+                method: "PUT",
+                body: JSON.stringify({
+                    is_active:
+                        !person.is_active
+                })
+            }
+        );
+
+        closeAdminStaffDrawer();
+
+        await loadAdminStaffData();
+
+    } catch (error) {
+
+        console.error(
+            "Unable to update staff status:",
+            error
+        );
+
+    }
+
+}
+
+
+function findAdminStaffPerson(id) {
+
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!data) {
+        return null;
+    }
+
+
+    for (
+        const supervisor
+        of data.supervisors || []
+    ) {
+
+        if (
+            String(supervisor.id) ===
+            String(id)
+        ) {
+            return supervisor;
+        }
+
+
+        const employee =
+            (supervisor.employees || [])
+                .find(
+                    item =>
+                        String(item.id) ===
+                        String(id)
+                );
+
+        if (employee) {
+            return employee;
+        }
+
+    }
+
+
+    return (
+        data.unassigned_employees || []
+    ).find(
+        employee =>
+            String(employee.id) ===
+            String(id)
+    ) || null;
+
+}
+
+
+function editAdminStaff(id) {
+
+    const person =
+        findAdminStaffPerson(id);
+
+    if (!person) {
+        return;
+    }
+
+
+    openAdminStaffDrawer(
+        person.name,
+        person.role === "supervisor"
+            ? "Supervisor"
+            : "Employee",
+        `
+            <form
+                class="staff-edit-form"
+                id="admin-staff-edit-form"
+            >
+
+                <label>
+                    Full name
+
+                    <input
+                        name="name"
+                        value="${escapeHtml(
+                            person.name || ""
+                        )}"
+                        required
+                    />
+
+                </label>
+
+
+                <label>
+                    Email
+
+                    <input
+                        type="email"
+                        name="email"
+                        value="${escapeHtml(
+                            person.email || ""
+                        )}"
+                    />
+
+                </label>
+
+
+                <label>
+                    Phone
+
+                    <input
+                        name="phone"
+                        value="${escapeHtml(
+                            person.phone || ""
+                        )}"
+                    />
+
+                </label>
+
+
+                <label>
+                    Employee ID
+
+                    <input
+                        name="employee_id"
+                        value="${escapeHtml(
+                            person.employee_id || ""
+                        )}"
+                    />
+
+                </label>
+
+
+                <label>
+                    Role
+
+                    <select name="role">
+
+                        <option
+                            value="employee"
+                            ${person.role === "employee"
+                                ? "selected"
+                                : ""}
+                        >
+                            Employee
+                        </option>
+
+                        <option
+                            value="supervisor"
+                            ${person.role === "supervisor"
+                                ? "selected"
+                                : ""}
+                        >
+                            Supervisor
+                        </option>
+
+                        <option
+                            value="admin"
+                            ${person.role === "admin"
+                                ? "selected"
+                                : ""}
+                        >
+                            Administrator
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <div class="staff-detail-actions">
+
+                    <button
+                        type="button"
+                        data-staff-cancel-edit
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+        `
+    );
+
+
+    const form =
+        document.getElementById(
+            "admin-staff-edit-form"
+        );
+
+
+    if (!form) {
+        return;
+    }
+
+
+    form.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+
+            const formData =
+                new FormData(form);
+
+
+            try {
+
+                await CleanTrack.api.request(
+                    `/api/users/${encodeURIComponent(id)}`,
+                    {
+                        method: "PUT",
+                        body: JSON.stringify({
+                            name:
+                                formData.get("name"),
+
+                            email:
+                                formData.get("email"),
+
+                            phone:
+                                formData.get("phone"),
+
+                            employee_id:
+                                formData.get(
+                                    "employee_id"
+                                ),
+
+                            role:
+                                formData.get("role")
+                        })
+                    }
+                );
+
+
+                await loadAdminStaffData();
+
+
+                closeAdminStaffDrawer();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Unable to update staff:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+
+    const cancel =
+        form.querySelector(
+            "[data-staff-cancel-edit]"
+        );
+
+
+    if (cancel) {
+
+        cancel.addEventListener(
+            "click",
+            closeAdminStaffDrawer
+        );
+
+    }
+
+}
+
+
+function exportAdminStaffCsv() {
+
+    const data =
+        CleanTrack.adminStaffData;
+
+    if (!data) {
+        return;
+    }
+
+
+    const rows = [
+        [
+            "Name",
+            "Role",
+            "Email",
+            "Phone",
+            "Employee ID",
+            "Status",
+            "Teams",
+            "Locations"
+        ]
+    ];
+
+
+    (data.supervisors || [])
+        .forEach(supervisor => {
+
+            rows.push([
+                supervisor.name || "",
+                "Supervisor",
+                supervisor.email || "",
+                supervisor.phone || "",
+                supervisor.employee_id || "",
+                supervisor.is_active
+                    ? "Active"
+                    : "Inactive",
+                (supervisor.teams || [])
+                    .map(team => team.name)
+                    .join("; "),
+                (supervisor.location_names || [])
+                    .join("; ")
+            ]);
+
+            (supervisor.employees || [])
+                .forEach(employee => {
+
+                    rows.push([
+                        employee.name || "",
+                        "Employee",
+                        employee.email || "",
+                        employee.phone || "",
+                        employee.employee_id || "",
+                        employee.is_active
+                            ? "Active"
+                            : "Inactive",
+                        (employee.team_names || [])
+                            .join("; "),
+                        employee.location_name || ""
+                    ]);
+
+                });
+
+        });
+
+
+    (data.unassigned_employees || [])
+        .forEach(employee => {
+
+            rows.push([
+                employee.name || "",
+                "Employee",
+                employee.email || "",
+                employee.phone || "",
+                employee.employee_id || "",
+                employee.is_active
+                    ? "Active"
+                    : "Inactive",
+                "",
+                employee.location_name || ""
+            ]);
+
+        });
+
+
+    const csv =
+        rows
+            .map(
+                row =>
+                    row
+                        .map(value => {
+
+                            const text =
+                                String(
+                                    value ?? ""
+                                )
+                                    .replace(
+                                        /"/g,
+                                        '""'
+                                    );
+
+                            return `"${text}"`;
+
+                        })
+                        .join(",")
+            )
+            .join("\n");
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "cleantrack-staff.csv";
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
 
     // --------------------------------------------------------
     // Other pages — temporary placeholders

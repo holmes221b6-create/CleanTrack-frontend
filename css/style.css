@@ -1577,3 +1577,588 @@ ol {
 .global-search-result + .global-search-result {
     margin-top: 1px;
 }
+
+/* =========================================================
+   ADMIN STAFF PAGE
+   ========================================================= */
+
+.admin-staff-page {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 30px 32px 48px;
+    box-sizing: border-box;
+}
+
+.staff-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.staff-page-eyebrow,
+.staff-panel-label {
+    color: rgba(255,255,255,0.4);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+}
+
+.staff-page-header h1 {
+    margin: 7px 0 4px;
+    font-size: 29px;
+    font-weight: 650;
+}
+
+.staff-page-header p {
+    margin: 0;
+    color: rgba(255,255,255,0.42);
+    font-size: 11px;
+}
+
+.staff-page-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.staff-page-actions button,
+.staff-detail-actions button {
+    padding: 9px 13px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.025);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.staff-page-actions button.primary,
+.staff-detail-actions button.primary {
+    border-color: rgba(79,142,247,.24);
+    background: rgba(79,142,247,.12);
+    color: #b8ceff;
+}
+
+.staff-health-summary {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 9px;
+    margin-bottom: 13px;
+}
+
+.staff-health-summary > div {
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    background: rgba(255,255,255,.022);
+}
+
+.staff-health-summary span {
+    display: block;
+    color: rgba(255,255,255,.38);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.staff-health-summary strong {
+    display: block;
+    margin-top: 9px;
+    font-size: 22px;
+}
+
+.staff-page-panel {
+    margin-top: 13px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 14px;
+    background: rgba(255,255,255,.022);
+}
+
+.staff-directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.staff-directory-header h2 {
+    margin: 6px 0 0;
+    font-size: 15px;
+}
+
+.staff-directory-header p {
+    margin: 7px 0 0;
+    color: rgba(255,255,255,.38);
+    font-size: 10px;
+}
+
+.staff-filter-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.staff-filter-row button {
+    padding: 6px 9px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 6px;
+    background: rgba(255,255,255,.018);
+    color: rgba(255,255,255,.48);
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.staff-filter-row button.active {
+    background: rgba(79,142,247,.10);
+    border-color: rgba(79,142,247,.18);
+    color: #b8ceff;
+}
+
+.staff-search-row {
+    margin-top: 15px;
+}
+
+.staff-search-box {
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 11px;
+    height: 38px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 9px;
+    background: rgba(255,255,255,.02);
+}
+
+.staff-search-box span {
+    color: rgba(255,255,255,.35);
+}
+
+.staff-search-box input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 11px;
+}
+
+.admin-supervisor-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.admin-supervisor-card {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 38px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 10px;
+    background: rgba(255,255,255,.014);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-supervisor-card:hover {
+    background: rgba(255,255,255,.04);
+    border-color: rgba(79,142,247,.14);
+}
+
+.staff-person-avatar {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(79,142,247,.10);
+    color: #b8ceff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.staff-person-avatar.small {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 9px;
+}
+
+.admin-supervisor-main {
+    min-width: 0;
+}
+
+.admin-supervisor-main strong {
+    display: block;
+    color: #fff;
+    font-size: 11px;
+}
+
+.admin-supervisor-main > span {
+    display: block;
+    margin-top: 3px;
+    color: rgba(255,255,255,.38);
+    font-size: 9px;
+}
+
+.admin-supervisor-meta {
+    display: flex;
+    gap: 5px;
+    margin-top: 7px;
+    color: rgba(255,255,255,.34);
+    font-size: 9px;
+}
+
+.admin-supervisor-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,.42);
+    font-size: 9px;
+}
+
+.admin-supervisor-status em {
+    margin-left: 5px;
+    color: rgba(255,255,255,.25);
+    font-style: normal;
+    font-size: 12px;
+}
+
+.staff-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.staff-status-dot.active {
+    background: #67d59a;
+}
+
+.staff-status-dot.inactive {
+    background: #ef6670;
+}
+
+.staff-empty,
+.staff-loading {
+    padding: 35px 15px;
+    color: rgba(255,255,255,.34);
+    text-align: center;
+    font-size: 10px;
+}
+
+.staff-empty strong {
+    display: block;
+    color: rgba(255,255,255,.67);
+    font-size: 11px;
+}
+
+.staff-empty span {
+    display: block;
+    margin-top: 5px;
+}
+
+.admin-unassigned-list {
+    display: grid;
+    gap: 5px;
+    margin-top: 12px;
+}
+
+.admin-unassigned-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    align-items: center;
+    gap: 9px;
+    padding: 9px;
+    border: 1px solid rgba(239,102,112,.08);
+    border-radius: 8px;
+    background: rgba(239,102,112,.018);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-unassigned-row strong,
+.admin-unassigned-row span {
+    display: block;
+}
+
+.admin-unassigned-row strong {
+    color: #fff;
+    font-size: 10px;
+}
+
+.admin-unassigned-row span {
+    margin-top: 3px;
+    color: rgba(255,255,255,.36);
+    font-size: 9px;
+}
+
+.admin-unassigned-row em {
+    color: rgba(255,255,255,.32);
+    font-size: 9px;
+    font-style: normal;
+}
+
+.staff-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(0,0,0,.35);
+}
+
+.staff-drawer-backdrop[hidden] {
+    display: none;
+}
+
+.admin-staff-drawer {
+    position: fixed;
+    z-index: 3001;
+    top: 0;
+    right: 0;
+    width: min(460px, 94vw);
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 22px;
+    border-left: 1px solid rgba(255,255,255,.08);
+    background: #121720;
+    transform: translateX(102%);
+    transition: transform .18s ease;
+}
+
+.admin-staff-drawer.open {
+    transform: translateX(0);
+}
+
+.staff-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.staff-drawer-header > div > span {
+    color: rgba(255,255,255,.35);
+    font-size: 8px;
+    letter-spacing: .13em;
+    font-weight: 700;
+}
+
+.staff-drawer-header h2 {
+    margin: 6px 0 3px;
+    font-size: 20px;
+}
+
+.staff-drawer-header p {
+    margin: 0;
+    color: rgba(255,255,255,.4);
+    font-size: 10px;
+}
+
+.staff-drawer-close {
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255,255,255,.6);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.staff-detail-block {
+    padding: 17px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.staff-detail-label {
+    display: block;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,.34);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.staff-detail-label-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.staff-detail-count {
+    color: rgba(255,255,255,.35);
+    font-size: 9px;
+}
+
+.staff-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 9px;
+}
+
+.staff-detail-grid > div {
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 8px;
+    background: rgba(255,255,255,.016);
+}
+
+.staff-detail-grid span {
+    display: block;
+    color: rgba(255,255,255,.34);
+    font-size: 8px;
+}
+
+.staff-detail-grid strong {
+    display: block;
+    margin-top: 5px;
+    color: #fff;
+    font-size: 10px;
+    word-break: break-word;
+}
+
+.staff-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.staff-chip {
+    padding: 6px 8px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 7px;
+    background: rgba(255,255,255,.02);
+    color: rgba(255,255,255,.62);
+    font-size: 9px;
+}
+
+.staff-detail-empty {
+    color: rgba(255,255,255,.34);
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.staff-employee-list {
+    display: grid;
+    gap: 5px;
+}
+
+.staff-employee-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    align-items: center;
+    gap: 9px;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 8px;
+    background: rgba(255,255,255,.014);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.staff-employee-row strong,
+.staff-employee-row span {
+    display: block;
+}
+
+.staff-employee-row strong {
+    color: #fff;
+    font-size: 9px;
+}
+
+.staff-employee-row span {
+    margin-top: 2px;
+    color: rgba(255,255,255,.34);
+    font-size: 8px;
+}
+
+.staff-employee-row em {
+    color: rgba(255,255,255,.27);
+    font-style: normal;
+}
+
+.staff-detail-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.staff-detail-actions button {
+    flex: 1;
+}
+
+.staff-detail-actions button.danger {
+    border-color: rgba(239,102,112,.16);
+    color: #f08c94;
+}
+
+.staff-edit-form {
+    display: grid;
+    gap: 13px;
+}
+
+.staff-edit-form label {
+    display: grid;
+    gap: 6px;
+    color: rgba(255,255,255,.4);
+    font-size: 9px;
+}
+
+.staff-edit-form input,
+.staff-edit-form select {
+    width: 100%;
+    height: 37px;
+    padding: 0 9px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: rgba(255,255,255,.025);
+    color: #fff;
+    outline: none;
+    font-size: 10px;
+}
+
+@media (max-width: 900px) {
+
+    .staff-health-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .staff-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .admin-staff-page {
+        padding: 22px 16px 36px;
+    }
+
+    .staff-health-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .staff-directory-header {
+        flex-direction: column;
+    }
+
+    .staff-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
