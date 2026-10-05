@@ -5835,15 +5835,31 @@ function loadPage(page) {
         return;
     }
 
-    if (page === "dashboard") {
-        renderDashboard();
+   if (page === "dashboard") {
+    renderDashboard();
+    return;
+}
+
+if (page === "staff") {
+
+    const role =
+        String(
+            CleanTrack.currentUser?.role || ""
+        ).toLowerCase();
+
+    if (role === "admin") {
+        renderAdminStaff();
         return;
     }
 
-    if (page === "profile") {
-        renderProfile();
-        return;
-    }
+    renderPlaceholder(page);
+    return;
+}
+
+if (page === "profile") {
+    renderProfile();
+    return;
+}
 
     renderPlaceholder(page);
 }
