@@ -780,6 +780,13 @@ async function loadHomeData() {
             await CleanTrack.api.request(
                 "/api/home/admin"
             );
+            
+            const dashboardRoot =
+    document.querySelector(".dashboard-page");
+
+if (!dashboardRoot) {
+    return;
+}
 
 
         const organization =
