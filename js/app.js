@@ -1152,103 +1152,119 @@ async function loadDashboardData() {
             );
 
 
-        const zones = data.zones || {};
-        const today = data.today || {};
+        const dashboardRoot =
+            document.querySelector(".dashboard-page");
+
+        if (!dashboardRoot) {
+            return;
+        }
 
 
-        document.getElementById(
-            "kpi-total-zones"
-        ).textContent =
-            zones.total ?? 0;
+        const zones =
+            data.zones || {};
+
+        const today =
+            data.today || {};
 
 
-        document.getElementById(
-            "kpi-cleaned-zones"
-        ).textContent =
-            zones.cleaned ?? 0;
+        function setText(id, value) {
+
+            const element =
+                document.getElementById(id);
+
+            if (element) {
+                element.textContent =
+                    value;
+            }
+
+        }
 
 
-        document.getElementById(
-            "kpi-overdue-zones"
-        ).textContent =
-            zones.overdue ?? 0;
+        setText(
+            "kpi-total-zones",
+            zones.total ?? 0
+        );
 
+        setText(
+            "kpi-cleaned-zones",
+            zones.cleaned ?? 0
+        );
 
-        document.getElementById(
-            "kpi-tasks-today"
-        ).textContent =
-            today.total ?? 0;
+        setText(
+            "kpi-overdue-zones",
+            zones.overdue ?? 0
+        );
+
+        setText(
+            "kpi-tasks-today",
+            today.total ?? 0
+        );
 
 
         const compliance =
             today.compliance_pct ?? 0;
 
-        document.getElementById(
-            "kpi-compliance"
-        ).textContent =
-            `${compliance}%`;
+
+        setText(
+            "kpi-compliance",
+            `${compliance}%`
+        );
 
 
-        document.getElementById(
-            "kpi-compliance-detail"
-        ).textContent =
-            `${today.completed ?? 0} of ${today.total ?? 0} completed`;
+        setText(
+            "kpi-compliance-detail",
+            `${today.completed ?? 0} of ${today.total ?? 0} completed`
+        );
 
 
-        document.getElementById(
-            "kpi-clean-time"
-        ).textContent =
+        setText(
+            "kpi-clean-time",
             data.avg_cleaning_duration != null
                 ? `${data.avg_cleaning_duration} min`
-                : "—";
+                : "—"
+        );
 
 
-        document.getElementById(
-            "task-progress-value"
-        ).textContent =
-            `${compliance}%`;
+        setText(
+            "task-progress-value",
+            `${compliance}%`
+        );
+
+        setText(
+            "task-completed",
+            today.completed ?? 0
+        );
+
+        setText(
+            "task-pending",
+            today.pending ?? 0
+        );
+
+        setText(
+            "task-missed",
+            today.missed ?? 0
+        );
 
 
-        document.getElementById(
-            "task-completed"
-        ).textContent =
-            today.completed ?? 0;
+        setText(
+            "zone-cleaned",
+            zones.cleaned ?? 0
+        );
 
+        setText(
+            "zone-progress",
+            zones.in_progress ?? 0
+        );
 
-        document.getElementById(
-            "task-pending"
-        ).textContent =
-            today.pending ?? 0;
+        setText(
+            "zone-pending",
+            zones.pending ?? 0
+        );
 
-
-        document.getElementById(
-            "task-missed"
-        ).textContent =
-            today.missed ?? 0;
-
-
-        document.getElementById(
-            "zone-cleaned"
-        ).textContent =
-            zones.cleaned ?? 0;
-
-
-        document.getElementById(
-            "zone-progress"
-        ).textContent =
-            zones.in_progress ?? 0;
-
-
-        document.getElementById(
-            "zone-pending"
-        ).textContent =
-            zones.pending ?? 0;
-
-
-        document.getElementById(
-            "zone-overdue"
-        ).textContent =
-            zones.overdue ?? 0;
+        setText(
+            "zone-overdue",
+            zones.overdue ?? 0
+        );
 
 
         renderDashboardAlerts(
@@ -1263,18 +1279,23 @@ async function loadDashboardData() {
             error
         );
 
+
         const alertList =
             document.getElementById(
                 "dashboard-alert-list"
             );
 
+
         if (alertList) {
+
             alertList.innerHTML = `
                 <div class="dashboard-empty">
                     Unable to load dashboard data.
                 </div>
             `;
+
         }
+
     }
 }
 
