@@ -7085,64 +7085,349 @@ function renderAdminTeams() {
     loadAdminTeamsData();
 }
 
+function loadAdminTeamsData() {
 
-async function loadAdminTeamsData() {
+    renderAdminTeamsLanding();
+}
+
+
+function getAdminRecentTeamIds() {
 
     try {
 
-        const data =
-            await CleanTrack.api.request(
-                "/api/teams"
+        const stored =
+            localStorage.getItem(
+                "cleantrack_admin_recent_teams"
             );
 
-        if (
-            !document.querySelector(
-                ".admin-teams-page"
-            )
-        ) {
-            return;
-        }
-
-        CleanTrack.adminTeamsData =
-            Array.isArray(data)
-                ? data
+        const parsed =
+            stored
+                ? JSON.parse(stored)
                 : [];
 
-        renderAdminTeamsData(
-            CleanTrack.adminTeamsData
-        );
+        return Array.isArray(parsed)
+            ? parsed.map(String)
+            : [];
 
     } catch (error) {
 
-        console.error(
-            "Admin Teams loading error:",
-            error
-        );
-
-        const content =
-            document.getElementById(
-                "admin-teams-content"
-            );
-
-        if (content) {
-
-            content.innerHTML = `
-                <div class="admin-teams-inline-empty">
-
-                    <h3>
-                        Unable to load teams
-                    </h3>
-
-                    <p>
-                        Please try again.
-                    </p>
-
-                </div>
-            `;
-        }
+        return [];
     }
 }
 
+
+function saveAdminRecentTeamIds(
+    ids
+) {
+
+    localStorage.setItem(
+        "cleantrack_admin_recent_teams",
+        JSON.stringify(
+            ids.map(String)
+        )
+    );
+}
+
+
+function recordAdminRecentlyOpenedTeam(
+    teamId
+) {
+
+    const id =
+        String(teamId);
+
+    const current =
+        getAdminRecentTeamIds();
+
+    const updated = [
+        id,
+        ...current.filter(
+            value => value !== id
+        )
+    ]
+    .slice(
+        0,
+        6
+    );
+
+    saveAdminRecentTeamIds(
+        updated
+    );
+}
+
+
+async function loadAdminTeamSummaries(
+    teamIds
+) {
+
+    const ids =
+        Array.isArray(teamIds)
+            ? teamIds.map(String)
+            : [];
+
+    if (!ids.length) {
+        return [];
+    }
+
+
+    const results =
+        await Promise.all(
+            ids.map(
+                async teamId => {
+
+                    try {
+
+                        const response =
+                            await CleanTrack.api.request(
+                                `/api/admin/teams/${encodeURIComponent(teamId)}`
+                            );
+
+                        const team =
+                            response?.team ||
+                            {};
+
+                        const supervisors =
+                            Array.isArray(
+                                response?.supervisors
+                            )
+                                ? response.supervisors
+                                : [];
+
+                        const employees =
+                            Array.isArray(
+                                response?.employees
+                            )
+                                ? response.employees
+                                : [];
+
+                        const locations =
+                            Array.isArray(
+                                response?.locations
+                            )
+                                ? response.locations
+                                : [];
+
+                        const zones =
+                            Array.isArray(
+                                response?.zones
+                            )
+                                ? response.zones
+                                : [];
+
+
+                        return {
+                            ...team,
+
+                            id:
+                                team.id ||
+                                teamId,
+
+                            supervisor_count:
+                                supervisors.length,
+
+                            employee_count:
+                                employees.length,
+
+                            member_count:
+                                employees.length,
+
+                            location_count:
+                                locations.length,
+
+                            zone_count:
+                                zones.length
+                        };
+
+                    } catch (error) {
+
+                        console.error(
+                            "Unable to load admin team summary:",
+                            teamId,
+                            error
+                        );
+
+                        return null;
+                    }
+
+                }
+            )
+        );
+
+
+    return results.filter(
+        Boolean
+    );
+}
+
+
+async function renderAdminTeamsLanding() {
+
+    const content =
+        document.getElementById(
+            "admin-teams-content"
+        );
+
+    if (!content) {
+        return;
+    }
+
+
+    content.innerHTML = `
+        <div class="admin-teams-loading">
+            Loading your teams...
+        </div>
+    `;
+
+
+    const pinnedIds =
+        getAdminPinnedTeamIds();
+
+    const recentIds =
+        getAdminRecentTeamIds();
+
+
+    const [
+        pinnedTeams,
+        recentTeams
+    ] =
+        await Promise.all([
+            loadAdminTeamSummaries(
+                pinnedIds
+            ),
+            loadAdminTeamSummaries(
+                recentIds
+            )
+        ]);
+
+
+    const recentOnlyTeams =
+        recentTeams.filter(
+            team =>
+                !pinnedIds.includes(
+                    String(team.id)
+                )
+        );
+
+
+    let html = "";
+
+
+    if (pinnedTeams.length) {
+
+        html += `
+            <section class="admin-teams-section">
+
+                <div class="admin-teams-section-header">
+
+                    <div>
+                        <h2>
+                            Pinned Teams
+                        </h2>
+
+                        <p>
+                            Your pinned teams
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="admin-teams-list">
+
+                    ${
+                        pinnedTeams
+                            .map(
+                                team =>
+                                    renderAdminTeamItem(
+                                        team,
+                                        true
+                                    )
+                            )
+                            .join("")
+                    }
+
+                </div>
+
+            </section>
+        `;
+    }
+
+
+    if (recentOnlyTeams.length) {
+
+        html += `
+            <section class="admin-teams-section">
+
+                <div class="admin-teams-section-header">
+
+                    <div>
+                        <h2>
+                            Recently Opened
+                        </h2>
+
+                        <p>
+                            Teams you opened recently
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="admin-teams-list">
+
+                    ${
+                        recentOnlyTeams
+                            .map(
+                                team =>
+                                    renderAdminTeamItem(
+                                        team,
+                                        pinnedIds.includes(
+                                            String(team.id)
+                                        )
+                                    )
+                            )
+                            .join("")
+                    }
+
+                </div>
+
+            </section>
+        `;
+    }
+
+
+    if (!html) {
+
+        html = `
+            <div class="admin-teams-inline-empty">
+
+                <h3>
+                    Find a team
+                </h3>
+
+                <p>
+                    Start typing a team name, person,
+                    location, or zone.
+                </p>
+
+            </div>
+        `;
+    }
+
+
+    content.innerHTML =
+        html;
+}
+
+
+/*
+ * Backward-compatible entry point.
+ * Admin Teams no longer renders a full team directory.
+ */
+function renderAdminTeamsData() {
+
+    renderAdminTeamsLanding();
+}
 
 function renderAdminTeamsData(
     teams
@@ -7512,7 +7797,6 @@ function saveAdminPinnedTeamIds(
     );
 }
 
-
 function toggleAdminPinnedTeam(
     teamId
 ) {
@@ -7537,9 +7821,7 @@ function toggleAdminPinnedTeam(
         updated
     );
 
-    renderAdminTeamsData(
-        CleanTrack.adminTeamsData || []
-    );
+    renderAdminTeamsLanding();
 }
 
 
@@ -7555,23 +7837,23 @@ function setupAdminTeamsEvents() {
     }
 
 
-    page.addEventListener(
-        "input",
-        event => {
+  page.addEventListener(
+    "input",
+    event => {
 
-            if (
-                event.target.id ===
-                "admin-teams-search"
-            ) {
-
-                renderAdminTeamsData(
-                    CleanTrack.adminTeamsData || []
-                );
-
-            }
-
+        if (
+            event.target.id !==
+            "admin-teams-search"
+        ) {
+            return;
         }
-    );
+
+        searchAdminTeams(
+            event.target.value
+        );
+
+    }
+);
 
 
     page.addEventListener(
@@ -7617,6 +7899,20 @@ function setupAdminTeamsEvents() {
 
                 return;
             }
+            
+                        const openButton =
+                event.target.closest(
+                    "[data-admin-team-open]"
+                );
+
+            if (openButton) {
+
+                openAdminTeamManagement(
+                    openButton.dataset.adminTeamOpen
+                );
+
+                return;
+            }
 
 
             const backdrop =
@@ -7655,6 +7951,976 @@ function setupAdminTeamsEvents() {
             }
         );
     }
+}
+
+async function openAdminTeamManagement(
+    teamId
+) {
+
+    const id =
+        String(teamId || "")
+        .trim();
+
+    if (!id) {
+        return;
+    }
+
+
+    recordAdminRecentlyOpenedTeam(
+        id
+    );
+
+
+    try {
+
+        const response =
+            await CleanTrack.api.request(
+                `/api/admin/teams/${encodeURIComponent(id)}`
+            );
+
+
+        const team =
+            response?.team ||
+            {};
+
+        const supervisors =
+            Array.isArray(
+                response?.supervisors
+            )
+                ? response.supervisors
+                : [];
+
+        const employees =
+            Array.isArray(
+                response?.employees
+            )
+                ? response.employees
+                : [];
+
+        const locations =
+            Array.isArray(
+                response?.locations
+            )
+                ? response.locations
+                : [];
+
+        const zones =
+            Array.isArray(
+                response?.zones
+            )
+                ? response.zones
+                : [];
+
+
+        let existing =
+            document.getElementById(
+                "admin-team-management-workspace"
+            );
+
+        if (existing) {
+            existing.remove();
+        }
+
+
+        const backdrop =
+            document.createElement(
+                "div"
+            );
+
+        backdrop.id =
+            "admin-team-management-workspace";
+
+        backdrop.className =
+            "admin-team-management-workspace";
+
+
+        backdrop.innerHTML = `
+
+            <div class="admin-team-management-panel">
+
+                <div class="admin-team-management-header">
+
+                    <div>
+
+                        <span class="admin-team-management-eyebrow">
+                            TEAM MANAGEMENT
+                        </span>
+
+                        <h2>
+                            ${escapeHtml(
+                                team.name ||
+                                "Unnamed Team"
+                            )}
+                        </h2>
+
+                        ${
+                            team.description
+                                ? `
+                                    <p>
+                                        ${escapeHtml(
+                                            team.description
+                                        )}
+                                    </p>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="admin-team-management-close"
+                        data-admin-team-management-close
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="admin-team-management-body">
+
+                    <div class="admin-team-management-tabs">
+
+                        <button
+                            type="button"
+                            class="active"
+                            data-admin-team-tab="overview"
+                        >
+                            Overview
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="people"
+                        >
+                            People
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="locations"
+                        >
+                            Locations
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="zones"
+                        >
+                            Zones
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="tasks"
+                        >
+                            Tasks
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="activity"
+                        >
+                            Activity History
+                        </button>
+
+                        <button
+                            type="button"
+                            data-admin-team-tab="performance"
+                        >
+                            Performance
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="admin-team-management-content"
+                        data-admin-team-management-content
+                    >
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="overview"
+                        >
+
+                            <div class="admin-team-metrics">
+
+                                <div class="admin-team-metric-card">
+
+                                    <span>
+                                        Supervisors
+                                    </span>
+
+                                    <strong>
+                                        ${supervisors.length}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="admin-team-metric-card">
+
+                                    <span>
+                                        Employees
+                                    </span>
+
+                                    <strong>
+                                        ${employees.length}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="admin-team-metric-card">
+
+                                    <span>
+                                        Locations
+                                    </span>
+
+                                    <strong>
+                                        ${locations.length}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="admin-team-metric-card">
+
+                                    <span>
+                                        Zones
+                                    </span>
+
+                                    <strong>
+                                        ${zones.length}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="admin-team-management-columns">
+
+                                <div class="admin-team-management-card">
+
+                                    <div class="admin-team-management-card-header">
+
+                                        <h3>
+                                            Quick Actions
+                                        </h3>
+
+                                    </div>
+
+
+                                    <div class="admin-team-quick-actions">
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="edit"
+                                        >
+                                            Edit Team
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="people"
+                                        >
+                                            Assign People
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="locations"
+                                        >
+                                            Assign Locations
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="zones"
+                                        >
+                                            Assign Zones
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="tasks"
+                                        >
+                                            Manage Tasks
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-admin-team-action="archive"
+                                        >
+                                            Archive Team
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="admin-team-management-card">
+
+                                    <div class="admin-team-management-card-header">
+
+                                        <h3>
+                                            Team Status
+                                        </h3>
+
+                                    </div>
+
+
+                                    <div class="admin-team-status-row">
+
+                                        <span>
+                                            Status
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                escapeHtml(
+                                                    team.status ||
+                                                    "Active"
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="people"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <div class="admin-team-management-card-header">
+
+                                    <h3>
+                                        Supervisors
+                                    </h3>
+
+                                </div>
+
+                                ${
+                                    supervisors.length
+                                        ? `
+                                            <div class="admin-team-management-list">
+
+                                                ${
+                                                    supervisors
+                                                        .map(
+                                                            person => `
+                                                                <div class="admin-team-management-list-row">
+
+                                                                    <div>
+                                                                        <strong>
+                                                                            ${escapeHtml(
+                                                                                person.name ||
+                                                                                person.full_name ||
+                                                                                "Unnamed Supervisor"
+                                                                            )}
+                                                                        </strong>
+                                                                    </div>
+
+                                                                    <span>
+                                                                        Supervisor
+                                                                    </span>
+
+                                                                </div>
+                                                            `
+                                                        )
+                                                        .join("")
+                                                }
+
+                                            </div>
+                                        `
+                                        : `
+                                            <div class="admin-team-management-empty">
+                                                No supervisors assigned.
+                                            </div>
+                                        `
+                                }
+
+                            </div>
+
+
+                            <div class="admin-team-management-card">
+
+                                <div class="admin-team-management-card-header">
+
+                                    <h3>
+                                        Employees
+                                    </h3>
+
+                                </div>
+
+                                ${
+                                    employees.length
+                                        ? `
+                                            <div class="admin-team-management-list">
+
+                                                ${
+                                                    employees
+                                                        .map(
+                                                            person => `
+                                                                <div class="admin-team-management-list-row">
+
+                                                                    <div>
+                                                                        <strong>
+                                                                            ${escapeHtml(
+                                                                                person.name ||
+                                                                                person.full_name ||
+                                                                                "Unnamed Employee"
+                                                                            )}
+                                                                        </strong>
+                                                                    </div>
+
+                                                                    <span>
+                                                                        Employee
+                                                                    </span>
+
+                                                                </div>
+                                                            `
+                                                        )
+                                                        .join("")
+                                                }
+
+                                            </div>
+                                        `
+                                        : `
+                                            <div class="admin-team-management-empty">
+                                                No employees assigned.
+                                            </div>
+                                        `
+                                }
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="locations"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <div class="admin-team-management-card-header">
+
+                                    <h3>
+                                        Locations
+                                    </h3>
+
+                                </div>
+
+                                ${
+                                    locations.length
+                                        ? `
+                                            <div class="admin-team-management-list">
+
+                                                ${
+                                                    locations
+                                                        .map(
+                                                            location => `
+                                                                <div class="admin-team-management-list-row">
+
+                                                                    <div>
+                                                                        <strong>
+                                                                            ${escapeHtml(
+                                                                                location.name ||
+                                                                                "Unnamed Location"
+                                                                            )}
+                                                                        </strong>
+                                                                    </div>
+
+                                                                </div>
+                                                            `
+                                                        )
+                                                        .join("")
+                                                }
+
+                                            </div>
+                                        `
+                                        : `
+                                            <div class="admin-team-management-empty">
+                                                No locations assigned.
+                                            </div>
+                                        `
+                                }
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="zones"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <div class="admin-team-management-card-header">
+
+                                    <h3>
+                                        Zones
+                                    </h3>
+
+                                </div>
+
+                                ${
+                                    zones.length
+                                        ? `
+                                            <div class="admin-team-management-list">
+
+                                                ${
+                                                    zones
+                                                        .map(
+                                                            zone => `
+                                                                <div class="admin-team-management-list-row">
+
+                                                                    <div>
+                                                                        <strong>
+                                                                            ${escapeHtml(
+                                                                                zone.name ||
+                                                                                "Unnamed Zone"
+                                                                            )}
+                                                                        </strong>
+                                                                    </div>
+
+                                                                </div>
+                                                            `
+                                                        )
+                                                        .join("")
+                                                }
+
+                                            </div>
+                                        `
+                                        : `
+                                            <div class="admin-team-management-empty">
+                                                No zones assigned.
+                                            </div>
+                                        `
+                                }
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="tasks"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <h3>
+                                    Tasks
+                                </h3>
+
+                                <p>
+                                    Task management will use the team's real task data.
+                                </p>
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="activity"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <h3>
+                                    Activity History
+                                </h3>
+
+                                <p>
+                                    Team activity history will appear here from real team changes.
+                                </p>
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="admin-team-management-section"
+                            data-admin-team-section="performance"
+                            hidden
+                        >
+
+                            <div class="admin-team-management-card">
+
+                                <h3>
+                                    Team Performance
+                                </h3>
+
+                                <p>
+                                    Performance metrics will appear here from real task and cleaning data.
+                                </p>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            backdrop
+        );
+
+
+        const closeButton =
+            backdrop.querySelector(
+                "[data-admin-team-management-close]"
+            );
+
+        if (closeButton) {
+
+            closeButton.addEventListener(
+                "click",
+                () => {
+                    backdrop.remove();
+                }
+            );
+        }
+
+
+        backdrop.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    backdrop
+                ) {
+
+                    backdrop.remove();
+
+                    return;
+                }
+
+
+                const tab =
+                    event.target.closest(
+                        "[data-admin-team-tab]"
+                    );
+
+                if (!tab) {
+                    return;
+                }
+
+
+                const target =
+                    tab.dataset.adminTeamTab;
+
+
+                backdrop
+                    .querySelectorAll(
+                        "[data-admin-team-tab]"
+                    )
+                    .forEach(
+                        button => {
+                            button.classList.toggle(
+                                "active",
+                                button === tab
+                            );
+                        }
+                    );
+
+
+                backdrop
+                    .querySelectorAll(
+                        "[data-admin-team-section]"
+                    )
+                    .forEach(
+                        section => {
+
+                            section.hidden =
+                                section.dataset.adminTeamSection !==
+                                target;
+
+                        }
+                    );
+
+            }
+        );
+
+
+        requestAnimationFrame(
+            () => {
+                backdrop.classList.add(
+                    "is-open"
+                );
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Admin team management error:",
+            error
+        );
+
+        alert(
+            "Unable to open this team right now."
+        );
+    }
+}
+
+let adminTeamSearchTimer = null;
+
+
+async function searchAdminTeams(
+    rawQuery
+) {
+
+    const query =
+        String(
+            rawQuery || ""
+        )
+        .trim();
+
+    const content =
+        document.getElementById(
+            "admin-teams-content"
+        );
+
+    if (!content) {
+        return;
+    }
+
+
+    clearTimeout(
+        adminTeamSearchTimer
+    );
+
+
+    if (!query) {
+
+        renderAdminTeamsData(
+            []
+        );
+
+        return;
+    }
+
+
+    adminTeamSearchTimer =
+        setTimeout(
+            async () => {
+
+                try {
+
+                    content.innerHTML = `
+                        <div class="admin-teams-loading">
+                            Searching teams...
+                        </div>
+                    `;
+
+
+                    const results =
+                        await CleanTrack.api.request(
+                            `/api/admin/teams/search?q=${encodeURIComponent(query)}&limit=8`
+                        );
+
+
+                    renderAdminTeamSearchResults(
+                        Array.isArray(results)
+                            ? results
+                            : []
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Admin team search error:",
+                        error
+                    );
+
+                    content.innerHTML = `
+                        <div class="admin-teams-inline-empty">
+
+                            <h3>
+                                Unable to search teams
+                            </h3>
+
+                            <p>
+                                Please try again.
+                            </p>
+
+                        </div>
+                    `;
+
+                }
+
+            },
+            180
+        );
+}
+
+
+function renderAdminTeamSearchResults(
+    teams
+) {
+
+    const content =
+        document.getElementById(
+            "admin-teams-content"
+        );
+
+    if (!content) {
+        return;
+    }
+
+
+    if (!teams.length) {
+
+        content.innerHTML = `
+            <div class="admin-teams-inline-empty">
+
+                <h3>
+                    No teams found
+                </h3>
+
+                <p>
+                    Try another team name, person, location, or zone.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    content.innerHTML = `
+
+        <div class="admin-teams-section">
+
+            <div class="admin-teams-section-header">
+
+                <div>
+                    <h2>
+                        Search Results
+                    </h2>
+
+                    <p>
+                        ${teams.length} matching
+                        team${teams.length === 1 ? "" : "s"}
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="admin-teams-list">
+
+                ${teams.map(team => `
+
+                    <button
+                        type="button"
+                        class="admin-team-item"
+                        data-admin-team-open="${team.id}"
+                    >
+
+                        <div>
+
+                            <div class="admin-team-item-title-row">
+
+                                <h3>
+                                    ${escapeHtml(
+                                        team.name || "Unnamed Team"
+                                    )}
+                                </h3>
+
+                            </div>
+
+
+                            ${
+                                team.description
+                                    ? `
+                                        <p class="admin-team-description">
+                                            ${escapeHtml(
+                                                team.description
+                                            )}
+                                        </p>
+                                    `
+                                    : ""
+                            }
+
+
+                            <div class="admin-team-meta">
+
+                                <span>
+                                    ${team.supervisor_count || 0}
+                                    supervisor${team.supervisor_count === 1 ? "" : "s"}
+                                </span>
+
+                                <span>
+                                    ${team.employee_count || 0}
+                                    employee${team.employee_count === 1 ? "" : "s"}
+                                </span>
+
+                                <span>
+                                    ${team.location_count || 0}
+                                    location${team.location_count === 1 ? "" : "s"}
+                                </span>
+
+                                <span>
+                                    ${team.zone_count || 0}
+                                    zone${team.zone_count === 1 ? "" : "s"}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <span class="admin-team-search-open">
+                            View
+                        </span>
+
+                    </button>
+
+                `).join("")}
+
+            </div>
+
+        </div>
+    `;
 }
 
 
@@ -7781,7 +9047,16 @@ async function createAdminTeam() {
 
         closeAdminCreateTeamDrawer();
 
-        await loadAdminTeamsData();
+       const searchInput =
+    document.getElementById(
+        "admin-teams-search"
+    );
+
+if (searchInput) {
+    searchInput.value = "";
+}
+
+loadAdminTeamsData();
 
     } catch (error) {
 
