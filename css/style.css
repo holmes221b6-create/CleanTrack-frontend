@@ -2272,3 +2272,103 @@ button.staff-attention-item:hover {
     color: rgba(255,255,255,.34);
     font-size: 9px;
 }
+
+/* =========================================================
+   ADMIN INVITATIONS
+   ========================================================= */
+
+.admin-invitations-page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 32px 46px;
+    box-sizing: border-box;
+}
+
+.invitations-page-header h1 {
+    margin: 7px 0 4px;
+    font-size: 29px;
+    font-weight: 650;
+}
+
+.invitations-page-header p {
+    margin: 0;
+    color: rgba(255,255,255,.42);
+    font-size: 11px;
+}
+
+.invitation-tabs {
+    display: flex;
+    gap: 5px;
+    margin: 20px 0 12px;
+}
+
+.invitation-tabs button {
+    padding: 8px 11px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 7px;
+    background: rgba(255,255,255,.018);
+    color: rgba(255,255,255,.44);
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.invitation-tabs button.active {
+    border-color: rgba(79,142,247,.18);
+    background: rgba(79,142,247,.09);
+    color: #b8ceff;
+}
+
+.admin-invitation-list {
+    display: grid;
+    gap: 7px;
+}
+
+.admin-invitation-card {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 11px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 9px;
+    background: rgba(255,255,255,.015);
+}
+
+.admin-invitation-main {
+    min-width: 0;
+}
+
+.admin-invitation-main strong,
+.admin-invitation-main span,
+.admin-invitation-main div {
+    display: block;
+}
+
+.admin-invitation-main strong {
+    color: #fff;
+    font-size: 11px;
+}
+
+.admin-invitation-main span {
+    margin-top: 3px;
+    color: rgba(255,255,255,.38);
+    font-size: 9px;
+}
+
+.admin-invitation-main div {
+    margin-top: 6px;
+    color: rgba(255,255,255,.34);
+    font-size: 9px;
+}
+
+.admin-invitation-actions button {
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 7px;
+    background: rgba(255,255,255,.025);
+    color: #fff;
+    font-size: 9px;
+    cursor: pointer;
+}

@@ -49,6 +49,12 @@ CleanTrack.navigation = (() => {
                     label: "Staff",
                     icon: "\u2659"
                 },
+                
+                {
+                    id: "invitations",
+                    label: "Invitations",
+                    icon: "\u2709"
+                },
                 {
                     id: "teams",
                     label: "Teams",

@@ -6002,6 +6002,705 @@ function exportAdminStaffCsv() {
 
 }
 
+async function renderAdminInvitations() {
+
+    const view =
+        document.getElementById("page-view");
+
+    if (!view) {
+        return;
+    }
+
+    view.innerHTML = `
+        <section class="admin-invitations-page">
+
+            <header class="invitations-page-header">
+
+                <div>
+                    <div class="staff-page-eyebrow">
+                        ORGANIZATION ACCESS
+                    </div>
+
+                    <h1>Invitations</h1>
+
+                    <p>
+                        Review people requesting access
+                        to your organization.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="invitation-tabs">
+
+                <button
+                    type="button"
+                    class="active"
+                    data-request-status="pending"
+                >
+                    Pending
+                </button>
+
+                <button
+                    type="button"
+                    data-request-status="approved"
+                >
+                    Approved
+                </button>
+
+                <button
+                    type="button"
+                    data-request-status="rejected"
+                >
+                    Rejected
+                </button>
+
+            </div>
+
+
+            <section class="staff-page-panel">
+
+                <div
+                    id="admin-invitation-list"
+                    class="admin-invitation-list"
+                >
+                    Loading requests...
+                </div>
+
+            </section>
+
+        </section>
+    `;
+
+
+    setupAdminInvitationTabs();
+
+    await loadAdminInvitationRequests(
+        "pending"
+    );
+
+}
+
+
+function setupAdminInvitationTabs() {
+
+    document
+        .querySelectorAll(
+            "[data-request-status]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    document
+                        .querySelectorAll(
+                            "[data-request-status]"
+                        )
+                        .forEach(item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                        );
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                    await loadAdminInvitationRequests(
+                        button.dataset
+                            .requestStatus
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+async function loadAdminInvitationRequests(
+    status
+) {
+
+    const list =
+        document.getElementById(
+            "admin-invitation-list"
+        );
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="staff-loading">
+            Loading requests...
+        </div>
+    `;
+
+
+    try {
+
+        const requests =
+            await CleanTrack.api.request(
+                `/api/admin/account-requests?status=${encodeURIComponent(
+                    status
+                )}`
+            );
+
+
+        CleanTrack.adminInvitationRequests =
+            requests;
+
+
+        renderAdminInvitationRequests(
+            requests,
+            status
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Unable to load account requests:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="staff-empty">
+                <strong>
+                    Unable to load requests
+                </strong>
+
+                <span>
+                    Please try again.
+                </span>
+            </div>
+        `;
+
+    }
+
+}
+
+
+function renderAdminInvitationRequests(
+    requests,
+    status
+) {
+
+    const list =
+        document.getElementById(
+            "admin-invitation-list"
+        );
+
+    if (!list) {
+        return;
+    }
+
+
+    if (!requests.length) {
+
+        list.innerHTML = `
+            <div class="staff-empty">
+
+                <strong>
+                    No ${escapeHtml(status)}
+                    requests
+                </strong>
+
+                <span>
+                    There are no requests in this section.
+                </span>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        requests
+            .map(request => `
+
+                <article
+                    class="admin-invitation-card"
+                >
+
+                    <div class="staff-person-avatar">
+
+                        ${escapeHtml(
+                            getStaffInitials(
+                                request.name
+                            )
+                        )}
+
+                    </div>
+
+
+                    <div class="admin-invitation-main">
+
+                        <strong>
+                            ${escapeHtml(
+                                request.name || "Unnamed"
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(
+                                request.email || ""
+                            )}
+                        </span>
+
+                        <div>
+
+                            Requested role:
+                            ${escapeHtml(
+                                request.requested_role ||
+                                "—"
+                            )}
+
+                            ${
+                                request.requested_team_name
+                                    ? `
+                                        ·
+                                        ${escapeHtml(
+                                            request.requested_team_name
+                                        )}
+                                      `
+                                    : ""
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    ${
+                        status === "pending"
+                            ? `
+                                <div
+                                    class="admin-invitation-actions"
+                                >
+
+                                    <button
+                                        type="button"
+                                        data-review-request="${escapeHtml(
+                                            String(
+                                                request.id
+                                            )
+                                        )}"
+                                    >
+                                        Review
+                                    </button>
+
+                                </div>
+                              `
+                            : ""
+                    }
+
+                </article>
+
+            `)
+            .join("");
+
+
+    list
+        .querySelectorAll(
+            "[data-review-request]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openAdminInvitationReview(
+                        button.dataset.reviewRequest
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+async function openAdminInvitationReview(
+    requestId
+) {
+
+    const request =
+        (
+            CleanTrack.adminInvitationRequests ||
+            []
+        ).find(
+            item =>
+                String(item.id) ===
+                String(requestId)
+        );
+
+
+    if (!request) {
+        return;
+    }
+
+
+    try {
+
+        const [
+            teams,
+            locations
+        ] = await Promise.all([
+
+            CleanTrack.api.request(
+                "/api/teams"
+            ),
+
+            CleanTrack.api.request(
+                "/api/locations"
+            )
+
+        ]);
+
+
+        openAdminStaffDrawer(
+            request.name,
+            "Join Request",
+            `
+                <form
+                    class="staff-edit-form"
+                    id="admin-request-review-form"
+                >
+
+                    <div class="staff-detail-block">
+
+                        <span class="staff-detail-label">
+                            APPLICANT
+                        </span>
+
+                        <div class="staff-detail-grid">
+
+                            <div>
+                                <span>Name</span>
+                                <strong>
+                                    ${escapeHtml(
+                                        request.name || "—"
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Email</span>
+                                <strong>
+                                    ${escapeHtml(
+                                        request.email || "—"
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Requested Role</span>
+                                <strong>
+                                    ${escapeHtml(
+                                        request.requested_role ||
+                                        "—"
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Requested Team</span>
+                                <strong>
+                                    ${escapeHtml(
+                                        request.requested_team_name ||
+                                        "—"
+                                    )}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <label>
+
+                        Approve as
+
+                        <select name="role">
+
+                            <option
+                                value="employee"
+                                ${
+                                    request.requested_role ===
+                                    "employee"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Employee
+                            </option>
+
+                            <option
+                                value="supervisor"
+                                ${
+                                    request.requested_role ===
+                                    "supervisor"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Supervisor
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Team
+
+                        <select name="team_id">
+
+                            <option value="">
+                                No team
+                            </option>
+
+                            ${teams
+                                .map(
+                                    team => `
+                                        <option
+                                            value="${escapeHtml(
+                                                String(team.id)
+                                            )}"
+                                            ${
+                                                String(
+                                                    team.id
+                                                ) ===
+                                                String(
+                                                    request.requested_team_id
+                                                )
+                                                    ? "selected"
+                                                    : ""
+                                            }
+                                        >
+                                            ${escapeHtml(
+                                                team.name
+                                            )}
+                                        </option>
+                                    `
+                                )
+                                .join("")}
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Location
+
+                        <select name="location_id">
+
+                            <option value="">
+                                No location
+                            </option>
+
+                            ${locations
+                                .map(
+                                    location => `
+                                        <option
+                                            value="${escapeHtml(
+                                                String(
+                                                    location.id
+                                                )
+                                            )}"
+                                        >
+                                            ${escapeHtml(
+                                                location.name
+                                            )}
+                                        </option>
+                                    `
+                                )
+                                .join("")}
+
+                        </select>
+
+                    </label>
+
+
+                    <div class="staff-detail-actions">
+
+                        <button
+                            type="button"
+                            data-request-reject
+                            class="danger"
+                        >
+                            Reject
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="primary"
+                        >
+                            Approve
+                        </button>
+
+                    </div>
+
+                </form>
+            `
+        );
+
+
+        const form =
+            document.getElementById(
+                "admin-request-review-form"
+            );
+
+
+        if (!form) {
+            return;
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                const formData =
+                    new FormData(form);
+
+
+                try {
+
+                    await CleanTrack.api.request(
+                        `/api/admin/account-requests/${encodeURIComponent(
+                            requestId
+                        )}/approve`,
+                        {
+                            method: "POST",
+
+                            body: JSON.stringify({
+
+                                role:
+                                    formData.get(
+                                        "role"
+                                    ),
+
+                                team_id:
+                                    formData.get(
+                                        "team_id"
+                                    ) || null,
+
+                                location_id:
+                                    formData.get(
+                                        "location_id"
+                                    ) || null
+
+                            })
+
+                        }
+                    );
+
+
+                    closeAdminStaffDrawer();
+
+
+                    await loadAdminInvitationRequests(
+                        "pending"
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Unable to approve request:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        form
+            .querySelector(
+                "[data-request-reject]"
+            )
+            ?.addEventListener(
+                "click",
+                async () => {
+
+                    const reason =
+                        window.prompt(
+                            "Reason for rejection (optional):"
+                        );
+
+
+                    try {
+
+                        await CleanTrack.api.request(
+                            `/api/admin/account-requests/${encodeURIComponent(
+                                requestId
+                            )}/reject`,
+                            {
+                                method: "POST",
+
+                                body: JSON.stringify({
+                                    reason:
+                                        reason || ""
+                                })
+                            }
+                        );
+
+
+                        closeAdminStaffDrawer();
+
+
+                        await loadAdminInvitationRequests(
+                            "pending"
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Unable to reject request:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+
+    } catch (error) {
+
+        console.error(
+            "Unable to open request:",
+            error
+        );
+
+    }
+
+}
+
 
     // --------------------------------------------------------
     // Other pages — temporary placeholders
@@ -6101,6 +6800,11 @@ function loadPage(page) {
             title: "Staff",
             subtitle: "People management"
         },
+        
+        invitations: {
+    title: "Invitations",
+    subtitle: "Organization access"
+},
 
         teams: {
             title: "Teams",
@@ -6178,6 +6882,22 @@ if (page === "staff") {
 
 if (page === "profile") {
     renderProfile();
+    return;
+}
+
+if (page === "invitations") {
+
+    const role =
+        String(
+            CleanTrack.currentUser?.role || ""
+        ).toLowerCase();
+
+    if (role === "admin") {
+        renderAdminInvitations();
+        return;
+    }
+
+    renderPlaceholder(page);
     return;
 }
 
