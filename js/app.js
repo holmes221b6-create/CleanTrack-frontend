@@ -6914,7 +6914,6 @@ async function openAdminInvitationReview(
     }
 
 }
-
 // --------------------------------------------------------
 // Admin Teams
 // --------------------------------------------------------
@@ -6939,7 +6938,6 @@ function renderAdminTeams() {
             <div class="admin-teams-toolbar">
 
                 <div class="admin-teams-search-wrap">
-
                     <span class="admin-teams-search-icon">
                         ⌕
                     </span>
@@ -6951,7 +6949,6 @@ function renderAdminTeams() {
                         placeholder="Search teams..."
                         autocomplete="off"
                     >
-
                 </div>
 
                 <button
@@ -6964,48 +6961,43 @@ function renderAdminTeams() {
 
             </div>
 
-
             <div
                 id="admin-teams-content"
                 class="admin-teams-content"
             >
-
                 <div class="admin-teams-loading">
                     Loading teams...
                 </div>
-
             </div>
 
-
             <div
-                id="admin-team-create-modal"
-                class="admin-team-modal-backdrop"
+                id="admin-team-drawer-backdrop"
+                class="admin-team-drawer-backdrop"
                 hidden
             >
 
-                <div
-                    class="admin-team-modal"
+                <aside
+                    class="admin-team-drawer"
                     role="dialog"
                     aria-modal="true"
-                    aria-labelledby="admin-team-modal-title"
+                    aria-label="Create Team"
                 >
 
-                    <div class="admin-team-modal-header">
+                    <div class="admin-team-drawer-header">
 
                         <div>
-                            <h2 id="admin-team-modal-title">
+                            <h2>
                                 Create Team
                             </h2>
 
                             <p>
-                                Create an organizational team for
-                                your staff and operations.
+                                Create a new team.
                             </p>
                         </div>
 
                         <button
                             type="button"
-                            class="admin-team-modal-close"
+                            class="admin-team-drawer-close"
                             data-admin-team-close
                             aria-label="Close"
                         >
@@ -7014,44 +7006,43 @@ function renderAdminTeams() {
 
                     </div>
 
-
                     <form
                         id="admin-team-create-form"
-                        class="admin-team-form"
+                        class="admin-team-drawer-form"
                     >
 
-                        <label>
-                            <span>Team Name</span>
+                        <div class="admin-team-field">
+
+                            <label for="admin-team-name">
+                                Team Name
+                            </label>
 
                             <input
                                 id="admin-team-name"
                                 type="text"
                                 maxlength="120"
-                                required
                                 placeholder="e.g. Airport Morning Cleaning"
+                                required
                             >
-                        </label>
 
+                        </div>
 
-                        <label>
-                            <span>Description</span>
+                        <div class="admin-team-field">
+
+                            <label for="admin-team-description">
+                                Description
+                            </label>
 
                             <textarea
                                 id="admin-team-description"
-                                rows="4"
+                                rows="5"
                                 maxlength="500"
-                                placeholder="Optional team description"
+                                placeholder="Optional"
                             ></textarea>
-                        </label>
 
-
-                        <div class="admin-team-form-note">
-                            Supervisors, employees, locations and zones
-                            can be assigned to the team later.
                         </div>
 
-
-                        <div class="admin-team-form-actions">
+                        <div class="admin-team-drawer-footer">
 
                             <button
                                 type="button"
@@ -7072,7 +7063,7 @@ function renderAdminTeams() {
 
                     </form>
 
-                </div>
+                </aside>
 
             </div>
 
@@ -7080,7 +7071,6 @@ function renderAdminTeams() {
     `;
 
     setupAdminTeamsEvents();
-
     loadAdminTeamsData();
 }
 
@@ -7128,10 +7118,6 @@ async function loadAdminTeamsData() {
             content.innerHTML = `
                 <div class="admin-teams-empty">
 
-                    <div class="admin-teams-empty-icon">
-                        !
-                    </div>
-
                     <h2>
                         Unable to load teams
                     </h2>
@@ -7168,14 +7154,20 @@ function renderAdminTeamsData(
         return;
     }
 
+    const searchInput =
+        document.getElementById(
+            "admin-teams-search"
+        );
+
     const query =
-        (
-            document.getElementById(
-                "admin-teams-search"
-            )?.value || ""
+        String(
+            searchInput?.value || ""
         )
         .trim()
         .toLowerCase();
+
+    const pinnedIds =
+        getAdminPinnedTeamIds();
 
     const filteredTeams =
         teams.filter(team => {
@@ -7183,12 +7175,14 @@ function renderAdminTeamsData(
             const name =
                 String(
                     team.name || ""
-                ).toLowerCase();
+                )
+                .toLowerCase();
 
             const description =
                 String(
                     team.description || ""
-                ).toLowerCase();
+                )
+                .toLowerCase();
 
             return (
                 !query ||
@@ -7197,27 +7191,10 @@ function renderAdminTeamsData(
             );
         });
 
-    const pinnedIds =
-        getAdminPinnedTeamIds();
-
-    const pinnedTeams =
-        teams.filter(team =>
-            pinnedIds.includes(
-                String(team.id)
-            )
-        );
-
-
-    if (
-        teams.length === 0
-    ) {
+    if (!teams.length) {
 
         content.innerHTML = `
             <div class="admin-teams-empty">
-
-                <div class="admin-teams-empty-icon">
-                    +
-                </div>
 
                 <h2>
                     No teams yet
@@ -7228,65 +7205,58 @@ function renderAdminTeamsData(
                     staff and operations.
                 </p>
 
-                <button
-                    type="button"
-                    class="admin-teams-create-btn"
-                    data-admin-team-create
-                >
-                    + Create Team
-                </button>
-
             </div>
         `;
 
         return;
     }
 
-
     let html = "";
 
+    if (!query && pinnedIds.length) {
 
-    if (
-        pinnedTeams.length > 0 &&
-        !query
-    ) {
+        const pinnedTeams =
+            teams.filter(team =>
+                pinnedIds.includes(
+                    String(team.id)
+                )
+            );
 
-        html += `
-            <section class="admin-teams-section">
+        if (pinnedTeams.length) {
 
-                <div class="admin-teams-section-header">
+            html += `
+                <section class="admin-teams-section">
 
-                    <div>
-                        <h2>
-                            Pinned Teams
-                        </h2>
+                    <div class="admin-teams-section-header">
+                        <div>
+                            <h2>
+                                Pinned Teams
+                            </h2>
 
-                        <p>
-                            Your frequently accessed teams
-                        </p>
+                            <p>
+                                Your pinned teams
+                            </p>
+                        </div>
                     </div>
 
-                </div>
+                    <div class="admin-teams-list">
 
-                <div class="admin-teams-list">
-
-                    ${pinnedTeams
-                        .map(
-                            team =>
+                        ${pinnedTeams
+                            .map(team =>
                                 renderAdminTeamItem(
                                     team,
                                     true
                                 )
-                        )
-                        .join("")
-                    }
+                            )
+                            .join("")
+                        }
 
-                </div>
+                    </div>
 
-            </section>
-        `;
+                </section>
+            `;
+        }
     }
-
 
     html += `
         <section class="admin-teams-section">
@@ -7301,7 +7271,9 @@ function renderAdminTeamsData(
                     </h2>
 
                     <p>
-                        ${filteredTeams.length}
+                        ${
+                            filteredTeams.length
+                        }
                         ${
                             filteredTeams.length === 1
                                 ? "team"
@@ -7311,13 +7283,9 @@ function renderAdminTeamsData(
                 </div>
 
             </div>
-
     `;
 
-
-    if (
-        filteredTeams.length === 0
-    ) {
+    if (!filteredTeams.length) {
 
         html += `
             <div class="admin-teams-inline-empty">
@@ -7327,7 +7295,7 @@ function renderAdminTeamsData(
                 </h3>
 
                 <p>
-                    Try a different search.
+                    Try another search.
                 </p>
 
             </div>
@@ -7339,14 +7307,13 @@ function renderAdminTeamsData(
             <div class="admin-teams-list">
 
                 ${filteredTeams
-                    .map(
-                        team =>
-                            renderAdminTeamItem(
-                                team,
-                                pinnedIds.includes(
-                                    String(team.id)
-                                )
+                    .map(team =>
+                        renderAdminTeamItem(
+                            team,
+                            pinnedIds.includes(
+                                String(team.id)
                             )
+                        )
                     )
                     .join("")
                 }
@@ -7354,7 +7321,6 @@ function renderAdminTeamsData(
             </div>
         `;
     }
-
 
     html += `
         </section>
@@ -7369,10 +7335,12 @@ function renderAdminTeamItem(
     isPinned
 ) {
 
+    const teamId =
+        String(team.id);
+
     const name =
         escapeHtml(
-            team.name ||
-            "Unnamed Team"
+            team.name || "Unnamed Team"
         );
 
     const description =
@@ -7385,15 +7353,13 @@ function renderAdminTeamItem(
             team.supervisor_count || 0
         );
 
-    const members =
+    const employees =
         Number(
             team.member_count || 0
         );
 
     return `
-        <article
-            class="admin-team-item"
-        >
+        <article class="admin-team-item">
 
             <div class="admin-team-item-main">
 
@@ -7409,14 +7375,13 @@ function renderAdminTeamItem(
                                 <span
                                     class="admin-team-pinned-label"
                                 >
-                                    ★ Pinned
+                                    Pinned
                                 </span>
                               `
                             : ""
                     }
 
                 </div>
-
 
                 ${
                     description
@@ -7427,7 +7392,6 @@ function renderAdminTeamItem(
                           `
                         : ""
                 }
-
 
                 <div class="admin-team-meta">
 
@@ -7441,9 +7405,9 @@ function renderAdminTeamItem(
                     </span>
 
                     <span>
-                        ${members}
+                        ${employees}
                         ${
-                            members === 1
+                            employees === 1
                                 ? " employee"
                                 : " employees"
                         }
@@ -7453,18 +7417,12 @@ function renderAdminTeamItem(
 
             </div>
 
-
             <button
                 type="button"
                 class="admin-team-pin-btn"
                 data-admin-team-pin="${escapeHtml(
-                    String(team.id)
+                    teamId
                 )}"
-                aria-label="${
-                    isPinned
-                        ? "Unpin team"
-                        : "Pin team"
-                }"
                 title="${
                     isPinned
                         ? "Unpin team"
@@ -7490,13 +7448,12 @@ function getAdminPinnedTeamStorageKey() {
         getUser() ||
         {};
 
-    const organizationId =
-        user.organization_id ||
-        "default";
-
     return (
         "cleantrack_admin_pinned_teams_" +
-        String(organizationId)
+        String(
+            user.organization_id ||
+            "default"
+        )
     );
 }
 
@@ -7521,11 +7478,6 @@ function getAdminPinnedTeamIds() {
 
     } catch (error) {
 
-        console.error(
-            "Unable to read pinned teams:",
-            error
-        );
-
         return [];
     }
 }
@@ -7535,22 +7487,12 @@ function saveAdminPinnedTeamIds(
     ids
 ) {
 
-    try {
-
-        localStorage.setItem(
-            getAdminPinnedTeamStorageKey(),
-            JSON.stringify(
-                ids.map(String)
-            )
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Unable to save pinned teams:",
-            error
-        );
-    }
+    localStorage.setItem(
+        getAdminPinnedTeamStorageKey(),
+        JSON.stringify(
+            ids.map(String)
+        )
+    );
 }
 
 
@@ -7561,19 +7503,16 @@ function toggleAdminPinnedTeam(
     const id =
         String(teamId);
 
-    const pinned =
+    const current =
         getAdminPinnedTeamIds();
 
-    const exists =
-        pinned.includes(id);
-
     const updated =
-        exists
-            ? pinned.filter(
-                value => value !== id
+        current.includes(id)
+            ? current.filter(
+                item => item !== id
             )
             : [
-                ...pinned,
+                ...current,
                 id
             ];
 
@@ -7589,73 +7528,95 @@ function toggleAdminPinnedTeam(
 
 function setupAdminTeamsEvents() {
 
-    const search =
-        document.getElementById(
-            "admin-teams-search"
+    const page =
+        document.querySelector(
+            ".admin-teams-page"
         );
 
-    if (search) {
+    if (!page) {
+        return;
+    }
 
-        search.addEventListener(
-            "input",
-            () => {
+    page.addEventListener(
+        "input",
+        event => {
+
+            if (
+                event.target.id ===
+                "admin-teams-search"
+            ) {
+
                 renderAdminTeamsData(
                     CleanTrack.adminTeamsData || []
                 );
             }
-        );
-    }
+        }
+    );
 
+    page.addEventListener(
+        "click",
+        event => {
 
-    document
-        .querySelectorAll(
-            "[data-admin-team-create]"
-        )
-        .forEach(button => {
+            const createButton =
+                event.target.closest(
+                    "[data-admin-team-create]"
+                );
 
-            button.addEventListener(
-                "click",
-                openAdminCreateTeamModal
-            );
+            if (createButton) {
 
-        });
-
-
-    document
-        .querySelectorAll(
-            "[data-admin-team-close]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                closeAdminCreateTeamModal
-            );
-
-        });
-
-
-    const modal =
-        document.getElementById(
-            "admin-team-create-modal"
-        );
-
-    if (modal) {
-
-        modal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target === modal
-                ) {
-                    closeAdminCreateTeamModal();
-                }
-
+                openAdminCreateTeamDrawer();
+                return;
             }
-        );
-    }
 
+            const closeButton =
+                event.target.closest(
+                    "[data-admin-team-close]"
+                );
+
+            if (closeButton) {
+
+                closeAdminCreateTeamDrawer();
+                return;
+            }
+
+            const pinButton =
+                event.target.closest(
+                    "[data-admin-team-pin]"
+                );
+
+            if (pinButton) {
+
+                toggleAdminPinnedTeam(
+                    pinButton.dataset.adminTeamPin
+                );
+
+                return;
+            }
+
+            const retryButton =
+                event.target.closest(
+                    "[data-admin-team-retry]"
+                );
+
+            if (retryButton) {
+
+                loadAdminTeamsData();
+                return;
+            }
+
+            const backdrop =
+                document.getElementById(
+                    "admin-team-drawer-backdrop"
+                );
+
+            if (
+                backdrop &&
+                event.target === backdrop
+            ) {
+                closeAdminCreateTeamDrawer();
+            }
+        }
+    );
 
     const form =
         document.getElementById(
@@ -7675,117 +7636,90 @@ function setupAdminTeamsEvents() {
             }
         );
     }
-
-
-    document
-        .querySelectorAll(
-            "[data-admin-team-pin]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    toggleAdminPinnedTeam(
-                        button.dataset.adminTeamPin
-                    );
-
-                }
-            );
-        });
-
-
-    document.addEventListener(
-        "click",
-        event => {
-
-            const retry =
-                event.target.closest(
-                    "[data-admin-team-retry]"
-                );
-
-            if (retry) {
-
-                loadAdminTeamsData();
-                return;
-
-            }
-        }
-    );
 }
 
 
-function openAdminCreateTeamModal() {
+function openAdminCreateTeamDrawer() {
 
-    const modal =
+    const backdrop =
         document.getElementById(
-            "admin-team-create-modal"
+            "admin-team-drawer-backdrop"
         );
 
-    if (!modal) {
+    if (!backdrop) {
         return;
     }
 
-    modal.hidden = false;
+    backdrop.hidden = false;
 
-    const nameInput =
+    requestAnimationFrame(() => {
+
+        backdrop.classList.add(
+            "is-open"
+        );
+
+    });
+
+    const input =
         document.getElementById(
             "admin-team-name"
         );
 
-    if (nameInput) {
-        nameInput.focus();
+    if (input) {
+        input.focus();
     }
 }
 
 
-function closeAdminCreateTeamModal() {
+function closeAdminCreateTeamDrawer() {
 
-    const modal =
+    const backdrop =
         document.getElementById(
-            "admin-team-create-modal"
+            "admin-team-drawer-backdrop"
         );
 
-    if (!modal) {
+    if (!backdrop) {
         return;
     }
 
-    modal.hidden = true;
+    backdrop.classList.remove(
+        "is-open"
+    );
 
-    const form =
-        document.getElementById(
-            "admin-team-create-form"
-        );
+    setTimeout(() => {
 
-    if (form) {
-        form.reset();
-    }
+        backdrop.hidden = true;
+
+        const form =
+            document.getElementById(
+                "admin-team-create-form"
+            );
+
+        if (form) {
+            form.reset();
+        }
+
+    }, 180);
 }
 
 
 async function createAdminTeam() {
 
-    const nameInput =
-        document.getElementById(
-            "admin-team-name"
-        );
-
-    const descriptionInput =
-        document.getElementById(
-            "admin-team-description"
-        );
-
     const name =
         (
-            nameInput?.value || ""
-        ).trim();
+            document.getElementById(
+                "admin-team-name"
+            )?.value || ""
+        )
+        .trim();
 
     const description =
         (
-            descriptionInput?.value || ""
-        ).trim();
-
+            document.getElementById(
+                "admin-team-description"
+            )?.value || ""
+        )
+        .trim();
 
     if (!name) {
 
@@ -7793,17 +7727,13 @@ async function createAdminTeam() {
             "Team name is required."
         );
 
-        nameInput?.focus();
-
         return;
     }
-
 
     const submitButton =
         document.querySelector(
             "#admin-team-create-form button[type='submit']"
         );
-
 
     if (submitButton) {
 
@@ -7813,7 +7743,6 @@ async function createAdminTeam() {
         submitButton.textContent =
             "Creating...";
     }
-
 
     try {
 
@@ -7828,14 +7757,14 @@ async function createAdminTeam() {
             }
         );
 
-        closeAdminCreateTeamModal();
+        closeAdminCreateTeamDrawer();
 
         await loadAdminTeamsData();
 
     } catch (error) {
 
         console.error(
-            "Admin team creation failed:",
+            "Admin Team creation error:",
             error
         );
 
@@ -7856,8 +7785,6 @@ async function createAdminTeam() {
         }
     }
 }
-
-
 
     // --------------------------------------------------------
     // Other pages — temporary placeholders

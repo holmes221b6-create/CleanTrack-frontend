@@ -2585,46 +2585,6 @@ button.staff-attention-item:hover {
     font-size: 13px;
 }
 
-.admin-team-modal-backdrop {
-    background: rgba(0,0,0,.55);
-}
-
-.admin-team-modal {
-    background: #121720;
-    border: 1px solid rgba(255,255,255,.07);
-}
-
-.admin-team-modal-header {
-    border-bottom-color: rgba(255,255,255,.06);
-}
-
-.admin-team-modal-header p {
-    color: rgba(255,255,255,.42);
-}
-
-.admin-team-form input,
-.admin-team-form textarea {
-    background: rgba(255,255,255,.025);
-    border-color: rgba(255,255,255,.08);
-    color: inherit;
-}
-
-.admin-team-form input:focus,
-.admin-team-form textarea:focus {
-    border-color: rgba(79,142,247,.35);
-}
-
-.admin-team-form-note {
-    background: rgba(255,255,255,.025);
-    color: rgba(255,255,255,.45);
-}
-
-.admin-team-cancel-btn {
-    background: rgba(255,255,255,.025);
-    border-color: rgba(255,255,255,.08);
-    color: inherit;
-}
-
 @media (max-width: 700px) {
 
     .admin-teams-page {
@@ -2650,9 +2610,157 @@ button.staff-attention-item:hover {
     }
 }
 
-/* =========================================================
-   ADMIN CREATE TEAM DRAWER
-   ========================================================= */
+.admin-teams-page {
+    padding: 24px;
+}
+
+.admin-teams-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.admin-teams-search-wrap {
+    position: relative;
+    width: 360px;
+}
+
+.admin-teams-search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,.42);
+    pointer-events: none;
+}
+
+.admin-teams-search {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+    background: rgba(255,255,255,.035);
+    color: inherit;
+    outline: none;
+}
+
+.admin-teams-create-btn {
+    height: 40px;
+    padding: 0 15px;
+    border: 1px solid rgba(79,142,247,.28);
+    border-radius: 9px;
+    background: rgba(79,142,247,.10);
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-teams-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.admin-teams-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-teams-section-header h2 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.admin-teams-section-header p {
+    margin: 4px 0 0;
+    color: rgba(255,255,255,.40);
+    font-size: 12px;
+}
+
+.admin-teams-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-team-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,.055);
+    border-radius: 10px;
+    background: rgba(255,255,255,.022);
+}
+
+.admin-team-item-main {
+    min-width: 0;
+}
+
+.admin-team-item h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.admin-team-description {
+    margin: 4px 0 0;
+    color: rgba(255,255,255,.47);
+    font-size: 12px;
+}
+
+.admin-team-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 6px;
+    color: rgba(255,255,255,.40);
+    font-size: 12px;
+}
+
+.admin-team-pinned-label {
+    color: rgba(79,142,247,.9);
+    font-size: 11px;
+}
+
+.admin-team-pin-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255,255,255,.58);
+    cursor: pointer;
+}
+
+.admin-teams-empty,
+.admin-teams-inline-empty,
+.admin-teams-loading {
+    padding: 44px 24px;
+    text-align: center;
+    border: 1px dashed rgba(255,255,255,.08);
+    border-radius: 12px;
+    background: rgba(255,255,255,.018);
+}
+
+.admin-teams-empty h2,
+.admin-teams-inline-empty h3 {
+    margin: 0 0 7px;
+}
+
+.admin-teams-empty p,
+.admin-teams-inline-empty p {
+    margin: 0;
+    color: rgba(255,255,255,.43);
+    font-size: 13px;
+}
+
+/* Create Team drawer */
 
 .admin-team-drawer-backdrop {
     position: fixed;
@@ -2664,175 +2772,6 @@ button.staff-attention-item:hover {
 }
 
 .admin-team-drawer-backdrop[hidden] {
-    display: none;
-}
-
-.admin-team-drawer {
-    width: 390px;
-    max-width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    background: #121720;
-    border-left: 1px solid rgba(255,255,255,.07);
-    box-shadow: -20px 0 50px rgba(0,0,0,.35);
-    transform: translateX(100%);
-    transition: transform .18s ease;
-}
-
-.admin-team-drawer-backdrop.is-open
-.admin-team-drawer {
-    transform: translateX(0);
-}
-
-.admin-team-drawer-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255,255,255,.06);
-}
-
-.admin-team-drawer-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.admin-team-drawer-header p {
-    margin: 5px 0 0;
-    color: rgba(255,255,255,.40);
-    font-size: 12px;
-}
-
-.admin-team-drawer-close {
-    width: 34px;
-    height: 34px;
-    flex: 0 0 auto;
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 8px;
-    background: rgba(255,255,255,.025);
-    color: rgba(255,255,255,.70);
-    font-size: 21px;
-    line-height: 1;
-    cursor: pointer;
-}
-
-.admin-team-drawer-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    flex: 1;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.admin-team-field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.admin-team-field label {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255,255,255,.65);
-}
-
-.admin-team-field input,
-.admin-team-field textarea {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 11px 12px;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 8px;
-    background: rgba(255,255,255,.025);
-    color: inherit;
-    font: inherit;
-    font-size: 13px;
-    outline: none;
-}
-
-.admin-team-field textarea {
-    min-height: 110px;
-    resize: vertical;
-}
-
-.admin-team-field input:focus,
-.admin-team-field textarea:focus {
-    border-color: rgba(79,142,247,.35);
-    background: rgba(255,255,255,.035);
-}
-
-.admin-team-drawer-note {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 12px 13px;
-    border: 1px solid rgba(255,255,255,.055);
-    border-radius: 9px;
-    background: rgba(255,255,255,.018);
-}
-
-.admin-team-drawer-note strong {
-    font-size: 12px;
-}
-
-.admin-team-drawer-note span {
-    color: rgba(255,255,255,.42);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.admin-team-drawer-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 9px;
-    margin-top: auto;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255,255,255,.055);
-}
-
-.admin-team-cancel-btn {
-    height: 40px;
-    padding: 0 14px;
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 8px;
-    background: rgba(255,255,255,.025);
-    color: inherit;
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.admin-team-cancel-btn:hover {
-    background: rgba(255,255,255,.05);
-}
-
-@media (max-width: 700px) {
-
-    .admin-team-drawer {
-        width: 100%;
-    }
-}
-
-/* =========================================================
-   ADMIN CREATE TEAM DRAWER — FINAL
-   ========================================================= */
-
-.admin-team-drawer-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 1200;
-    display: flex;
-    justify-content: flex-end;
-    background: rgba(0, 0, 0, 0.55);
-}
-
-.admin-team-drawer-backdrop[hidden] {
     display: none !important;
 }
 
@@ -2841,14 +2780,11 @@ button.staff-attention-item:hover {
     max-width: 100%;
     height: 100%;
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
-
     background: #121720;
     border-left: 1px solid rgba(255,255,255,.07);
     box-shadow: -20px 0 50px rgba(0,0,0,.35);
-
     transform: translateX(100%);
     transition: transform .18s ease;
 }
@@ -2861,17 +2797,13 @@ button.staff-attention-item:hover {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-
     padding: 20px;
-
     border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
 .admin-team-drawer-header h2 {
     margin: 0;
     font-size: 18px;
-    font-weight: 700;
 }
 
 .admin-team-drawer-header p {
@@ -2883,30 +2815,19 @@ button.staff-attention-item:hover {
 .admin-team-drawer-close {
     width: 34px;
     height: 34px;
-    flex: 0 0 auto;
-
     border: 1px solid rgba(255,255,255,.07);
     border-radius: 8px;
-
     background: rgba(255,255,255,.025);
-    color: rgba(255,255,255,.70);
-
-    font-size: 21px;
-    line-height: 1;
+    color: rgba(255,255,255,.7);
     cursor: pointer;
 }
 
 .admin-team-drawer-form {
     display: flex;
     flex-direction: column;
-
-    gap: 18px;
-
     flex: 1;
-    min-height: 0;
-
+    gap: 18px;
     padding: 20px;
-    box-sizing: border-box;
 }
 
 .admin-team-field {
@@ -2918,104 +2839,37 @@ button.staff-attention-item:hover {
 .admin-team-field label {
     font-size: 12px;
     font-weight: 600;
-    color: rgba(255,255,255,.65);
 }
 
 .admin-team-field input,
 .admin-team-field textarea {
     width: 100%;
     box-sizing: border-box;
-
     padding: 11px 12px;
-
     border: 1px solid rgba(255,255,255,.08);
     border-radius: 8px;
-
     background: rgba(255,255,255,.025);
     color: inherit;
-
     font: inherit;
-    font-size: 13px;
-
     outline: none;
-}
-
-.admin-team-field textarea {
-    min-height: 110px;
-    resize: vertical;
-}
-
-.admin-team-field input:focus,
-.admin-team-field textarea:focus {
-    border-color: rgba(79,142,247,.35);
-    background: rgba(255,255,255,.035);
-}
-
-.admin-team-drawer-note {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
-    padding: 12px 13px;
-
-    border: 1px solid rgba(255,255,255,.055);
-    border-radius: 9px;
-
-    background: rgba(255,255,255,.018);
-}
-
-.admin-team-drawer-note strong {
-    font-size: 12px;
-}
-
-.admin-team-drawer-note span {
-    color: rgba(255,255,255,.42);
-    font-size: 12px;
-    line-height: 1.45;
 }
 
 .admin-team-drawer-footer {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
-
     gap: 9px;
-
     margin-top: auto;
     padding-top: 18px;
-
     border-top: 1px solid rgba(255,255,255,.055);
-}
-
-.admin-team-drawer-footer .admin-teams-create-btn {
-    height: 40px;
-    width: auto;
 }
 
 .admin-team-cancel-btn {
     height: 40px;
-
     padding: 0 14px;
-
     border: 1px solid rgba(255,255,255,.07);
     border-radius: 8px;
-
     background: rgba(255,255,255,.025);
     color: inherit;
-
     font: inherit;
-    font-size: 13px;
-
     cursor: pointer;
-}
-
-.admin-team-cancel-btn:hover {
-    background: rgba(255,255,255,.05);
-}
-
-@media (max-width: 700px) {
-
-    .admin-team-drawer {
-        width: 100%;
-    }
 }
