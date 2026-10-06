@@ -4584,6 +4584,24 @@ function renderAdminUnassignedStaff(employees) {
 
 function setupAdminStaffEvents() {
 
+    document.addEventListener(
+        "click",
+        event => {
+
+            const inviteButton =
+                event.target.closest(
+                    "[data-staff-empty-invite]"
+                );
+
+            if (!inviteButton) {
+                return;
+            }
+
+            loadPage("invitations");
+
+        }
+    );
+
     const search =
         document.getElementById(
             "admin-staff-search"
