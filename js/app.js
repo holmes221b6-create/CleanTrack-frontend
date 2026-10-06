@@ -4300,40 +4300,57 @@ function renderAdminSupervisorList(
             }
         );
 
+if (!filtered.length) {
 
-    if (!filtered.length) {
+    container.innerHTML = `
+        <div class="staff-empty staff-empty-organization">
 
-        container.innerHTML = `
-       <div class="staff-empty staff-empty-organization">
+            <div class="staff-empty-icon">
+                ♙
+            </div>
 
-    <div class="staff-empty-icon">
-        ♙
-    </div>
+            <strong>
+                No supervisors yet
+            </strong>
 
-    <strong>
-        No supervisors yet
-    </strong>
+            <span>
+                Your organization doesn't have any supervisors.
+                Invite your first supervisor to begin building
+                your staff structure.
+            </span>
 
-    <span>
-        Your organization doesn't have any supervisors.
-        Invite your first supervisor to begin building
-        your staff structure.
-    </span>
+            <button
+                type="button"
+                class="primary"
+                data-staff-empty-invite
+            >
+                + Invite Supervisor
+            </button>
 
-    <button
-        type="button"
-        class="primary"
-        data-staff-empty-invite
-    >
-        + Invite Supervisor
-    </button>
+        </div>
+    `;
 
-</div>
 
-`;
+    const inviteButton =
+        container.querySelector(
+            "[data-staff-empty-invite]"
+        );
 
-        return;
+
+    if (inviteButton) {
+
+        inviteButton.addEventListener(
+            "click",
+            () => {
+                loadPage("invitations");
+            }
+        );
+
     }
+
+
+    return;
+}
 
 
     container.innerHTML =
