@@ -2372,3 +2372,340 @@ button.staff-attention-item:hover {
     font-size: 9px;
     cursor: pointer;
 }
+
+/* =========================================================
+   ADMIN TEAMS
+   ========================================================= */
+
+.admin-teams-page {
+    padding: 24px;
+}
+
+.admin-teams-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.admin-teams-search-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 620px;
+}
+
+.admin-teams-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.admin-teams-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 16px 13px 42px;
+    border: 1px solid #d9dee7;
+    border-radius: 10px;
+    background: #ffffff;
+    font: inherit;
+    outline: none;
+}
+
+.admin-teams-search:focus {
+    border-color: #8b96a8;
+}
+
+.admin-teams-create-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 17px;
+    background: #111827;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.admin-teams-create-btn:hover {
+    opacity: 0.92;
+}
+
+.admin-teams-create-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.admin-teams-content {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.admin-teams-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-teams-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-teams-section-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.admin-teams-section-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    opacity: 0.62;
+}
+
+.admin-teams-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-team-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 17px 18px;
+    border: 1px solid #e3e7ed;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.admin-team-item-main {
+    min-width: 0;
+}
+
+.admin-team-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-team-item h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.admin-team-pinned-label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-team-description {
+    margin: 6px 0 0;
+    font-size: 13px;
+    opacity: 0.68;
+}
+
+.admin-team-meta {
+    display: flex;
+    gap: 18px;
+    margin-top: 9px;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.admin-team-pin-btn {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #dfe4eb;
+    border-radius: 9px;
+    background: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.admin-team-pin-btn:hover {
+    background: #f5f7fa;
+}
+
+.admin-teams-empty,
+.admin-teams-inline-empty,
+.admin-teams-loading {
+    padding: 52px 24px;
+    text-align: center;
+    border: 1px dashed #d9dee7;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.admin-teams-empty-icon {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f3f6;
+    font-weight: 700;
+}
+
+.admin-teams-empty h2,
+.admin-teams-inline-empty h3 {
+    margin: 0 0 8px;
+}
+
+.admin-teams-empty p,
+.admin-teams-inline-empty p {
+    margin: 0 0 18px;
+    opacity: 0.65;
+}
+
+.admin-team-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.admin-team-modal-backdrop[hidden] {
+    display: none;
+}
+
+.admin-team-modal {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+}
+
+.admin-team-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 22px 18px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.admin-team-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.admin-team-modal-header p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    opacity: 0.64;
+}
+
+.admin-team-modal-close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: #f4f5f7;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-team-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+}
+
+.admin-team-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-team-form input,
+.admin-team-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 13px;
+    border: 1px solid #d9dee7;
+    border-radius: 9px;
+    background: #ffffff;
+    font: inherit;
+    outline: none;
+    resize: vertical;
+}
+
+.admin-team-form input:focus,
+.admin-team-form textarea:focus {
+    border-color: #8b96a8;
+}
+
+.admin-team-form-note {
+    padding: 12px 13px;
+    border-radius: 9px;
+    background: #f5f7fa;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.72;
+}
+
+.admin-team-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+.admin-team-cancel-btn {
+    border: 1px solid #d9dee7;
+    border-radius: 9px;
+    padding: 11px 15px;
+    background: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+
+    .admin-teams-page {
+        padding: 16px;
+    }
+
+    .admin-teams-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-teams-search-wrap {
+        max-width: none;
+    }
+
+    .admin-team-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .admin-team-item {
+        align-items: flex-start;
+    }
+
+}

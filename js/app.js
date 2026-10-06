@@ -6915,6 +6915,949 @@ async function openAdminInvitationReview(
 
 }
 
+// --------------------------------------------------------
+// Admin Teams
+// --------------------------------------------------------
+
+function renderAdminTeams() {
+
+    const view =
+        document.getElementById("page-view");
+
+    if (!view) {
+        return;
+    }
+
+    setPageHeader(
+        "Teams",
+        "Organization"
+    );
+
+    view.innerHTML = `
+        <section class="admin-teams-page">
+
+            <div class="admin-teams-toolbar">
+
+                <div class="admin-teams-search-wrap">
+
+                    <span class="admin-teams-search-icon">
+                        ⌕
+                    </span>
+
+                    <input
+                        id="admin-teams-search"
+                        class="admin-teams-search"
+                        type="search"
+                        placeholder="Search teams..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+                <button
+                    type="button"
+                    class="admin-teams-create-btn"
+                    data-admin-team-create
+                >
+                    + Create Team
+                </button>
+
+            </div>
+
+
+            <div
+                id="admin-teams-content"
+                class="admin-teams-content"
+            >
+
+                <div class="admin-teams-loading">
+                    Loading teams...
+                </div>
+
+            </div>
+
+
+            <div
+                id="admin-team-create-modal"
+                class="admin-team-modal-backdrop"
+                hidden
+            >
+
+                <div
+                    class="admin-team-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="admin-team-modal-title"
+                >
+
+                    <div class="admin-team-modal-header">
+
+                        <div>
+                            <h2 id="admin-team-modal-title">
+                                Create Team
+                            </h2>
+
+                            <p>
+                                Create an organizational team for
+                                your staff and operations.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="admin-team-modal-close"
+                            data-admin-team-close
+                            aria-label="Close"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <form
+                        id="admin-team-create-form"
+                        class="admin-team-form"
+                    >
+
+                        <label>
+                            <span>Team Name</span>
+
+                            <input
+                                id="admin-team-name"
+                                type="text"
+                                maxlength="120"
+                                required
+                                placeholder="e.g. Airport Morning Cleaning"
+                            >
+                        </label>
+
+
+                        <label>
+                            <span>Description</span>
+
+                            <textarea
+                                id="admin-team-description"
+                                rows="4"
+                                maxlength="500"
+                                placeholder="Optional team description"
+                            ></textarea>
+                        </label>
+
+
+                        <div class="admin-team-form-note">
+                            Supervisors, employees, locations and zones
+                            can be assigned to the team later.
+                        </div>
+
+
+                        <div class="admin-team-form-actions">
+
+                            <button
+                                type="button"
+                                class="admin-team-cancel-btn"
+                                data-admin-team-close
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="admin-teams-create-btn"
+                            >
+                                Create Team
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+
+    setupAdminTeamsEvents();
+
+    loadAdminTeamsData();
+}
+
+
+async function loadAdminTeamsData() {
+
+    try {
+
+        const data =
+            await CleanTrack.api.request(
+                "/api/teams"
+            );
+
+        if (
+            !document.querySelector(
+                ".admin-teams-page"
+            )
+        ) {
+            return;
+        }
+
+        CleanTrack.adminTeamsData =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        renderAdminTeamsData(
+            CleanTrack.adminTeamsData
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Admin Teams loading error:",
+            error
+        );
+
+        const content =
+            document.getElementById(
+                "admin-teams-content"
+            );
+
+        if (content) {
+
+            content.innerHTML = `
+                <div class="admin-teams-empty">
+
+                    <div class="admin-teams-empty-icon">
+                        !
+                    </div>
+
+                    <h2>
+                        Unable to load teams
+                    </h2>
+
+                    <p>
+                        Please try again.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="admin-teams-create-btn"
+                        data-admin-team-retry
+                    >
+                        Retry
+                    </button>
+
+                </div>
+            `;
+        }
+    }
+}
+
+
+function renderAdminTeamsData(
+    teams
+) {
+
+    const content =
+        document.getElementById(
+            "admin-teams-content"
+        );
+
+    if (!content) {
+        return;
+    }
+
+    const query =
+        (
+            document.getElementById(
+                "admin-teams-search"
+            )?.value || ""
+        )
+        .trim()
+        .toLowerCase();
+
+    const filteredTeams =
+        teams.filter(team => {
+
+            const name =
+                String(
+                    team.name || ""
+                ).toLowerCase();
+
+            const description =
+                String(
+                    team.description || ""
+                ).toLowerCase();
+
+            return (
+                !query ||
+                name.includes(query) ||
+                description.includes(query)
+            );
+        });
+
+    const pinnedIds =
+        getAdminPinnedTeamIds();
+
+    const pinnedTeams =
+        teams.filter(team =>
+            pinnedIds.includes(
+                String(team.id)
+            )
+        );
+
+
+    if (
+        teams.length === 0
+    ) {
+
+        content.innerHTML = `
+            <div class="admin-teams-empty">
+
+                <div class="admin-teams-empty-icon">
+                    +
+                </div>
+
+                <h2>
+                    No teams yet
+                </h2>
+
+                <p>
+                    Create your first team to organize
+                    staff and operations.
+                </p>
+
+                <button
+                    type="button"
+                    class="admin-teams-create-btn"
+                    data-admin-team-create
+                >
+                    + Create Team
+                </button>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    if (
+        pinnedTeams.length > 0 &&
+        !query
+    ) {
+
+        html += `
+            <section class="admin-teams-section">
+
+                <div class="admin-teams-section-header">
+
+                    <div>
+                        <h2>
+                            Pinned Teams
+                        </h2>
+
+                        <p>
+                            Your frequently accessed teams
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="admin-teams-list">
+
+                    ${pinnedTeams
+                        .map(
+                            team =>
+                                renderAdminTeamItem(
+                                    team,
+                                    true
+                                )
+                        )
+                        .join("")
+                    }
+
+                </div>
+
+            </section>
+        `;
+    }
+
+
+    html += `
+        <section class="admin-teams-section">
+
+            <div class="admin-teams-section-header">
+
+                <div>
+                    <h2>
+                        ${query
+                            ? "Search Results"
+                            : "Teams"}
+                    </h2>
+
+                    <p>
+                        ${filteredTeams.length}
+                        ${
+                            filteredTeams.length === 1
+                                ? "team"
+                                : "teams"
+                        }
+                    </p>
+                </div>
+
+            </div>
+
+    `;
+
+
+    if (
+        filteredTeams.length === 0
+    ) {
+
+        html += `
+            <div class="admin-teams-inline-empty">
+
+                <h3>
+                    No teams found
+                </h3>
+
+                <p>
+                    Try a different search.
+                </p>
+
+            </div>
+        `;
+
+    } else {
+
+        html += `
+            <div class="admin-teams-list">
+
+                ${filteredTeams
+                    .map(
+                        team =>
+                            renderAdminTeamItem(
+                                team,
+                                pinnedIds.includes(
+                                    String(team.id)
+                                )
+                            )
+                    )
+                    .join("")
+                }
+
+            </div>
+        `;
+    }
+
+
+    html += `
+        </section>
+    `;
+
+    content.innerHTML = html;
+}
+
+
+function renderAdminTeamItem(
+    team,
+    isPinned
+) {
+
+    const name =
+        escapeHtml(
+            team.name ||
+            "Unnamed Team"
+        );
+
+    const description =
+        escapeHtml(
+            team.description || ""
+        );
+
+    const supervisors =
+        Number(
+            team.supervisor_count || 0
+        );
+
+    const members =
+        Number(
+            team.member_count || 0
+        );
+
+    return `
+        <article
+            class="admin-team-item"
+        >
+
+            <div class="admin-team-item-main">
+
+                <div class="admin-team-item-title-row">
+
+                    <h3>
+                        ${name}
+                    </h3>
+
+                    ${
+                        isPinned
+                            ? `
+                                <span
+                                    class="admin-team-pinned-label"
+                                >
+                                    ★ Pinned
+                                </span>
+                              `
+                            : ""
+                    }
+
+                </div>
+
+
+                ${
+                    description
+                        ? `
+                            <p class="admin-team-description">
+                                ${description}
+                            </p>
+                          `
+                        : ""
+                }
+
+
+                <div class="admin-team-meta">
+
+                    <span>
+                        ${supervisors}
+                        ${
+                            supervisors === 1
+                                ? " supervisor"
+                                : " supervisors"
+                        }
+                    </span>
+
+                    <span>
+                        ${members}
+                        ${
+                            members === 1
+                                ? " employee"
+                                : " employees"
+                        }
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="admin-team-pin-btn"
+                data-admin-team-pin="${escapeHtml(
+                    String(team.id)
+                )}"
+                aria-label="${
+                    isPinned
+                        ? "Unpin team"
+                        : "Pin team"
+                }"
+                title="${
+                    isPinned
+                        ? "Unpin team"
+                        : "Pin team"
+                }"
+            >
+                ${
+                    isPinned
+                        ? "★"
+                        : "☆"
+                }
+            </button>
+
+        </article>
+    `;
+}
+
+
+function getAdminPinnedTeamStorageKey() {
+
+    const user =
+        CleanTrack.currentUser ||
+        getUser() ||
+        {};
+
+    const organizationId =
+        user.organization_id ||
+        "default";
+
+    return (
+        "cleantrack_admin_pinned_teams_" +
+        String(organizationId)
+    );
+}
+
+
+function getAdminPinnedTeamIds() {
+
+    try {
+
+        const stored =
+            localStorage.getItem(
+                getAdminPinnedTeamStorageKey()
+            );
+
+        const parsed =
+            stored
+                ? JSON.parse(stored)
+                : [];
+
+        return Array.isArray(parsed)
+            ? parsed.map(String)
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read pinned teams:",
+            error
+        );
+
+        return [];
+    }
+}
+
+
+function saveAdminPinnedTeamIds(
+    ids
+) {
+
+    try {
+
+        localStorage.setItem(
+            getAdminPinnedTeamStorageKey(),
+            JSON.stringify(
+                ids.map(String)
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to save pinned teams:",
+            error
+        );
+    }
+}
+
+
+function toggleAdminPinnedTeam(
+    teamId
+) {
+
+    const id =
+        String(teamId);
+
+    const pinned =
+        getAdminPinnedTeamIds();
+
+    const exists =
+        pinned.includes(id);
+
+    const updated =
+        exists
+            ? pinned.filter(
+                value => value !== id
+            )
+            : [
+                ...pinned,
+                id
+            ];
+
+    saveAdminPinnedTeamIds(
+        updated
+    );
+
+    renderAdminTeamsData(
+        CleanTrack.adminTeamsData || []
+    );
+}
+
+
+function setupAdminTeamsEvents() {
+
+    const search =
+        document.getElementById(
+            "admin-teams-search"
+        );
+
+    if (search) {
+
+        search.addEventListener(
+            "input",
+            () => {
+                renderAdminTeamsData(
+                    CleanTrack.adminTeamsData || []
+                );
+            }
+        );
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-admin-team-create]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                openAdminCreateTeamModal
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(
+            "[data-admin-team-close]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                closeAdminCreateTeamModal
+            );
+
+        });
+
+
+    const modal =
+        document.getElementById(
+            "admin-team-create-modal"
+        );
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === modal
+                ) {
+                    closeAdminCreateTeamModal();
+                }
+
+            }
+        );
+    }
+
+
+    const form =
+        document.getElementById(
+            "admin-team-create-form"
+        );
+
+    if (form) {
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+                await createAdminTeam();
+
+            }
+        );
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-admin-team-pin]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    toggleAdminPinnedTeam(
+                        button.dataset.adminTeamPin
+                    );
+
+                }
+            );
+        });
+
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const retry =
+                event.target.closest(
+                    "[data-admin-team-retry]"
+                );
+
+            if (retry) {
+
+                loadAdminTeamsData();
+                return;
+
+            }
+        }
+    );
+}
+
+
+function openAdminCreateTeamModal() {
+
+    const modal =
+        document.getElementById(
+            "admin-team-create-modal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden = false;
+
+    const nameInput =
+        document.getElementById(
+            "admin-team-name"
+        );
+
+    if (nameInput) {
+        nameInput.focus();
+    }
+}
+
+
+function closeAdminCreateTeamModal() {
+
+    const modal =
+        document.getElementById(
+            "admin-team-create-modal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden = true;
+
+    const form =
+        document.getElementById(
+            "admin-team-create-form"
+        );
+
+    if (form) {
+        form.reset();
+    }
+}
+
+
+async function createAdminTeam() {
+
+    const nameInput =
+        document.getElementById(
+            "admin-team-name"
+        );
+
+    const descriptionInput =
+        document.getElementById(
+            "admin-team-description"
+        );
+
+    const name =
+        (
+            nameInput?.value || ""
+        ).trim();
+
+    const description =
+        (
+            descriptionInput?.value || ""
+        ).trim();
+
+
+    if (!name) {
+
+        alert(
+            "Team name is required."
+        );
+
+        nameInput?.focus();
+
+        return;
+    }
+
+
+    const submitButton =
+        document.querySelector(
+            "#admin-team-create-form button[type='submit']"
+        );
+
+
+    if (submitButton) {
+
+        submitButton.disabled =
+            true;
+
+        submitButton.textContent =
+            "Creating...";
+    }
+
+
+    try {
+
+        await CleanTrack.api.request(
+            "/api/teams",
+            {
+                method: "POST",
+                body: {
+                    name,
+                    description
+                }
+            }
+        );
+
+        closeAdminCreateTeamModal();
+
+        await loadAdminTeamsData();
+
+    } catch (error) {
+
+        console.error(
+            "Admin team creation failed:",
+            error
+        );
+
+        alert(
+            error?.message ||
+            "Unable to create team."
+        );
+
+    } finally {
+
+        if (submitButton) {
+
+            submitButton.disabled =
+                false;
+
+            submitButton.textContent =
+                "Create Team";
+        }
+    }
+}
+
+
 
     // --------------------------------------------------------
     // Other pages — temporary placeholders
@@ -7108,6 +8051,22 @@ if (page === "invitations") {
 
     if (role === "admin") {
         renderAdminInvitations();
+        return;
+    }
+
+    renderPlaceholder(page);
+    return;
+}
+
+if (page === "teams") {
+
+    const role =
+        String(
+            CleanTrack.currentUser?.role || ""
+        ).toLowerCase();
+
+    if (role === "admin") {
+        renderAdminTeams();
         return;
     }
 
