@@ -4467,22 +4467,6 @@ function renderAdminSupervisorList(
 
 }
 
-const emptyInvite =
-    container.querySelector(
-        "[data-staff-empty-invite]"
-    );
-
-if (emptyInvite) {
-
-    emptyInvite.addEventListener(
-        "click",
-        () => {
-            loadPage("invitations");
-        }
-    );
-
-}
-
 
 function renderAdminUnassignedStaff(employees) {
 
