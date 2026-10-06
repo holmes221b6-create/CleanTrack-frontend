@@ -4342,7 +4342,7 @@ if (!filtered.length) {
         inviteButton.addEventListener(
             "click",
             () => {
-                loadPage("invitations");
+                shareAdminStaffInvitation();
             }
         );
 
@@ -4753,12 +4753,14 @@ if (action === "whatsapp") {
                         exportAdminStaffCsv();
                         return;
                     }
-
-
+                    
                     if (action === "invite") {
-                        loadPage("invitations");
-                    }
+    shareAdminStaffInvitation();
+    return;
+}
 
+
+                    
                 }
             );
 
@@ -5065,6 +5067,108 @@ function renderSupervisorDrawer(
 
         </div>
     `;
+
+}
+
+async function shareAdminStaffInvitation() {
+
+    const user =
+        CleanTrack.currentUser || {};
+
+    const organizationCode =
+        user.organization_code ||
+        user.organization?.organization_code ||
+        "";
+
+    const organizationName =
+        user.organization_name ||
+        user.organization?.name ||
+        "our organization";
+
+    if (!organizationCode) {
+
+        alert(
+            "Your organization code is not available."
+        );
+
+        return;
+    }
+
+
+    const joinUrl =
+        window.location.origin +
+        window.location.pathname;
+
+
+    const shareText =
+        `You're invited to join ${organizationName} on CleanTrack.\n\n` +
+        `Open CleanTrack:\n${joinUrl}\n\n` +
+        `Organization code: ${organizationCode}`;
+
+
+    const shareData = {
+        title:
+            `Join ${organizationName} on CleanTrack`,
+
+        text:
+            shareText,
+
+        url:
+            joinUrl
+    };
+
+
+    try {
+
+        if (
+            navigator.share &&
+            typeof navigator.share === "function"
+        ) {
+
+            await navigator.share(
+                shareData
+            );
+
+            return;
+        }
+
+
+        if (
+            navigator.clipboard &&
+            navigator.clipboard.writeText
+        ) {
+
+            await navigator.clipboard.writeText(
+                shareText
+            );
+
+            alert(
+                "Invitation copied. You can paste it into WhatsApp, Email, or another app."
+            );
+
+            return;
+        }
+
+
+        alert(
+            shareText
+        );
+
+    } catch (error) {
+
+        if (
+            error &&
+            error.name === "AbortError"
+        ) {
+            return;
+        }
+
+        console.error(
+            "Invitation sharing failed:",
+            error
+        );
+
+    }
 
 }
 
