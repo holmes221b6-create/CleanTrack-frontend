@@ -2209,3 +2209,66 @@ button.staff-attention-item:hover {
     color: #83d8a4;
     font-size: 9px;
 }
+
+.staff-empty-organization {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 42px 20px;
+}
+
+.staff-empty-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 3px;
+    border: 1px solid rgba(79,142,247,.12);
+    border-radius: 11px;
+    background: rgba(79,142,247,.05);
+    color: #a9c4ff;
+    font-size: 18px;
+}
+
+.staff-empty-organization strong {
+    color: #fff;
+    font-size: 13px;
+}
+
+.staff-empty-organization span {
+    max-width: 390px;
+    color: rgba(255,255,255,.38);
+    line-height: 1.5;
+}
+
+.staff-empty-organization button {
+    margin-top: 5px;
+    padding: 9px 13px;
+    border: 1px solid rgba(79,142,247,.22);
+    border-radius: 8px;
+    background: rgba(79,142,247,.1);
+    color: #b8ceff;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.staff-attention-clear {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 9px;
+    background: rgba(255,255,255,.018);
+}
+
+.staff-attention-clear strong {
+    color: rgba(255,255,255,.7);
+    font-size: 10px;
+}
+
+.staff-attention-clear span {
+    color: rgba(255,255,255,.34);
+    font-size: 9px;
+}

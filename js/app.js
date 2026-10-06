@@ -3759,24 +3759,38 @@ async function renderAdminStaff() {
                     </p>
                 </div>
 
-                <div class="staff-page-actions">
+             <div class="staff-page-actions">
 
-                    <button
-                        type="button"
-                        data-staff-action="export"
-                    >
-                        Export
-                    </button>
+    <button
+        type="button"
+        data-staff-action="import"
+    >
+        Import
+    </button>
 
-                    <button
-                        type="button"
-                        class="primary"
-                        data-staff-action="invite"
-                    >
-                        + Invite Staff
-                    </button>
+    <button
+        type="button"
+        data-staff-action="export"
+    >
+        Export
+    </button>
 
-                </div>
+    <button
+        type="button"
+        data-staff-action="whatsapp"
+    >
+        WhatsApp
+    </button>
+
+    <button
+        type="button"
+        class="primary"
+        data-staff-action="invite"
+    >
+        + Invite Staff
+    </button>
+
+</div>
 
             </header>
 
@@ -3814,6 +3828,11 @@ async function renderAdminStaff() {
                 </div>
 
             </section>
+            
+            <section
+    id="admin-staff-attention"
+    class="staff-attention-strip"
+></section>
 
 
             <section class="staff-page-panel">
@@ -4285,13 +4304,33 @@ function renderAdminSupervisorList(
     if (!filtered.length) {
 
         container.innerHTML = `
-            <div class="staff-empty">
-                <strong>No supervisors found</strong>
-                <span>
-                    Try a different search or filter.
-                </span>
-            </div>
-        `;
+       <div class="staff-empty staff-empty-organization">
+
+    <div class="staff-empty-icon">
+        ♙
+    </div>
+
+    <strong>
+        No supervisors yet
+    </strong>
+
+    <span>
+        Your organization doesn't have any supervisors.
+        Invite your first supervisor to begin building
+        your staff structure.
+    </span>
+
+    <button
+        type="button"
+        class="primary"
+        data-staff-empty-invite
+    >
+        + Invite Supervisor
+    </button>
+
+</div>
+
+`;
 
         return;
     }
@@ -4425,6 +4464,22 @@ function renderAdminSupervisorList(
             );
 
         });
+
+}
+
+const emptyInvite =
+    container.querySelector(
+        "[data-staff-empty-invite]"
+    );
+
+if (emptyInvite) {
+
+    emptyInvite.addEventListener(
+        "click",
+        () => {
+            loadPage("invitations");
+        }
+    );
 
 }
 
@@ -4654,6 +4709,25 @@ function setupAdminStaffEvents() {
 
                     const action =
                         button.dataset.staffAction;
+                        
+                        if (action === "import") {
+
+    alert(
+        "Staff import will be connected to the bulk-import workflow."
+    );
+
+    return;
+}
+
+
+if (action === "whatsapp") {
+
+    alert(
+        "Staff WhatsApp will be connected after the organization WhatsApp group is configured."
+    );
+
+    return;
+}
 
 
                     if (action === "export") {
