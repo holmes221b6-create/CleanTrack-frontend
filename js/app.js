@@ -6069,8 +6069,54 @@ async function renderAdminInvitations() {
                 </div>
 
             </section>
+            <div
+    id="admin-staff-drawer-backdrop"
+    class="staff-drawer-backdrop"
+    hidden
+></div>
 
-        </section>
+
+<aside
+    id="admin-staff-drawer"
+    class="admin-staff-drawer"
+    aria-hidden="true"
+>
+
+    <div class="staff-drawer-header">
+
+        <div>
+
+            <span>
+                JOIN REQUEST
+            </span>
+
+            <h2 id="staff-drawer-name">
+                Request
+            </h2>
+
+            <p id="staff-drawer-role">
+                —
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="staff-drawer-close"
+            id="staff-drawer-close"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div
+        id="staff-drawer-content"
+        class="staff-drawer-content"
+    ></div>
+
+</aside>
     `;
 
 
@@ -6081,9 +6127,38 @@ async function renderAdminInvitations() {
     );
 
 }
-
-
 function setupAdminInvitationTabs() {
+
+    const closeButton =
+        document.getElementById(
+            "staff-drawer-close"
+        );
+
+    const backdrop =
+        document.getElementById(
+            "admin-staff-drawer-backdrop"
+        );
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            closeAdminStaffDrawer
+        );
+
+    }
+
+
+    if (backdrop) {
+
+        backdrop.addEventListener(
+            "click",
+            closeAdminStaffDrawer
+        );
+
+    }
+
 
     document
         .querySelectorAll(
@@ -6105,13 +6180,14 @@ function setupAdminInvitationTabs() {
                             )
                         );
 
+
                     button.classList.add(
                         "active"
                     );
 
+
                     await loadAdminInvitationRequests(
-                        button.dataset
-                            .requestStatus
+                        button.dataset.requestStatus
                     );
 
                 }
@@ -6120,7 +6196,6 @@ function setupAdminInvitationTabs() {
         });
 
 }
-
 
 async function loadAdminInvitationRequests(
     status
