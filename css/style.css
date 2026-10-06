@@ -2709,60 +2709,270 @@ button.staff-attention-item:hover {
     }
 
 }
-
 /* =========================================================
-   ADMIN TEAMS — softer CleanTrack surface styling
+   ADMIN TEAMS — refined professional styling
    ========================================================= */
 
 .admin-teams-page {
-    background: transparent;
+    min-height: calc(100vh - 120px);
+    padding: 24px;
+    background: #eef1f4;
+    border-radius: 16px;
+    box-sizing: border-box;
+}
+
+.admin-teams-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.admin-teams-search-wrap {
+    position: relative;
+    width: 360px;
+    max-width: 100%;
+    flex: 0 1 360px;
+}
+
+.admin-teams-search-icon {
+    left: 13px;
+    opacity: 0.42;
+    font-size: 17px;
 }
 
 .admin-teams-search {
-    background: #f5f6f8;
-    border-color: #d7dbe2;
+    width: 100%;
+    height: 42px;
+    box-sizing: border-box;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid #d3d8df;
+    border-radius: 9px;
+    background: #e6e9ed;
+    color: #20252b;
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.admin-teams-search::placeholder {
+    color: #7c838c;
+}
+
+.admin-teams-search:focus {
+    background: #e9ecef;
+    border-color: #aeb6c0;
+}
+
+.admin-teams-create-btn {
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid #22272e;
+    border-radius: 9px;
+    background: #22272e;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.admin-teams-create-btn:hover {
+    background: #171b20;
+}
+
+.admin-teams-content {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.admin-teams-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-teams-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.admin-teams-section-header h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #252a31;
+}
+
+.admin-teams-section-header p {
+    margin: 0;
+    font-size: 12px;
+    color: #7b828b;
+}
+
+.admin-teams-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .admin-team-item {
-    background: #f5f6f8;
-    border-color: #d9dde4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 68px;
+    padding: 13px 14px;
+    border: 1px solid #d8dde3;
+    border-radius: 10px;
+    background: #e4e7eb;
+    box-sizing: border-box;
+}
+
+.admin-team-item:hover {
+    background: #e0e4e8;
+}
+
+.admin-team-item-main {
+    min-width: 0;
+}
+
+.admin-team-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.admin-team-item h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #23282f;
+}
+
+.admin-team-description {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #707781;
+}
+
+.admin-team-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #737a83;
+}
+
+.admin-team-pinned-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #737a32;
 }
 
 .admin-team-pin-btn {
-    background: #eceff3;
-    border-color: #d7dbe2;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border: 1px solid #cdd2d8;
+    border-radius: 8px;
+    background: #dfe3e7;
+    color: #42484f;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .admin-team-pin-btn:hover {
-    background: #e4e8ed;
+    background: #d6dbe0;
 }
 
 .admin-teams-empty,
 .admin-teams-inline-empty,
 .admin-teams-loading {
-    background: #f5f6f8;
-    border-color: #d9dde4;
+    padding: 48px 24px;
+    text-align: center;
+    border: 1px dashed #cdd2d8;
+    border-radius: 12px;
+    background: #e4e7eb;
+}
+
+.admin-teams-empty-icon {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 12px;
+    border-radius: 10px;
+   background: #dadde2;
+    color: #5e646c;
+}
+
+.admin-teams-empty h2,
+.admin-teams-inline-empty h3 {
+    margin: 0 0 7px;
+    color: #2a2f35;
+}
+
+.admin-teams-empty p,
+.admin-teams-inline-empty p {
+    margin: 0 0 16px;
+    color: #737a83;
+    font-size: 13px;
+}
+
+.admin-team-modal-backdrop {
+    background: rgba(20, 24, 29, 0.58);
 }
 
 .admin-team-modal {
-    background: #f5f6f8;
+    background: #edf0f2;
 }
 
 .admin-team-modal-header {
-    border-bottom-color: #dde1e7;
+    border-bottom-color: #d5d9de;
 }
 
 .admin-team-form input,
 .admin-team-form textarea {
-    background: #ffffff;
-    border-color: #d7dbe2;
+    background: #e4e7eb;
+    border-color: #ccd2d8;
 }
 
 .admin-team-form-note {
-    background: #eceff3;
+    background: #dfe3e7;
 }
 
 .admin-team-cancel-btn {
-    background: #eceff3;
-    border-color: #d7dbe2;
+    background: #dfe3e7;
+    border-color: #ccd2d8;
+}
+
+@media (max-width: 700px) {
+
+    .admin-teams-page {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .admin-teams-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-teams-search-wrap {
+        width: 100%;
+        flex-basis: auto;
+    }
+
+    .admin-teams-create-btn {
+        width: fit-content;
+    }
+
+    .admin-team-meta {
+        flex-direction: column;
+        gap: 3px;
+    }
+
 }
