@@ -2709,3 +2709,60 @@ button.staff-attention-item:hover {
     }
 
 }
+
+/* =========================================================
+   ADMIN TEAMS — softer CleanTrack surface styling
+   ========================================================= */
+
+.admin-teams-page {
+    background: transparent;
+}
+
+.admin-teams-search {
+    background: #f5f6f8;
+    border-color: #d7dbe2;
+}
+
+.admin-team-item {
+    background: #f5f6f8;
+    border-color: #d9dde4;
+}
+
+.admin-team-pin-btn {
+    background: #eceff3;
+    border-color: #d7dbe2;
+}
+
+.admin-team-pin-btn:hover {
+    background: #e4e8ed;
+}
+
+.admin-teams-empty,
+.admin-teams-inline-empty,
+.admin-teams-loading {
+    background: #f5f6f8;
+    border-color: #d9dde4;
+}
+
+.admin-team-modal {
+    background: #f5f6f8;
+}
+
+.admin-team-modal-header {
+    border-bottom-color: #dde1e7;
+}
+
+.admin-team-form input,
+.admin-team-form textarea {
+    background: #ffffff;
+    border-color: #d7dbe2;
+}
+
+.admin-team-form-note {
+    background: #eceff3;
+}
+
+.admin-team-cancel-btn {
+    background: #eceff3;
+    border-color: #d7dbe2;
+}
