@@ -133,13 +133,24 @@ CleanTrack.api = (() => {
         // Send Request
         // ----------------------------------------------------
 
-        let response;
+       let response;
 
-        try {
+const requestStart = performance.now();
 
-            response = await fetch(url, requestOptions);
+try {
+    response = await fetch(
+        url,
+        requestOptions
+    );
 
-        } catch (error) {
+    console.log(
+        `[CleanTrack API] ${method} ${endpoint} -> ${response.status} (${Math.round(performance.now() - requestStart)} ms)`
+    );
+} catch (error) {
+    console.error(
+        `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
+        error
+    );
 
             console.error("CleanTrack API network error:", error);
 
