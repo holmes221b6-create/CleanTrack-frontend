@@ -12,9 +12,11 @@ CleanTrack.api = (() => {
 
     const API_BASE = "https://cleantrack-1tv6.onrender.com";
     const TOKEN_KEY = "cleantrack_token";
-
-    const GET_CACHE = new Map();
+    
+        const GET_CACHE = new Map();
+    const GET_INFLIGHT = new Map();
     const GET_CACHE_TTL = 5000;
+
 
     // --------------------------------------------------------
     // Token Management
@@ -118,7 +120,7 @@ async function request(endpoint, options = {}) {
     const cacheKey =
         method + ":" + url;
 
-    if (
+       if (
         method === "GET" &&
         !endpoint.includes("/api/auth/me")
     ) {
@@ -137,35 +139,76 @@ async function request(endpoint, options = {}) {
         }
 
         GET_CACHE.delete(cacheKey);
-    }
 
-    let response;
+        const inflight =
+            GET_INFLIGHT.get(cacheKey);
+
+        if (inflight) {
+            console.log(
+                `[CleanTrack API] INFLIGHT ${method} ${endpoint}`
+            );
+
+            return inflight;
+        }
+    }
+    
+        let response;
 
     const requestStart =
         performance.now();
 
+    const fetchPromise = (async () => {
+
+        try {
+
+            const result =
+                await fetch(
+                    url,
+                    requestOptions
+                );
+
+            console.log(
+                `[CleanTrack API] ${method} ${endpoint} -> ${result.status} (${Math.round(performance.now() - requestStart)} ms)`
+            );
+
+            return result;
+
+        } catch (error) {
+
+            console.error(
+                `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
+                error
+            );
+
+            throw new Error(
+                "Unable to connect to the CleanTrack server. " +
+                "Check your internet connection or try again."
+            );
+        }
+
+    })();
+
+    if (
+        method === "GET" &&
+        !endpoint.includes("/api/auth/me")
+    ) {
+        GET_INFLIGHT.set(
+            cacheKey,
+            fetchPromise
+        );
+    }
+
     try {
-
-        response = await fetch(
-            url,
-            requestOptions
-        );
-
-        console.log(
-            `[CleanTrack API] ${method} ${endpoint} -> ${response.status} (${Math.round(performance.now() - requestStart)} ms)`
-        );
-
-    } catch (error) {
-
-        console.error(
-            `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
-            error
-        );
-
-        throw new Error(
-            "Unable to connect to the CleanTrack server. " +
-            "Check your internet connection or try again."
-        );
+        response = await fetchPromise;
+    } finally {
+        if (
+            method === "GET" &&
+            !endpoint.includes("/api/auth/me")
+        ) {
+            GET_INFLIGHT.delete(
+                cacheKey
+            );
+        }
     }
 
     if (!response.ok) {
