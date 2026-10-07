@@ -829,7 +829,6 @@ async function loadCurrentUser() {
      * Validate the session without blocking
      * the application from opening.
      */
-    void validateCurrentUserInBackground();
 }
 
 
