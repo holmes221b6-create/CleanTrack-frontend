@@ -8676,6 +8676,46 @@ async function openAdminTeamManagement(
 
             }
         );
+        
+                backdrop.addEventListener(
+            "click",
+            event => {
+
+                const actionButton =
+                    event.target.closest(
+                        "[data-admin-team-action]"
+                    );
+
+                if (!actionButton) {
+                    return;
+                }
+
+
+                const action =
+                    actionButton.dataset.adminTeamAction;
+
+
+                if (action === "edit") {
+
+                    openAdminEditTeamDrawer(
+                        team
+                    );
+
+                    return;
+                }
+
+
+                if (action === "people") {
+
+                    openAdminAssignPeopleDrawer(
+                        team.id
+                    );
+
+                    return;
+                }
+
+            }
+        );
 
 
         requestAnimationFrame(
@@ -8697,6 +8737,807 @@ async function openAdminTeamManagement(
         alert(
             "Unable to open this team right now."
         );
+    }
+}
+
+function closeAdminTeamActionDrawer() {
+
+    const drawer =
+        document.querySelector(
+            "[data-admin-team-action-drawer]"
+        );
+
+    if (drawer) {
+        drawer.remove();
+    }
+}
+
+
+function openAdminEditTeamDrawer(
+    team
+) {
+
+    closeAdminTeamActionDrawer();
+
+
+    const backdrop =
+        document.createElement(
+            "div"
+        );
+
+    backdrop.className =
+        "admin-team-drawer-backdrop admin-team-action-drawer-backdrop is-open";
+
+    backdrop.dataset.adminTeamActionDrawer =
+        "true";
+
+
+    backdrop.innerHTML = `
+
+        <div class="admin-team-drawer">
+
+            <div class="admin-team-drawer-header">
+
+                <div>
+
+                    <h2>
+                        Edit Team
+                    </h2>
+
+                    <p>
+                        Update this team's basic information.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="admin-team-drawer-close"
+                    data-admin-team-action-close
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form
+                class="admin-team-drawer-form"
+                data-admin-team-edit-form
+            >
+
+                <div class="admin-team-field">
+
+                    <label>
+                        Team Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        value="${escapeHtml(
+                            team.name || ""
+                        )}"
+                        required
+                        maxlength="120"
+                    >
+
+                </div>
+
+
+                <div class="admin-team-field">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        maxlength="500"
+                    >${escapeHtml(
+                        team.description || ""
+                    )}</textarea>
+
+                </div>
+
+
+                <div class="admin-team-drawer-note">
+
+                    <strong>
+                        Team structure
+                    </strong>
+
+                    <span>
+                        People, locations, zones and tasks are managed separately from the basic team information.
+                    </span>
+
+                </div>
+
+
+                <div class="admin-team-drawer-footer">
+
+                    <button
+                        type="button"
+                        class="admin-team-cancel-btn"
+                        data-admin-team-action-close
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="admin-teams-create-btn"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    `;
+
+
+    document.body.appendChild(
+        backdrop
+    );
+
+
+    const closeButtons =
+        backdrop.querySelectorAll(
+            "[data-admin-team-action-close]"
+        );
+
+    closeButtons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                closeAdminTeamActionDrawer
+            );
+
+        }
+    );
+
+
+    backdrop.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                backdrop
+            ) {
+
+                closeAdminTeamActionDrawer();
+
+            }
+
+        }
+    );
+
+
+    const form =
+        backdrop.querySelector(
+            "[data-admin-team-edit-form]"
+        );
+
+    if (!form) {
+        return;
+    }
+
+
+    form.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+
+            const submitButton =
+                form.querySelector(
+                    "button[type='submit']"
+                );
+
+            const name =
+                String(
+                    form.elements.name.value || ""
+                ).trim();
+
+            const description =
+                String(
+                    form.elements.description.value || ""
+                ).trim();
+
+
+            if (!name) {
+
+                form.elements.name.focus();
+
+                return;
+            }
+
+
+            submitButton.disabled =
+                true;
+
+            submitButton.textContent =
+                "Saving...";
+
+
+            try {
+
+                await CleanTrack.api.request(
+                    `/api/admin/teams/${encodeURIComponent(team.id)}`,
+                    {
+                        method: "PUT",
+                        body: {
+                            name,
+                            description
+                        }
+                    }
+                );
+
+
+                closeAdminTeamActionDrawer();
+
+
+                const workspace =
+                    document.getElementById(
+                        "admin-team-management-workspace"
+                    );
+
+                if (workspace) {
+                    workspace.remove();
+                }
+
+
+                await openAdminTeamManagement(
+                    team.id
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Admin team update error:",
+                    error
+                );
+
+                alert(
+                    error?.message ||
+                    "Unable to update this team."
+                );
+
+
+                submitButton.disabled =
+                    false;
+
+                submitButton.textContent =
+                    "Save Changes";
+            }
+
+        }
+    );
+}
+
+
+async function openAdminAssignPeopleDrawer(
+    teamId
+) {
+
+    closeAdminTeamActionDrawer();
+
+
+    const backdrop =
+        document.createElement(
+            "div"
+        );
+
+    backdrop.className =
+        "admin-team-drawer-backdrop admin-team-action-drawer-backdrop is-open";
+
+    backdrop.dataset.adminTeamActionDrawer =
+        "true";
+
+
+    backdrop.innerHTML = `
+
+        <div class="admin-team-drawer">
+
+            <div class="admin-team-drawer-header">
+
+                <div>
+
+                    <h2>
+                        Assign People
+                    </h2>
+
+                    <p>
+                        Choose the supervisors and employees assigned to this team.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="admin-team-drawer-close"
+                    data-admin-team-action-close
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div
+                class="admin-team-drawer-form"
+                data-admin-team-people-body
+            >
+
+                <div class="admin-teams-loading">
+                    Loading people...
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+
+    document.body.appendChild(
+        backdrop
+    );
+
+
+    const closeButtons =
+        backdrop.querySelectorAll(
+            "[data-admin-team-action-close]"
+        );
+
+    closeButtons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                closeAdminTeamActionDrawer
+            );
+
+        }
+    );
+
+
+    backdrop.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                backdrop
+            ) {
+
+                closeAdminTeamActionDrawer();
+
+            }
+
+        }
+    );
+
+
+    const body =
+        backdrop.querySelector(
+            "[data-admin-team-people-body]"
+        );
+
+
+    try {
+
+        const [
+            teamResponse,
+            supervisors,
+            employees
+        ] = await Promise.all([
+
+            CleanTrack.api.request(
+                `/api/admin/teams/${encodeURIComponent(teamId)}`
+            ),
+
+            CleanTrack.api.request(
+                "/api/users?role=supervisor"
+            ),
+
+            CleanTrack.api.request(
+                "/api/users?role=employee"
+            )
+
+        ]);
+
+
+        const currentSupervisorIds =
+            new Set(
+                (
+                    Array.isArray(
+                        teamResponse?.supervisors
+                    )
+                        ? teamResponse.supervisors
+                        : []
+                )
+                .map(
+                    person =>
+                        String(person.id)
+                )
+            );
+
+
+        const currentEmployeeIds =
+            new Set(
+                (
+                    Array.isArray(
+                        teamResponse?.employees
+                    )
+                        ? teamResponse.employees
+                        : []
+                )
+                .map(
+                    person =>
+                        String(person.id)
+                )
+            );
+
+
+        const supervisorList =
+            Array.isArray(
+                supervisors
+            )
+                ? supervisors
+                : [];
+
+
+        const employeeList =
+            Array.isArray(
+                employees
+            )
+                ? employees
+                : [];
+
+
+        const renderPerson =
+            (
+                person,
+                selected,
+                role
+            ) => {
+
+                const id =
+                    String(
+                        person.id || ""
+                    );
+
+                if (!id) {
+                    return "";
+                }
+
+
+                const active =
+                    person.is_active !== false &&
+                    person.account_status !== "disabled";
+
+
+                if (!active) {
+                    return "";
+                }
+
+
+                return `
+
+                    <label
+                        class="admin-team-person-option"
+                    >
+
+                        <input
+                            type="checkbox"
+                            name="${role}_ids"
+                            value="${escapeHtml(id)}"
+                            ${selected ? "checked" : ""}
+                        >
+
+                        <span>
+
+                            <strong>
+                                ${escapeHtml(
+                                    person.name ||
+                                    "Unnamed User"
+                                )}
+                            </strong>
+
+                            <small>
+                                ${escapeHtml(
+                                    person.email ||
+                                    ""
+                                )}
+                            </small>
+
+                        </span>
+
+                    </label>
+                `;
+
+            };
+
+
+        body.innerHTML = `
+
+            <form
+                class="admin-team-people-form"
+                data-admin-team-people-form
+            >
+
+                <div class="admin-team-people-group">
+
+                    <div class="admin-team-people-group-header">
+
+                        <div>
+
+                            <strong>
+                                Supervisors
+                            </strong>
+
+                            <span>
+                                ${currentSupervisorIds.size}
+                                assigned
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="admin-team-people-list">
+
+                        ${
+                            supervisorList.length
+                                ? supervisorList
+                                    .map(
+                                        person =>
+                                            renderPerson(
+                                                person,
+                                                currentSupervisorIds.has(
+                                                    String(person.id)
+                                                ),
+                                                "supervisor"
+                                            )
+                                    )
+                                    .join("")
+                                : `
+                                    <div class="admin-team-management-empty">
+                                        No supervisor accounts available.
+                                    </div>
+                                `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-team-people-group">
+
+                    <div class="admin-team-people-group-header">
+
+                        <div>
+
+                            <strong>
+                                Employees
+                            </strong>
+
+                            <span>
+                                ${currentEmployeeIds.size}
+                                assigned
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="admin-team-people-list">
+
+                        ${
+                            employeeList.length
+                                ? employeeList
+                                    .map(
+                                        person =>
+                                            renderPerson(
+                                                person,
+                                                currentEmployeeIds.has(
+                                                    String(person.id)
+                                                ),
+                                                "employee"
+                                            )
+                                    )
+                                    .join("")
+                                : `
+                                    <div class="admin-team-management-empty">
+                                        No employee accounts available.
+                                    </div>
+                                `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-team-drawer-footer">
+
+                    <button
+                        type="button"
+                        class="admin-team-cancel-btn"
+                        data-admin-team-action-close
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="admin-teams-create-btn"
+                    >
+                        Save People
+                    </button>
+
+                </div>
+
+            </form>
+        `;
+
+
+        body
+            .querySelectorAll(
+                "[data-admin-team-action-close]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        closeAdminTeamActionDrawer
+                    );
+
+                }
+            );
+
+
+        const form =
+            body.querySelector(
+                "[data-admin-team-people-form]"
+            );
+
+        if (!form) {
+            return;
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                const submitButton =
+                    form.querySelector(
+                        "button[type='submit']"
+                    );
+
+
+                const supervisorIds =
+                    Array.from(
+                        form.querySelectorAll(
+                            "input[name='supervisor_ids']:checked"
+                        )
+                    )
+                    .map(
+                        input =>
+                            input.value
+                    );
+
+
+                const employeeIds =
+                    Array.from(
+                        form.querySelectorAll(
+                            "input[name='employee_ids']:checked"
+                        )
+                    )
+                    .map(
+                        input =>
+                            input.value
+                    );
+
+
+                submitButton.disabled =
+                    true;
+
+                submitButton.textContent =
+                    "Saving...";
+
+
+                try {
+
+                    await CleanTrack.api.request(
+                        `/api/admin/teams/${encodeURIComponent(teamId)}/people`,
+                        {
+                            method: "PUT",
+                            body: {
+                                supervisor_ids:
+                                    supervisorIds,
+
+                                employee_ids:
+                                    employeeIds
+                            }
+                        }
+                    );
+
+
+                    closeAdminTeamActionDrawer();
+
+
+                    const workspace =
+                        document.getElementById(
+                            "admin-team-management-workspace"
+                        );
+
+                    if (workspace) {
+                        workspace.remove();
+                    }
+
+
+                    await openAdminTeamManagement(
+                        teamId
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Admin team people update error:",
+                        error
+                    );
+
+                    alert(
+                        error?.message ||
+                        "Unable to update team people."
+                    );
+
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Save People";
+                }
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Admin team people load error:",
+            error
+        );
+
+        body.innerHTML = `
+
+            <div class="admin-team-management-empty">
+
+                Unable to load people right now.
+
+            </div>
+
+        `;
+
     }
 }
 

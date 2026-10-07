@@ -3365,3 +3365,125 @@ button[data-admin-team-action="archive"]:hover {
         margin-right: 15px;
     }
 }
+
+/* =========================================================
+   ADMIN TEAM PEOPLE ASSIGNMENT
+   ========================================================= */
+
+.admin-team-action-drawer-backdrop {
+    z-index: 1400;
+}
+
+
+.admin-team-people-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    flex: 1;
+}
+
+
+.admin-team-people-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-height: 0;
+}
+
+
+.admin-team-people-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.admin-team-people-group-header strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.admin-team-people-group-header span {
+    display: block;
+    margin-top: 3px;
+    color: rgba(255,255,255,.38);
+    font-size: 11px;
+}
+
+
+.admin-team-people-list {
+    max-height: 250px;
+    overflow-y: auto;
+
+    border: 1px solid rgba(255,255,255,.055);
+    border-radius: 9px;
+    background: rgba(255,255,255,.018);
+}
+
+
+.admin-team-person-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px;
+
+    border-bottom: 1px solid rgba(255,255,255,.04);
+
+    cursor: pointer;
+}
+
+
+.admin-team-person-option:last-child {
+    border-bottom: 0;
+}
+
+
+.admin-team-person-option:hover {
+    background: rgba(255,255,255,.025);
+}
+
+
+.admin-team-person-option input {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    accent-color: #4f8ef7;
+}
+
+
+.admin-team-person-option span {
+    min-width: 0;
+}
+
+
+.admin-team-person-option strong {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: rgba(255,255,255,.78);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.admin-team-person-option small {
+    display: block;
+
+    margin-top: 2px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: rgba(255,255,255,.35);
+
+    font-size: 10px;
+}
