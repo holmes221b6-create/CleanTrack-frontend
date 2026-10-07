@@ -702,88 +702,163 @@ function updateRegistrationFields() {
             );
     }
 
+function decodeJwtPayload(token) {
+    try {
+        const parts = String(token || "").split(".");
 
-    // --------------------------------------------------------
-    // Current User
-    // --------------------------------------------------------
+        if (parts.length !== 3) {
+            return null;
+        }
 
-    async function loadCurrentUser() {
+        const base64 =
+            parts[1]
+                .replace(/-/g, "+")
+                .replace(/_/g, "/");
 
-        try {
-
-            const data =
-                await CleanTrack.api.request(
-                    "/api/auth/me"
-                );
-
-            currentUser =
-                data.user || data;
-
-            /*
-             * Expose current user for the rest
-             * of the frontend.
-             */
-
-            CleanTrack.currentUser =
-                currentUser;
-
-            showApplication();
-
-            window.dispatchEvent(
-                new CustomEvent(
-                    "cleantrack:authenticated",
-                    {
-                        detail: currentUser
-                    }
-                )
+        const padded =
+            base64 + "=".repeat(
+                (4 - (base64.length % 4)) % 4
             );
 
-        } catch (error) {
+        return JSON.parse(
+            atob(padded)
+        );
+    } catch (error) {
+        console.error(
+            "Unable to decode CleanTrack token:",
+            error
+        );
 
-            console.error(
-                "Unable to load current user:",
-                error
+        return null;
+    }
+}
+
+
+async function validateCurrentUserInBackground() {
+    try {
+        const data =
+            await CleanTrack.api.request(
+                "/api/auth/me"
             );
 
-            logout(false);
+        currentUser =
+            data.user || data;
 
-            renderLogin();
-        }
+        CleanTrack.currentUser =
+            currentUser;
+
+        console.log(
+            "CleanTrack session validated."
+        );
+
+    } catch (error) {
+        console.error(
+            "CleanTrack session validation failed:",
+            error
+        );
+
+        logout(false);
+        renderLogin();
+    }
+}
+
+
+async function loadCurrentUser() {
+    const token =
+        CleanTrack.api.getToken();
+
+    if (!token) {
+        throw new Error(
+            "No authentication token."
+        );
     }
 
+    const claims =
+        decodeJwtPayload(token);
 
-    // --------------------------------------------------------
-    // Session Initialization
-    // --------------------------------------------------------
-
-    async function initialize() {
-
-        const token =
-            CleanTrack.api.getToken();
-
-        if (!token) {
-
-            showAuth();
-            renderLogin();
-
-            return false;
-        }
-
-        try {
-
-            await loadCurrentUser();
-
-            return true;
-
-        } catch {
-
-            showAuth();
-            renderLogin();
-
-            return false;
-        }
+    if (!claims) {
+        throw new Error(
+            "Invalid authentication token."
+        );
     }
 
+    currentUser = {
+        id:
+            claims.user_id ||
+            claims.sub,
+
+        name:
+            claims.name || "",
+
+        email:
+            claims.email || "",
+
+        role:
+            claims.role || "",
+
+        location_id:
+            claims.location_id || null,
+
+        organization_id:
+            claims.organization_id || null,
+
+        account_status:
+            "active",
+
+        team_ids:
+            Array.isArray(claims.team_ids)
+                ? claims.team_ids
+                : []
+    };
+
+    CleanTrack.currentUser =
+        currentUser;
+
+    showApplication();
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "cleantrack:authenticated",
+            {
+                detail: currentUser
+            }
+        )
+    );
+
+    /*
+     * Validate the session without blocking
+     * the application from opening.
+     */
+    void validateCurrentUserInBackground();
+}
+
+
+async function initialize() {
+    const token =
+        CleanTrack.api.getToken();
+
+    if (!token) {
+        showAuth();
+        renderLogin();
+        return false;
+    }
+
+    try {
+        await loadCurrentUser();
+        return true;
+
+    } catch (error) {
+        console.error(
+            "Unable to initialize current user:",
+            error
+        );
+
+        logout(false);
+        renderLogin();
+
+        return false;
+    }
+}
 
     // --------------------------------------------------------
     // Logout
