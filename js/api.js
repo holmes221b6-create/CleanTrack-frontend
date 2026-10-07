@@ -11,9 +11,10 @@ CleanTrack.api = (() => {
     // --------------------------------------------------------
 
     const API_BASE = "https://cleantrack-1tv6.onrender.com";
-
     const TOKEN_KEY = "cleantrack_token";
 
+    const GET_CACHE = new Map();
+    const GET_CACHE_TTL = 5000;
 
     // --------------------------------------------------------
     // Token Management
@@ -66,188 +67,223 @@ CleanTrack.api = (() => {
     // --------------------------------------------------------
     // Main API Request
     // --------------------------------------------------------
+async function request(endpoint, options = {}) {
 
-    async function request(endpoint, options = {}) {
+    const url = buildUrl(endpoint);
 
-        const url = buildUrl(endpoint);
+    const token = getAuthToken();
 
-        const token = getAuthToken();
+    const method =
+        (options.method || "GET").toUpperCase();
 
-        const method = (options.method || "GET").toUpperCase();
+    const headers = {
+        ...(options.headers || {})
+    };
 
-        const headers = {
-            ...(options.headers || {})
-        };
+    if (token) {
+        headers["Authorization"] =
+            `Bearer ${token}`;
+    }
 
+    const hasBody =
+        options.body !== undefined &&
+        options.body !== null;
 
-        // ----------------------------------------------------
-        // Authentication
-        // ----------------------------------------------------
+    if (
+        hasBody &&
+        !(options.body instanceof FormData) &&
+        !(options.body instanceof Blob)
+    ) {
+        headers["Content-Type"] =
+            "application/json";
+    }
 
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
+    const requestOptions = {
+        ...options,
+        method,
+        headers
+    };
 
+    if (
+        hasBody &&
+        typeof options.body === "object" &&
+        !(options.body instanceof FormData) &&
+        !(options.body instanceof Blob) &&
+        !(options.body instanceof ArrayBuffer)
+    ) {
+        requestOptions.body =
+            JSON.stringify(options.body);
+    }
 
-        // ----------------------------------------------------
-        // JSON Content Type
-        // ----------------------------------------------------
+    const cacheKey =
+        method + ":" + url;
 
-        const hasBody = options.body !== undefined && options.body !== null;
+    if (
+        method === "GET" &&
+        !endpoint.includes("/api/auth/me")
+    ) {
+        const cached =
+            GET_CACHE.get(cacheKey);
 
         if (
-            hasBody &&
-            !(options.body instanceof FormData) &&
-            !(options.body instanceof Blob)
+            cached &&
+            cached.expiresAt > Date.now()
         ) {
-            headers["Content-Type"] = "application/json";
+            console.log(
+                `[CleanTrack API] CACHE ${method} ${endpoint}`
+            );
+
+            return cached.data;
         }
 
+        GET_CACHE.delete(cacheKey);
+    }
 
-        // ----------------------------------------------------
-        // Prepare Request
-        // ----------------------------------------------------
+    let response;
 
-        const requestOptions = {
-            ...options,
-            method,
-            headers
-        };
+    const requestStart =
+        performance.now();
 
+    try {
 
-        // Automatically convert normal JavaScript objects
-        // into JSON.
+        response = await fetch(
+            url,
+            requestOptions
+        );
+
+        console.log(
+            `[CleanTrack API] ${method} ${endpoint} -> ${response.status} (${Math.round(performance.now() - requestStart)} ms)`
+        );
+
+    } catch (error) {
+
+        console.error(
+            `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
+            error
+        );
+
+        throw new Error(
+            "Unable to connect to the CleanTrack server. " +
+            "Check your internet connection or try again."
+        );
+    }
+
+    if (!response.ok) {
+
+        const errorData =
+            await response.json()
+                .catch(() => ({}));
 
         if (
-            hasBody &&
-            typeof options.body === "object" &&
-            !(options.body instanceof FormData) &&
-            !(options.body instanceof Blob) &&
-            !(options.body instanceof ArrayBuffer)
+            response.status === 401 &&
+            !endpoint.includes("/api/auth/login")
         ) {
-            requestOptions.body = JSON.stringify(options.body);
-        }
+            clearAuthToken();
 
-
-        // ----------------------------------------------------
-        // Send Request
-        // ----------------------------------------------------
-
-       let response;
-
-const requestStart = performance.now();
-
-try {
-    response = await fetch(
-        url,
-        requestOptions
-    );
-
-    console.log(
-        `[CleanTrack API] ${method} ${endpoint} -> ${response.status} (${Math.round(performance.now() - requestStart)} ms)`
-    );
-} catch (error) {
-    console.error(
-        `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
-        error
-    );
-
-            console.error("CleanTrack API network error:", error);
+            window.dispatchEvent(
+                new CustomEvent(
+                    "cleantrack:unauthorized"
+                )
+            );
 
             throw new Error(
-                "Unable to connect to the CleanTrack server. " +
-                "Check your internet connection or try again."
+                "Your session has expired. Please log in again."
             );
         }
 
-
-        // ----------------------------------------------------
-        // Handle Unauthorized
-        // ----------------------------------------------------
-if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-
-   if (response.status === 401 && !endpoint.includes("/api/auth/login")) { 
-        clearAuthToken();
-        window.dispatchEvent(new CustomEvent("cleantrack:unauthorized"));
-        throw new Error("Your session has expired. Please log in again.");
+        throw new Error(
+            errorData.error ||
+            errorData.message ||
+            `Request failed (${response.status})`
+        );
     }
 
-    throw new Error(
-        errorData.error ||
-        errorData.message ||
-        `Request failed (${response.status})`
-    );
+    const contentType =
+        response.headers.get(
+            "content-type"
+        ) || "";
+
+    let data;
+
+    if (
+        contentType.includes(
+            "application/json"
+        )
+    ) {
+
+        try {
+            data = await response.json();
+        } catch {
+            data = null;
+        }
+
+    } else {
+
+        try {
+            data = await response.text();
+        } catch {
+            data = null;
+        }
+    }
+
+    if (!response.ok) {
+
+        let message =
+            "An unexpected server error occurred.";
+
+        if (data) {
+
+            if (
+                typeof data === "object"
+            ) {
+                message =
+                    data.error ||
+                    data.message ||
+                    data.detail ||
+                    message;
+
+            } else if (
+                typeof data === "string" &&
+                data.trim()
+            ) {
+                message = data;
+            }
+        }
+
+        const error =
+            new Error(message);
+
+        error.status =
+            response.status;
+
+        error.data = data;
+
+        throw error;
+    }
+
+    if (
+        method === "GET" &&
+        !endpoint.includes("/api/auth/me")
+    ) {
+
+        GET_CACHE.set(
+            cacheKey,
+            {
+                data,
+                expiresAt:
+                    Date.now() +
+                    GET_CACHE_TTL
+            }
+        );
+
+    } else if (
+        method !== "GET"
+    ) {
+        GET_CACHE.clear();
+    }
+
+    return data;
 }
-
-
-        // ----------------------------------------------------
-        // Read Response
-        // ----------------------------------------------------
-
-        const contentType =
-            response.headers.get("content-type") || "";
-
-        let data;
-
-        if (contentType.includes("application/json")) {
-
-            try {
-                data = await response.json();
-            } catch {
-                data = null;
-            }
-
-        } else {
-
-            try {
-                data = await response.text();
-            } catch {
-                data = null;
-            }
-        }
-
-
-        // ----------------------------------------------------
-        // Handle HTTP Errors
-        // ----------------------------------------------------
-
-        if (!response.ok) {
-
-            let message = "An unexpected server error occurred.";
-
-            if (data) {
-
-                if (typeof data === "object") {
-
-                    message =
-                        data.error ||
-                        data.message ||
-                        data.detail ||
-                        message;
-
-                } else if (typeof data === "string" && data.trim()) {
-
-                    message = data;
-                }
-            }
-
-            const error = new Error(message);
-
-            error.status = response.status;
-            error.data = data;
-
-            throw error;
-        }
-
-
-        // ----------------------------------------------------
-        // Return Successful Response
-        // ----------------------------------------------------
-
-        return data;
-    }
-
 
     // --------------------------------------------------------
     // Blob / File Request
