@@ -133,15 +133,106 @@ async function renderHome() {
         return;
     }
     
-    let homeData = {};
+   let homeData = {
+    organization: {
+        name:
+            CleanTrack.currentUser?.organization_name ||
+            "Organization"
+    },
+    counts: {}
+};
 
-try {
-    homeData = await CleanTrack.api.request(
-        "/api/home/admin"
+void CleanTrack.api.request(
+    "/api/home/admin"
+)
+.then(data => {
+
+    if (
+        CleanTrack.currentPage &&
+        CleanTrack.currentPage !== "home"
+    ) {
+        return;
+    }
+
+    const organization =
+        data?.organization || {};
+
+    const counts =
+        data?.counts || {};
+
+    const organizationName =
+        organization.name ||
+        "Organization";
+
+    const subtitle =
+        document.getElementById(
+            "home-welcome-subtitle"
+        );
+
+    const organizationNameElement =
+        document.getElementById(
+            "home-organization-name"
+        );
+
+    const staffElement =
+        document.getElementById(
+            "home-staff-count"
+        );
+
+    const teamElement =
+        document.getElementById(
+            "home-team-count"
+        );
+
+    const locationElement =
+        document.getElementById(
+            "home-location-count"
+        );
+
+    const zoneElement =
+        document.getElementById(
+            "home-zone-count"
+        );
+
+    if (subtitle) {
+        subtitle.textContent =
+            `${organizationName} · Administrator`;
+    }
+
+    if (organizationNameElement) {
+        organizationNameElement.textContent =
+            organizationName;
+    }
+
+    if (staffElement) {
+        staffElement.textContent =
+            counts.staff ?? 0;
+    }
+
+    if (teamElement) {
+        teamElement.textContent =
+            counts.teams ?? 0;
+    }
+
+    if (locationElement) {
+        locationElement.textContent =
+            counts.locations ?? 0;
+    }
+
+    if (zoneElement) {
+        zoneElement.textContent =
+            counts.zones ?? 0;
+    }
+
+})
+.catch(error => {
+
+    console.error(
+        "Home data loading error:",
+        error
     );
-} catch (error) {
-    console.error("Home data loading error:", error);
-}
+
+});
 
 const organization =
     homeData.organization || {};
@@ -812,6 +903,9 @@ function renderAdminDashboard() {
     if (!pageView) {
         return;
     }
+    if (CleanTrack.currentPage !== "dashboard") {
+    return;
+}
 
 
     const user =
@@ -3739,6 +3833,9 @@ async function renderAdminStaff() {
     if (!view) {
         return;
     }
+    if (CleanTrack.currentPage !== "staff") {
+    return;
+}
 
     view.innerHTML = `
         <section class="admin-staff-page">
@@ -6149,6 +6246,9 @@ async function renderAdminInvitations() {
     if (!view) {
         return;
     }
+    if (CleanTrack.currentPage !== "invitations") {
+    return;
+}
 
     view.innerHTML = `
         <section class="admin-invitations-page">
@@ -6927,6 +7027,9 @@ function renderAdminTeams() {
     if (!view) {
         return;
     }
+    if (CleanTrack.currentPage !== "teams") {
+    return;
+}
 
     setPageHeader(
         "Teams",
@@ -9987,6 +10090,7 @@ loadAdminTeamsData();
 // --------------------------------------------------------
 
 function loadPage(page) {
+CleanTrack.currentPage = page;
 
     if (CleanTrack.navigation) {
         CleanTrack.navigation.setActive(page);
