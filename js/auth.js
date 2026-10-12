@@ -197,14 +197,6 @@ function normalizeUser(user) {
   }
 
   async function restoreSession() {
-    // This API uses bearer JWT authentication. Do not send a guaranteed-401
-    // session probe on a fresh visit when this tab has no token.
-    if (!getAuthToken()) {
-      currentUser = null;
-      emitAuthEvent("cleantrack:session-restored", null);
-      return null;
-    }
-
     try {
       const response = await api.get("auth/me");
       const user = response.user || response.data?.user || null;
