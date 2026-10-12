@@ -1,0 +1,692 @@
+/* CleanTrack Style 1 — Professional Blue
+   Darker navy surfaces, restrained blue accents, consistent internal UI.
+   Loaded after the existing stylesheets intentionally to normalize every page. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #050b16;
+  --bg-elevated: #071225;
+  --surface: #0a162a;
+  --surface-hover: #10213b;
+  --surface-raised: #12243e;
+  --border: #1b3150;
+  --border-strong: #29476c;
+  --text: #e7effb;
+  --text-secondary: #a0b2cc;
+  --text-muted: #7086a5;
+
+  --primary: #176bd0;
+  --primary-hover: #1d7ce8;
+  --primary-contrast: #f5f9ff;
+  --accent: #3d9bff;
+  --success: #238e89;
+  --warning: #ad794a;
+  --danger: #b84b63;
+  --info: #3986ce;
+
+  --ct-bg: #050b16;
+  --ct-page: #050b16;
+  --ct-surface: #0a162a;
+  --ct-panel: #0b192e;
+  --ct-panel-raised: #112541;
+  --ct-border: #1b3150;
+  --ct-text: #e7effb;
+  --ct-muted: #8ba0bf;
+  --ct-blue: #176bd0;
+  --ct-blue-hover: #1d7ce8;
+  --ct-focus: #3986ce;
+  --ct-green: #0b2445;
+  --ct-green-light: #2c75c7;
+  --ct-accent: #3d9bff;
+
+  --focus-ring: 0 0 0 3px rgb(61 155 255 / 22%);
+  --shadow-sm: 0 5px 18px rgb(0 0 0 / 24%);
+  --shadow-md: 0 16px 40px rgb(0 0 0 / 34%);
+}
+
+html,
+body,
+#app,
+#main-content {
+  min-height: 100%;
+  background: #050b16 !important;
+  color: #e7effb !important;
+}
+
+body {
+  background-image: radial-gradient(ellipse at 70% -15%, rgb(17 65 122 / 13%), transparent 48%) !important;
+}
+
+#workspace-view,
+#workspace-view .ct-workspace-shell,
+#workspace-view .ct-workspace-main,
+#workspace-view #page-content,
+#workspace-view .page-content,
+#page-content {
+  background: #050b16 !important;
+  color: #e7effb !important;
+}
+
+#page-content {
+  padding-top: 22px;
+  padding-bottom: 36px;
+}
+
+#page-content > h2 {
+  margin: 0 0 20px;
+  color: #ecf4ff !important;
+  font-size: clamp(22px, 2.1vw, 29px);
+  font-weight: 750;
+  letter-spacing: -.025em;
+}
+
+#page-content > p,
+.page-placeholder {
+  color: #92a7c6 !important;
+}
+
+/* Workspace frame and slide-out navigation */
+body #workspace-view .ct-workspace-toolbar {
+  background: #050c19 !important;
+  border-bottom: 1px solid #172b46 !important;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+}
+body #workspace-view .ct-sidebar {
+  background: #071225 !important;
+  color: #dbe8fa !important;
+  border-right: 1px solid #1a2c47 !important;
+}
+body #workspace-view .ct-sidebar-brand {
+  border-bottom-color: #182e4d !important;
+}
+body #workspace-view .ct-sidebar-brand-mark {
+  color: #edf6ff !important;
+  background: #1554a0 !important;
+  border: 1px solid #2c71bd !important;
+}
+body #workspace-view .ct-sidebar-brand strong { color: #eef5ff !important; }
+body #workspace-view .ct-sidebar-brand small,
+body #workspace-view .ct-sidebar-label { color: #6f91bb !important; }
+
+body #workspace-view #workspace-navigation button,
+body #workspace-view #workspace-navigation a {
+  color: #93a9c7 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+}
+body #workspace-view #workspace-navigation button:hover,
+body #workspace-view #workspace-navigation a:hover {
+  color: #e7f1ff !important;
+  background: #0f2038 !important;
+  border-color: #1b3558 !important;
+}
+body #workspace-view #workspace-navigation .active,
+body #workspace-view #workspace-navigation [aria-current="page"],
+body #workspace-view #workspace-navigation .ct-nav-active {
+  color: #f2f8ff !important;
+  background: linear-gradient(90deg, #123c70, #0c2749) !important;
+  border-color: #1c5692 !important;
+  box-shadow: inset 3px 0 #2589ed;
+}
+body #workspace-view .ct-sidebar-toggle {
+  background: #0b192d !important;
+  color: #d9eaff !important;
+  border-color: #244368 !important;
+}
+body #workspace-view .ct-sidebar-toggle:hover {
+  background: #102746 !important;
+  border-color: #347dc6 !important;
+}
+body #workspace-view .ct-hamburger > span { background: #c7e1ff !important; }
+
+/* Shared headings, copy and separators */
+body #page-content h1,
+body #page-content h2,
+body #page-content h3,
+body #page-content h4,
+body #page-content h5,
+body #page-content h6,
+body .app-modal h1,
+body .app-modal h2,
+body .app-modal h3 {
+  color: #e7effb;
+}
+body #page-content p,
+body #page-content label,
+body #page-content small,
+body #page-content .muted,
+body #page-content .ct-muted {
+  color: #91a6c4;
+}
+body #page-content hr,
+body #page-content .divider {
+  border-color: #1b3150 !important;
+  background-color: #1b3150;
+}
+
+/* Common surfaces — deep navy rather than generic black or grey */
+body #page-content .card,
+body #page-content .panel,
+body #page-content .stat-card,
+body #page-content .metric-card,
+body #page-content .dashboard-card,
+body #page-content .form-card,
+body #page-content .dropdown-menu,
+body #page-content .table-wrap,
+body #page-content .table-container,
+body #page-content .modal-content,
+body #page-content .content-card {
+  color: #e7effb !important;
+  background: #0a172b !important;
+  border-color: #1b3150 !important;
+  box-shadow: 0 9px 25px rgb(0 0 0 / 13%);
+}
+
+/* Buttons — one consistent blue hierarchy */
+body #page-content button,
+body #page-content .button,
+body #page-content .btn,
+body #page-content .ct-button,
+body .app-modal button {
+  border-radius: 9px;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+body #page-content .button-primary,
+body #page-content .btn-primary,
+body #page-content button.primary,
+body #page-content .ct-button--primary,
+body .app-modal .button-primary {
+  color: #f4f8ff !important;
+  background: #1557a7 !important;
+  border: 1px solid #246fbd !important;
+  box-shadow: 0 3px 10px rgb(0 52 120 / 18%);
+}
+body #page-content .button-primary:hover,
+body #page-content .btn-primary:hover,
+body #page-content button.primary:hover,
+body #page-content .ct-button--primary:hover {
+  color: #fff !important;
+  background: #1b6dc8 !important;
+  border-color: #3d91e7 !important;
+}
+body #page-content .button-secondary,
+body #page-content .btn-secondary,
+body #page-content .ct-button--secondary,
+body #page-content .button,
+body #page-content .btn,
+body .app-modal button {
+  color: #c9d9ef !important;
+  background: #101f35 !important;
+  border: 1px solid #294363 !important;
+}
+body #page-content .button-secondary:hover,
+body #page-content .btn-secondary:hover,
+body #page-content .ct-button--secondary:hover,
+body #page-content .button:hover,
+body #page-content .btn:hover {
+  color: #edf6ff !important;
+  background: #172b47 !important;
+  border-color: #376293 !important;
+}
+body button:disabled,
+body #page-content button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+body button:focus-visible,
+body a:focus-visible,
+body input:focus-visible,
+body select:focus-visible,
+body textarea:focus-visible {
+  outline: 2px solid #3189e4 !important;
+  outline-offset: 2px;
+}
+
+/* Forms, select lists, date controls and search */
+body input,
+body select,
+body textarea,
+body #page-content input,
+body #page-content select,
+body #page-content textarea,
+body .app-modal input,
+body .app-modal select,
+body .app-modal textarea {
+  color: #e1ecfb !important;
+  background: #071326 !important;
+  border: 1px solid #233c5d !important;
+  border-radius: 9px;
+}
+body input::placeholder,
+body textarea::placeholder {
+  color: #637c9e !important;
+  opacity: 1;
+}
+body input:hover,
+body select:hover,
+body textarea:hover {
+  border-color: #315985 !important;
+}
+body input:focus,
+body select:focus,
+body textarea:focus {
+  border-color: #2e83d7 !important;
+  box-shadow: 0 0 0 3px rgb(46 131 215 / 15%) !important;
+  outline: none;
+}
+body select option {
+  color: #e1ecfb;
+  background: #0a172b;
+}
+body input[type="checkbox"],
+body input[type="radio"] {
+  accent-color: #2a83dd;
+}
+body fieldset {
+  border-color: #203956 !important;
+}
+body legend,
+body label,
+body .field-label {
+  color: #b5c7df !important;
+}
+
+/* Tables: deeply shaded headers and subtle row boundaries */
+body #page-content table,
+body #page-content .table-wrap,
+body #page-content .table-container {
+  width: 100%;
+  color: #dce8f8 !important;
+  background: #091528 !important;
+  border-color: #1b3150 !important;
+}
+body #page-content thead,
+body #page-content table th,
+body #page-content .table-header {
+  background: #0e2038 !important;
+  color: #a9c2e2 !important;
+  border-color: #203956 !important;
+}
+body #page-content table td,
+body #page-content table th {
+  border-bottom-color: #1b2e48 !important;
+}
+body #page-content tbody tr {
+  background: #091528 !important;
+}
+body #page-content tbody tr:nth-child(even) {
+  background: #0b192d !important;
+}
+body #page-content tbody tr:hover {
+  background: #102440 !important;
+}
+
+/* Badges and status colors stay muted; no bright yellow blocks */
+body #page-content .badge,
+body #page-content .ct-status,
+body #page-content .status-badge {
+  border: 1px solid #274363 !important;
+  background: #10223a !important;
+  color: #9fc7f2 !important;
+}
+body #page-content .badge-primary,
+body #page-content .badge-info,
+body #page-content .badge-assigned,
+body #page-content .badge-in-progress {
+  background: #102d4d !important;
+  color: #75b8f4 !important;
+  border-color: #244e7d !important;
+}
+body #page-content .badge-success,
+body #page-content .badge-approved,
+body #page-content .badge-completed,
+body #page-content .badge-active {
+  background: #0b2b30 !important;
+  color: #54c1b4 !important;
+  border-color: #1c555b !important;
+}
+body #page-content .badge-warning,
+body #page-content .badge-pending {
+  background: #282234 !important;
+  color: #b1a5e8 !important;
+  border-color: #49406f !important;
+}
+body #page-content .badge-danger,
+body #page-content .badge-rejected,
+body #page-content .badge-suspended,
+body #page-content .badge-overdue {
+  background: #2b1727 !important;
+  color: #e38ba1 !important;
+  border-color: #613248 !important;
+}
+
+/* Alerts, notices, empty states and dropdowns */
+body #page-content .alert,
+body #page-content .notice,
+body #page-content .ct-notice,
+body #page-content .ct-empty,
+body #page-content .empty-state,
+body #page-content .status-panel {
+  color: #aabdd7 !important;
+  background: #0a182c !important;
+  border-color: #213957 !important;
+}
+body #page-content .alert-info,
+body #page-content .ct-notice--info {
+  background: #0b2038 !important;
+  border-color: #1c4c79 !important;
+}
+body #page-content .alert-success,
+body #page-content .ct-notice--success {
+  background: #0a252d !important;
+  border-color: #1c555b !important;
+}
+body #page-content .alert-warning {
+  background: #201e31 !important;
+  border-color: #48406c !important;
+}
+body #page-content .alert-danger,
+body #page-content .ct-notice--error {
+  background: #2b1727 !important;
+  border-color: #613248 !important;
+  color: #eaa0b1 !important;
+}
+
+/* Authentication: dark blue two-panel appearance, including nested forms */
+body #auth-view,
+body #auth-view.auth-layout {
+  background: #050b16 !important;
+  color: #e7effb !important;
+}
+body #auth-view .auth-intro {
+  background:
+    radial-gradient(ellipse at 15% 85%, rgb(32 108 186 / 15%), transparent 46%),
+    linear-gradient(145deg, #0a2343 0%, #07162c 58%, #050d1b 100%) !important;
+  color: #ecf4ff !important;
+  border-right: 1px solid #1b3150;
+}
+body #auth-view .auth-intro h1,
+body #auth-view .auth-intro p,
+body #auth-view .auth-intro li,
+body #auth-view .auth-intro .brand-name {
+  color: #e7effb !important;
+}
+body #auth-view .auth-intro .eyebrow { color: #69aff8 !important; }
+body #auth-view .auth-panel {
+  background: #070f1e !important;
+}
+body #auth-view .auth-card {
+  color: #e7effb !important;
+  background: #0a172b !important;
+  border: 1px solid #1d3555 !important;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 28%);
+}
+body #auth-view .auth-heading h2,
+body #auth-view .auth-heading label,
+body #auth-view .form-field > label,
+body #auth-view .role-selector legend,
+body #auth-view .role-option-content strong {
+  color: #e7effb !important;
+}
+body #auth-view .auth-heading > p:last-child,
+body #auth-view .auth-switch,
+body #auth-view .checkbox-label,
+body #auth-view .field-hint,
+body #auth-view .role-option-content small {
+  color: #8fa5c3 !important;
+}
+body #auth-view .form-field input,
+body #auth-view .form-field textarea,
+body #auth-view .role-option {
+  color: #e2edfb !important;
+  background: #071326 !important;
+  border-color: #233d5f !important;
+}
+body #auth-view .role-option:has(input:checked) {
+  background: #102b4b !important;
+  border-color: #2b70b4 !important;
+}
+body #auth-view .text-button,
+body #auth-view .terms-checkbox a,
+body #auth-view .password-toggle {
+  color: #66adf5 !important;
+}
+body #auth-view .password-toggle:hover {
+  background: #102440 !important;
+}
+body #auth-view .button-primary,
+body #auth-view .button.button-primary {
+  color: #f4f8ff !important;
+  background: #1557a7 !important;
+  border-color: #246fbd !important;
+}
+body #auth-view .button-primary:hover {
+  background: #1b6dc8 !important;
+}
+body #auth-view .button-secondary {
+  color: #c9d9ef !important;
+  background: #102039 !important;
+  border-color: #294363 !important;
+}
+body #auth-view .status-panel {
+  color: #c0d2e9 !important;
+  background: #0b1b30 !important;
+  border-color: #244264 !important;
+}
+body #auth-view .brand-mark {
+  color: #f3f8ff !important;
+  background: #1557a7 !important;
+  border: 1px solid #2d7ac5;
+}
+body #auth-view .brand-light,
+body #auth-view .brand { color: #f1f6ff !important; }
+
+/* Teams, staff and other module cards */
+body #page-content .ct-teams-page {
+  color: #e7effb !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+body #page-content .ct-page-header,
+body #page-content .ct-teams-toolbar {
+  color: #e7effb !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+body #page-content .ct-eyebrow { color: #579ee9 !important; }
+body #page-content .ct-page-title,
+body #page-content .ct-section-title,
+body #page-content .ct-team-card__title,
+body #page-content .ct-overview-item__value {
+  color: #e7effb !important;
+}
+body #page-content .ct-muted,
+body #page-content .ct-team-card__description,
+body #page-content .ct-team-card__meta,
+body #page-content .ct-overview-item__label {
+  color: #8fa5c3 !important;
+}
+body #page-content .ct-input {
+  color: #e2edfb !important;
+  background: #071326 !important;
+  border-color: #233d5f !important;
+}
+body #page-content .ct-button {
+  color: #c9d9ef !important;
+  background: #102039 !important;
+  border-color: #294363 !important;
+}
+body #page-content .ct-button--primary {
+  color: #f4f8ff !important;
+  background: #1557a7 !important;
+  border-color: #246fbd !important;
+}
+body #page-content .ct-notice--success {
+  color: #65c9be !important;
+  background: #09262c !important;
+  border-color: #1d5359 !important;
+}
+body #page-content .ct-notice--error {
+  color: #eaa0b1 !important;
+  background: #2b1727 !important;
+  border-color: #613248 !important;
+}
+body #page-content .ct-create-form,
+body #page-content .ct-team-card,
+body #page-content .ct-details-panel {
+  color: #e7effb !important;
+  background: #0a172b !important;
+  border-color: #1b3150 !important;
+  box-shadow: 0 9px 25px rgb(0 0 0 / 13%) !important;
+}
+body #page-content .ct-overview-item {
+  color: #dce8f8 !important;
+  background: #0e2038 !important;
+  border-color: #203956 !important;
+}
+body #page-content .ct-status {
+  background: #102d4d !important;
+  color: #8ec6ff !important;
+  border-color: #244e7d !important;
+}
+body #page-content .ct-empty {
+  color: #8fa5c3 !important;
+  background: #081427 !important;
+  border-color: #294363 !important;
+}
+
+/* Admin dashboard uses the same navy / professional blue system */
+body #page-content .ct-admin-dashboard {
+  --dash-bg: #050b16;
+  --dash-panel: #0a172b;
+  --dash-panel-alt: #0e2038;
+  --dash-border: #1b3150;
+  --dash-text: #e7effb;
+  --dash-muted: #8fa5c3;
+  --dash-green: #267fbd;
+  --dash-blue: #24559a;
+  --dash-red: #a84460;
+  --dash-amber: #67548b;
+
+  color: #e7effb !important;
+  background: #050b16 !important;
+  border-color: #142844 !important;
+  box-shadow: none !important;
+}
+body #page-content .ct-dash-panel {
+  color: #e7effb !important;
+  background: #09172b !important;
+  border-color: #1b3150 !important;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 16%) !important;
+}
+body #page-content .ct-dash-kpi {
+  background: linear-gradient(145deg, #0d2039, #091529) !important;
+  border-color: #1d3555 !important;
+  box-shadow: none !important;
+}
+body #page-content .ct-dash-kpi-value { color: #83bfff !important; }
+body #page-content .ct-dash-kpi--green .ct-dash-kpi-value { color: #55b9ba !important; }
+body #page-content .ct-dash-kpi--blue .ct-dash-kpi-value { color: #6fa9ee !important; }
+body #page-content .ct-dash-kpi--red .ct-dash-kpi-value { color: #d7788d !important; }
+body #page-content .ct-dash-kpi-symbol {
+  background: #102846 !important;
+  border-color: #254b75 !important;
+  color: #8bc1fa !important;
+}
+body #page-content .ct-dash-title,
+body #page-content .ct-dash-panel-title,
+body #page-content .ct-dash-kpi-label,
+body #page-content .ct-dash-activity-copy strong,
+body #page-content .ct-dash-action-copy strong,
+body #page-content .ct-dash-location-name strong {
+  color: #e2edfb !important;
+}
+body #page-content .ct-dash-eyebrow,
+body #page-content .ct-dash-panel-kicker { color: #4c9de8 !important; }
+body #page-content .ct-dash-note,
+body #page-content .ct-dash-description,
+body #page-content .ct-dash-kpi-hint,
+body #page-content .ct-dash-action-copy p,
+body #page-content .ct-dash-location-name span,
+body #page-content .ct-dash-activity-copy p,
+body #page-content .ct-dash-activity-row time { color: #8097b7 !important; }
+body #page-content .ct-dash-current-rate strong { color: #59a8f4 !important; }
+body #page-content .ct-dash-location-rate { color: #4c9de8 !important; }
+body #page-content .ct-dash-progress-track { background: #102744 !important; }
+body #page-content .ct-dash-progress-fill { background: linear-gradient(90deg, #1759a0, #328ce1) !important; }
+body #page-content .ct-dash-donut-hole {
+  background: #09172b !important;
+  border-color: #1d3555 !important;
+}
+body #page-content .ct-dash-error {
+  color: #e6a5b5 !important;
+  background: #251423 !important;
+  border-color: #603047 !important;
+}
+body #page-content .ct-dash-empty {
+  color: #8fa5c3 !important;
+  background: #081427 !important;
+  border-color: #294363 !important;
+}
+body #page-content .ct-dash-quick-action {
+  color: #e7effb !important;
+  background: #0d1e35 !important;
+  border-color: #1d3a5e !important;
+}
+body #page-content .ct-dash-quick-action:hover {
+  background: #112844 !important;
+  border-color: #2d70b4 !important;
+}
+body #page-content .ct-dash-quick-icon {
+  color: #84bfff !important;
+  background: #102d4d !important;
+  border-color: #275c92 !important;
+}
+
+/* Dialogs, popovers and shared application chrome */
+body #app-header,
+body .app-header,
+body .ct-workspace-toolbar {
+  color: #dce8f8 !important;
+  background: #050c19 !important;
+  border-color: #172b46 !important;
+}
+body dialog,
+body .app-modal,
+body .modal,
+body .modal-content,
+body .profile-menu,
+body .dropdown-menu {
+  color: #e7effb !important;
+  background: #09172b !important;
+  border-color: #1b3150 !important;
+}
+body dialog::backdrop { background: rgb(0 5 14 / 76%); }
+body .modal-header { border-color: #1b3150 !important; }
+body .app-footer {
+  color: #758baa !important;
+  background: #050b16 !important;
+  border-color: #172b46 !important;
+}
+body .app-footer a { color: #5ba9f5 !important; }
+body a { color: #68adf4; }
+body a:hover { color: #9bcaff; }
+
+/* Dark scrolling bars and restrained selection color */
+* {
+  scrollbar-color: #263d5d #071225;
+}
+::selection {
+  color: #f5f9ff;
+  background: #164f8e;
+}
+@media (prefers-reduced-motion: reduce) {
+  body *,
+  body *::before,
+  body *::after {
+    transition-duration: .01ms !important;
+  }
+}
