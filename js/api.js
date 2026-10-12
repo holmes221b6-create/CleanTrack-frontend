@@ -20,6 +20,16 @@
     }
   }
 
+  function readCsrfCookie() {
+    try {
+      const entry = document.cookie.split(";").map(part => part.trim())
+        .find(part => part.startsWith("csrf_access_token="));
+      return entry ? decodeURIComponent(entry.slice("csrf_access_token=".length)) : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
   async function request(path, options = {}) {
     const controller = new AbortController();
     const timeoutMs = options.timeoutMs || config.requestTimeoutMs;
@@ -31,6 +41,14 @@
 
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
+
+    // The active backend stores JWTs in HttpOnly cookies and protects mutating
+    // requests with Flask-JWT-Extended's readable CSRF cookie.
+    const method = String(options.method || "GET").toUpperCase();
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !headers.has("X-CSRF-TOKEN")) {
+      const csrfToken = readCsrfCookie();
+      if (csrfToken) headers.set("X-CSRF-TOKEN", csrfToken);
+    }
 
     // The Flask API uses Bearer JWTs; keep the token in this browser tab's session.
     try {
