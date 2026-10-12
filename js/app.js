@@ -341,6 +341,18 @@
 
     pageContent.replaceChildren();
 
+    // Home is the admin landing/control page; Dashboard remains the deeper analytics page.
+    if (pageId === "home" && String(user?.role || "").toLowerCase() === "admin") {
+      if (window.CleanTrackAdminHome && typeof window.CleanTrackAdminHome.render === "function") {
+        await window.CleanTrackAdminHome.render(pageContent);
+      } else {
+        const message = document.createElement("p");
+        message.textContent = "Home could not load. Refresh the page and try again.";
+        pageContent.appendChild(message);
+      }
+      return;
+    }
+
     // Admin-only live operational dashboard. Other roles never render this page.
     if (pageId === "dashboard") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
