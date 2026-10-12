@@ -1,438 +1,135 @@
-// ============================================================
-// CleanTrack API Client
-// ============================================================
 
-window.CleanTrack = window.CleanTrack || {};
+/* CleanTrack - API Client */
+(function () {
+  "use strict";
 
-CleanTrack.api = (() => {
+  const config = window.CleanTrackConfig;
 
-    // --------------------------------------------------------
-    // Configuration
-    // --------------------------------------------------------
+  if (!config) {
+    throw new Error(
+      "CleanTrackConfig is missing. Load js/config.js before js/api.js."
+    );
+  }
 
-    const API_BASE = "https://cleantrack-1tv6.onrender.com";
-    const TOKEN_KEY = "cleantrack_token";
-    
-        const GET_CACHE = new Map();
-    const GET_INFLIGHT = new Map();
-    const GET_CACHE_TTL = 5000;
-
-
-    // --------------------------------------------------------
-    // Token Management
-    // --------------------------------------------------------
-
-    function getAuthToken() {
-        return localStorage.getItem(TOKEN_KEY);
+  class ApiError extends Error {
+    constructor(message, status, data) {
+      super(message);
+      this.name = "ApiError";
+      this.status = status;
+      this.data = data;
     }
+  }
 
+  async function request(path, options = {}) {
+    const controller = new AbortController();
+    const timeoutMs = options.timeoutMs || config.requestTimeoutMs;
 
-    function setAuthToken(token) {
-        if (!token) {
-            console.warn("CleanTrack: Attempted to store empty token.");
-            return;
-        }
+    const timeoutId = window.setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
 
-        localStorage.setItem(TOKEN_KEY, token);
-    }
+    const headers = new Headers(options.headers || {});
+    headers.set("Accept", "application/json");
 
-
-    function clearAuthToken() {
-        localStorage.removeItem(TOKEN_KEY);
-    }
-
-
-    // --------------------------------------------------------
-    // Build Request URL
-    // --------------------------------------------------------
-
-    function buildUrl(endpoint) {
-
-        if (!endpoint) {
-            throw new Error("API endpoint is required.");
-        }
-
-        // Allow full URLs if ever needed.
-        if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
-            return endpoint;
-        }
-
-        // Make sure endpoint begins with /
-        if (!endpoint.startsWith("/")) {
-            endpoint = "/" + endpoint;
-        }
-
-        return API_BASE + endpoint;
-    }
-
-
-    // --------------------------------------------------------
-    // Main API Request
-    // --------------------------------------------------------
-async function request(endpoint, options = {}) {
-
-    const url = buildUrl(endpoint);
-
-    const token = getAuthToken();
-
-    const method =
-        (options.method || "GET").toUpperCase();
-
-    const headers = {
-        ...(options.headers || {})
-    };
-
-    if (token) {
-        headers["Authorization"] =
-            `Bearer ${token}`;
-    }
-
-    const hasBody =
-        options.body !== undefined &&
-        options.body !== null;
+    let body = options.body;
 
     if (
-        hasBody &&
-        !(options.body instanceof FormData) &&
-        !(options.body instanceof Blob)
+      body !== undefined &&
+      body !== null &&
+      !(body instanceof FormData) &&
+      typeof body !== "string"
     ) {
-        headers["Content-Type"] =
-            "application/json";
-    }
-
-    const requestOptions = {
-        ...options,
-        method,
-        headers
-    };
-
-    if (
-        hasBody &&
-        typeof options.body === "object" &&
-        !(options.body instanceof FormData) &&
-        !(options.body instanceof Blob) &&
-        !(options.body instanceof ArrayBuffer)
-    ) {
-        requestOptions.body =
-            JSON.stringify(options.body);
-    }
-
-    const cacheKey =
-        method + ":" + url;
-
-       if (
-        method === "GET" &&
-        !endpoint.includes("/api/auth/me")
-    ) {
-        const cached =
-            GET_CACHE.get(cacheKey);
-
-        if (
-            cached &&
-            cached.expiresAt > Date.now()
-        ) {
-            console.log(
-                `[CleanTrack API] CACHE ${method} ${endpoint}`
-            );
-
-            return cached.data;
-        }
-
-        GET_CACHE.delete(cacheKey);
-
-        const inflight =
-            GET_INFLIGHT.get(cacheKey);
-
-        if (inflight) {
-            console.log(
-                `[CleanTrack API] INFLIGHT ${method} ${endpoint}`
-            );
-
-            return inflight;
-        }
-    }
-    
-        let response;
-
-    const requestStart =
-        performance.now();
-
-    const fetchPromise = (async () => {
-
-        try {
-
-            const result =
-                await fetch(
-                    url,
-                    requestOptions
-                );
-
-            console.log(
-                `[CleanTrack API] ${method} ${endpoint} -> ${result.status} (${Math.round(performance.now() - requestStart)} ms)`
-            );
-
-            return result;
-
-        } catch (error) {
-
-            console.error(
-                `[CleanTrack API] ${method} ${endpoint} -> NETWORK ERROR (${Math.round(performance.now() - requestStart)} ms)`,
-                error
-            );
-
-            throw new Error(
-                "Unable to connect to the CleanTrack server. " +
-                "Check your internet connection or try again."
-            );
-        }
-
-    })();
-
-    if (
-        method === "GET" &&
-        !endpoint.includes("/api/auth/me")
-    ) {
-        GET_INFLIGHT.set(
-            cacheKey,
-            fetchPromise
-        );
+      headers.set("Content-Type", "application/json");
+      body = JSON.stringify(body);
     }
 
     try {
-        response = await fetchPromise;
-    } finally {
-        if (
-            method === "GET" &&
-            !endpoint.includes("/api/auth/me")
-        ) {
-            GET_INFLIGHT.delete(
-                cacheKey
-            );
+      const response = await fetch(
+        config.apiBaseUrl + normalizePath(path),
+        {
+          method: options.method || "GET",
+          headers,
+          body,
+          credentials: "include",
+          signal: controller.signal
         }
-    }
+      );
 
-    if (!response.ok) {
+      const contentType = response.headers.get("content-type") || "";
+      let data = null;
 
-        const errorData =
-            await response.json()
-                .catch(() => ({}));
+      if (contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const responseText = await response.text();
+        data = responseText ? { message: responseText } : null;
+      }
 
-        if (
-            response.status === 401 &&
-            !endpoint.includes("/api/auth/login")
-        ) {
-            clearAuthToken();
+      if (!response.ok) {
+        const message =
+          data && (data.message || data.error)
+            ? (data.message || data.error)
+            : "The request failed. Please try again.";
 
-            window.dispatchEvent(
-                new CustomEvent(
-                    "cleantrack:unauthorized"
-                )
-            );
+        throw new ApiError(message, response.status, data);
+      }
 
-            throw new Error(
-                "Your session has expired. Please log in again."
-            );
-        }
-
-        throw new Error(
-            errorData.error ||
-            errorData.message ||
-            `Request failed (${response.status})`
+      return data;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        throw new ApiError(
+          "The request timed out. Check your connection and try again.",
+          0,
+          null
         );
-    }
+      }
 
-    const contentType =
-        response.headers.get(
-            "content-type"
-        ) || "";
-
-    let data;
-
-    if (
-        contentType.includes(
-            "application/json"
-        )
-    ) {
-
-        try {
-            data = await response.json();
-        } catch {
-            data = null;
-        }
-
-    } else {
-
-        try {
-            data = await response.text();
-        } catch {
-            data = null;
-        }
-    }
-
-    if (!response.ok) {
-
-        let message =
-            "An unexpected server error occurred.";
-
-        if (data) {
-
-            if (
-                typeof data === "object"
-            ) {
-                message =
-                    data.error ||
-                    data.message ||
-                    data.detail ||
-                    message;
-
-            } else if (
-                typeof data === "string" &&
-                data.trim()
-            ) {
-                message = data;
-            }
-        }
-
-        const error =
-            new Error(message);
-
-        error.status =
-            response.status;
-
-        error.data = data;
-
+      if (error instanceof ApiError) {
         throw error;
+      }
+
+      throw new ApiError(
+        "Unable to reach CleanTrack. Check your connection and backend status.",
+        0,
+        null
+      );
+    } finally {
+      window.clearTimeout(timeoutId);
     }
+  }
 
-    if (
-        method === "GET" &&
-        !endpoint.includes("/api/auth/me")
-    ) {
+  function normalizePath(path) {
+    return "/" + String(path || "").replace(/^\/+/, "");
+  }
 
-        GET_CACHE.set(
-            cacheKey,
-            {
-                data,
-                expiresAt:
-                    Date.now() +
-                    GET_CACHE_TTL
-            }
-        );
+  function get(path, options = {}) {
+    return request(path, { ...options, method: "GET" });
+  }
 
-    } else if (
-        method !== "GET"
-    ) {
-        GET_CACHE.clear();
-    }
+  function post(path, body, options = {}) {
+    return request(path, { ...options, method: "POST", body });
+  }
 
-    return data;
-}
+  function put(path, body, options = {}) {
+    return request(path, { ...options, method: "PUT", body });
+  }
 
-    // --------------------------------------------------------
-    // Blob / File Request
-    // --------------------------------------------------------
+  function patch(path, body, options = {}) {
+    return request(path, { ...options, method: "PATCH", body });
+  }
 
-    async function requestBlob(endpoint, options = {}) {
+  function del(path, options = {}) {
+    return request(path, { ...options, method: "DELETE" });
+  }
 
-        const url = buildUrl(endpoint);
-
-        const token = getAuthToken();
-
-        const headers = {
-            ...(options.headers || {})
-        };
-
-
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
-
-
-        let response;
-
-        try {
-
-            response = await fetch(url, {
-                ...options,
-                headers
-            });
-
-        } catch (error) {
-
-            console.error(
-                "CleanTrack API file request error:",
-                error
-            );
-
-            throw new Error(
-                "Unable to connect to the CleanTrack server."
-            );
-        }
-
-
-        if (response.status === 401) {
-
-            clearAuthToken();
-
-            window.dispatchEvent(
-                new CustomEvent("cleantrack:unauthorized")
-            );
-
-            throw new Error(
-                "Your session has expired. Please log in again."
-            );
-        }
-
-
-        if (!response.ok) {
-
-            let message = "Unable to download the requested file.";
-
-            try {
-
-                const contentType =
-                    response.headers.get("content-type") || "";
-
-                if (contentType.includes("application/json")) {
-
-                    const data = await response.json();
-
-                    message =
-                        data.error ||
-                        data.message ||
-                        message;
-                }
-
-            } catch {
-                // Keep default error message.
-            }
-
-            const error = new Error(message);
-
-            error.status = response.status;
-
-            throw error;
-        }
-
-
-        return await response.blob();
-    }
-
-
-    // --------------------------------------------------------
-    // Public API
-    // --------------------------------------------------------
-
-    return {
-
-        baseUrl: API_BASE,
-
-        getToken: getAuthToken,
-        setToken: setAuthToken,
-        clearToken: clearAuthToken,
-
-        request,
-        requestBlob
-    };
-
+  window.CleanTrackApi = Object.freeze({
+    request,
+    get,
+    post,
+    put,
+    patch,
+    delete: del,
+    ApiError
+  });
 })();

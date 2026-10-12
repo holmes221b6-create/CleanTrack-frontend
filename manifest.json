@@ -1,0 +1,32 @@
+
+{
+  "id": "/",
+  "name": "CleanTrack - Operations Management",
+  "short_name": "CleanTrack",
+  "description": "Manage teams, locations, tasks, and operational quality.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#10131b",
+  "theme_color": "#6757e8",
+  "lang": "en",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,270 +1,185 @@
-window.CleanTrack = window.CleanTrack || {};
 
-CleanTrack.navigation = (() => {
+/* =========================================
+   CleanTrack - Navigation
+   File: js/navigation.js
+   ========================================= */
 
-    function getUser() {
-        return CleanTrack.currentUser || {};
+(function () {
+  "use strict";
+
+  const auth = window.CleanTrackAuth;
+
+  if (!auth) {
+    throw new Error(
+      "CleanTrackAuth is missing. Load js/auth.js before js/navigation.js."
+    );
+  }
+
+  const routes = {
+    admin: [
+      { id: "home", label: "Home", icon: "⌂" },
+      { id: "staff", label: "Staff", icon: "♙" },
+      { id: "invitations", label: "Invitations", icon: "✉" },
+      { id: "teams", label: "Teams", icon: "♧" },
+      { id: "locations", label: "Locations", icon: "⌖" },
+      { id: "zones", label: "Zones", icon: "▦" },
+      { id: "operations", label: "Tasks and Operations", icon: "☷" },
+      { id: "reviews", label: "Logs and Reviews", icon: "✓" },
+      { id: "analytics", label: "Analytics", icon: "▥" },
+      { id: "reports", label: "Reports", icon: "▤" },
+      { id: "announcements", label: "Announcements and Alerts", icon: "♢" },
+      { id: "audit", label: "Audit Trail", icon: "◷" },
+      { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "billing", label: "Billing", icon: "$" }
+    ],
+
+    supervisor: [
+      { id: "workspace", label: "My Workspace", icon: "⌂" },
+      { id: "personnel", label: "Personnel", icon: "♙" },
+      { id: "operations", label: "Operations", icon: "☷" },
+      { id: "reviews", label: "Review Queue", icon: "✓" },
+      { id: "sites", label: "Sites and Zones", icon: "⌖" },
+      { id: "team-channel", label: "Team Channel", icon: "♧" },
+      { id: "performance", label: "Performance Arena", icon: "▥" },
+      { id: "reports", label: "Reports", icon: "▤" },
+      { id: "team-pulse", label: "Team Pulse", icon: "♡" },
+      { id: "skills", label: "Skills and Eligibility", icon: "★" },
+      { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" }
+    ],
+
+    employee: [
+      { id: "my-desk", label: "My Desk", icon: "⌂" },
+      { id: "my-tasks", label: "My Tasks", icon: "☷" },
+      { id: "my-history", label: "My History", icon: "◷" },
+      { id: "announcements", label: "Announcements", icon: "♢" },
+      { id: "team-channel", label: "Team Channel", icon: "♧" },
+      { id: "skills", label: "My Skills", icon: "★" },
+      { id: "billing", label: "Billing", icon: "$" },
+      { id: "profile", label: "My Profile", icon: "♙" }
+    ]
+  };
+
+  let activePage = null;
+
+  function getMenu(role) {
+    const normalizedRole = String(role || "").toLowerCase();
+    return (routes[normalizedRole] || []).map(function (item) {
+      return { ...item };
+    });
+  }
+
+  function setActivePage(pageId) {
+    const user = auth.getCurrentUser();
+
+    if (!user) {
+      return false;
     }
 
-    function getRole() {
-        return String(getUser().role || "").toLowerCase();
+    const allowedRoutes = getMenu(user.role);
+    const allowed = allowedRoutes.some(function (item) {
+      return item.id === pageId;
+    });
+
+    if (!allowed) {
+      console.warn("Navigation denied for this role:", pageId);
+      return false;
     }
 
-    function getNavigationItems() {
+    activePage = pageId;
 
-        const role = getRole();
-
-        const commonStart = [
-            {
-                id: "home",
-                label: "Home",
-                icon: "\u2302"
-            }
-        ];
-
-        const commonEnd = [
-            {
-                id: "profile",
-                label: "Profile",
-                icon: "\u25c9"
-            }
-        ];
-
-        if (role === "admin") {
-            return [
-                ...commonStart,
-
-                {
-                    id: "dashboard",
-                    label: "Dashboard",
-                    icon: "\u25a3"
-                },
-                {
-                    id: "tasks",
-                    label: "Tasks",
-                    icon: "\u2713"
-                },
-                {
-                    id: "staff",
-                    label: "Staff",
-                    icon: "\u2659"
-                },
-                
-                {
-                    id: "invitations",
-                    label: "Invitations",
-                    icon: "\u2709"
-                },
-                {
-                    id: "teams",
-                    label: "Teams",
-                    icon: "\u265f"
-                },
-                {
-                    id: "zones",
-                    label: "Zones",
-                    icon: "\u25ab"
-                },
-                {
-                    id: "locations",
-                    label: "Locations",
-                    icon: "\u2306"
-                },
-                {
-                    id: "logs",
-                    label: "Cleaning Logs",
-                    icon: "\u25a4"
-                },
-                {
-                    id: "analytics",
-                    label: "Analytics",
-                    icon: "\u25c8"
-                },
-                {
-                    id: "reports",
-                    label: "Reports",
-                    icon: "\u25a5"
-                },
-                {
-                    id: "alerts",
-                    label: "Alerts",
-                    icon: "!"
-                },
-
-                ...commonEnd
-            ];
+    window.dispatchEvent(
+      new CustomEvent("cleantrack:navigate", {
+        detail: {
+          page: pageId,
+          role: user.role
         }
+      })
+    );
 
-        if (role === "supervisor") {
-            return [
-                ...commonStart,
+    return true;
+  }
 
-                {
-                    id: "dashboard",
-                    label: "Team Dashboard",
-                    icon: "\u25a3"
-                },
-                {
-                    id: "team",
-                    label: "My Team",
-                    icon: "\u265f"
-                },
-                {
-                    id: "tasks",
-                    label: "Team Tasks",
-                    icon: "\u2713"
-                },
-                {
-                    id: "staff",
-                    label: "Team Staff",
-                    icon: "\u2659"
-                },
-                {
-                    id: "zones",
-                    label: "Zones",
-                    icon: "\u25ab"
-                },
-                {
-                    id: "locations",
-                    label: "Locations",
-                    icon: "\u2306"
-                },
-                {
-                    id: "logs",
-                    label: "Cleaning Logs",
-                    icon: "\u25a4"
-                },
-                {
-                    id: "analytics",
-                    label: "Team Analytics",
-                    icon: "\u25c8"
-                },
-                {
-                    id: "reports",
-                    label: "Team Reports",
-                    icon: "\u25a5"
-                },
-                {
-                    id: "alerts",
-                    label: "Alerts",
-                    icon: "!"
-                },
+  function getActivePage() {
+    return activePage;
+  }
 
-                ...commonEnd
-            ];
-        }
-
-        if (role === "employee" || role === "staff") {
-            return [
-                ...commonStart,
-
-                {
-                    id: "dashboard",
-                    label: "My Dashboard",
-                    icon: "\u25a3"
-                },
-                {
-                    id: "tasks",
-                    label: "My Tasks",
-                    icon: "\u2713"
-                },
-                {
-                    id: "activity",
-                    label: "My Activity",
-                    icon: "\u25c7"
-                },
-                {
-                    id: "performance",
-                    label: "My Performance",
-                    icon: "\u25c8"
-                },
-                {
-                    id: "zones",
-                    label: "My Zones",
-                    icon: "\u25ab"
-                },
-                {
-                    id: "alerts",
-                    label: "Alerts",
-                    icon: "!"
-                },
-
-                ...commonEnd
-            ];
-        }
-
-        return [
-            ...commonStart,
-            ...commonEnd
-        ];
-    }
-
-    function render() {
-
-        const navigation =
-            document.getElementById("main-navigation");
-
-        if (!navigation) {
-            return;
-        }
-
-        const items = getNavigationItems();
-
-        navigation.innerHTML = items.map(item => `
-            <button
-                type="button"
-                class="nav-item"
-                data-page="${item.id}"
-            >
-                <span class="nav-icon">${item.icon}</span>
-                <span class="nav-label">${item.label}</span>
-            </button>
-        `).join("");
-
-        navigation
-            .querySelectorAll(".nav-item")
-            .forEach(button => {
-
-                button.addEventListener("click", () => {
-
-                    const page =
-                        button.dataset.page;
-
-                    setActive(page);
-
-                    if (
-                        CleanTrack.app &&
-                        typeof CleanTrack.app.loadPage === "function"
-                    ) {
-                        CleanTrack.app.loadPage(page);
-                    }
-
-                });
-
-            });
-
-        setActive("home");
-    }
-
-    function setActive(pageId) {
-
-        document
-            .querySelectorAll(".nav-item")
-            .forEach(button => {
-
-                button.classList.toggle(
-                    "active",
-                    button.dataset.page === pageId
-                );
-
-            });
-
-    }
-
-    return {
-        render,
-        setActive,
-        getNavigationItems
+  function getDefaultPage(role) {
+    const defaults = {
+      admin: "home",
+      supervisor: "workspace",
+      employee: "my-desk"
     };
 
+    return defaults[String(role || "").toLowerCase()] || null;
+  }
+
+  function renderMenu(container) {
+    if (!container) {
+      throw new Error("A navigation container is required.");
+    }
+
+    const user = auth.getCurrentUser();
+
+    if (!user) {
+      container.replaceChildren();
+      return;
+    }
+
+    const menu = getMenu(user.role);
+    const fragment = document.createDocumentFragment();
+
+    menu.forEach(function (item) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "nav-item";
+      button.dataset.page = item.id;
+      button.setAttribute("aria-current", "false");
+
+      const icon = document.createElement("span");
+      icon.className = "nav-item-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = item.icon;
+
+      const label = document.createElement("span");
+      label.className = "nav-item-label";
+      label.textContent = item.label;
+
+      button.append(icon, label);
+
+      button.addEventListener("click", function () {
+        setActivePage(item.id);
+      });
+
+      fragment.appendChild(button);
+    });
+
+    container.replaceChildren(fragment);
+    updateActiveItem();
+  }
+
+  function updateActiveItem() {
+    document.querySelectorAll(".nav-item[data-page]").forEach(
+      function (button) {
+        const active = button.dataset.page === activePage;
+        button.classList.toggle("active", active);
+        button.setAttribute(
+          "aria-current",
+          active ? "page" : "false"
+        );
+      }
+    );
+  }
+
+  window.addEventListener("cleantrack:navigate", function (event) {
+    activePage = event.detail.page;
+    updateActiveItem();
+  });
+
+  window.CleanTrackNavigation = Object.freeze({
+    getMenu: getMenu,
+    setActivePage: setActivePage,
+    getActivePage: getActivePage,
+    getDefaultPage: getDefaultPage,
+    renderMenu: renderMenu
+  });
 })();

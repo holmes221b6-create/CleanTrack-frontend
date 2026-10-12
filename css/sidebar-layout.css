@@ -1,0 +1,197 @@
+/* CleanTrack workspace sidebar patch */
+#workspace-view .ct-workspace-shell {
+  --ct-sidebar-width: 248px;
+  display: grid;
+  grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
+  min-height: 100%;
+  width: 100%;
+  background: var(--surface, #fff);
+  color: var(--text-color, #172033);
+}
+#workspace-view .ct-sidebar {
+  width: var(--ct-sidebar-width);
+  min-width: 0;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 18px 12px;
+  box-sizing: border-box;
+  background: var(--sidebar-bg, #102f29);
+  color: #f8fafc;
+  border-right: 1px solid rgba(255,255,255,.1);
+  transition: width .18s ease, padding .18s ease;
+  z-index: 30;
+}
+#workspace-view .ct-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 22px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+}
+#workspace-view .ct-sidebar-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 11px;
+  background: #b9e4cc;
+  color: #12382d;
+  font-weight: 900;
+  font-size: 19px;
+}
+#workspace-view .ct-sidebar-brand strong,
+#workspace-view .ct-sidebar-brand small { display: block; }
+#workspace-view .ct-sidebar-brand strong { font-size: 15px; letter-spacing: -.02em; }
+#workspace-view .ct-sidebar-brand small {
+  margin-top: 2px;
+  color: #b8ccc5;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#workspace-view .ct-sidebar-label {
+  padding: 0 10px 8px;
+  color: #a9c4ba;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+#workspace-view #workspace-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+#workspace-view #workspace-navigation button,
+#workspace-view #workspace-navigation a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #d9e8e2;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+#workspace-view #workspace-navigation button:hover,
+#workspace-view #workspace-navigation a:hover {
+  background: rgba(255,255,255,.09);
+  color: #fff;
+}
+#workspace-view #workspace-navigation .active,
+#workspace-view #workspace-navigation [aria-current="page"],
+#workspace-view #workspace-navigation .ct-nav-active {
+  color: #fff;
+  background: rgba(185,228,204,.17);
+  border-color: rgba(185,228,204,.18);
+}
+#workspace-view .ct-workspace-main { min-width: 0; }
+#workspace-view .ct-workspace-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  padding: 7px 18px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background: var(--surface, #fff);
+}
+#workspace-view .ct-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-color, #d8dee7);
+  border-radius: 9px;
+  background: var(--surface, #fff);
+  color: var(--text-color, #172033);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+#workspace-view .ct-sidebar-toggle > span:first-child { font-size: 25px; line-height: 1; }
+#workspace-view .ct-sidebar-toggle:hover { background: var(--surface-hover, #f3f6f8); }
+#workspace-view .ct-sidebar-collapsed { --ct-sidebar-width: 72px; }
+#workspace-view .ct-sidebar-collapsed .ct-sidebar { padding-inline: 8px; }
+#workspace-view .ct-sidebar-collapsed .ct-sidebar-brand { justify-content: center; padding-inline: 0; }
+#workspace-view .ct-sidebar-collapsed .ct-sidebar-brand > span:last-child,
+#workspace-view .ct-sidebar-collapsed .ct-sidebar-label,
+#workspace-view .ct-sidebar-collapsed #workspace-navigation button .nav-label,
+#workspace-view .ct-sidebar-collapsed #workspace-navigation a .nav-label,
+#workspace-view .ct-sidebar-collapsed .ct-sidebar-toggle-text { display: none; }
+#workspace-view .ct-sidebar-collapsed #workspace-navigation button,
+#workspace-view .ct-sidebar-collapsed #workspace-navigation a { justify-content: center; padding-inline: 7px; }
+#workspace-view .ct-sidebar-collapsed .ct-sidebar-brand-mark { width: 34px; height: 34px; flex-basis: 34px; }
+#workspace-view .ct-sidebar-mobile { grid-template-columns: 0 minmax(0,1fr); }
+#workspace-view .ct-sidebar-mobile .ct-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 248px;
+  transform: translateX(-100%);
+  box-shadow: 8px 0 28px rgba(0,0,0,.16);
+}
+#workspace-view .ct-sidebar-mobile:not(.ct-sidebar-collapsed) .ct-sidebar { transform: translateX(0); }
+#workspace-view .ct-sidebar-mobile .ct-sidebar-collapsed { width: 0; }
+@media (max-width: 760px) {
+  #workspace-view .ct-workspace-shell { grid-template-columns: 0 minmax(0,1fr); }
+  #workspace-view .ct-sidebar { transition: transform .18s ease; }
+  #workspace-view .ct-sidebar-toggle { padding-inline: 10px; }
+}
+/* CleanTrack: dark toolbar and dark More/menu buttons */
+#workspace-view .ct-workspace-toolbar {
+background: #0b1120 !important;
+color: #e7edf7 !important;
+border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#workspace-view .ct-workspace-toolbar button,
+#workspace-view .ct-workspace-toolbar .ct-sidebar-toggle {
+background: #141e31 !important;
+color: #cbd5e1 !important;
+border: 1px solid #334155 !important;
+box-shadow: none !important;
+}
+
+#workspace-view .ct-workspace-toolbar button svg,
+#workspace-view .ct-workspace-toolbar button i {
+color: inherit !important;
+fill: currentColor;
+}
+
+#workspace-view .ct-workspace-toolbar button:hover {
+background: #243247 !important;
+color: #ffffff !important;
+}
+
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.sidebar-brand-text .brand-name,
+.sidebar-brand-text #workspace-role,
+.sidebar-brand-text #workspace-organization {
+  display: block;
+  margin: 0;
+}
+
+

@@ -1,426 +1,651 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#173f35">
 
     <meta
         name="description"
-        content="CleanTrack - Facility Hygiene Management System"
+        content="CleanTrack — manage teams, locations, operations, and workplace quality."
     >
 
-    <title>CleanTrack</title>
-
-
-    <!-- =================================================
-         GLOBAL CSS
-    ================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="css/components.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="css/dashboard.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="css/responsive.css"
-    >
+    <title>CleanTrack | Operations Management</title>
     
-    <link
-    rel="stylesheet"
-    href="css/home.css"
-    
-    >
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1120'/%3E%3Ctext x='32' y='45' font-size='44' text-anchor='middle' fill='%2345c4a0' font-family='Arial' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/teams.css">
+    <link rel="stylesheet" href="css/sidebar-layout.css">
+
+    <script src="js/config.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/navigation.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/teams.js" defer></script>
+    <script src="js/sidebar-layout.js" defer></script>
 </head>
 
-
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
+    <div id="app" class="app-shell">
 
-<!-- =====================================================
-     APPLICATION ROOT
-====================================================== -->
+        <!-- Global application header -->
+        <header id="app-header" class="app-header" hidden>
+            <a class="brand" href="#dashboard" aria-label="CleanTrack home">
+                <span class="brand-mark" aria-hidden="true">C</span>
+                <span class="brand-name">CleanTrack</span>
+            </a>
 
-<div id="app">
-
-
-    <!-- =================================================
-         AUTHENTICATION AREA
-
-         Login / registration will be rendered here.
-    ================================================== -->
-
-    <div
-        id="auth-container"
-        class="hidden"
-    ></div>
-
-
-    <!-- =================================================
-         MAIN APPLICATION
-    ================================================== -->
-
-    <div
-        id="application"
-        class="hidden"
-    >
-
-
-        <!-- =============================================
-             SIDEBAR
-        ============================================== -->
-
-        <aside
-            id="sidebar"
-            class="sidebar"
-        >
-
-            <!-- Logo -->
-
-            <div class="sidebar-brand">
-
-                <div class="brand-logo">
-                    CT
-                </div>
-
-                <div class="brand-text">
-
-                    <div class="brand-name">
-                        Clean<span>Track</span>
-                    </div>
-
-                    <div class="brand-subtitle">
-                        Facility Management
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- User -->
-
-            <div
-                id="sidebar-user"
-                class="sidebar-user"
-            >
-
-                <div
-                    id="sidebar-avatar"
-                    class="avatar"
-                >
-                    ?
-                </div>
-
-                <div class="sidebar-user-info">
-
-                    <div
-                        id="sidebar-user-name"
-                        class="sidebar-user-name"
-                    >
-                        User
-                    </div>
-
-                    <div
-                        id="sidebar-user-role"
-                        class="sidebar-user-role"
-                    >
-                        Role
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Navigation -->
-
-            <nav
-                id="main-navigation"
-                class="main-navigation"
-            >
-
-                <!--
-                    Navigation is generated
-                    dynamically according to role.
-                -->
-
-            </nav>
-
-
-            <!-- Sidebar footer -->
-
-            <div class="sidebar-footer">
-
+            <div class="header-actions">
                 <button
-                    id="logout-button"
-                    class="sidebar-logout"
+                    id="global-search-button"
+                    class="icon-button"
                     type="button"
+                    aria-label="Search CleanTrack"
+                    title="Search"
                 >
-
-                    <span class="logout-icon">
-                        ↪
-                    </span>
-
-                    <span>
-                        Logout
-                    </span>
-
+                    <span aria-hidden="true">⌕</span>
                 </button>
 
+                <button
+                    id="ai-assistant-button"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Open AI Assistant"
+                    title="AI Assistant"
+                >
+                    <span aria-hidden="true">✦</span>
+                </button>
+
+                <button
+                    id="notifications-button"
+                    class="icon-button notification-button"
+                    type="button"
+                    aria-label="Open notifications"
+                >
+                    <span aria-hidden="true">♧</span>
+                    <span id="notification-count" class="notification-count" hidden>0</span>
+                </button>
+
+                <button
+                    id="profile-menu-button"
+                    class="profile-button"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="profile-menu"
+                >
+                    <span id="header-avatar" class="avatar" aria-hidden="true">U</span>
+                    <span id="header-user-name">Account</span>
+                    <span aria-hidden="true">▾</span>
+                </button>
             </div>
 
-        </aside>
+            <div id="profile-menu" class="profile-menu" hidden>
+                <p id="profile-menu-email"></p>
+                <button type="button" data-action="open-settings">Settings</button>
+                <button type="button" data-action="logout">Log out</button>
+            </div>
+        </header>
 
+        <!-- Live status and accessible feedback -->
+        <div
+            id="connection-status"
+            class="connection-status"
+            role="status"
+            aria-live="polite"
+            hidden
+        ></div>
 
-        <!-- =============================================
-             MAIN CONTENT
-        ============================================== -->
+        <div
+            id="toast-container"
+            class="toast-container"
+            aria-live="polite"
+            aria-atomic="true"
+        ></div>
 
-        <div class="app-content">
+        <!-- Main page content -->
+        <main id="main-content" class="main-content">
 
+            <!-- Authentication screens -->
+            <section id="auth-view" class="auth-layout" aria-labelledby="auth-title">
 
-            <!-- =========================================
-                 TOPBAR
-            ========================================== -->
-            
-            <header class="topbar">
+                <aside class="auth-intro">
+                    <a class="brand brand-light" href="#login">
+                        <span class="brand-mark" aria-hidden="true">C</span>
+                        <span class="brand-name">CleanTrack</span>
+                    </a>
 
-    <!-- Mobile menu -->
-    <button
-        id="mobile-menu-button"
-        class="icon-button mobile-menu-button"
-        type="button"
-        aria-label="Open menu"
+                    <div class="auth-intro-content">
+                        <p class="eyebrow">OPERATIONS. ACCOUNTABILITY. QUALITY.</p>
+
+                        <h1>Every task matters. Every team counts.</h1>
+
+                        <p>
+                            Bring your people, places, and daily operations
+                            together in one organized workspace.
+                        </p>
+
+                        <ul class="auth-benefits">
+                            <li>Organize teams and work locations</li>
+                            <li>Assign, complete, and review operations</li>
+                            <li>Track progress and operational quality</li>
+                        </ul>
+                    </div>
+
+                    <p class="auth-footer-note">
+                        CleanTrack Operations Management
+                    </p>
+                </aside>
+
+                <div class="auth-panel">
+
+                    <!-- Login -->
+                    <section
+                        id="login-view"
+                        class="auth-card"
+                        aria-labelledby="auth-title"
+                    >
+                        <div class="auth-heading">
+                            <p class="eyebrow">WELCOME BACK</p>
+                            <h2 id="auth-title">Sign in to CleanTrack</h2>
+                            <p>Enter your account details to continue.</p>
+                        </div>
+
+                        <form id="login-form" novalidate>
+                            <div class="form-field">
+                                <label for="login-email">Email address</label>
+                                <input
+                                    id="login-email"
+                                    name="email"
+                                    type="email"
+                                    autocomplete="username"
+                                    placeholder="you@example.com"
+                                    required
+                                >
+                                <small class="field-error" data-error-for="email"></small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="login-password">Password</label>
+                                <div class="password-field">
+                                    <input
+                                        id="login-password"
+                                        name="password"
+                                        type="password"
+                                        autocomplete="current-password"
+                                        placeholder="Enter your password"
+                                        required
+                                    >
+                                    <button
+                                        class="password-toggle"
+                                        type="button"
+                                        data-toggle-password="login-password"
+                                        aria-label="Show password"
+                                    >
+                                        Show
+                                    </button>
+                                </div>
+                                <small class="field-error" data-error-for="password"></small>
+                            </div>
+
+                            <div class="form-options">
+                                <label class="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        name="remember"
+                                        id="remember-me"
+                                    >
+                                    <span>Remember me</span>
+                                </label>
+
+                                <button
+                                    class="text-button"
+                                    type="button"
+                                    data-view="forgot-password"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+
+                            <button
+                                class="button button-primary button-full"
+                                type="submit"
+                                id="login-submit"
+                            >
+                                Sign in
+                            </button>
+
+                            <p class="form-message" id="login-message" role="status"></p>
+                        </form>
+
+                        <p class="auth-switch">
+                            New to CleanTrack?
+                            <button class="text-button" type="button" data-view="register">
+                                Create an account
+                            </button>
+                        </p>
+                    </section>
+
+                    <!-- Registration: role selection is part of registration -->
+                    <section
+                        id="register-view"
+                        class="auth-card"
+                        aria-labelledby="register-title"
+                        hidden
+                    >
+                        <div class="auth-heading">
+                            <p class="eyebrow">GET STARTED</p>
+                            <h2 id="register-title">Create your account</h2>
+                            <p>Enter your details and choose your intended role.</p>
+                        </div>
+
+                        <form id="register-form" novalidate>
+                            <div class="form-field">
+                                <label for="register-name">Full name</label>
+                                <input
+                                    id="register-name"
+                                    name="name"
+                                    type="text"
+                                    autocomplete="name"
+                                    minlength="2"
+                                    maxlength="120"
+                                    placeholder="Your full name"
+                                    required
+                                >
+                                <small class="field-error" data-error-for="name"></small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="register-email">Email address</label>
+                                <input
+                                    id="register-email"
+                                    name="email"
+                                    type="email"
+                                    autocomplete="email"
+                                    placeholder="you@example.com"
+                                    required
+                                >
+                                <small class="field-error" data-error-for="email"></small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="register-password">Create password</label>
+                                <div class="password-field">
+                                    <input
+                                        id="register-password"
+                                        name="password"
+                                        type="password"
+                                        autocomplete="new-password"
+                                        minlength="10"
+                                        placeholder="At least 10 characters"
+                                        required
+                                    >
+                                    <button
+                                        class="password-toggle"
+                                        type="button"
+                                        data-toggle-password="register-password"
+                                        aria-label="Show password"
+                                    >
+                                        Show
+                                    </button>
+                                </div>
+                                <small class="field-hint">
+                                    Use a long, unique password.
+                                </small>
+                                <small class="field-error" data-error-for="password"></small>
+                            </div>
+                           
+                            
+<div class="form-group" id="organization-name-group" hidden>
+    <label for="register-organization-name">Organization Name</label>
+    <input
+        type="text"
+        id="register-organization-name"
+        name="organization_name"
+        placeholder="Enter your organization name"
+        autocomplete="organization"
     >
-        &#9776;
-    </button>
-
-
-    <!-- Current page -->
-    <div class="topbar-page">
-
-        <div
-            id="topbar-title"
-            class="topbar-title"
-        >
-            Home
-        </div>
-
-        <div
-            id="topbar-subtitle"
-            class="topbar-subtitle"
-        >
-            CleanTrack
-        </div>
-
-    </div>
-
-
-    <!-- Global search -->
-    <div class="global-search">
-
-        <span class="global-search-icon">
-            &#128269;
-        </span>
-
-        <input
-            id="global-search-input"
-            type="search"
-            placeholder="Search CleanTrack..."
-            autocomplete="off"
-            aria-label="Search CleanTrack"
-        />
-
-        <span class="global-search-key">
-            /
-        </span>
-
-    </div>
-
-
-    <!-- Right side -->
-    <div class="topbar-actions">
-
-        <!-- Notifications -->
-        <button
-            id="notification-button"
-            class="icon-button notification-button"
-            type="button"
-            aria-label="Notifications"
-            title="Notifications"
-        >
-            &#128276;
-
-            <span
-                id="notification-count"
-                class="notification-count hidden"
-            >
-                0
-            </span>
-        </button>
-
-
-        <!-- AI Help -->
-        <button
-            id="ai-help-button"
-            class="icon-button ai-help-button"
-            type="button"
-            aria-label="AI Help"
-            title="AI Help"
-        >
-            &#10024;
-        </button>
-
-
-        <!-- Profile -->
-        <button
-            id="profile-button"
-            class="profile-button"
-            type="button"
-            aria-expanded="false"
-            aria-label="Open profile menu"
-        >
-
-            <span
-                id="topbar-avatar"
-                class="avatar avatar-sm"
-            >
-                ?
-            </span>
-
-            <span
-                id="topbar-user-name"
-                class="profile-name"
-            >
-                User
-            </span>
-
-            <span class="profile-chevron">
-                &#9662;
-            </span>
-
-        </button>
-
-
-        <!-- Profile dropdown -->
-        <div
-            id="global-profile-menu"
-            class="global-profile-menu hidden"
-        >
-
-            <div class="global-profile-header">
-
-                <strong id="global-profile-name">
-                    User
-                </strong>
-
-                <span id="global-profile-role">
-                    Administrator
-                </span>
-
-            </div>
-
-            <div class="global-profile-divider"></div>
-
-            <button
-                type="button"
-                data-global-profile="profile"
-            >
-                My Profile
-            </button>
-
-            <button
-                type="button"
-                data-global-profile="settings"
-            >
-                Settings
-            </button>
-
-            <div class="global-profile-divider"></div>
-
-            <button
-                type="button"
-                class="global-profile-logout"
-                data-global-profile="logout"
-            >
-                Logout
-            </button>
-
-        </div>
-
-    </div>
-
-</header>
-
-
-            <!-- =========================================
-                 PAGE CONTENT
-            ========================================== -->
-
-            <main
-                id="page-content"
-                class="page-content"
-            >
-
-                <!-- Dynamic page content -->
-
-                <div
-                    id="page-view"
-                    class="page-view"
-                ></div>
-
-            </main>
-
-
-        </div>
-
-    </div>
-
-
+    <small class="field-error" data-error-for="organization_name"></small>
 </div>
 
+                            <fieldset class="role-selector">
+                                <legend>Which role are you registering for?</legend>
 
-<!-- =====================================================
-     GLOBAL TOAST CONTAINER
-====================================================== -->
+                                <label class="role-option">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="admin"
+                                        required
+                                    >
+                                    <span class="role-option-content">
+                                        <strong>Admin</strong>
+                                        <small>Create and manage an organization.</small>
+                                    </span>
+                                </label>
 
-<div
-    id="toast-container"
-    class="toast-container"
-></div>
+                                <label class="role-option">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="supervisor"
+                                        required
+                                    >
+                                    <span class="role-option-content">
+                                        <strong>Supervisor</strong>
+                                        <small>Request to join and manage an authorized team.</small>
+                                    </span>
+                                </label>
+
+                                <label class="role-option">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="employee"
+                                        required
+                                    >
+                                    <span class="role-option-content">
+                                        <strong>Employee</strong>
+                                        <small>Request to join an organization and complete assigned work.</small>
+                                    </span>
+                                </label>
+
+                                <small class="field-error" data-error-for="role"></small>
+                            </fieldset>
+
+                            <label class="checkbox-label terms-checkbox">
+                                <input
+                                    id="accept-terms"
+                                    name="accept_terms"
+                                    type="checkbox"
+                                    required
+                                >
+                                <span>
+                                    I agree to the
+                                    <a href="legal/terms.html">Terms of Service</a>
+                                    and
+                                    <a href="legal/privacy.html">Privacy Policy</a>.
+                                </span>
+                            </label>
+
+                            <button
+                                class="button button-primary button-full"
+                                type="submit"
+                                id="register-submit"
+                            >
+                                Continue
+                            </button>
+
+                            <p class="form-message" id="register-message" role="status"></p>
+                        </form>
+
+                        <p class="auth-switch">
+                            Already registered?
+                            <button class="text-button" type="button" data-view="login">
+                                Sign in
+                            </button>
+                        </p>
+                    </section>
+
+                    <!-- Organization onboarding -->
+                    <section
+                        id="organization-view"
+                        class="auth-card"
+                        aria-labelledby="organization-title"
+                        hidden
+                    >
+                        <div class="auth-heading">
+                            <p class="eyebrow">ORGANIZATION SETUP</p>
+                            <h2 id="organization-title">Connect your organization</h2>
+                            <p id="organization-description">
+                                Choose how you will connect to CleanTrack.
+                            </p>
+                        </div>
+
+                        <!-- Admin creates the organization -->
+                        <form id="create-organization-form" novalidate hidden>
+                            <div class="form-field">
+                                <label for="organization-name">Organization name</label>
+                                <input
+                                    id="organization-name"
+                                    name="organization_name"
+                                    type="text"
+                                    minlength="2"
+                                    maxlength="160"
+                                    placeholder="Your company or organization"
+                                    required
+                                >
+                                <small class="field-error"
+                                    data-error-for="organization_name"></small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="organization-description-input">
+                                    Description <span class="optional-label">(optional)</span>
+                                </label>
+                                <textarea
+                                    id="organization-description-input"
+                                    name="description"
+                                    rows="3"
+                                    maxlength="1000"
+                                    placeholder="What does your organization do?"
+                                ></textarea>
+                            </div>
+
+                            <button
+                                class="button button-primary button-full"
+                                type="submit"
+                            >
+                                Create organization
+                            </button>
+
+                            <p class="form-message" id="create-organization-message"
+                                role="status"></p>
+                        </form>
+
+                        <!-- Supervisor or Employee requests membership -->
+                        <form id="join-organization-form" novalidate hidden>
+                            <div class="form-field">
+                                <label for="organization-code">Organization code</label>
+                                <input
+                                    id="organization-code"
+                                    name="organization_code"
+                                    type="text"
+                                    autocomplete="off"
+                                    maxlength="80"
+                                    placeholder="Enter the code from your Admin"
+                                    required
+                                >
+                                <small class="field-hint">
+                                    Your request must be approved before you gain organization access.
+                                </small>
+                                <small class="field-error"
+                                    data-error-for="organization_code"></small>
+                            </div>
+
+                            <button
+                                class="button button-primary button-full"
+                                type="submit"
+                            >
+                                Request to join
+                            </button>
+
+                            <p class="form-message" id="join-organization-message"
+                                role="status"></p>
+                        </form>
+
+                        <!-- Shown while membership awaits approval -->
+                        <div id="pending-approval-panel" class="status-panel" hidden>
+                            <span class="status-icon" aria-hidden="true">◷</span>
+                            <h3>Approval pending</h3>
+                            <p>
+                                Your membership request has been submitted.
+                                You will gain access when an authorized Admin approves it.
+                            </p>
+                            <button
+                                class="button button-secondary button-full"
+                                type="button"
+                                data-action="check-membership"
+                            >
+                                Check request status
+                            </button>
+                            <p id="membership-status-message" class="form-message"
+                                role="status"></p>
+                        </div>
+                    </section>
+
+                    <!-- Password recovery -->
+                    <section
+                        id="forgot-password-view"
+                        class="auth-card"
+                        aria-labelledby="forgot-password-title"
+                        hidden
+                    >
+                        <div class="auth-heading">
+                            <p class="eyebrow">ACCOUNT RECOVERY</p>
+                            <h2 id="forgot-password-title">Reset your password</h2>
+                            <p>
+                                Enter your registered email address to request
+                                password recovery instructions.
+                            </p>
+                        </div>
+
+                        <form id="forgot-password-form" novalidate>
+                            <div class="form-field">
+                                <label for="forgot-password-email">Email address</label>
+                                <input
+                                    id="forgot-password-email"
+                                    name="email"
+                                    type="email"
+                                    autocomplete="email"
+                                    placeholder="you@example.com"
+                                    required
+                                >
+                            </div>
+
+                            <button
+                                class="button button-primary button-full"
+                                type="submit"
+                            >
+                                Request password reset
+                            </button>
+
+                            <p class="form-message" id="forgot-password-message"
+                                role="status"></p>
+                        </form>
+
+                        <p class="auth-switch">
+                            Remembered your password?
+                            <button class="text-button" type="button" data-view="login">
+                                Back to sign in
+                            </button>
+                        </p>
+                    </section>
+
+                </div>
+            </section>
+
+            <!-- Authenticated application layout -->
+            <section id="workspace-view" class="workspace-layout" hidden>
+                <aside id="sidebar" class="sidebar" aria-label="Main navigation">
+         
+<div class="sidebar-brand">
+    <span class="brand-mark" aria-hidden="true">C</span>
+    <span class="brand-name">CleanTrack</span>
+</div>
+
+<div class="workspace-identity">
+    <span id="workspace-role" class="role-badge"></span>
+    <strong id="workspace-organization">Organization</strong>
+</div>
+
+                
+
+                    <nav id="workspace-navigation" class="workspace-navigation">
+                        <!-- Navigation items are rendered for the authenticated role. -->
+                    </nav>
+
+                    <div class="sidebar-bottom">
+                        <button
+                            class="navigation-link"
+                            type="button"
+                            data-action="open-settings"
+                        >
+                            <span aria-hidden="true">⚙</span>
+                            <span>Settings</span>
+                        </button>
+
+                        <button
+                            class="navigation-link"
+                            type="button"
+                            data-action="logout"
+                        >
+                            <span aria-hidden="true">↪</span>
+                            <span>Log out</span>
+                        </button>
+                    </div>
+                </aside>
+
+                <div class="workspace-main">
+
+                <div class="mobile-workspace-bar" hidden>
+                    <button
+                        id="mobile-navigation-toggle"
+                        class="icon-button"
+                        type="button"
+                        aria-label="Toggle navigation"
+                        aria-expanded="false"
+                        aria-controls="sidebar"
+                    >
+                        ☰
+                    </button>
+
+                    <span id="mobile-page-title"></span>
+                </div>
 
 
-<!-- =====================================================
-     JAVASCRIPT
-====================================================== -->
+                    <div id="page-content" class="page-content">
+                        <!-- Role-specific pages are rendered by the application JavaScript. -->
+                    </div>
+                </div>
+            </section>
 
-<script src="js/api.js"></script>
+        </main>
 
-<script src="js/auth.js"></script>
+        <!-- Shared modal -->
+        <dialog id="app-modal" class="app-modal" aria-labelledby="modal-title">
+            <div class="modal-header">
+                <h2 id="modal-title">CleanTrack</h2>
+                <button
+                    class="icon-button"
+                    type="button"
+                    data-action="close-modal"
+                    aria-label="Close dialog"
+                >
+                    ×
+                </button>
+            </div>
 
-<script src="js/navigation.js"></script>
+            <div id="modal-content" class="modal-content"></div>
+        </dialog>
 
-<script src="js/app.js"></script>
+        <!-- Application footer -->
+        <footer id="app-footer" class="app-footer">
+            <p>CleanTrack · Operations Management</p>
+            <p>
+                <a href="legal/privacy.html">Privacy</a>
+                <span aria-hidden="true">·</span>
+                <a href="legal/terms.html">Terms</a>
+            </p>
+        </footer>
 
-
+    </div>
 </body>
-
 </html>
