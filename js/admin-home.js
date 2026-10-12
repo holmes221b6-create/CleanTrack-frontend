@@ -467,34 +467,55 @@
     const directoryHeader = el("div", "ct-home-section-heading");
     directoryHeader.append(el("p", "ct-home-kicker", "ORGANIZATION DIRECTORY"));
     directoryHeader.append(el("h2", "", "Find a member"));
-    directoryHeader.append(el("p", "ct-home-muted", "Search approved members of this organization by name, email, role, or location."));
+    directoryHeader.append(el("p", "ct-home-muted", "Search approved members and combine location, team, zone, role, and work-performance filters. Performance ranks use actual task records for the selected period."));
     directory.appendChild(directoryHeader);
 
     const searchWrap = el("div", "ct-home-member-search-wrap");
     const searchIcon = el("span", "ct-home-member-search-icon", "⌕");
     const search = el("input", "ct-home-member-search");
     search.type = "search";
-    search.placeholder = "Search staff, supervisors, email, location…";
+    search.placeholder = "Search names, emails, roles, teams, zones, locations…";
     search.setAttribute("aria-label", "Search members of this organization");
     search.autocomplete = "off";
     search.setAttribute("aria-controls", "ct-home-member-results");
+    search.dataset.ctMemberSearch = "true";
     searchWrap.append(searchIcon, search);
     directory.appendChild(searchWrap);
-    const resultInfo = el("p", "ct-home-member-count", members.length + " members");
+
+    const filterGrid = el("div", "ct-home-member-filters");
+    [
+      ["role", "Role"], ["location", "Location"], ["team", "Team"], ["zone", "Zone"],
+      ["ranking", "Performance ranking"], ["period", "Rank period"], ["sort", "Sort results"]
+    ].forEach(([key, label]) => {
+      const field = el("label", "ct-home-member-filter");
+      field.append(el("span", "", label));
+      const select = el("select", "ct-home-filter-select");
+      select.dataset.ctMemberFilter = key;
+      select.setAttribute("aria-label", label);
+      field.appendChild(select);
+      filterGrid.appendChild(field);
+    });
+    directory.appendChild(filterGrid);
+
+    const resultInfo = el("p", "ct-home-member-count", "Loading organization members…");
     resultInfo.dataset.ctMemberCount = "true";
     directory.appendChild(resultInfo);
     const results = el("div", "ct-home-member-results");
     results.dataset.ctMemberResults = "true";
     results.id = "ct-home-member-results";
-    results.hidden = true;
     directory.appendChild(results);
-    if (memberLoadError) {
-      directory.appendChild(el("p", "ct-home-inline-error", memberLoadError));
-    } else {
-      directory.appendChild(el("p", "ct-home-muted ct-home-directory-hint", "Start typing to get ranked suggestions. Names and emails that start with your search appear first, followed by word matches and partial matches."));
-    }
+    const errorMessage = el("p", "ct-home-inline-error", "");
+    errorMessage.dataset.ctMemberError = "true";
+    errorMessage.hidden = true;
+    directory.appendChild(errorMessage);
+    directory.appendChild(el("p", "ct-home-muted ct-home-directory-hint", "Members with task history are ranked by compliance. Members without eligible task records remain unranked; no score is invented."));
     search.addEventListener("input", () => renderMemberResults(root, search.value));
-    search.addEventListener("focus", () => { if (search.value.trim()) renderMemberResults(root, search.value); });
+    filterGrid.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", () => {
+        if (select.dataset.ctMemberFilter === "period") loadDirectoryMembers(root, true);
+        else renderMemberResults(root, search.value);
+      });
+    });
     search.addEventListener("keydown", event => {
       const items = Array.from(results.querySelectorAll("button"));
       const active = items.findIndex(item => item.getAttribute("aria-selected") === "true");
@@ -510,28 +531,24 @@
         results.hidden = true;
       }
     });
-    document.addEventListener("click", function closeMemberResults(event) {
-      if (!directory.contains(event.target)) {
-        results.hidden = true;
-        document.removeEventListener("click", closeMemberResults);
-      }
-    });
     root.appendChild(directory);
 
     try {
-      const responseMembers = await API.get("organizations/members");
-      members = Array.isArray(responseMembers) ? responseMembers :
-        (Array.isArray(responseMembers.members) ? responseMembers.members : []);
-      memberLoadError = "";
-      const count = root.querySelector("[data-ct-member-count]");
-      if (count) count.textContent = members.length + (members.length === 1 ? " member" : " members");
-      if (memberQuery) renderMemberResults(root, memberQuery);
+      const options = await API.get("organizations/directory-options");
+      directoryOptions = {
+        locations: Array.isArray(options.locations) ? options.locations : [],
+        teams: Array.isArray(options.teams) ? options.teams : [],
+        zones: Array.isArray(options.zones) ? options.zones : []
+      };
     } catch (error) {
-      members = [];
-      memberLoadError = "Member search is unavailable: " + (error.message || "request failed");
-      const hint = root.querySelector(".ct-home-directory-hint");
-      if (hint) { hint.textContent = memberLoadError; hint.className = "ct-home-inline-error"; }
+      directoryOptions = { locations: [], teams: [], zones: [] };
+      const warning = root.querySelector("[data-ct-member-error]");
+      if (warning) {
+        warning.hidden = false;
+        warning.textContent = "Filter options could not be loaded: " + (error.message || "request failed");
+      }
     }
+    await loadDirectoryMembers(root, true);
   }
 
   window.CleanTrackAdminHome = Object.freeze({ render: render });
