@@ -95,11 +95,16 @@ existingChildren.forEach(function (node) {
     const media = window.matchMedia("(max-width: 760px)");
     function updateMobileMode() {
       shell.classList.toggle("ct-sidebar-mobile", media.matches);
-      // Keep the menu closed by default on both desktop and mobile.
-      shell.classList.add("ct-sidebar-collapsed");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Open navigation");
-      toggle.title = "Open navigation";
+      // Desktop starts with a normal open sidebar; mobile starts with its drawer closed.
+      if (media.matches) {
+        shell.classList.add("ct-sidebar-collapsed");
+      } else {
+        shell.classList.remove("ct-sidebar-collapsed");
+      }
+      const collapsed = shell.classList.contains("ct-sidebar-collapsed");
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", collapsed ? "Open navigation" : "Close navigation");
+      toggle.title = collapsed ? "Open navigation" : "Close navigation";
     }
     if (media.addEventListener) media.addEventListener("change", updateMobileMode);
     else if (media.addListener) media.addListener(updateMobileMode);
