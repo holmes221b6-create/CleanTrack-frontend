@@ -269,7 +269,7 @@
             "",
             "Issue:",
             String(formData.get("message") || "")
-          ].join("\\n");
+          ].join("\n");
           const mailto = "mailto:?subject=" + encodeURIComponent(String(formData.get("subject") || "CleanTrack support request")) + "&body=" + encodeURIComponent(body);
           window.location.href = mailto;
         });
