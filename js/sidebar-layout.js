@@ -18,7 +18,7 @@
 
     const brand = document.createElement("div");
     brand.className = "ct-sidebar-brand";
-    brand.innerHTML = '<span class="ct-sidebar-brand-mark" aria-hidden="true"><svg class="ct-logo-symbol" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" focusable="false"><path d="M28.4 6.4 21.2 3.7C12.1.3 4.5 7.3 4.5 16.3v15.4c0 9 7.6 16 16.7 12.6l7.2-2.7-5.2-7.9-3.5 1.3c-3.3 1.2-6.7-1.2-6.7-4.7V19.7c0-3.5 3.4-5.9 6.7-4.7l3.5 1.3z" fill="#786dbb"/><path d="M30.3 17.2 43.5 24 30.3 32.2 23.2 24z" fill="#36a88a"/><path d="m30.3 17.2 0 15 13.2-8.2z" fill="#25866f"/></svg></span><span><strong>CleanTrack</strong><small>Operations</small></span>';
+    brand.innerHTML = '<span class="ct-sidebar-brand-mark" aria-hidden="true"><svg class="ct-logo-symbol" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true"><path d="M31 8 22 4 10 13 10 23 21 32 10 41 10 51 22 60 31 56" fill="none" stroke="#786dbb" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 17 57 32 42 47 27 32Z" fill="#36a88a"/><path d="M42 17 42 47 57 32Z" fill="#25866f"/></svg></span><span><strong>CleanTrack</strong><small>Operations</small></span>';
 
     const navLabel = document.createElement("div");
     navLabel.className = "ct-sidebar-label";
