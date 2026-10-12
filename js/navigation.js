@@ -17,8 +17,8 @@
 
   const routes = {
     admin: [
-      { id: "dashboard", label: "Dashboard", icon: "▦" },
       { id: "home", label: "Home", icon: "⌂" },
+      { id: "dashboard", label: "Dashboard", icon: "▦" },
       { id: "staff", label: "Staff", icon: "♙" },
       { id: "invitations", label: "Invitations", icon: "✉" },
       { id: "teams", label: "Teams", icon: "♧" },
@@ -106,7 +106,7 @@
 
   function getDefaultPage(role) {
     const defaults = {
-      admin: "dashboard",
+      admin: "home",
       supervisor: "workspace",
       employee: "my-desk"
     };
