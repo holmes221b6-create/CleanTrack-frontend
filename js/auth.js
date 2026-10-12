@@ -174,6 +174,7 @@ function normalizeUser(user) {
     } else {
       // Supervisors and employees stay signed out until their membership is approved.
       currentUser = null;
+      persistToken("");
     }
 
     return {
@@ -206,6 +207,7 @@ function normalizeUser(user) {
       return currentUser;
     } catch (error) {
       currentUser = null;
+      if (error.status === 401 || error.status === 403) persistToken("");
 
       if (error.status !== 401 && error.status !== 403) {
         console.warn(
