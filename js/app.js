@@ -509,6 +509,97 @@ function bindNavigation() {
   });
 }
 
+  function bindRegistrationForm() {
+    const form = getElement("register-form");
+    if (!form || form.dataset.bound === "true") return;
+    form.dataset.bound = "true";
+
+    const nameGroup = getElement("organization-name-group");
+    const codeGroup = getElement("organization-code-group");
+    const organizationName = getElement("register-organization-name");
+    const organizationCode = getElement("register-organization-code");
+    const message = getElement("register-message");
+    const submit = getElement("register-submit");
+    const roleInputs = Array.from(form.querySelectorAll('input[name="role"]'));
+
+    function updateRoleFields() {
+      const selected = form.querySelector('input[name="role"]:checked');
+      const role = selected ? selected.value : "";
+      const isAdmin = role === "admin";
+      const isJoining = role === "supervisor" || role === "employee";
+      if (nameGroup) nameGroup.hidden = !isAdmin;
+      if (codeGroup) codeGroup.hidden = !isJoining;
+      if (organizationName) organizationName.required = isAdmin;
+      if (organizationCode) organizationCode.required = isJoining;
+      if (submit) submit.textContent = isAdmin ? "Create organization" : "Request to join";
+    }
+    roleInputs.forEach(input => input.addEventListener("change", updateRoleFields));
+    updateRoleFields();
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      if (message) {
+        message.textContent = "";
+        message.className = "form-message";
+      }
+      if (!form.reportValidity()) return;
+
+      const data = new FormData(form);
+      const role = String(data.get("role") || "").toLowerCase();
+      if (!role) {
+        if (message) {
+          message.textContent = "Choose the role you are registering for.";
+          message.className = "form-message error";
+        }
+        return;
+      }
+
+      if (submit) {
+        submit.disabled = true;
+        submit.textContent = role === "admin" ? "Creating organization…" : "Sending request…";
+      }
+      setLoading(true);
+      try {
+        const result = await auth.register({
+          name: data.get("name"),
+          email: data.get("email"),
+          password: data.get("password"),
+          role,
+          organization_name: data.get("organization_name"),
+          organization_code: data.get("organization_code"),
+          accept_terms: data.get("accept_terms") === "on"
+        });
+
+        if (result.user && result.membershipStatus !== "pending") {
+          showAuthenticatedLayout(result.user);
+          navigation.setActivePage(navigation.getDefaultPage(result.user.role) || "home");
+          if (message) message.textContent = "";
+          form.reset();
+          updateRoleFields();
+          return;
+        }
+
+        if (message) {
+          message.textContent = result.message || "Your request was submitted.";
+          message.className = "form-message success";
+        }
+        form.reset();
+        updateRoleFields();
+      } catch (error) {
+        if (message) {
+          message.textContent = error.message || "Unable to create the account. Please check the details and try again.";
+          message.className = "form-message error";
+        }
+      } finally {
+        setLoading(false);
+        if (submit) {
+          submit.disabled = false;
+          updateRoleFields();
+        }
+      }
+    });
+  }
+
   function bindLoginForm() {
     const form = getElement("login-form");
     if (!form) return;
