@@ -1032,3 +1032,150 @@ body #workspace-view .ct-sidebar-toggle:focus-visible {
 body #workspace-view .ct-hamburger > span {
   background: currentColor !important;
 }
+
+
+/* Compact, shared bottom footer and contextual help dialogs. */
+body #app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body #main-content {
+  flex: 1 0 auto;
+  width: 100%;
+}
+body #app-footer.app-footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 22px;
+  padding: 12px clamp(16px, 3vw, 34px);
+  border-top: 1px solid #24232d !important;
+  background: #080b10 !important;
+  color: #777485 !important;
+  font-size: 11px;
+  line-height: 1.45;
+}
+body #app-footer .app-footer-brand,
+body #app-footer .app-footer-help,
+body #app-footer .app-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px 16px;
+}
+body #app-footer .app-footer-help {
+  justify-content: center;
+}
+body #app-footer a {
+  color: #a49db5 !important;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+body #app-footer a:hover,
+body #app-footer a:focus-visible {
+  color: #65b79e !important;
+  outline-color: #7668a5;
+}
+body #app-footer .app-footer-legal {
+  gap: 7px;
+}
+body #app-modal .ct-help-dialog {
+  display: grid;
+  gap: 15px;
+  color: #dcd8e7;
+  font-size: 13px;
+}
+body #app-modal .ct-help-dialog p { margin: 0; }
+body #app-modal .ct-help-lead {
+  color: #e9e7ef;
+  font-size: 14px;
+}
+body #app-modal .ct-help-topic {
+  padding: 12px 0;
+  border-bottom: 1px solid #292c36;
+}
+body #app-modal .ct-help-topic h3 {
+  margin: 0 0 5px;
+  color: #b4a7dc !important;
+  font-size: 13px;
+}
+body #app-modal .ct-help-topic p,
+body #app-modal .ct-help-note { color: #9290a0 !important; }
+body #app-modal .ct-help-dialog ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 22px;
+}
+body #app-modal .ct-help-dialog li { padding-left: 3px; }
+body #app-modal .ct-help-dialog li strong { color: #e9e7ef; }
+body #app-modal .ct-help-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+body #app-modal .ct-help-action-button,
+body #app-modal .ct-help-secondary-button {
+  padding: 9px 13px;
+  border: 1px solid #3b334d;
+  border-radius: 8px;
+  background: #1b1926;
+  color: #e9e7ef;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+body #app-modal .ct-help-action-button {
+  border-color: #356b5b;
+  background: #16352d;
+  color: #9fe0c8;
+}
+body #app-modal .ct-help-action-button:hover,
+body #app-modal .ct-help-secondary-button:hover {
+  border-color: #7668a5;
+}
+body #app-modal .ct-support-form {
+  display: grid;
+  gap: 8px;
+}
+body #app-modal .ct-support-form label {
+  color: #dcd8e7;
+  font-size: 12px;
+  font-weight: 600;
+}
+body #app-modal .ct-support-form input,
+body #app-modal .ct-support-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid #353143;
+  border-radius: 8px;
+  background: #0c1017;
+  color: #e9e7ef;
+  font: inherit;
+}
+body #app-modal .ct-support-form input:focus,
+body #app-modal .ct-support-form textarea:focus {
+  outline: 2px solid #7668a5;
+  outline-offset: 1px;
+}
+@media (max-width: 720px) {
+  body #app-footer.app-footer {
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 16px;
+  }
+  body #app-footer .app-footer-brand,
+  body #app-footer .app-footer-help,
+  body #app-footer .app-footer-legal {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px 14px;
+  }
+}
