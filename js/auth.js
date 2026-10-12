@@ -16,6 +16,27 @@
   }
 
   let currentUser = null;
+  let authToken = "";
+
+  function persistToken(token) {
+    authToken = String(token || "");
+    try {
+      if (authToken) window.sessionStorage.setItem("cleantrack_token", authToken);
+      else window.sessionStorage.removeItem("cleantrack_token");
+    } catch (error) {
+      // Keep the in-memory token for the current page when storage is unavailable.
+    }
+  }
+
+  function getAuthToken() {
+    if (authToken) return authToken;
+    try {
+      authToken = window.sessionStorage.getItem("cleantrack_token") || "";
+    } catch (error) {
+      authToken = "";
+    }
+    return authToken;
+  }
 
 function normalizeUser(user) {
   if (!user || typeof user !== "object") {
@@ -74,6 +95,7 @@ function normalizeUser(user) {
       password: credentials.password
     });
 
+    persistToken(response.token || response.data?.token || "");
     currentUser = normalizeUser(
       response.user || response.data?.user
     );
@@ -142,19 +164,24 @@ function normalizeUser(user) {
     }
 
     const response = await api.post("auth/register", payload);
-
     const user = response.user || response.data?.user || null;
+    const token = response.token || response.data?.token || "";
 
-    if (user) {
+    if (token) {
+      persistToken(token);
       currentUser = normalizeUser(user);
       emitAuthEvent("cleantrack:register", currentUser);
+    } else {
+      // Supervisors and employees stay signed out until their membership is approved.
+      currentUser = null;
     }
 
     return {
       user: currentUser,
-      message:
-        response.message ||
-        "Registration request received."
+      pendingUser: token ? null : user,
+      membershipStatus: response.membership_status || user?.membership_status || (token ? "approved" : "pending"),
+      organization: response.organization || null,
+      message: response.message || "Registration request received."
     };
   }
 
@@ -163,6 +190,7 @@ function normalizeUser(user) {
       await api.post("auth/logout", {});
     } finally {
       currentUser = null;
+      persistToken("");
       emitAuthEvent("cleantrack:logout", null);
     }
   }
@@ -242,6 +270,7 @@ function normalizeUser(user) {
     logout: logout,
     restoreSession: restoreSession,
     getCurrentUser: getCurrentUser,
+    getAuthToken: getAuthToken,
     isAuthenticated: isAuthenticated,
     hasRole: hasRole
   });
