@@ -76,6 +76,7 @@
   function showAuthenticatedLayout(user) {
     setVisible(getElement("auth-view"), false);
     setVisible(getElement("workspace-view"), true);
+    updateFooterGuide(user);
 
     const nameElement = getElement("header-user-name");
     const roleElement = getElement("workspace-role");
@@ -120,6 +121,7 @@
     setVisible(getElement("auth-view"), true);
     setVisible(getElement("login-view"), true);
     setVisible(getElement("register-view"), false);
+    updateFooterGuide(null);
   }
 
 
@@ -131,6 +133,184 @@
     };
 
     return labels[String(role || "").toLowerCase()] || "User";
+  }
+
+  function updateFooterGuide(user) {
+    const guide = getElement("footer-role-guide");
+    if (!guide) return;
+
+    const role = String(user?.role || "").toLowerCase();
+    const labels = {
+      admin: "Admin Guide",
+      supervisor: "Supervisor Guide",
+      employee: "Employee Guide"
+    };
+    guide.textContent = labels[role] || "Getting Started Guide";
+    guide.dataset.guideRole = role || "guest";
+  }
+
+  function openFooterHelp(action) {
+    const dialog = getElement("app-modal");
+    const titleElement = getElement("modal-title");
+    const content = getElement("modal-content");
+    if (!dialog || !titleElement || !content) return;
+
+    const user = auth.getCurrentUser();
+    const role = String(user?.role || "").toLowerCase();
+    const roleTitle = {
+      admin: "Admin Guide",
+      supervisor: "Supervisor Guide",
+      employee: "Employee Guide"
+    }[role] || "Getting Started Guide";
+
+    content.replaceChildren();
+
+    if (action === "center") {
+      titleElement.textContent = "Help Center";
+      content.innerHTML = `
+        <div class="ct-help-dialog">
+          <p class="ct-help-lead">Find your way around CleanTrack and get help with everyday work.</p>
+          <section class="ct-help-topic">
+            <h3>Finding your workspace</h3>
+            <p>Use the left navigation to open the sections available to your account. On smaller screens, use the three-line menu button to open navigation.</p>
+          </section>
+          <section class="ct-help-topic">
+            <h3>Roles and access</h3>
+            <p>Your role determines which tools and actions are available. If a section is missing or you need access, contact your workspace administrator.</p>
+          </section>
+          <section class="ct-help-topic">
+            <h3>Tasks and records</h3>
+            <p>Open the task or operations area available to your role to review work. Follow the instructions shown for each task and record evidence when requested.</p>
+          </section>
+          <div class="ct-help-dialog-actions">
+            <button type="button" class="ct-help-action-button" data-help-open="guide">Open ${roleTitle}</button>
+            <button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact Support</button>
+          </div>
+        </div>`;
+    } else if (action === "guide") {
+      titleElement.textContent = roleTitle;
+      const guideContent = {
+        admin: `
+          <p class="ct-help-lead">Manage your organization and keep operations accountable.</p>
+          <ol>
+            <li><strong>Set up the workspace.</strong> Check organization details, locations, and zones.</li>
+            <li><strong>Manage people.</strong> Review staff and invitations, and confirm that each person has the correct access.</li>
+            <li><strong>Plan work.</strong> Create and organize tasks or operations, with clear ownership and timing.</li>
+            <li><strong>Review execution.</strong> Check task progress, submitted evidence, and items that need attention.</li>
+            <li><strong>Monitor performance.</strong> Use the dashboard, reports, logs, and audit trail to follow up on exceptions.</li>
+          </ol>
+          <p class="ct-help-note">Only grant access appropriate to each person's responsibilities. Server-side permissions determine what actions are allowed.</p>`,
+        supervisor: `
+          <p class="ct-help-lead">Coordinate the team, review work, and follow up on exceptions.</p>
+          <ol>
+            <li><strong>Check today's work.</strong> Open the workspace and operations areas available to you.</li>
+            <li><strong>Coordinate coverage.</strong> Review personnel, sites, zones, and assigned responsibilities.</li>
+            <li><strong>Follow progress.</strong> Watch for pending, delayed, or incomplete work and raise issues early.</li>
+            <li><strong>Review submissions.</strong> Use the review queue to check records or evidence when that function is available to your account.</li>
+            <li><strong>Report blockers.</strong> Escalate missing access, unclear instructions, or site issues to your administrator.</li>
+          </ol>`,
+        employee: `
+          <p class="ct-help-lead">Use your workspace to understand assigned work and keep your records up to date.</p>
+          <ol>
+            <li><strong>Start with My Desk or My Tasks.</strong> Review the work and instructions available to you.</li>
+            <li><strong>Complete the task as instructed.</strong> Follow site procedures and any timing or safety requirements.</li>
+            <li><strong>Record completion accurately.</strong> Add requested evidence or notes when the task flow provides those options.</li>
+            <li><strong>Check your history.</strong> Review prior activity and announcements available to your account.</li>
+            <li><strong>Ask for help early.</strong> Contact your supervisor if an instruction is unclear or a task cannot be completed.</li>
+          </ol>`,
+        guest: `
+          <p class="ct-help-lead">Get started with your CleanTrack workspace.</p>
+          <ol>
+            <li>Sign in with your work account, or complete registration if your organization allows it.</li>
+            <li>Choose the role and organization details you were given by your organization.</li>
+            <li>After signing in, use the navigation to find the tools available to your account.</li>
+            <li>If you cannot access your workspace, contact your organization administrator.</li>
+          </ol>`
+      };
+      content.innerHTML = `<div class="ct-help-dialog">${guideContent[role] || guideContent.guest}<div class="ct-help-dialog-actions"><button type="button" class="ct-help-secondary-button" data-help-open="center">Help Center</button><button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact Support</button></div></div>`;
+    } else if (action === "contact") {
+      titleElement.textContent = "Contact Support";
+      const replyEmail = user?.email || "";
+      const accountName = user?.name || "";
+      const org = user?.organization_name || user?.organizationName || user?.organization?.name || (typeof user?.organization === "string" ? user.organization : "");
+      content.innerHTML = `
+        <div class="ct-help-dialog">
+          <p class="ct-help-lead">Prepare a support request with the details needed to investigate your issue.</p>
+          <p class="ct-help-note">The support email address has not been configured in this workspace. When your email app opens, enter your organization's support contact or ask your workspace administrator for it. The message will not be sent automatically.</p>
+          <form id="ct-support-form" class="ct-support-form">
+            <label for="ct-support-name">Your name</label>
+            <input id="ct-support-name" name="name" type="text" autocomplete="name" required>
+            <label for="ct-support-email">Reply-to email</label>
+            <input id="ct-support-email" name="email" type="email" autocomplete="email" required>
+            <label for="ct-support-subject">Subject</label>
+            <input id="ct-support-subject" name="subject" type="text" maxlength="120" value="CleanTrack support request" required>
+            <label for="ct-support-message">What do you need help with?</label>
+            <textarea id="ct-support-message" name="message" rows="4" maxlength="3000" required placeholder="Describe what happened and which page you were using."></textarea>
+            <div class="ct-help-dialog-actions">
+              <button type="submit" class="ct-help-action-button">Prepare email</button>
+              <button type="button" class="ct-help-secondary-button" data-help-open="center">Help Center</button>
+            </div>
+          </form>
+        </div>`;
+      const nameInput = content.querySelector("#ct-support-name");
+      const emailInput = content.querySelector("#ct-support-email");
+      if (nameInput) nameInput.value = accountName;
+      if (emailInput) emailInput.value = replyEmail;
+      const supportForm = content.querySelector("#ct-support-form");
+      if (supportForm) {
+        supportForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          const formData = new FormData(supportForm);
+          const body = [
+            "Name: " + String(formData.get("name") || ""),
+            "Reply-to email: " + String(formData.get("email") || ""),
+            "Role: " + (role || "guest"),
+            "Organization: " + (typeof org === "string" && org ? org : "Not available"),
+            "",
+            "Issue:",
+            String(formData.get("message") || "")
+          ].join("\\n");
+          const mailto = "mailto:?subject=" + encodeURIComponent(String(formData.get("subject") || "CleanTrack support request")) + "&body=" + encodeURIComponent(body);
+          window.location.href = mailto;
+        });
+      }
+    } else {
+      return;
+    }
+
+    if (typeof dialog.showModal === "function") {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+
+  function bindFooterHelp() {
+    const footer = getElement("app-footer");
+    const dialog = getElement("app-modal");
+    if (!footer || footer.dataset.helpReady === "true") return;
+    footer.dataset.helpReady = "true";
+    const year = getElement("footer-year");
+    if (year) year.textContent = String(new Date().getFullYear());
+
+    footer.addEventListener("click", function (event) {
+      const link = event.target.closest("[data-help-action]");
+      if (!link) return;
+      event.preventDefault();
+      openFooterHelp(link.dataset.helpAction);
+    });
+
+    if (dialog && dialog.dataset.footerHelpReady !== "true") {
+      dialog.dataset.footerHelpReady = "true";
+      dialog.addEventListener("click", function (event) {
+        if (event.target.closest("[data-action='close-modal']")) {
+          dialog.close ? dialog.close() : dialog.removeAttribute("open");
+          return;
+        }
+        const opener = event.target.closest("[data-help-open]");
+        if (opener) openFooterHelp(opener.dataset.helpOpen);
+      });
+    }
   }
 
   async function renderPage(pageId) {
@@ -356,6 +536,7 @@ function bindNavigation() {
     }
 
     state.started = true;
+    bindFooterHelp();
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
   bindRegistrationForm();
