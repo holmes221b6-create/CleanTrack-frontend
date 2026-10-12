@@ -52,7 +52,23 @@
     const results = root.querySelector("[data-ct-team-results]");
     if (!results) return;
     results.replaceChildren();
-    const visible = teams.filter(team => String(team.name || "").toLowerCase().includes(filterText.toLowerCase()));
+    const query = String(filterText || "").normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase().trim();
+    const visible = teams
+      .map(team => {
+        const name = String(team.name || "").normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+        const words = name.split(/\\s+/);
+        const description = String(team.description || "").toLowerCase();
+        let score = 0;
+        if (!query) score = 0;
+        else if (name.startsWith(query)) score = 300;
+        else if (words.some(word => word.startsWith(query))) score = 200;
+        else if (name.includes(query) || description.includes(query)) score = 100;
+        else score = -1;
+        return { team, score };
+      })
+      .filter(item => item.score >= 0)
+      .sort((a, b) => b.score - a.score || String(a.team.name || "").localeCompare(String(b.team.name || "")))
+      .map(item => item.team);
     const count = root.querySelector("[data-ct-team-count]");
     if (count) count.textContent = visible.length + (visible.length === 1 ? " team" : " teams");
     if (!visible.length) {
