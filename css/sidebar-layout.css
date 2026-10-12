@@ -288,3 +288,78 @@ color: #ffffff !important;
 @media (max-width: 760px) {
   #workspace-view .ct-workspace-toolbar { padding: 8px 12px; }
 }
+
+
+/* Slide the navigation panel off-canvas; keep page content visible and expanding. */
+#workspace-view .ct-workspace-shell {
+  --ct-sidebar-width: 248px;
+  display: grid;
+  grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
+  overflow-x: clip;
+  transition: grid-template-columns 240ms cubic-bezier(.2,.75,.25,1);
+}
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed {
+  --ct-sidebar-width: 0px;
+  grid-template-columns: 0 minmax(0, 1fr) !important;
+}
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile) > .ct-sidebar {
+  display: block !important;
+  width: 248px !important;
+  min-width: 248px !important;
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  transition: transform 240ms cubic-bezier(.2,.75,.25,1), opacity 160ms ease;
+}
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed > .ct-sidebar {
+  display: block !important;
+  width: 248px !important;
+  min-width: 248px !important;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+#workspace-view .ct-workspace-main {
+  min-width: 0;
+  width: 100%;
+  background: #0b1120 !important;
+}
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed .ct-sidebar-brand,
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed #workspace-navigation,
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed .workspace-identity,
+#workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed .ct-sidebar-label {
+  visibility: hidden;
+}
+
+/* On small screens the panel behaves like a drawer over the page. */
+#workspace-view .ct-workspace-shell.ct-sidebar-mobile {
+  grid-template-columns: minmax(0, 1fr) !important;
+  overflow: visible;
+}
+#workspace-view .ct-workspace-shell.ct-sidebar-mobile > .ct-sidebar {
+  display: block !important;
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(280px, 86vw) !important;
+  min-width: 0 !important;
+  height: 100dvh;
+  min-height: 100dvh;
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1000;
+  overflow-y: auto;
+  transition: transform 240ms cubic-bezier(.2,.75,.25,1), opacity 160ms ease, visibility 240ms;
+}
+#workspace-view .ct-workspace-shell.ct-sidebar-mobile.ct-sidebar-collapsed > .ct-sidebar {
+  transform: translateX(-105%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  box-shadow: none;
+}
+#workspace-view .ct-workspace-shell.ct-sidebar-mobile:not(.ct-sidebar-collapsed) > .ct-sidebar {
+  box-shadow: 10px 0 35px rgba(0,0,0,.42);
+}
