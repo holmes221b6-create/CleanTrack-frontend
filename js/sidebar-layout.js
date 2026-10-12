@@ -157,16 +157,26 @@ if (identity) {
         ? window.CleanTrackNavigation.getMenu(user && user.role)
         : [];
       const q = normalized(query);
-      if (q.length < 2) return [];
+      if (!q) return [];
 
       const terms = q.split(/\\s+/).filter(Boolean);
+      function scoreLabel(label, searchable) {
+        const labelNorm = normalized(label);
+        const words = labelNorm.split(/\\s+/);
+        if (labelNorm.startsWith(q)) return 500;
+        if (words.some(word => word.startsWith(q))) return 400;
+        if (labelNorm.includes(q)) return 300;
+        if (terms.length > 1 && terms.every(term => labelNorm.includes(term))) return 280;
+        if (searchable.startsWith(q)) return 200;
+        if (terms.every(term => searchable.includes(term))) return 100 + terms.filter(term => searchable.includes(term)).length;
+        return -1;
+      }
+
       const pages = menu.map(item => {
         const searchable = normalized(item.label + " " + item.id + " " + (pageKeywords[item.id] || ""));
-        const matches = terms.every(term => searchable.includes(term)) ||
-          searchable.includes(q);
-        if (!matches) return null;
-        const exact = normalized(item.label).startsWith(q) ? 20 : normalized(item.label).includes(q) ? 12 : 0;
-        return { kind: "page", id: item.id, label: item.label, detail: "Open page", icon: item.icon || "•", score: exact + terms.filter(term => searchable.includes(term)).length };
+        const score = scoreLabel(item.label, searchable);
+        if (score < 0) return null;
+        return { kind: "page", id: item.id, label: item.label, detail: "Open page", icon: item.icon || "•", score };
       }).filter(Boolean);
 
       const visibleMatches = [];
@@ -177,13 +187,16 @@ if (identity) {
         candidates.forEach(el => {
           const text = el.textContent.trim().replace(/\\s+/g, " ");
           const searchable = normalized(text + " " + (el.getAttribute("aria-label") || "") + " " + (el.getAttribute("title") || ""));
-          if (!searchable.includes(q) && !terms.every(term => searchable.includes(term))) return;
+          const score = scoreLabel(text, searchable);
+          if (score < 0) return;
           if (visibleMatches.some(match => match.element === el || match.element.contains(el) || el.contains(match.element))) return;
-          visibleMatches.push({ kind: "content", id: "", label: text.slice(0, 90), detail: "Match on this page", element: el, icon: "↳", score: normalized(text).startsWith(q) ? 14 : 4 });
+          visibleMatches.push({ kind: "content", id: "", label: text.slice(0, 90), detail: "Match on this page", element: el, icon: "↳", score: score - 5 });
         });
       }
 
-      return pages.concat(visibleMatches).sort((a,b) => b.score-a.score).slice(0, 8);
+      return pages.concat(visibleMatches)
+        .sort((a,b) => b.score-a.score || a.label.localeCompare(b.label))
+        .slice(0, 10);
     }
 
     function navigateToResult(result) {
@@ -204,7 +217,7 @@ if (identity) {
       const results = searchWrap.querySelector("#ct-global-search-results");
       const query = input.value.trim();
       results.replaceChildren();
-      if (normalized(query).length < 2) {
+      if (normalized(query).length < 1) {
         results.hidden = true;
         input.setAttribute("aria-expanded", "false");
         return;
