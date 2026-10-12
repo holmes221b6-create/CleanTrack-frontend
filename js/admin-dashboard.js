@@ -12,13 +12,13 @@
   let customTo = "";
 
   const COLORS = {
-    green: "#64d8b0",
-    blue: "#8ca8ff",
-    red: "#ff7f91",
-    amber: "#f4c56a",
-    grid: "#29374d",
-    muted: "#93a4bb",
-    text: "#edf3fc"
+    green: "#267fbd",
+    blue: "#24559a",
+    red: "#a84460",
+    amber: "#67548b",
+    grid: "#1b3150",
+    muted: "#8097b7",
+    text: "#e7effb"
   };
 
   function el(tag, className, text) {
