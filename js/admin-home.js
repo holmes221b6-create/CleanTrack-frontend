@@ -7,6 +7,9 @@
   let rootElement = null;
   let memberQuery = "";
   let memberLoadError = "";
+  let directoryOptions = { locations: [], teams: [], zones: [] };
+  let rankingPeriod = 30;
+  let rankedMemberCount = 0;
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -94,15 +97,69 @@
 
   function memberScore(member, query) {
     const q = normalized(query);
-    const name = normalized(member.name);
-    const email = normalized(member.email);
-    const role = normalized(member.role);
-    const location = normalized(member.location_name);
     if (!q) return 0;
-    if (name.startsWith(q) || email.startsWith(q)) return 300;
-    if (name.split(/\s+/).some(word => word.startsWith(q)) || role.startsWith(q) || location.startsWith(q)) return 200;
-    if ([name, email, role, location].some(value => value.includes(q))) return 100;
+    const fields = [member.name, member.email, member.role, member.location_name]
+      .concat(member.team_names || [], member.zone_names || []).map(normalized);
+    if (normalized(member.name).startsWith(q) || normalized(member.email).startsWith(q)) return 300;
+    if (fields.some(value => value.split(/\s+/).some(word => word.startsWith(q)))) return 200;
+    if (fields.some(value => value.includes(q))) return 100;
     return -1;
+  }
+
+  function selectedFilter(root, name) {
+    const control = root.querySelector('[data-ct-member-filter="' + name + '"]');
+    return control ? control.value : "";
+  }
+
+  function populateDirectoryFilters(root) {
+    const roles = Array.from(new Set(members.map(member => String(member.role || "").trim()).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
+    const optionSets = {
+      role: roles.map(value => ({ id: value, name: value.replace(/[-_]/g, " ") })),
+      location: directoryOptions.locations,
+      team: directoryOptions.teams,
+      zone: directoryOptions.zones,
+      ranking: [
+        { id: "ranked", name: "Ranked members" },
+        { id: "top", name: "Top performers (top 25%)" },
+        { id: "attention", name: "Needs attention (<80% compliance)" },
+        { id: "unranked", name: "Not ranked yet" }
+      ],
+      sort: [
+        { id: "relevance", name: "Best match / rank" },
+        { id: "name", name: "Name A–Z" },
+        { id: "compliance", name: "Highest compliance" },
+        { id: "completed", name: "Most tasks completed" },
+        { id: "missed", name: "Most missed tasks" }
+      ],
+      period: [
+        { id: "7", name: "Last 7 days" },
+        { id: "30", name: "Last 30 days" },
+        { id: "90", name: "Last 90 days" },
+        { id: "365", name: "Last 12 months" }
+      ]
+    };
+    Object.entries(optionSets).forEach(([key, choices]) => {
+      const select = root.querySelector('[data-ct-member-filter="' + key + '"]');
+      if (!select) return;
+      const previous = select.value;
+      const firstLabel = ({ role: "All roles", location: "All locations", team: "All teams", zone: "All zones", ranking: "All rankings" })[key];
+      select.replaceChildren();
+      choices.forEach(choice => {
+        const option = el("option", "", choice.name);
+        option.value = String(choice.id);
+        if (key === "zone" && choice.location_name) option.textContent += " · " + choice.location_name;
+        select.appendChild(option);
+      });
+      if (firstLabel) {
+        const all = el("option", "", firstLabel);
+        all.value = "";
+        select.prepend(all);
+      }
+      if (choices.some(choice => String(choice.id) === previous)) select.value = previous;
+      else if (key === "period") select.value = String(rankingPeriod);
+      else if (key === "sort") select.value = "relevance";
+    });
   }
 
   function renderMemberResults(root, query) {
@@ -112,54 +169,95 @@
     results.replaceChildren();
     memberQuery = query;
     const q = normalized(query);
+    const role = normalized(selectedFilter(root, "role"));
+    const location = selectedFilter(root, "location");
+    const team = selectedFilter(root, "team");
+    const zone = selectedFilter(root, "zone");
+    const ranking = selectedFilter(root, "ranking");
+    const sort = selectedFilter(root, "sort");
 
-    if (!q) {
-      results.hidden = true;
-      if (count) count.textContent = members.length + (members.length === 1 ? " member" : " members");
-      return;
-    }
-
-    const matches = members
-      .map(member => ({ member, score: memberScore(member, q) }))
+    let matched = members.map(member => ({ member, score: memberScore(member, q) }))
       .filter(item => item.score >= 0)
-      .sort((a, b) => b.score - a.score || normalized(a.member.name).localeCompare(normalized(b.member.name)))
-      .slice(0, 10);
-
-    results.hidden = false;
-    if (count) count.textContent = matches.length + (matches.length === 1 ? " match" : " matches");
-
-    if (!matches.length) {
-      results.appendChild(el("div", "ct-home-member-empty", "No organization members match “" + query + "”. Try a name, email, role, or location."));
-      return;
-    }
-
-    const groups = [
-      { score: 300, label: "Starts with your search" },
-      { score: 200, label: "Starts with it in another word" },
-      { score: 100, label: "Contains your search" }
-    ];
-
-    let rendered = 0;
-    groups.forEach(group => {
-      const subset = matches.filter(item => item.score === group.score);
-      if (!subset.length) return;
-      results.appendChild(el("div", "ct-home-member-group-label", group.label));
-      subset.forEach(({ member }) => {
-        const item = button("", "ct-home-member-result", () => openMemberDetails(member));
-        const avatar = el("span", "ct-home-member-avatar", initials(member.name));
-        const copy = el("span", "ct-home-member-copy");
-        copy.append(el("strong", "", member.name || "Unnamed member"));
-        copy.append(el("small", "", member.email || "No email available"));
-        const badge = el("span", "ct-home-role-pill", String(member.role || "member").replace(/[-_]/g, " "));
-        const arrow = el("span", "ct-home-member-arrow", "↗");
-        item.append(avatar, copy, badge, arrow);
-        results.appendChild(item);
-        rendered += 1;
+      .filter(({ member }) => !role || normalized(member.role) === role)
+      .filter(({ member }) => !location || String(member.location_id || "") === location)
+      .filter(({ member }) => !team || (member.team_ids || []).includes(team))
+      .filter(({ member }) => !zone || (member.zone_ids || []).includes(zone))
+      .filter(({ member }) => {
+        if (!ranking) return true;
+        const hasRank = member.rank !== null && member.rank !== undefined && Number.isFinite(Number(member.rank));
+        if (ranking === "ranked") return hasRank;
+        if (ranking === "unranked") return !hasRank;
+        if (ranking === "attention") return hasRank && Number(member.compliance_pct) < 80;
+        if (ranking === "top") return hasRank && Number(member.rank) <= Math.max(1, Math.ceil(rankedMemberCount * 0.25));
+        return true;
       });
+
+    matched.sort((a, b) => {
+      const x = a.member, y = b.member;
+      if (sort === "name") return normalized(x.name).localeCompare(normalized(y.name));
+      if (sort === "compliance") return Number(y.compliance_pct ?? -1) - Number(x.compliance_pct ?? -1);
+      if (sort === "completed") return Number(y.completed_tasks || 0) - Number(x.completed_tasks || 0);
+      if (sort === "missed") return Number(y.missed_tasks || 0) - Number(x.missed_tasks || 0);
+      const xr = x.rank !== null && x.rank !== undefined;
+      const yr = y.rank !== null && y.rank !== undefined;
+      if (xr && !yr) return -1;
+      if (yr && !xr) return 1;
+      if (xr && yr && x.rank !== y.rank) return x.rank - y.rank;
+      return b.score - a.score || normalized(x.name).localeCompare(normalized(y.name));
     });
 
-    if (!rendered) {
-      results.appendChild(el("div", "ct-home-member-empty", "No matching members."));
+    results.hidden = false;
+    const limit = 100;
+    if (count) count.textContent = matched.length + " matching " + (matched.length === 1 ? "member" : "members")
+      + (matched.length > limit ? " · showing first " + limit : "");
+    if (!matched.length) {
+      results.appendChild(el("div", "ct-home-member-empty",
+        members.length ? "No members match these search terms and filters." : "No active approved members are available in this organization yet."));
+      return;
+    }
+    matched.slice(0, limit).forEach(({ member }) => {
+      const item = button("", "ct-home-member-result", () => openMemberDetails(member));
+      const copy = el("span", "ct-home-member-copy");
+      copy.append(el("strong", "", member.name || "Unnamed member"));
+      copy.append(el("small", "", member.email || "No email available"));
+      const context = [member.location_name || "No location", (member.team_names || []).join(", "), (member.zone_names || []).join(", ")]
+        .filter(Boolean).join(" · ");
+      copy.append(el("small", "ct-home-member-context", context));
+      const badges = el("span", "ct-home-member-badges");
+      badges.append(el("span", "ct-home-role-pill", String(member.role || "member").replace(/[-_]/g, " ")));
+      if (member.rank) badges.append(el("span", "ct-home-rank-pill", "#" + member.rank + " · " + Number(member.compliance_pct).toFixed(1) + "%"));
+      else if (["staff", "employee"].includes(normalized(member.role)) && Number(member.total_tasks || 0) === 0) {
+        badges.append(el("span", "ct-home-rank-pill ct-home-rank-pill--muted", "Not ranked"));
+      }
+      item.append(el("span", "ct-home-member-avatar", initials(member.name)), copy, badges, el("span", "ct-home-member-arrow", "↗"));
+      results.appendChild(item);
+    });
+  }
+
+  async function loadDirectoryMembers(root, showLoading) {
+    if (!root || !API) return;
+    const periodControl = root.querySelector('[data-ct-member-filter="period"]');
+    rankingPeriod = Number(periodControl && periodControl.value) || rankingPeriod || 30;
+    if (showLoading) {
+      const results = root.querySelector("[data-ct-member-results]");
+      if (results) results.replaceChildren(el("div", "ct-home-loading", "Loading member performance…"));
+    }
+    try {
+      const response = await API.get("organizations/members?days=" + encodeURIComponent(rankingPeriod));
+      members = Array.isArray(response) ? response : (Array.isArray(response.members) ? response.members : []);
+      rankedMemberCount = Number(response.ranked_count) || members.filter(member => member.rank).length;
+      memberLoadError = "";
+      populateDirectoryFilters(root);
+      const message = root.querySelector("[data-ct-member-error]");
+      if (message) message.hidden = true;
+      renderMemberResults(root, root.querySelector("[data-ct-member-search]")?.value || "");
+    } catch (error) {
+      members = [];
+      rankedMemberCount = 0;
+      memberLoadError = "Member search is unavailable: " + (error.message || "request failed");
+      const message = root.querySelector("[data-ct-member-error]");
+      if (message) { message.hidden = false; message.textContent = memberLoadError; }
+      renderMemberResults(root, root.querySelector("[data-ct-member-search]")?.value || "");
     }
   }
 
