@@ -628,18 +628,25 @@
   }
 
   async function load(container, force) {
-    if (loading) return;
-    if (hasLoaded && !force) {
-      const existing = container.querySelector(".ct-admin-dashboard");
-      if (existing) renderSummary(existing);
+    let root = container.querySelector(".ct-admin-dashboard");
+    // app.js clears #page-content on every navigation. Rebuild the dashboard
+    // shell synchronously when returning to the route, even if data is cached.
+    if (!root) root = build(container);
+
+    if (loading) {
+      renderSummary(root);
       return;
     }
+    if (hasLoaded && !force) {
+      renderSummary(root);
+      return;
+    }
+
     loading = true;
-    let root = container.querySelector(".ct-admin-dashboard");
-    if (!root) root = build(container);
     const refresh = root.querySelector(".ct-dash-refresh");
     if (refresh) { refresh.disabled = true; refresh.textContent = "Loading…"; }
     showError(root, "");
+    let loadError = "";
     try {
       if (!API) throw new Error("CleanTrack API client is unavailable.");
       const responses = await Promise.allSettled([
@@ -661,18 +668,24 @@
         activity = Array.isArray(result) ? result : (result.audit_logs || []);
       } else { activity = []; errors.push("recent activity"); }
       hasLoaded = true;
-      if (errors.length) showError(root, "Some dashboard data could not load (" + errors.join(", ") + "). Check the backend logs and database setup.");
-      renderSummary(root);
+      if (errors.length) {
+        loadError = "Some dashboard data could not load (" + errors.join(", ") + "). Check the backend logs and database setup.";
+      }
     } catch (error) {
       hasLoaded = false;
-      showError(root, error && error.message ? error.message : "Dashboard data failed to load.");
+      loadError = error && error.message ? error.message : "Dashboard data failed to load.";
       operations = [];
       locations = [];
       activity = [];
-      renderSummary(root);
     } finally {
       loading = false;
-      if (refresh) { refresh.disabled = false; refresh.textContent = "↻ Refresh"; }
+      // Navigation may have replaced the original root while requests were in
+      // flight. Update the currently visible dashboard instead of a detached node.
+      const activeRoot = document.getElementById("page-content")?.querySelector(".ct-admin-dashboard") || root;
+      showError(activeRoot, loadError);
+      renderSummary(activeRoot);
+      const activeRefresh = activeRoot.querySelector(".ct-dash-refresh");
+      if (activeRefresh) { activeRefresh.disabled = false; activeRefresh.textContent = "↻ Refresh"; }
     }
   }
 
