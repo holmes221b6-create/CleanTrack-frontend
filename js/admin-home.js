@@ -245,6 +245,7 @@
       if (sort === "missed") return Number(y.missed_tasks || 0) - Number(x.missed_tasks || 0);
       const xr = x.rank !== null && x.rank !== undefined;
       const yr = y.rank !== null && y.rank !== undefined;
+      if (q && b.score !== a.score) return b.score - a.score;
       if (xr && !yr) return -1;
       if (yr && !xr) return 1;
       if (xr && yr && x.rank !== y.rank) return x.rank - y.rank;
