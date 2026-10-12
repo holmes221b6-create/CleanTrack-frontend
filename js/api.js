@@ -32,6 +32,16 @@
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
 
+    // The Flask API uses Bearer JWTs; keep the token in this browser tab's session.
+    try {
+      const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken
+        ? window.CleanTrackAuth.getAuthToken()
+        : window.sessionStorage.getItem("cleantrack_token");
+      if (token) headers.set("Authorization", "Bearer " + token);
+    } catch (error) {
+      // Storage can be unavailable in privacy-restricted browsing modes.
+    }
+
     let body = options.body;
 
     if (
