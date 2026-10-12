@@ -974,3 +974,61 @@ body #page-content .ct-team-card:hover,
 body #page-content .card:hover,
 body #page-content .panel:hover { border-color: #464052 !important; }
 body ::selection { color: #f5f2fb; background: #51456f; }
+
+
+/* Focus brand finishing: show the diamond and hamburger without button/logo boxes. */
+body .brand-mark,
+body #auth-view .brand-mark,
+body #workspace-view .ct-sidebar-brand-mark {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+body .brand-mark {
+  display: inline-grid !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  place-items: center !important;
+}
+body .brand-mark .ct-logo-symbol {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+body #workspace-view .ct-sidebar-brand-mark {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  place-items: center !important;
+}
+body #workspace-view .ct-sidebar-brand-mark .ct-logo-symbol {
+  width: 40px !important;
+  height: 40px !important;
+}
+body #workspace-view .ct-sidebar-toggle {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  color: #d4cde7 !important;
+}
+body #workspace-view .ct-sidebar-toggle:hover,
+body #workspace-view .ct-sidebar-toggle:focus-visible {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #ffffff !important;
+}
+body #workspace-view .ct-hamburger > span {
+  background: currentColor !important;
+}
