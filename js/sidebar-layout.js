@@ -43,7 +43,7 @@ if (identity) {
     toggle.setAttribute("aria-label", "Collapse sidebar");
     toggle.setAttribute("aria-expanded", "true");
     toggle.title = "Collapse or expand navigation";
-    toggle.innerHTML = '<span aria-hidden="true">⋯</span><span class="ct-sidebar-toggle-text">Menu</span>';
+    toggle.innerHTML = '<span class="ct-hamburger" aria-hidden="true"><span></span><span></span><span></span></span>';
 
     const toolbar = document.createElement("div");
     toolbar.className = "ct-workspace-toolbar";
@@ -76,8 +76,8 @@ existingChildren.forEach(function (node) {
     toggle.addEventListener("click", function () {
       const collapsed = shell.classList.toggle("ct-sidebar-collapsed");
       toggle.setAttribute("aria-expanded", String(!collapsed));
-      toggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
-      toggle.title = collapsed ? "Expand navigation" : "Collapse navigation";
+      toggle.setAttribute("aria-label", collapsed ? "Open navigation" : "Close navigation");
+      toggle.title = collapsed ? "Open navigation" : "Close navigation";
     });
 
     // Keep the active navigation page highlighted by the existing navigation renderer.
@@ -95,9 +95,11 @@ existingChildren.forEach(function (node) {
     const media = window.matchMedia("(max-width: 760px)");
     function updateMobileMode() {
       shell.classList.toggle("ct-sidebar-mobile", media.matches);
-      if (media.matches) shell.classList.add("ct-sidebar-collapsed");
-      else shell.classList.remove("ct-sidebar-collapsed");
-      toggle.setAttribute("aria-expanded", String(!shell.classList.contains("ct-sidebar-collapsed")));
+      // Keep the menu closed by default on both desktop and mobile.
+      shell.classList.add("ct-sidebar-collapsed");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open navigation");
+      toggle.title = "Open navigation";
     }
     if (media.addEventListener) media.addEventListener("change", updateMobileMode);
     else if (media.addListener) media.addListener(updateMobileMode);
