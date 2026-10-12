@@ -224,7 +224,7 @@
     let matched = members.map(member => ({ member, score: memberScore(member, q) }))
       .filter(item => item.score >= 0)
       .filter(({ member }) => !role || normalized(member.role) === role)
-      .filter(({ member }) => !location || String(member.location_id || "") === location)
+      .filter(({ member }) => !location || (member.location_ids || [member.location_id]).map(String).includes(location))
       .filter(({ member }) => !team || (member.team_ids || []).includes(team))
       .filter(({ member }) => !zone || (member.zone_ids || []).includes(zone))
       .filter(({ member }) => {
