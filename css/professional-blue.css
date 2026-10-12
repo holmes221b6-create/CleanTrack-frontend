@@ -16,14 +16,14 @@
   --text-secondary: #a0b2cc;
   --text-muted: #7086a5;
 
-  --primary: #176bd0;
-  --primary-hover: #1d7ce8;
+  --primary: #163d68;
+  --primary-hover: #1c4a78;
   --primary-contrast: #f5f9ff;
-  --accent: #3d9bff;
+  --accent: #527ca8;
   --success: #238e89;
   --warning: #ad794a;
   --danger: #b84b63;
-  --info: #3986ce;
+  --info: #31577c;
 
   --ct-bg: #050b16;
   --ct-page: #050b16;
@@ -33,12 +33,12 @@
   --ct-border: #1b3150;
   --ct-text: #e7effb;
   --ct-muted: #8ba0bf;
-  --ct-blue: #176bd0;
-  --ct-blue-hover: #1d7ce8;
-  --ct-focus: #3986ce;
+  --ct-blue: #163d68;
+  --ct-blue-hover: #1c4a78;
+  --ct-focus: #31577c;
   --ct-green: #0b2445;
   --ct-green-light: #2c75c7;
-  --ct-accent: #3d9bff;
+  --ct-accent: #527ca8;
 
   --focus-ring: 0 0 0 3px rgb(61 155 255 / 22%);
   --shadow-sm: 0 5px 18px rgb(0 0 0 / 24%);
@@ -102,7 +102,7 @@ body #workspace-view .ct-sidebar-brand {
 }
 body #workspace-view .ct-sidebar-brand-mark {
   color: #edf6ff !important;
-  background: #1554a0 !important;
+  background: #143761 !important;
   border: 1px solid #2c71bd !important;
 }
 body #workspace-view .ct-sidebar-brand strong { color: #eef5ff !important; }
@@ -126,9 +126,9 @@ body #workspace-view #workspace-navigation .active,
 body #workspace-view #workspace-navigation [aria-current="page"],
 body #workspace-view #workspace-navigation .ct-nav-active {
   color: #f2f8ff !important;
-  background: linear-gradient(90deg, #123c70, #0c2749) !important;
-  border-color: #1c5692 !important;
-  box-shadow: inset 3px 0 #2589ed;
+  background: linear-gradient(90deg, #102b49, #0a1e35) !important;
+  border-color: #23466a !important;
+  box-shadow: inset 3px 0 #2a5b88;
 }
 body #workspace-view .ct-sidebar-toggle {
   background: #0b192d !important;
@@ -137,7 +137,7 @@ body #workspace-view .ct-sidebar-toggle {
 }
 body #workspace-view .ct-sidebar-toggle:hover {
   background: #102746 !important;
-  border-color: #347dc6 !important;
+  border-color: #2a547f !important;
 }
 body #workspace-view .ct-hamburger > span { background: #c7e1ff !important; }
 
@@ -199,8 +199,8 @@ body #page-content button.primary,
 body #page-content .ct-button--primary,
 body .app-modal .button-primary {
   color: #f4f8ff !important;
-  background: #1557a7 !important;
-  border: 1px solid #246fbd !important;
+  background: #102d52 !important;
+  border: 1px solid #1c416e !important;
   box-shadow: 0 3px 10px rgb(0 52 120 / 18%);
 }
 body #page-content .button-primary:hover,
@@ -208,8 +208,8 @@ body #page-content .btn-primary:hover,
 body #page-content button.primary:hover,
 body #page-content .ct-button--primary:hover {
   color: #fff !important;
-  background: #1b6dc8 !important;
-  border-color: #3d91e7 !important;
+  background: #154071 !important;
+  border-color: #315f8b !important;
 }
 body #page-content .button-secondary,
 body #page-content .btn-secondary,
@@ -240,7 +240,7 @@ body a:focus-visible,
 body input:focus-visible,
 body select:focus-visible,
 body textarea:focus-visible {
-  outline: 2px solid #3189e4 !important;
+  outline: 2px solid #315b84 !important;
   outline-offset: 2px;
 }
 
@@ -272,7 +272,7 @@ body textarea:hover {
 body input:focus,
 body select:focus,
 body textarea:focus {
-  border-color: #2e83d7 !important;
+  border-color: #315d88 !important;
   box-shadow: 0 0 0 3px rgb(46 131 215 / 15%) !important;
   outline: none;
 }
@@ -282,7 +282,7 @@ body select option {
 }
 body input[type="checkbox"],
 body input[type="radio"] {
-  accent-color: #2a83dd;
+  accent-color: #2a5d8d;
 }
 body fieldset {
   border-color: #203956 !important;
@@ -413,7 +413,7 @@ body #auth-view .auth-intro li,
 body #auth-view .auth-intro .brand-name {
   color: #e7effb !important;
 }
-body #auth-view .auth-intro .eyebrow { color: #69aff8 !important; }
+body #auth-view .auth-intro .eyebrow { color: #7192b8 !important; }
 body #auth-view .auth-panel {
   background: #070f1e !important;
 }
@@ -446,12 +446,12 @@ body #auth-view .role-option {
 }
 body #auth-view .role-option:has(input:checked) {
   background: #102b4b !important;
-  border-color: #2b70b4 !important;
+  border-color: #244b75 !important;
 }
 body #auth-view .text-button,
 body #auth-view .terms-checkbox a,
 body #auth-view .password-toggle {
-  color: #66adf5 !important;
+  color: #648cb4 !important;
 }
 body #auth-view .password-toggle:hover {
   background: #102440 !important;
@@ -459,11 +459,11 @@ body #auth-view .password-toggle:hover {
 body #auth-view .button-primary,
 body #auth-view .button.button-primary {
   color: #f4f8ff !important;
-  background: #1557a7 !important;
-  border-color: #246fbd !important;
+  background: #102d52 !important;
+  border-color: #1c416e !important;
 }
 body #auth-view .button-primary:hover {
-  background: #1b6dc8 !important;
+  background: #154071 !important;
 }
 body #auth-view .button-secondary {
   color: #c9d9ef !important;
@@ -477,8 +477,8 @@ body #auth-view .status-panel {
 }
 body #auth-view .brand-mark {
   color: #f3f8ff !important;
-  background: #1557a7 !important;
-  border: 1px solid #2d7ac5;
+  background: #102d52 !important;
+  border: 1px solid #244d78;
 }
 body #auth-view .brand-light,
 body #auth-view .brand { color: #f1f6ff !important; }
@@ -496,7 +496,7 @@ body #page-content .ct-teams-toolbar {
   background: transparent !important;
   border: 0 !important;
 }
-body #page-content .ct-eyebrow { color: #579ee9 !important; }
+body #page-content .ct-eyebrow { color: #547ba8 !important; }
 body #page-content .ct-page-title,
 body #page-content .ct-section-title,
 body #page-content .ct-team-card__title,
@@ -521,8 +521,8 @@ body #page-content .ct-button {
 }
 body #page-content .ct-button--primary {
   color: #f4f8ff !important;
-  background: #1557a7 !important;
-  border-color: #246fbd !important;
+  background: #102d52 !important;
+  border-color: #1c416e !important;
 }
 body #page-content .ct-notice--success {
   color: #65c9be !important;
@@ -605,7 +605,7 @@ body #page-content .ct-dash-location-name strong {
   color: #e2edfb !important;
 }
 body #page-content .ct-dash-eyebrow,
-body #page-content .ct-dash-panel-kicker { color: #4c9de8 !important; }
+body #page-content .ct-dash-panel-kicker { color: #4b7299 !important; }
 body #page-content .ct-dash-note,
 body #page-content .ct-dash-description,
 body #page-content .ct-dash-kpi-hint,
@@ -613,10 +613,10 @@ body #page-content .ct-dash-action-copy p,
 body #page-content .ct-dash-location-name span,
 body #page-content .ct-dash-activity-copy p,
 body #page-content .ct-dash-activity-row time { color: #8097b7 !important; }
-body #page-content .ct-dash-current-rate strong { color: #59a8f4 !important; }
-body #page-content .ct-dash-location-rate { color: #4c9de8 !important; }
+body #page-content .ct-dash-current-rate strong { color: #618bb1 !important; }
+body #page-content .ct-dash-location-rate { color: #4b7299 !important; }
 body #page-content .ct-dash-progress-track { background: #102744 !important; }
-body #page-content .ct-dash-progress-fill { background: linear-gradient(90deg, #1759a0, #328ce1) !important; }
+body #page-content .ct-dash-progress-fill { background: linear-gradient(90deg, #143b65, #245584) !important; }
 body #page-content .ct-dash-donut-hole {
   background: #09172b !important;
   border-color: #1d3555 !important;
@@ -638,12 +638,12 @@ body #page-content .ct-dash-quick-action {
 }
 body #page-content .ct-dash-quick-action:hover {
   background: #112844 !important;
-  border-color: #2d70b4 !important;
+  border-color: #284c73 !important;
 }
 body #page-content .ct-dash-quick-icon {
-  color: #84bfff !important;
+  color: #7298bd !important;
   background: #102d4d !important;
-  border-color: #275c92 !important;
+  border-color: #244363 !important;
 }
 
 /* Dialogs, popovers and shared application chrome */
@@ -671,9 +671,9 @@ body .app-footer {
   background: #050b16 !important;
   border-color: #172b46 !important;
 }
-body .app-footer a { color: #5ba9f5 !important; }
-body a { color: #68adf4; }
-body a:hover { color: #9bcaff; }
+body .app-footer a { color: #648cb4 !important; }
+body a { color: #648cb4; }
+body a:hover { color: #8aa8cc; }
 
 /* Dark scrolling bars and restrained selection color */
 * {
@@ -681,7 +681,7 @@ body a:hover { color: #9bcaff; }
 }
 ::selection {
   color: #f5f9ff;
-  background: #164f8e;
+  background: #12365e;
 }
 @media (prefers-reduced-motion: reduce) {
   body *,
