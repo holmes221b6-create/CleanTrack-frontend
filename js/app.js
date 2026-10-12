@@ -166,6 +166,89 @@
     pageContent.appendChild(heading);
     
     
+    // Dedicated dashboard is available only to Admin users.
+    if (pageId === "dashboard") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        const message = document.createElement("p");
+        message.textContent = "The Dashboard is available to Admin users only.";
+        pageContent.appendChild(message);
+        return;
+      }
+
+      const organizationName =
+        user?.organization_name ||
+        user?.organizationName ||
+        user?.organization?.name ||
+        (typeof user?.organization === "string" ? user.organization : "") ||
+        "Your organization";
+
+      const shell = document.createElement("div");
+      shell.className = "admin-dashboard";
+
+      const welcome = document.createElement("section");
+      welcome.className = "admin-dashboard-welcome";
+      const eyebrow = document.createElement("p");
+      eyebrow.className = "admin-dashboard-eyebrow";
+      eyebrow.textContent = "ADMIN OVERVIEW";
+      const welcomeTitle = document.createElement("h2");
+      welcomeTitle.textContent = "Welcome back, " + (user?.name || "Administrator");
+      const welcomeText = document.createElement("p");
+      welcomeText.textContent =
+        "Here is your workspace overview for " + organizationName + ". Choose a section below to manage your operations.";
+      welcome.append(eyebrow, welcomeTitle, welcomeText);
+      shell.appendChild(welcome);
+
+      const sectionTitle = document.createElement("h3");
+      sectionTitle.className = "admin-dashboard-section-title";
+      sectionTitle.textContent = "Workspace management";
+      shell.appendChild(sectionTitle);
+
+      const descriptions = {
+        staff: "Manage staff accounts and role access.",
+        invitations: "Invite people to join your organization.",
+        teams: "Organize staff into teams.",
+        locations: "Manage your work locations.",
+        zones: "Configure work areas and zones.",
+        operations: "Review and coordinate operational tasks.",
+        reviews: "Inspect logs and review submitted work.",
+        analytics: "Explore operational performance insights.",
+        reports: "Open reports for your organization.",
+        announcements: "Share important updates and alerts.",
+        audit: "Review activity and accountability records.",
+        settings: "Configure your organization workspace.",
+        billing: "Review plan and billing information."
+      };
+      const menu = navigation.getMenu(user?.role).filter(item => item.id !== "dashboard" && item.id !== "home");
+      const grid = document.createElement("div");
+      grid.className = "admin-dashboard-grid";
+
+      menu.forEach(function (item) {
+        const card = document.createElement("article");
+        card.className = "admin-dashboard-card";
+        const icon = document.createElement("span");
+        icon.className = "admin-dashboard-card-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = item.icon;
+        const title = document.createElement("h4");
+        title.textContent = item.label;
+        const description = document.createElement("p");
+        description.textContent = descriptions[item.id] || ("Open " + item.label.toLowerCase() + " for your organization.");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "admin-dashboard-card-action";
+        button.textContent = "Open section";
+        button.addEventListener("click", function () {
+          navigation.setActivePage(item.id);
+        });
+        card.append(icon, title, description, button);
+        grid.appendChild(card);
+      });
+
+      shell.appendChild(grid);
+      pageContent.appendChild(shell);
+      return;
+    }
+
     // Render the landing page instead of the generic placeholder.
     if (["home", "workspace", "my-desk"].includes(pageId)) {
       const intro = document.createElement("p");
