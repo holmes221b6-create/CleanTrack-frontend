@@ -690,3 +690,287 @@ body a:hover { color: #8aa8cc; }
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Focus identity: graphite, muted violet and emerald — blue is not the brand color. */
+:root {
+  color-scheme: dark;
+  --bg: #080b10;
+  --bg-elevated: #0b0e14;
+  --surface: #0e1219;
+  --surface-hover: #151923;
+  --surface-raised: #191d27;
+  --border: #262b35;
+  --border-strong: #393342;
+  --text: #e9e7ef;
+  --text-secondary: #b4b1c0;
+  --text-muted: #858292;
+  --primary: #5b4e83;
+  --primary-hover: #6b5c99;
+  --primary-contrast: #f5f2fb;
+  --accent: #8878b9;
+  --success: #288e74;
+  --warning: #655895;
+  --danger: #9f4559;
+  --info: #655895;
+  --ct-bg: #080b10;
+  --ct-page: #080b10;
+  --ct-surface: #0e1219;
+  --ct-panel: #10141c;
+  --ct-panel-raised: #191d27;
+  --ct-border: #262b35;
+  --ct-text: #e9e7ef;
+  --ct-muted: #9290a0;
+  --ct-blue: #5b4e83;
+  --ct-blue-hover: #6b5c99;
+  --ct-focus: #8172b2;
+  --ct-green: #111e1b;
+  --ct-green-light: #36a88a;
+  --ct-accent: #8878b9;
+  --focus-ring: 0 0 0 3px rgb(136 120 185 / 20%);
+  --shadow-sm: 0 5px 18px rgb(0 0 0 / 30%);
+  --shadow-md: 0 16px 40px rgb(0 0 0 / 42%);
+}
+
+html, body, #app, #main-content,
+#workspace-view, #workspace-view .ct-workspace-shell,
+#workspace-view .ct-workspace-main, #workspace-view #page-content,
+#workspace-view .page-content, #page-content {
+  background-color: #080b10 !important;
+  color: #e9e7ef !important;
+}
+body { background-image: radial-gradient(ellipse at 76% -20%, rgb(92 74 127 / 9%), transparent 47%) !important; }
+.ct-wordmark-accent { color: #a39ac8 !important; }
+.ct-logo-symbol { display: block; width: 100%; height: 100%; overflow: visible; }
+body .brand-mark {
+  display: inline-grid !important;
+  place-items: center;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: transparent !important;
+}
+body .brand-mark .ct-logo-symbol { width: 100%; height: 100%; }
+body .ct-sidebar-brand-mark {
+  display: grid !important;
+  place-items: center;
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+body .ct-sidebar-brand-mark .ct-logo-symbol { width: 38px; height: 38px; }
+body #auth-view .brand-mark { background: transparent !important; }
+body #auth-view .ct-wordmark-accent { color: #a39ac8 !important; }
+
+/* Dark graphite shell with violet selected state. */
+body #workspace-view .ct-sidebar,
+body #workspace-view #workspace-navigation { background: #0a0d13 !important; color: #d6d2e1 !important; }
+body #workspace-view .ct-sidebar-brand { border-bottom-color: #24232d !important; }
+body #workspace-view .ct-sidebar-brand strong { color: #e9e7ef !important; }
+body #workspace-view .ct-sidebar-brand small,
+body #workspace-view .ct-sidebar-label { color: #888397 !important; }
+body #workspace-view #workspace-navigation button,
+body #workspace-view #workspace-navigation a { color: #a9a5b7 !important; }
+body #workspace-view #workspace-navigation button:hover,
+body #workspace-view #workspace-navigation a:hover { background: #15151f !important; color: #eeebf7 !important; border-color: #2a2638 !important; }
+body #workspace-view #workspace-navigation .active,
+body #workspace-view #workspace-navigation [aria-current="page"],
+body #workspace-view #workspace-navigation .ct-nav-active {
+  color: #eeeafb !important;
+  background: linear-gradient(90deg, #211d30, #17151f) !important;
+  border-color: #393149 !important;
+  box-shadow: inset 3px 0 #7668a5;
+}
+body #workspace-view .ct-workspace-toolbar { background: #080b10 !important; border-bottom-color: #24232d !important; }
+body #workspace-view .ct-sidebar-toggle { background: #11141b !important; color: #ddd8ec !important; border-color: #373142 !important; }
+body #workspace-view .ct-sidebar-toggle:hover { background: #1a1724 !important; border-color: #7668a5 !important; }
+body #workspace-view .ct-hamburger > span { background: #ccc5e2 !important; }
+
+/* Unified graphite panels and typography throughout internal pages. */
+body #page-content .card,
+body #page-content .panel,
+body #page-content .stat-card,
+body #page-content .metric-card,
+body #page-content .dashboard-card,
+body #page-content .form-card,
+body #page-content .dropdown-menu,
+body #page-content .table-wrap,
+body #page-content .table-container,
+body #page-content .content-card {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #282c36 !important;
+  box-shadow: 0 9px 25px rgb(0 0 0 / 18%) !important;
+}
+body #page-content h1, body #page-content h2, body #page-content h3,
+body #page-content h4, body #page-content h5, body #page-content h6 { color: #e9e7ef !important; }
+body #page-content p, body #page-content label, body #page-content small,
+body #page-content .muted, body #page-content .ct-muted { color: #9290a0; }
+body #page-content input, body #page-content select, body #page-content textarea,
+body .app-modal input, body .app-modal select, body .app-modal textarea {
+  color: #e9e7ef !important;
+  background: #090c12 !important;
+  border-color: #2c303b !important;
+  border-radius: 9px;
+}
+body #page-content input::placeholder, body #page-content textarea::placeholder { color: #666475 !important; }
+body #page-content input:focus, body #page-content select:focus, body #page-content textarea:focus {
+  border-color: #6d5f98 !important;
+  box-shadow: 0 0 0 3px rgb(109 95 152 / 17%) !important;
+}
+
+/* Purple is the primary interactive accent; emerald is used for positive states. */
+body #page-content .button-primary,
+body #page-content .btn-primary,
+body #page-content button.primary,
+body #page-content .ct-button--primary,
+body #auth-view .button-primary,
+body #auth-view .button.button-primary {
+  color: #f5f2fb !important;
+  background: #4a3e6d !important;
+  border: 1px solid #68578f !important;
+}
+body #page-content .button-primary:hover,
+body #page-content .btn-primary:hover,
+body #page-content button.primary:hover,
+body #page-content .ct-button--primary:hover,
+body #auth-view .button-primary:hover { background: #5b4d81 !important; border-color: #8171ac !important; }
+body #page-content .button-secondary, body #page-content .btn-secondary,
+body #page-content .ct-button--secondary, body #page-content .button,
+body #page-content .btn {
+  color: #d3cedf !important;
+  background: #151720 !important;
+  border-color: #34303e !important;
+}
+body #page-content .button-secondary:hover, body #page-content .btn-secondary:hover,
+body #page-content .ct-button--secondary:hover, body #page-content .button:hover,
+body #page-content .btn:hover { background: #1e1c29 !important; border-color: #5b4d75 !important; }
+body #page-content a, body .app-footer a, body #auth-view .text-button,
+body #auth-view .terms-checkbox a, body #auth-view .password-toggle { color: #a59acb !important; }
+body #page-content a:hover, body .app-footer a:hover { color: #c4b8ea !important; }
+
+/* Tables use graphite rows and subtle separators, not blue-tinted panels. */
+body #page-content table, body #page-content .table-wrap, body #page-content .table-container { background: #0c1017 !important; border-color: #262a34 !important; }
+body #page-content thead, body #page-content table th { background: #141720 !important; color: #b8b2c8 !important; border-color: #292733 !important; }
+body #page-content tbody tr, body #page-content tbody tr:nth-child(even) { background: #0c1017 !important; }
+body #page-content tbody tr:nth-child(even) { background: #0f121a !important; }
+body #page-content tbody tr:hover { background: #191722 !important; }
+body #page-content table td, body #page-content table th { border-bottom-color: #262631 !important; }
+
+/* Status colors remain dim and readable; no yellow/gold warning blocks. */
+body #page-content .badge, body #page-content .ct-status, body #page-content .status-badge {
+  color: #b8b3ca !important; background: #171722 !important; border-color: #353144 !important;
+}
+body #page-content .badge-primary, body #page-content .badge-info, body #page-content .badge-assigned, body #page-content .badge-in-progress {
+  color: #b0a3dd !important; background: #211d30 !important; border-color: #403651 !important;
+}
+body #page-content .badge-success, body #page-content .badge-approved, body #page-content .badge-completed, body #page-content .badge-active {
+  color: #63b8a0 !important; background: #10231f !important; border-color: #25483d !important;
+}
+body #page-content .badge-warning, body #page-content .badge-pending {
+  color: #b7a9d9 !important; background: #211d2c !important; border-color: #40364f !important;
+}
+body #page-content .badge-danger, body #page-content .badge-rejected, body #page-content .badge-suspended, body #page-content .badge-overdue {
+  color: #d78b9b !important; background: #26151d !important; border-color: #512b37 !important;
+}
+body #page-content .alert, body #page-content .notice, body #page-content .ct-notice,
+body #page-content .ct-empty, body #page-content .empty-state, body #page-content .status-panel {
+  color: #aaa6b8 !important; background: #10141c !important; border-color: #2b2d38 !important;
+}
+body #page-content .ct-notice--success { color: #69c8ad !important; background: #10231f !important; border-color: #25483d !important; }
+body #page-content .ct-notice--error { color: #d78b9b !important; background: #26151d !important; border-color: #512b37 !important; }
+
+/* Authentication page follows the same Focus identity. */
+body #auth-view, body #auth-view.auth-layout { background: #080b10 !important; color: #e9e7ef !important; }
+body #auth-view .auth-intro {
+  background: radial-gradient(ellipse at 20% 85%, rgb(115 94 157 / 11%), transparent 44%), linear-gradient(145deg, #151320, #0b0d13 72%) !important;
+  border-right-color: #282532 !important;
+}
+body #auth-view .auth-intro .eyebrow { color: #a59acb !important; }
+body #auth-view .auth-panel { background: #080b10 !important; }
+body #auth-view .auth-card { background: #10141c !important; border-color: #2a2a35 !important; box-shadow: 0 18px 48px rgb(0 0 0 / 32%) !important; }
+body #auth-view .auth-heading h2, body #auth-view .form-field > label, body #auth-view .role-selector legend,
+body #auth-view .role-option-content strong { color: #e9e7ef !important; }
+body #auth-view .auth-heading > p:last-child, body #auth-view .auth-switch,
+body #auth-view .checkbox-label, body #auth-view .field-hint, body #auth-view .role-option-content small { color: #9290a0 !important; }
+body #auth-view .form-field input, body #auth-view .form-field textarea, body #auth-view .role-option {
+  background: #090c12 !important; color: #e9e7ef !important; border-color: #302d3c !important;
+}
+body #auth-view .role-option:has(input:checked) { background: #1b1827 !important; border-color: #65558b !important; }
+body #auth-view .button-secondary { color: #d3cedf !important; background: #151720 !important; border-color: #34303e !important; }
+
+/* Teams module: remove its original white cards and pale status surfaces. */
+body #page-content .ct-teams-page, body #page-content .ct-page-header, body #page-content .ct-teams-toolbar {
+  color: #e9e7ef !important; background: transparent !important; border-color: #262b35 !important;
+}
+body #page-content .ct-eyebrow { color: #a59acb !important; }
+body #page-content .ct-create-form, body #page-content .ct-team-card, body #page-content .ct-details-panel {
+  color: #e9e7ef !important; background: #10141c !important; border-color: #292c36 !important; box-shadow: 0 9px 25px rgb(0 0 0 / 18%) !important;
+}
+body #page-content .ct-team-card__title, body #page-content .ct-section-title, body #page-content .ct-overview-item__value { color: #e9e7ef !important; }
+body #page-content .ct-team-card__description, body #page-content .ct-team-card__meta, body #page-content .ct-overview-item__label { color: #9290a0 !important; }
+body #page-content .ct-overview-item { color: #ded9e9 !important; background: #151720 !important; border-color: #2d2d39 !important; }
+body #page-content .ct-status { color: #b4a8dc !important; background: #211d30 !important; border-color: #403651 !important; }
+body #page-content .ct-empty { background: #0c1017 !important; color: #9290a0 !important; border-color: #353143 !important; }
+
+/* Dashboard palette: violet + emerald + muted rose, never yellow. */
+body #page-content .ct-admin-dashboard {
+  --dash-bg: #080b10;
+  --dash-panel: #10141c;
+  --dash-panel-alt: #151720;
+  --dash-border: #282b35;
+  --dash-text: #e9e7ef;
+  --dash-muted: #9290a0;
+  --dash-green: #288e74;
+  --dash-blue: #655895;
+  --dash-red: #9f4559;
+  --dash-amber: #655895;
+  color: #e9e7ef !important; background: #080b10 !important; border-color: #20232c !important;
+}
+body #page-content .ct-dash-panel { background: #10141c !important; border-color: #292c36 !important; box-shadow: 0 10px 26px rgb(0 0 0 / 20%) !important; }
+body #page-content .ct-dash-kpi { background: linear-gradient(145deg, #151722, #0e1118) !important; border-color: #292c37 !important; box-shadow: none !important; }
+body #page-content .ct-dash-kpi-value { color: #aa9bd7 !important; }
+body #page-content .ct-dash-kpi--green .ct-dash-kpi-value { color: #5eb39b !important; }
+body #page-content .ct-dash-kpi--blue .ct-dash-kpi-value { color: #aa9bd7 !important; }
+body #page-content .ct-dash-kpi--red .ct-dash-kpi-value { color: #d17d90 !important; }
+body #page-content .ct-dash-kpi-symbol { background: #1b1926 !important; border-color: #3b334d !important; color: #b0a2da !important; }
+body #page-content .ct-dash-title, body #page-content .ct-dash-panel-title,
+body #page-content .ct-dash-kpi-label, body #page-content .ct-dash-activity-copy strong,
+body #page-content .ct-dash-action-copy strong, body #page-content .ct-dash-location-name strong { color: #e9e7ef !important; }
+body #page-content .ct-dash-eyebrow, body #page-content .ct-dash-panel-kicker { color: #a59acb !important; }
+body #page-content .ct-dash-note, body #page-content .ct-dash-description,
+body #page-content .ct-dash-kpi-hint, body #page-content .ct-dash-action-copy p,
+body #page-content .ct-dash-location-name span, body #page-content .ct-dash-activity-copy p,
+body #page-content .ct-dash-activity-row time { color: #8d899c !important; }
+body #page-content .ct-dash-current-rate strong { color: #aa9bd7 !important; }
+body #page-content .ct-dash-location-rate { color: #65b79e !important; }
+body #page-content .ct-dash-progress-track { background: #24232d !important; }
+body #page-content .ct-dash-progress-fill { background: linear-gradient(90deg, #276e5d, #359c82) !important; }
+body #page-content .ct-dash-donut-hole { background: #10141c !important; border-color: #292c36 !important; }
+body #page-content .ct-dash-error { color: #dba0ad !important; background: #24151c !important; border-color: #512d38 !important; }
+body #page-content .ct-dash-empty { color: #9290a0 !important; background: #0c1017 !important; border-color: #353143 !important; }
+body #page-content .ct-dash-quick-action { color: #e9e7ef !important; background: #11141c !important; border-color: #2b2b37 !important; }
+body #page-content .ct-dash-quick-action:hover { background: #191722 !important; border-color: #5b4d75 !important; }
+body #page-content .ct-dash-quick-icon { color: #b4a7dc !important; background: #1b1926 !important; border-color: #3b334d !important; }
+
+/* Modal, header and footer */
+body #app-header, body .app-header, body .ct-workspace-toolbar { color: #dcd8e7 !important; background: #080b10 !important; border-color: #24232d !important; }
+body dialog, body .app-modal, body .modal, body .modal-content, body .profile-menu, body .dropdown-menu {
+  color: #e9e7ef !important; background: #10141c !important; border-color: #292c36 !important;
+}
+body dialog::backdrop { background: rgb(0 0 0 / 80%); }
+body .modal-header { border-color: #292c36 !important; }
+body .app-footer { color: #777485 !important; background: #080b10 !important; border-color: #24232d !important; }
+
+/* Avoid any leftover blue primary styling from earlier theme rules. */
+body #page-content .ct-dash-quick-action:hover,
+body #page-content .ct-dash-quick-action:focus-visible { outline-color: #7668a5 !important; }
+body #page-content .ct-team-card:hover,
+body #page-content .card:hover,
+body #page-content .panel:hover { border-color: #464052 !important; }
+body ::selection { color: #f5f2fb; background: #51456f; }
