@@ -1504,3 +1504,19 @@ body #workspace-view .ct-toolbar-actions > .ct-sidebar-toggle {
   body #workspace-view .ct-global-search { gap: 6px; padding-inline: 8px; }
   body #workspace-view #ct-global-search-input { font-size: 11px; }
 }
+
+
+/* Admin Home member-detail dialog lives outside #page-content, inside the shared modal. */
+body .app-modal .ct-home-member-detail { display:grid; gap:16px; color:#dcd8e7; }
+body .app-modal .ct-home-member-detail-top { display:flex; align-items:center; gap:12px; padding-bottom:15px; border-bottom:1px solid #292c36; }
+body .app-modal .ct-home-member-detail-top h3 { margin:0 0 3px; color:#e9e7ef !important; font-size:16px; }
+body .app-modal .ct-home-member-email { margin:0 0 7px; color:#9290a0; font-size:12px; overflow-wrap:anywhere; }
+body .app-modal .ct-home-member-details { display:grid; grid-template-columns:minmax(110px,.7fr) minmax(0,1.3fr); gap:10px 14px; margin:0; font-size:12px; }
+body .app-modal .ct-home-member-details dt { color:#858194; }
+body .app-modal .ct-home-member-details dd { margin:0; color:#dcd8e7; overflow-wrap:anywhere; }
+body .app-modal .ct-home-actions-row { display:flex; justify-content:flex-end; gap:8px; margin-top:3px; }
+body .app-modal .ct-home-role-pill { display:inline-flex; padding:4px 7px; border:1px solid #383246; border-radius:6px; background:#1a1725; color:#b4a7dc; font-size:9px; font-weight:700; text-transform:capitalize; }
+@media (max-width:520px) {
+  body .app-modal .ct-home-member-details { grid-template-columns:1fr; gap:4px; }
+  body .app-modal .ct-home-member-details dd { margin-bottom:8px; }
+}
