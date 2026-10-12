@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  const DEFAULT_API_URL = "http://127.0.0.1:5000/api";
+  const DEFAULT_API_URL = "https://YOUR-BACKEND-NAME.onrender.com/api";
 
   const apiBaseUrl = (
     window.CLEANTRACK_API_URL || DEFAULT_API_URL
