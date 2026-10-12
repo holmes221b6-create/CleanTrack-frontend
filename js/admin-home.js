@@ -77,6 +77,12 @@
       ["Member ID", member.id || "Not available"],
       ["Role", String(member.role || "Not available")],
       ["Location", member.location_name || "Not assigned"],
+      ["Teams", (member.team_names || []).join(", ") || "No team assigned"],
+      ["Zones", (member.zone_names || []).join(", ") || "No assigned zones"],
+      ["Performance rank", member.rank ? "#" + member.rank : "Not ranked yet"],
+      ["Compliance", member.compliance_pct === null || member.compliance_pct === undefined ? "No task history" : Number(member.compliance_pct).toFixed(1) + "%"],
+      ["Completed tasks / total", (member.completed_tasks || 0) + " / " + (member.total_tasks || 0)],
+      ["Missed tasks", member.missed_tasks || 0],
       ["Phone", member.phone || "Not provided"],
       ["Account status", member.is_active ? "Active" : "Inactive"],
       ["Joined", member.created_at ? new Date(member.created_at).toLocaleDateString() : "Not available"]
@@ -85,6 +91,45 @@
       details.append(el("dd", "", value));
     });
     wrap.appendChild(details);
+
+    const teamEditor = el("section", "ct-home-team-editor");
+    teamEditor.append(el("h3", "", "Team assignments"));
+    teamEditor.append(el("p", "ct-home-muted", "Assign this member to real organization teams. Team assignments are used by the directory filters."));
+    if (!directoryOptions.teams.length) {
+      teamEditor.append(el("p", "ct-home-muted", "There are no teams to assign yet. Create a team on the Teams page first."));
+    } else {
+      const teamSelect = el("select", "ct-home-filter-select");
+      teamSelect.multiple = true;
+      teamSelect.size = Math.min(5, directoryOptions.teams.length);
+      teamSelect.setAttribute("aria-label", "Team assignments");
+      directoryOptions.teams.forEach(team => {
+        const option = el("option", "", team.name);
+        option.value = team.id;
+        option.selected = (member.team_ids || []).includes(team.id);
+        teamSelect.appendChild(option);
+      });
+      const teamStatus = el("p", "ct-home-form-status");
+      teamStatus.setAttribute("role", "status");
+      const saveTeams = button("Save team assignments", "ct-home-button ct-home-button--secondary", async () => {
+        saveTeams.disabled = true;
+        saveTeams.textContent = "Saving…";
+        teamStatus.textContent = "";
+        try {
+          await API.post("organizations/members/" + encodeURIComponent(member.id) + "/teams", {
+            team_ids: Array.from(teamSelect.selectedOptions).map(option => option.value)
+          });
+          teamStatus.textContent = "Team assignments saved.";
+          await loadDirectoryMembers(rootElement, false);
+        } catch (error) {
+          teamStatus.textContent = error.message || "Unable to save team assignments.";
+        } finally {
+          saveTeams.disabled = false;
+          saveTeams.textContent = "Save team assignments";
+        }
+      });
+      teamEditor.append(teamSelect, saveTeams, teamStatus);
+    }
+    wrap.appendChild(teamEditor);
 
     const actions = el("div", "ct-home-actions-row");
     actions.appendChild(button("Close", "ct-home-button ct-home-button--secondary", () => dialog.close()));
