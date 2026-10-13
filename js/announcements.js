@@ -81,8 +81,30 @@
   function attachmentLink(item) {
     const a = el("a","ct-ann-attachment", "↧ " + item.filename + " (" + Math.max(1, Math.round((item.size||0)/1024)) + " KB)");
     const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
-    a.href = base.replace(/\/+$/,"") + item.download_url;
-    a.target = "_blank"; a.rel = "noopener";
+    const path = String(item.download_url || "").replace(/^\\/api(?=\\/)/, "");
+    a.href = "#";
+    a.addEventListener("click", async event => {
+      event.preventDefault();
+      a.setAttribute("aria-busy","true");
+      try {
+        const headers = new Headers();
+        const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : "";
+        if (token) headers.set("Authorization","Bearer "+token);
+        const response = await fetch(base.replace(/\\/+$/,"") + path, {method:"GET",headers,credentials:"include"});
+        if (!response.ok) throw new Error(response.status === 401 || response.status === 403 ? "You are not authorized to download this attachment." : "The attachment could not be downloaded.");
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const download = document.createElement("a");
+        download.href = url;
+        download.download = item.filename || "announcement-attachment";
+        document.body.appendChild(download); download.click(); download.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (error) {
+        window.alert(apiError(error));
+      } finally {
+        a.removeAttribute("aria-busy");
+      }
+    });
     return a;
   }
   function announcementPayload(item, overrides) {
@@ -398,15 +420,13 @@
           composerHost.replaceChildren();
           await load();
         } catch(error) {
-          statusLine.textContent=apiError(error)+(editing?" The existing announcement was not confirmed as updated.":"");
+          statusLine.textContent=apiError(error)+(editing
+            ? " The announcement update may have succeeded; refresh to verify."
+            : " If the announcement itself was saved, it may appear in the list; check the attachment status before retrying.");
           statusLine.className="ct-ann-status is-error";statusLine.hidden=false;
           save.disabled=false;save.textContent=editing?"Save changes":"Save";
-          // If the post saved but attachments failed, tell the user so they can retry
-          // rather than claiming the whole operation completed.
-          if(!editing) {
-            try { const refreshed=await API.get("announcements"); state.items=refreshed.announcements||[];renderList();updateMetrics(); }
-            catch(_) {}
-          }
+          try { const refreshed=await API.get("announcements"); state.items=refreshed.announcements||[];renderList();updateMetrics(); }
+          catch(_) {}
         }
       });
     }
