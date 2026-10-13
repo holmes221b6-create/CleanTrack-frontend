@@ -59,7 +59,7 @@
     const header = el("header", "ct-inv-header");
     const intro = el("div");
     intro.append(el("p", "ct-inv-eyebrow", "ORGANIZATION ACCESS"), el("h1", "", "Invitations"),
-      el("p", "ct-inv-muted", "Review requests to join and manage invitation links. An organization code or invitation link never grants access by itself; every join request needs Admin approval."));
+      el("p", "ct-inv-muted", "Review requests to join and manage invitation links. An organization code or invitation link never grants access by itself; every join request needs Admin approval. Outgoing email is not configured, so no approval, rejection, or invitation email is sent by this deployment."));
     header.appendChild(intro);
     header.appendChild(button("Refresh", "ct-inv-button", () => load(page, false)));
     page.appendChild(header);
@@ -195,8 +195,9 @@
             if(!confirm("Approve "+(a.full_name||a.email||"this applicant")+" as "+r.requested_role+"? Their account will become active."))return;
             await reviewRequest(page,r.id,"approve","");
           }),button("Reject request","ct-inv-button ct-inv-button--danger",async()=>{
-            const reason=prompt("Optional rejection reason (this is recorded in the audit trail and review history):","")||"";
-            await reviewRequest(page,r.id,"reject",reason.trim());
+            const prompted=prompt("Optional rejection reason (this is recorded in the audit trail and review history):","");
+            if(prompted===null)return;
+            await reviewRequest(page,r.id,"reject",prompted.trim());
           }));
           card.appendChild(actions);
         }
