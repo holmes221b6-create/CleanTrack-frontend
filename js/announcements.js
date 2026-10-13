@@ -187,25 +187,38 @@
     header.append(eyebrow,heading,subtitle);
     page.appendChild(header);
 
-    const state = { items:[], options:{teams:[],locations:[],zones:[]}, filterType:"all", filterStatus:"all", query:"", error:"" };
+    const state = { items:[], options:{teams:[],locations:[],zones:[]}, filterType:"all", filterStatus:"all", filterSeverity:"all", filterAudience:"all", filterReceipt:"all", dateFrom:"", dateTo:"", query:"", view:"all", error:"" };
     const notice = el("div","ct-ann-global-status"); notice.hidden = true; notice.setAttribute("role","status"); page.appendChild(notice);
     const teamGroupsHost = el("div","ct-ann-team-groups-host");
     if (pageMode === "team-channel") page.appendChild(teamGroupsHost);
     const metrics = el("div","ct-ann-metrics");
     const metricNodes = [
       ["Published",el("strong","","0"),"ct-ann-metric"],
-      ["Operational alerts",el("strong","","0"),"ct-ann-metric ct-ann-metric-alert"],
-      ["Acknowledgements due",el("strong","","0"),"ct-ann-metric"]
+      ["Open operational alerts",el("strong","","0"),"ct-ann-metric ct-ann-metric-alert"],
+      ["Your acknowledgements due",el("strong","","0"),"ct-ann-metric"]
     ];
     metricNodes.forEach(([label,value,cls])=>{const box=el("div",cls);box.append(value,el("span","",label));metrics.appendChild(box);});
     page.appendChild(metrics);
 
+    const viewHost=el("nav","ct-ann-views"); viewHost.setAttribute("aria-label","Announcement views");
+    page.appendChild(viewHost);
     const tools = el("div","ct-ann-toolbar");
-    const search = textInput("search","",120,false); search.placeholder="Search by title, message or team";
+    const search = textInput("search","",120,false); search.placeholder="Search title, message, team or author";
     const typeFilter = optionSelect([["all","All types"],...TYPES], "all");
-    const statusFilter = optionSelect(isAdmin ? [["all","All statuses"],["published","Published"],["scheduled","Scheduled"],["draft","Draft"]] : [["all","Published notices"]], "all");
+    const statusOptions=isAdmin
+      ? [["all","All statuses"],["published","Published"],["scheduled","Scheduled"],["draft","Draft"]]
+      : isSupervisor
+        ? [["all","All visible statuses"],["published","Published"],["scheduled","Scheduled"],["draft","Draft"]]
+        : [["all","Published notices"]];
+    const statusFilter = optionSelect(statusOptions, "all");
+    const severityFilter=optionSelect([["all","All priorities"],...SEVERITIES], "all");
+    const audienceFilter=optionSelect([["all","All audiences"],["organization","Organization"],["supervisors","Supervisors"],["team","Team"]], "all");
+    const receiptFilter=optionSelect([["all","All read states"],["unread","Unread"],["read","Read"],["acknowledged","Acknowledged"],["issued","Published by me"]], "all");
+    const dateFrom=textInput("date","",null,false); dateFrom.title="Published/created on or after"; dateFrom.setAttribute("aria-label","From date");
+    const dateTo=textInput("date","",null,false); dateTo.title="Published/created on or before"; dateTo.setAttribute("aria-label","To date");
+    const exportButton=button("↓ Export CSV","ct-ann-button ct-ann-button-secondary",exportCsv);
     const refresh = button("↻ Refresh","ct-ann-button",()=>load());
-    tools.append(search,typeFilter,statusFilter,refresh);
+    tools.append(search,typeFilter,statusFilter,severityFilter,audienceFilter,receiptFilter,dateFrom,dateTo,exportButton,refresh);
     page.appendChild(tools);
 
     const grid = el("div","ct-ann-main-grid");
@@ -220,12 +233,13 @@
       notice.hidden = true; refresh.disabled = true; refresh.textContent = "Loading…";
       try {
         const [list, opts] = await Promise.all([
-          API.get("announcements" + (isAdmin && statusFilter.value !== "all" ? "?status="+encodeURIComponent(statusFilter.value) : "")),
+          API.get("announcements"),
           API.get("announcements/options")
         ]);
         state.items = Array.isArray(list.announcements) ? list.announcements : [];
         state.options = opts || {teams:[],locations:[],zones:[]};
         renderTeamGroups();
+        renderQuickViews();
         renderList();
         updateMetrics();
         refresh.textContent = "↻ Refresh"; refresh.disabled=false;
@@ -261,22 +275,81 @@
       teamGroupsHost.appendChild(box);
     }
 
+    const quickViews=[
+      {id:"all",label:"All updates",test:()=>true},
+      {id:"unread",label:"Unread",test:a=>a.my_receipt?.state==="unread" && (a.can_mark_read || a.can_acknowledge)},
+      {id:"needs-ack",label:"Needs acknowledgement",test:a=>Boolean(a.requires_acknowledgement && a.can_acknowledge && a.my_receipt?.state!=="acknowledged")},
+      {id:"open-alerts",label:"Open alerts",test:a=>a.announcement_type==="alert" && a.status==="published" && a.alert_status!=="resolved"},
+      {id:"resolved-alerts",label:"Resolved alerts",test:a=>a.announcement_type==="alert" && a.alert_status==="resolved"}
+    ];
+    if(canCreate){
+      quickViews.push({id:"my-posts",label:"My posts",test:a=>Number(a.created_by_id)===Number(user.id)});
+      quickViews.push({id:"drafts-scheduled",label:"Drafts & scheduled",test:a=>["draft","scheduled"].includes(a.status)});
+    }
+    function renderQuickViews(){
+      viewHost.replaceChildren();
+      quickViews.forEach(v=>{
+        const rows=state.items.filter(v.test);
+        const b=button("", "ct-ann-view"+(state.view===v.id?" is-active":""),()=>{
+          state.view=v.id;
+          renderQuickViews();
+          renderList();
+        });
+        b.setAttribute("aria-pressed",String(state.view===v.id));
+        b.append(el("span","ct-ann-view-label",v.label),el("span","ct-ann-view-count",String(rows.length)));
+        viewHost.appendChild(b);
+      });
+    }
     function updateMetrics() {
       const published = state.items.filter(a=>a.status==="published" && !a.archived_at).length;
       const alerts = state.items.filter(a=>a.announcement_type==="alert" && a.status==="published" && a.alert_status!=="resolved").length;
-      const due = state.items.filter(a=>a.status==="published" && a.requires_acknowledgement && a.my_receipt?.state!=="acknowledged").length;
+      const due = state.items.filter(a=>a.status==="published" && a.requires_acknowledgement && a.can_acknowledge && a.my_receipt?.state!=="acknowledged").length;
       metricNodes[0][1].textContent = String(published);
       metricNodes[1][1].textContent = String(alerts);
       metricNodes[2][1].textContent = String(due);
     }
     function filteredItems() {
-      const q = state.query.toLowerCase();
+      const q = state.query.toLowerCase().trim();
+      const from=state.dateFrom?new Date(state.dateFrom+"T00:00:00"):null;
+      const to=state.dateTo?new Date(state.dateTo+"T23:59:59.999"):null;
+      const view=quickViews.find(v=>v.id===state.view)||quickViews[0];
       return state.items.filter(a=>{
+        if (!view.test(a)) return false;
         if (typeFilter.value!=="all" && a.announcement_type!==typeFilter.value) return false;
-        if (isAdmin && statusFilter.value!=="all" && a.status!==statusFilter.value) return false;
+        if (statusFilter.value!=="all" && a.status!==statusFilter.value) return false;
+        if (severityFilter.value!=="all" && String(a.severity||"info")!==severityFilter.value) return false;
+        if (audienceFilter.value!=="all" && a.audience_scope!==audienceFilter.value) return false;
+        if (receiptFilter.value!=="all") {
+          const stateValue=a.my_receipt?.state || (Number(a.created_by_id)===Number(user.id)?"issued":"unread");
+          if(stateValue!==receiptFilter.value) return false;
+        }
+        const when=new Date(a.published_at||a.scheduled_at||a.created_at||0);
+        if(from && (!Number.isFinite(when.getTime()) || when<from)) return false;
+        if(to && (!Number.isFinite(when.getTime()) || when>to)) return false;
         if (q && ![a.title,a.message,a.team_name,a.location_name,a.zone_name,a.created_by_name].some(v=>String(v||"").toLowerCase().includes(q))) return false;
         return true;
       });
+    }
+    function exportCsv(){
+      const rows=filteredItems();
+      if(!rows.length){showNotice("There are no records in the current view to export.",true);return;}
+      const columns=[
+        ["id","ID"],["title","Title"],["message","Message"],["announcement_type","Type"],["severity","Severity"],
+        ["status","Status"],["alert_status","Alert status"],["audience_scope","Audience"],["team_name","Team"],
+        ["location_name","Location"],["zone_name","Zone"],["created_by_name","Created by"],["created_at","Created at"],
+        ["published_at","Published at"],["scheduled_at","Scheduled at"],["expires_at","Expires at"],
+        ["is_pinned","Pinned"],["requires_acknowledgement","Requires acknowledgement"],["my_receipt","My read state"]
+      ];
+      const safe=value=>{
+        let textValue=value==null?"":typeof value==="object"?(value.state||JSON.stringify(value)):String(value);
+        if(/^[\s\u0000-\u001f]*[=+\-@]/.test(textValue)) textValue="'"+textValue;
+        return '"'+textValue.replace(/"/g,'""')+'"';
+      };
+      const csv=[columns.map(c=>safe(c[1])).join(","),...rows.map(row=>columns.map(([key])=>safe(row[key])).join(","))].join("\r\n");
+      const url=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));
+      const link=el("a");link.href=url;link.download="cleantrack-announcements-"+new Date().toISOString().slice(0,10)+".csv";
+      document.body.appendChild(link);link.click();link.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+      showNotice("Exported "+rows.length+" records from the current view.",false);
     }
     function renderList() {
       content.replaceChildren();
@@ -509,7 +582,12 @@
 
     search.addEventListener("input",()=>{state.query=search.value;renderList();});
     typeFilter.addEventListener("change",renderList);
-    statusFilter.addEventListener("change",load);
+    statusFilter.addEventListener("change",renderList);
+    severityFilter.addEventListener("change",renderList);
+    audienceFilter.addEventListener("change",renderList);
+    receiptFilter.addEventListener("change",renderList);
+    dateFrom.addEventListener("change",()=>{state.dateFrom=dateFrom.value;renderList();});
+    dateTo.addEventListener("change",()=>{state.dateTo=dateTo.value;renderList();});
     await load();
     if(canCreate) renderComposer(null);
   }
