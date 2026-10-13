@@ -706,6 +706,8 @@ function bindNavigation() {
       try {
         const url = new URL(window.location.href);
         url.searchParams.delete("invite");
+        url.searchParams.delete("join");
+        url.searchParams.delete("role");
         window.history.replaceState(null, "", url.pathname + url.search + url.hash);
       } catch (_) {}
     }
@@ -729,21 +731,41 @@ function bindNavigation() {
     updateRoleFields();
 
     async function prefillInvitationFromUrl() {
-      const token = new URLSearchParams(window.location.search).get("invite");
-      if (!token || !invitationTokenInput) return;
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("invite");
+      if (!invitationTokenInput) return;
+      const loginView = getElement("login-view");
+      const registerView = getElement("register-view");
+      const forgotView = getElement("forgot-password-view");
+      const organizationView = getElement("organization-view");
+      const showRegistration = function () {
+        if (loginView) loginView.hidden = true;
+        if (registerView) registerView.hidden = false;
+        if (forgotView) forgotView.hidden = true;
+        if (organizationView) organizationView.hidden = true;
+      };
+      if (!token) {
+        const joinCode = params.get("join");
+        if (!joinCode || !organizationCode) return;
+        organizationCode.value = joinCode;
+        const requestedRole = ["supervisor", "employee"].includes(String(params.get("role") || "").toLowerCase())
+          ? String(params.get("role")).toLowerCase()
+          : "supervisor";
+        roleInputs.forEach(input => { input.checked = input.value === requestedRole; input.disabled = false; });
+        if (invitationNotice) {
+          invitationNotice.hidden = false;
+          invitationNotice.textContent = "Organization join code loaded. This creates a pending request; an Admin must approve it before you can sign in.";
+        }
+        showRegistration();
+        updateRoleFields();
+        return;
+      }
       invitationTokenInput.value = token;
       if (invitationNotice) {
         invitationNotice.hidden = false;
         invitationNotice.textContent = "Checking this invitation link…";
       }
-      const loginView = getElement("login-view");
-      const registerView = getElement("register-view");
-      const forgotView = getElement("forgot-password-view");
-      const organizationView = getElement("organization-view");
-      if (loginView) loginView.hidden = true;
-      if (registerView) registerView.hidden = false;
-      if (forgotView) forgotView.hidden = true;
-      if (organizationView) organizationView.hidden = true;
+      showRegistration();
       updateRoleFields();
 
       try {
