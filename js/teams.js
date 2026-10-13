@@ -19,6 +19,13 @@ function input(value,name,type){const n=el("input","ct-team-input");n.name=name;
 function textarea(value,name){const n=el("textarea","ct-team-input");n.name=name;n.value=value||"";n.rows=3;return n}
 function metric(label,value,note,warning){const n=el("div","ct-team-metric"+(warning?" is-warning":""));n.append(el("small","",label),el("strong","",value===undefined||value===null?"—":value));if(note)n.append(el("span","ct-team-muted",note));return n}
 function createOpen(open){const f=root.querySelector("[data-team-create]");f.hidden=!open;if(open)f.querySelector("[name=name]").focus()}
+function teamCompliance(teamId){
+ const insight=teamInsights.get(String(teamId));const rows=(insight?.performance||[]).filter(x=>x.compliance_rate!==null&&x.compliance_rate!==undefined&&Number(x.due_dated_completions||0)>0);
+ if(!rows.length)return null;
+ const count=rows.reduce((n,x)=>n+Number(x.due_dated_completions||0),0);
+ const onTime=rows.reduce((n,x)=>n+Math.round(Number(x.compliance_rate)*Number(x.due_dated_completions||0)/100),0);
+ return count?Math.round(onTime/count*1000)/10:null;
+}
 function card(t){
  const c=el("article","ct-team-card"),top=el("div","ct-team-card__top"),ident=el("div");
  ident.append(el("h3","",t.name),el("p","ct-team-muted",t.description||"No description provided."));
@@ -26,7 +33,8 @@ function card(t){
  const meta=el("div","ct-team-card__summary");
  [txt(t.member_count,"0")+" people",txt(t.location_count,"0")+" locations",txt(t.zone_count,"0")+" zones"].forEach(x=>meta.append(el("span","",x)));c.append(meta);
  const load=el("div","ct-team-card__summary");
- ["Active tasks: "+txt(t.active_task_count,"0"),"Pending: "+txt(t.pending_task_count,"0"),"Overdue: "+txt(t.overdue_task_count,"0")].forEach(x=>load.append(el("span","",x)));c.append(load);
+ const compliance=teamCompliance(t.id);
+ ["Active tasks: "+txt(t.active_task_count,"0"),"Pending: "+txt(t.pending_task_count,"0"),"Overdue: "+txt(t.overdue_task_count,"0"),"Due-task compliance: "+(compliance===null?"—":compliance+"%")].forEach(x=>load.append(el("span","",x)));c.append(load);
  if(t.capacity!==null&&t.capacity!==undefined){const cap=el("div","ct-team-capacity");cap.append(el("span","","Capacity"),el("strong",Number(t.member_count)>Number(t.capacity)?"ct-team-warning":"",txt(t.member_count,"0")+" / "+t.capacity));const bar=el("div","ct-team-capacity__track"),fill=el("span","ct-team-capacity__fill"+(Number(t.member_count)>Number(t.capacity)?" over":""));fill.style.width=Math.min(Number(t.capacity)?Number(t.member_count||0)/Number(t.capacity)*100:0,100)+"%";bar.append(fill);cap.append(bar);c.append(cap)}
  const foot=el("div","ct-team-card__footer"),pin=pins().includes(String(t.id));
  foot.append(el("small","ct-team-muted",t.created_at?"Created "+date(t.created_at):"Team record"),button(pin?"★ Pinned":"☆ Pin team","ct-team-btn ct-team-btn--quiet",()=>{let p=pins().filter(x=>x!==String(t.id));if(!pin)p.push(String(t.id));write("ct.team.pins."+userKey(),p);renderList()}),button("Open team →","ct-team-btn ct-team-btn--primary",()=>openTeam(t.id)));c.append(foot);return c
@@ -123,7 +131,7 @@ async function act(label,fn){if(busy)return;busy=true;notice(label,"info");try{a
 async function reloadTeam(id){await load();await openTeam(id)}
 function actionPanel(d,mode){
  const p=root.querySelector("[data-team-action]");p.replaceChildren();p.hidden=false;
- const title={edit:"Edit Team",people:"Assign People",locations:"Assign Locations",zones:"Assign Zones",tasks:"Manage Tasks"}[mode]||"Team action";
+ const title={edit:"Edit Team",people:"Assign People",locations:"Assign Locations",zones:"Assign Zones","create-task":"Create & Assign Task",tasks:"Manage Tasks"}[mode]||"Team action";
  const top=el("div","ct-team-section-heading");top.append(el("h3","",title),button("Close","ct-team-btn ct-team-btn--quiet",()=>{p.hidden=true;p.replaceChildren()}));p.append(top);
  const t=d.team;
  if(mode==="edit"){
