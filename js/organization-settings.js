@@ -207,6 +207,22 @@
     grid.appendChild(approvalCard);
     card.appendChild(grid);
 
+    const accessBoundaries = el("div", "ct-org-role-boundaries");
+    accessBoundaries.append(el("h3", "", "Role access boundaries"));
+    const boundaryGrid = el("div", "ct-org-role-grid");
+    [
+      ["Admin", "Organization profile, policies, membership reviews, permissions, and audit history."],
+      ["Supervisor", "Personal settings and assigned team/location/zone scope. No organization-wide controls."],
+      ["Employee", "Personal settings and assigned work. No organization-wide controls."]
+    ].forEach(([role, description]) => {
+      const item = el("article", "ct-org-role-boundary");
+      item.append(el("strong", "", role));
+      item.append(el("p", "", description));
+      boundaryGrid.appendChild(item);
+    });
+    accessBoundaries.appendChild(boundaryGrid);
+    card.appendChild(accessBoundaries);
+
     const roster = el("div", "ct-org-roster");
     const rosterHeader = el("div", "ct-org-roster-header");
     const rosterTitle = el("div");
