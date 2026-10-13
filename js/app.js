@@ -675,13 +675,18 @@ function bindNavigation() {
     const organizationCode = getElement("register-organization-code");
     const invitationTokenInput = getElement("register-invitation-token");
     const invitationNotice = getElement("register-invitation-notice");
+    const membershipMessageGroup = getElement("membership-message-group");
+    const joinMessage = getElement("register-join-message");
     const emailInput = getElement("register-email");
     const phoneInput = getElement("register-phone");
     const message = getElement("register-message");
     const submit = getElement("register-submit");
     const roleInputs = Array.from(form.querySelectorAll('input[name="role"]'));
+    let invitationRole = "";
 
     function clearInvitationContext() {
+      invitationRole = "";
+      roleInputs.forEach(input => { input.disabled = false; });
       if (invitationTokenInput) invitationTokenInput.value = "";
       if (emailInput) emailInput.readOnly = false;
       if (invitationNotice) invitationNotice.hidden = true;
@@ -700,6 +705,7 @@ function bindNavigation() {
       const isJoining = role === "supervisor" || role === "employee";
       if (nameGroup) nameGroup.hidden = !isAdmin;
       if (codeGroup) codeGroup.hidden = !isJoining || hasInvitation;
+      if (membershipMessageGroup) membershipMessageGroup.hidden = !isJoining;
       if (organizationName) organizationName.required = isAdmin;
       if (organizationCode) organizationCode.required = isJoining && !hasInvitation;
       if (invitationNotice && hasInvitation) invitationNotice.hidden = false;
@@ -734,7 +740,8 @@ function bindNavigation() {
           emailInput.value = invite.email || "";
           emailInput.readOnly = true;
         }
-        roleInputs.forEach(input => { input.checked = input.value === String(invite.role || "").toLowerCase(); });
+        invitationRole = String(invite.role || "").toLowerCase();
+        roleInputs.forEach(input => { input.checked = input.value === invitationRole; input.disabled = input.value !== invitationRole; });
         if (invitationNotice) invitationNotice.textContent =
           "Invitation for " + (invite.organization_name || "your organization") +
           " · Requested role: " + (invite.role || "not specified") +
@@ -742,6 +749,8 @@ function bindNavigation() {
         updateRoleFields();
       } catch (error) {
         if (invitationTokenInput) invitationTokenInput.value = "";
+        invitationRole = "";
+        roleInputs.forEach(input => { input.disabled = false; });
         if (emailInput) emailInput.readOnly = false;
         if (invitationNotice) {
           invitationNotice.hidden = false;
@@ -781,6 +790,7 @@ function bindNavigation() {
           name: data.get("name"),
           email: data.get("email"),
           phone: data.get("phone"),
+          membership_message: data.get("membership_message"),
           password: data.get("password"),
           role,
           organization_name: data.get("organization_name"),
