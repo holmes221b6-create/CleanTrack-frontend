@@ -1,191 +1,45 @@
-(function () {
-  "use strict";
-
-  const API = window.CleanTrackApi;
-  const AUTH = window.CleanTrackAuth;
-
-  function el(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text !== undefined && text !== null) node.textContent = String(text);
-    return node;
-  }
-
-  function button(label, className, onClick) {
-    const node = el("button", className || "ct-settings-button", label);
-    node.type = "button";
-    node.addEventListener("click", onClick);
-    return node;
-  }
-
-  function showStatus(node, message, isError) {
-    node.textContent = message || "";
-    node.className = "ct-settings-status" + (isError ? " is-error" : " is-success");
-    node.hidden = !message;
-  }
-
-  function render(container) {
-    container.replaceChildren();
-    const user = AUTH && AUTH.getCurrentUser ? AUTH.getCurrentUser() : null;
-    if (!user) {
-      container.appendChild(el("p", "ct-settings-muted", "Sign in to view your personal settings."));
-      return;
-    }
-
-    const role = String(user.role || "").toLowerCase();
-    const page = el("section", "ct-settings-page");
-    const header = el("header", "ct-settings-header");
-    header.append(el("p", "ct-settings-eyebrow", "ACCOUNT"));
-    header.append(el("h1", "", "Settings"));
-    header.append(el("p", "ct-settings-muted", role === "admin"
-      ? "Manage your personal details here. Organization-wide controls live in their own protected section."
-      : role === "supervisor"
-        ? "Manage your personal details and review the team scope assigned to you."
-        : "Manage your personal details for your CleanTrack account."));
-    page.appendChild(header);
-
-    const profile = el("section", "ct-settings-card");
-    const profileHeader = el("div", "ct-settings-card-header");
-    profileHeader.append(el("span", "ct-settings-icon", "♙"));
-    const profileHeading = el("div");
-    profileHeading.append(el("h2", "", "Personal profile"));
-    profileHeading.append(el("p", "ct-settings-muted", "Changes here apply only to your account."));
-    profileHeader.appendChild(profileHeading);
-    profile.appendChild(profileHeader);
-
-    const form = el("form", "ct-settings-form");
-    const nameLabel = el("label", "ct-settings-field");
-    nameLabel.append(el("span", "", "Full name"));
-    const name = el("input", "ct-settings-input");
-    name.name = "full_name";
-    name.minLength = 2;
-    name.maxLength = 120;
-    name.required = true;
-    name.autocomplete = "name";
-    name.value = user.name || "";
-    nameLabel.appendChild(name);
-
-    const phoneLabel = el("label", "ct-settings-field");
-    phoneLabel.append(el("span", "", "Phone number"));
-    const phone = el("input", "ct-settings-input");
-    phone.name = "phone";
-    phone.maxLength = 30;
-    phone.autocomplete = "tel";
-    phone.value = user.phone || "";
-    phoneLabel.appendChild(phone);
-
-    const accountGrid = el("dl", "ct-settings-account-data");
-    [
-      ["Email address", user.email || "Not available"],
-      ["Role", role ? role.charAt(0).toUpperCase() + role.slice(1) : "Not available"],
-      ["Organization", user.organization_name || user.organizationName || "Not available"],
-      ["Account ID", user.id === null || user.id === undefined ? "Not available" : String(user.id)]
-    ].forEach(([label, value]) => {
-      accountGrid.append(el("dt", "", label));
-      accountGrid.append(el("dd", "", value));
-    });
-
-    const actions = el("div", "ct-settings-actions");
-    const save = el("button", "ct-settings-button ct-settings-button-primary", "Save personal settings");
-    save.type = "submit";
-    const status = el("p", "ct-settings-status");
-    status.hidden = true;
-    status.setAttribute("role", "status");
-    form.append(nameLabel, phoneLabel, accountGrid, actions);
-    actions.appendChild(save);
-    form.appendChild(status);
-    profile.appendChild(form);
-    page.appendChild(profile);
-
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      if (!API || typeof API.patch !== "function") {
-        showStatus(status, "The account API is unavailable.", true);
-        return;
-      }
-      save.disabled = true;
-      save.textContent = "Saving…";
-      showStatus(status, "", false);
-      try {
-        const response = await API.patch("auth/me", {
-          full_name: name.value.trim(),
-          phone: phone.value.trim()
-        });
-        const saved = response && response.user;
-        if (saved) {
-          user.name = saved.full_name || saved.name || name.value.trim();
-          user.phone = saved.phone || "";
-          const headerName = document.querySelector(".ct-profile-trigger-name");
-          if (headerName) headerName.textContent = user.name || user.email || "Account";
-          const legacyHeaderName = document.getElementById("header-user-name");
-          if (legacyHeaderName) legacyHeaderName.textContent = user.name || user.email || "Account";
-        }
-        showStatus(status, "Your personal settings have been saved.", false);
-      } catch (error) {
-        showStatus(status, error.message || "Unable to save your personal settings.", true);
-      } finally {
-        save.disabled = false;
-        save.textContent = "Save personal settings";
-      }
-    });
-
-    if (role === "admin") {
-      const orgCard = el("section", "ct-settings-card ct-settings-org-card");
-      const top = el("div", "ct-settings-card-header");
-      top.append(el("span", "ct-settings-icon", "◇"));
-      const copy = el("div");
-      copy.append(el("h2", "", "Organization settings"));
-      copy.append(el("p", "ct-settings-muted", "Organization profile, membership, policies, audit history, and archive controls are kept separate from your personal account."));
-      top.appendChild(copy);
-      orgCard.appendChild(top);
-      orgCard.appendChild(button("Open Organization Settings", "ct-settings-button ct-settings-button-primary", () => {
-        if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage("org-settings");
-      }));
-      page.appendChild(orgCard);
-    }
-
-    if (role === "supervisor") {
-      const scopeCard = el("section", "ct-settings-card");
-      const top = el("div", "ct-settings-card-header");
-      top.append(el("span", "ct-settings-icon", "♧"));
-      const copy = el("div");
-      copy.append(el("h2", "", "Team scope"));
-      copy.append(el("p", "ct-settings-muted", "This is the team, location, and zone scope currently assigned to your account. Assigned scope is read-only here; ask an Admin to change assignments. Organization-wide permissions remain Admin-only."));
-      top.appendChild(copy);
-      scopeCard.appendChild(top);
-      const scopeStatus = el("p", "ct-settings-muted", "Loading assigned scope…");
-      scopeCard.appendChild(scopeStatus);
-      const scopeGroups = el("div", "ct-settings-scope-grid");
-      scopeCard.appendChild(scopeGroups);
-      page.appendChild(scopeCard);
-
-      API.get("organizations/team-scope").then(data => {
-        scopeStatus.textContent = "";
-        scopeGroups.replaceChildren();
-        const groups = [
-          ["Teams", Array.isArray(data.teams) ? data.teams.map(item => item.name) : []],
-          ["Locations", Array.isArray(data.locations) ? data.locations.map(item => item.name) : []],
-          ["Zones", Array.isArray(data.zones) ? data.zones.map(item => item.name) : []]
-        ];
-        groups.forEach(([label, values]) => {
-          const group = el("div", "ct-settings-scope-group");
-          group.append(el("h3", "", label));
-          if (!values.length) group.append(el("p", "ct-settings-muted", "No assignments recorded."));
-          else {
-            const list = el("ul", "ct-settings-chip-list");
-            values.forEach(value => list.appendChild(el("li", "", value)));
-            group.appendChild(list);
-          }
-          scopeGroups.appendChild(group);
-        });
-      }).catch(error => {
-        scopeStatus.className = "ct-settings-status is-error";
-        scopeStatus.textContent = error.message || "Unable to load your assigned team scope.";
-      });
-    }
-
-    container.appendChild(page);
-  }
-
-  window.CleanTrackSettings = Object.freeze({ render });
+(function(){
+"use strict";
+const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
+const LANG=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
+const CUR=["USD","EUR","GBP","INR","CNY","JPY","KRW","AED","SAR","QAR","KWD","SGD","AUD","CAD","CHF","NZD","HKD","THB","IDR","MYR","PHP","VND","BDT","PKR","LKR","NPR","ZAR","NGN","KES","EGP","TRY","BRL","MXN","ARS","CLP","COP","PLN","SEK","NOK","DKK","RUB"];
+const SECTIONS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
+function el(t,c,x){let n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=String(x);return n}
+function btn(x,fn,c="ct-settings-button"){let n=el("button",c,x);n.type="button";n.addEventListener("click",fn);return n}
+function input(t,v,name){let n=el("input","ct-settings-input");n.type=t;n.value=v==null?"":String(v);n.name=name||"";return n}
+function select(opts,v,name){let n=el("select","ct-settings-input");n.name=name||"";opts.forEach(([x,l])=>{let o=el("option","",l);o.value=x;n.append(o)});n.value=v;return n}
+function field(l,n,h){let w=el("label","ct-settings-field");w.append(el("span","",l),n);if(h)w.append(el("small","ct-settings-muted",h));return w}
+function check(l,v,k){let w=el("label","ct-settings-check"),n=el("input");n.type="checkbox";n.name=k;n.checked=!!v;w.append(n,el("span","",l));return {wrap:w,input:n}}
+function card(t,d,ic="•"){let c=el("section","ct-settings-card"),h=el("div","ct-settings-card-header"),i=el("span","ct-settings-icon",ic),x=el("div");x.append(el("h2","",t));if(d)x.append(el("p","ct-settings-muted",d));h.append(i,x);c.append(h);return c}
+function formCard(t,d,ic,fields,save,label){let c=card(t,d,ic),f=el("form","ct-settings-form"),g=el("div","ct-settings-grid"),a=el("div","ct-settings-actions"),b=el("button","ct-settings-button ct-settings-button-primary",label||"Save changes"),m=el("p","ct-settings-status");fields.forEach(n=>g.append(n));b.type="submit";m.hidden=true;m.setAttribute("role","status");a.append(b);f.append(g,a,m);f.addEventListener("submit",async e=>{e.preventDefault();b.disabled=true;try{await save();m.className="ct-settings-status is-success";m.textContent="Saved."}catch(err){m.className="ct-settings-status is-error";m.textContent=err.message||"Could not save settings."}m.hidden=false;b.disabled=false;PREF.applyLanguage()});c.append(f);return c}
+function panel(root,id){root.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==id);root.querySelectorAll("[data-nav]").forEach(b=>{b.classList.toggle("is-active",b.dataset.nav===id);b.setAttribute("aria-current",b.dataset.nav===id?"page":"false")});try{history.replaceState(null,"","#settings-"+id)}catch(_){}}
+async function render(container){
+container.replaceChildren();let user=AUTH?.getCurrentUser?.();if(!user){container.append(el("p","ct-settings-muted","Sign in to view your settings."));return}
+try{user={...user,...(await API.get("auth/me")).user}}catch(_){}
+let role=String(user.role||"").toLowerCase(),p=PREF.get(),root=el("section","ct-settings-page"),head=el("header","ct-settings-header");
+head.append(el("p","ct-settings-eyebrow","YOUR WORKSPACE"),el("h1","","Settings"),el("p","ct-settings-muted","Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section."));root.append(head);
+let layout=el("div","ct-settings-layout"),nav=el("nav","ct-settings-nav"),body=el("div","ct-settings-panels"),ps={};nav.setAttribute("aria-label","Settings sections");
+SECTIONS.forEach(([id,label,icon])=>{let b=btn("",()=>panel(root,id),"ct-settings-nav-item");b.dataset.nav=id;b.append(el("span","ct-settings-icon",icon),el("span","",label));nav.append(b);let s=el("section","ct-settings-panel");s.dataset.panel=id;s.hidden=true;ps[id]=s;body.append(s)});layout.append(nav,body);root.append(layout);
+let av="";try{av=localStorage.getItem("cleantrack.avatar."+user.id)||""}catch(_){}
+let name=input("text",user.full_name||user.name,"full_name");name.required=true;name.minLength=2;name.maxLength=120;let phone=input("tel",user.phone,"phone");phone.maxLength=30;let email=input("email",user.email,"email");email.readOnly=true;email.title="Email changes are not enabled yet.";let avatar=input("url",av,"avatar_url");avatar.placeholder="https://…";
+ps.account.append(formCard("Personal profile","Name and phone save to your account. Avatar URL is stored in this browser for this account.","♙",[field("Full name",name),field("Email address",email,"Email changes are not supported by the current API."),field("Phone number",phone),field("Profile avatar URL",avatar,"Browser-local; no avatar upload service is connected.")],async()=>{let r=await API.patch("auth/me",{full_name:name.value.trim(),phone:phone.value.trim()});user={...user,...(r.user||{}),name:(r.user||{}).full_name||name.value.trim()};if(AUTH.getCurrentUser())Object.assign(AUTH.getCurrentUser(),{name:user.name,phone:phone.value.trim()});try{localStorage.setItem("cleantrack.avatar."+user.id,avatar.value.trim())}catch(_){}let h=document.getElementById("header-user-name");if(h)h.textContent=user.name||user.email;let a=document.getElementById("header-avatar");if(a){a.textContent=(user.name||"U").trim()[0].toUpperCase();a.style.backgroundImage=avatar.value.trim()?"url('"+avatar.value.trim().replace(/['()\\]/g,"")+"')":"";a.style.backgroundSize="cover";a.style.color=avatar.value.trim()?"transparent":""}},"Save account details"));
+let details=card("Account information","Status and identity from the authenticated backend.","ⓘ"),dl=el("dl","ct-settings-account-data");[["Role",user.role||"Not available"],["Account status",user.account_status||"Not available"],["Organization",user.organization_name||"Not available"],["Email verified",user.email_verified===true?"Yes":user.email_verified===false?"No":"Not available"],["Created",user.created_at||"Not available"],["Account ID",user.id??"Not available"]].forEach(([k,v])=>dl.append(el("dt","",k),el("dd","",v)));details.append(dl);ps.account.append(details);
+let old=input("password","","current_password"),nw=input("password","","new_password"),cf=input("password","","confirm_password");old.required=nw.required=cf.required=true;nw.minLength=8;old.autocomplete="current-password";nw.autocomplete=cf.autocomplete="new-password";
+ps.account.append(formCard("Change password","Current password is required. Forgotten-password email recovery is not configured.","⌑",[field("Current password",old),field("New password",nw,"At least 8 characters."),field("Confirm new password",cf)],async()=>{if(nw.value!==cf.value)throw Error("New passwords do not match.");await API.patch("auth/me",{current_password:old.value,new_password:nw.value});old.value=nw.value=cf.value=""},"Save password"));
+if(role==="admin"){let c=card("Organization settings","Organization profile, members, policies, audit history, and archive controls stay separate and Admin-only.","◇");c.append(btn("Open Organization Settings",()=>window.CleanTrackNavigation?.setActivePage("org-settings"),"ct-settings-button ct-settings-button-primary"));ps.account.append(c)}
+if(role==="supervisor"){let c=card("Team scope","Assigned team, location, and zone scope is read-only here. Ask an Admin to change it.","♧"),loading=el("p","ct-settings-muted","Loading assigned scope…"),groups=el("div","ct-settings-scope-grid");c.append(loading,groups);ps.account.append(c);API.get("organizations/team-scope").then(d=>{loading.remove();[["Teams",d.teams],["Locations",d.locations],["Zones",d.zones]].forEach(([k,arr])=>{let g=el("div","ct-settings-scope-group");g.append(el("h3","",k));let vals=Array.isArray(arr)?arr.map(x=>x.name):[];if(!vals.length)g.append(el("p","ct-settings-muted","No assignments recorded."));else{let ul=el("ul","ct-settings-chip-list");vals.forEach(v=>ul.append(el("li","",v)));g.append(ul)}groups.append(g)})}).catch(e=>loading.textContent=e.message||"Unable to load scope")}
+let language=select(LANG,p.language,"language"),date=select([["YYYY-MM-DD","YYYY-MM-DD"],["DD/MM/YYYY","DD/MM/YYYY"],["MM/DD/YYYY","MM/DD/YYYY"],["DD Mon YYYY","DD Mon YYYY"]],p.dateFormat,"dateFormat"),time=select([["24","24-hour (14:30)"],["12","12-hour (2:30 PM)"]],p.timeFormat,"timeFormat");let zones;try{zones=Intl.supportedValuesOf("timeZone").map(z=>[z,z])}catch(_){zones=["UTC","Asia/Kolkata","Europe/London","America/New_York","Asia/Dubai","Asia/Shanghai"].map(z=>[z,z])}if(!zones.some(z=>z[0]===p.timeZone))zones.unshift([p.timeZone,p.timeZone]);let zone=select(zones,p.timeZone,"timeZone"),currency=select(CUR.map(c=>[c,c]),p.currency,"currency");
+ps.preferences.append(formCard("Regional preferences","Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.","⚙",[field("Language",language,"English, Spanish, Arabic, Hindi, Urdu, and Chinese."),field("Date format",date),field("Time format",time),field("Time zone",zone),field("Currency",currency)],async()=>PREF.update({language:language.value,dateFormat:date.value,timeFormat:time.value,timeZone:zone.value,currency:currency.value}),"Save preferences"));
+let checks=Object.entries({inApp:"In-app notifications",taskUpdates:"Task assignment and status updates",announcements:"Announcements and alerts",security:"Security and account alerts",email:"Email notifications"}).map(([k,l])=>check(l,p.notifications[k],k)),nc=card("Notification preferences","Saved as personal preferences only; delivery rules must be connected to the notification service.","♧"),ng=el("div","ct-settings-check-list");checks.forEach(c=>ng.append(c.wrap));nc.append(ng,btn("Save notification settings",()=>PREF.update({notifications:Object.fromEntries(checks.map(c=>[c.input.name,c.input.checked]))}),"ct-settings-button ct-settings-button-primary"));ps.notifications.append(nc);
+let privacy=card("Privacy and security","The backend does not yet provide an active-device list or remote session revocation.","◈");privacy.append(el("p","ct-settings-info-row","Visibility: controlled by your role and organization membership."),el("p","ct-settings-info-row","Current browser: authenticated CleanTrack session."),el("p","ct-settings-info-row","Other active sessions: not available yet."),btn("Sign out of other devices",()=>alert("Remote session revocation is not implemented; no other sessions were changed.")));let vis=check("Keep profile visibility restricted to authorized organization members",true,"restricted");try{vis.input.checked=JSON.parse(localStorage.getItem("cleantrack.privacy."+user.id)||'{"restricted":true}').restricted!==false}catch(_){}privacy.append(vis.wrap,btn("Save security preferences",()=>{try{localStorage.setItem("cleantrack.privacy."+user.id,JSON.stringify({restricted:vis.input.checked}));alert("Saved in this browser only. This does not change backend access rules.")}catch(_){alert("Unable to save this browser preference.")}},"ct-settings-button ct-settings-button-primary"));ps.privacy.append(privacy);
+let themes=el("div","ct-settings-theme-options"),themeCard=card("Appearance","Theme applies throughout the app in this browser. Translation applies wherever a matching label exists.","◐");[["light","Light","☀","Bright interface"],["dark","Dark","☾","Low-light interface"]].forEach(([v,l,ic,sub])=>{let b=btn("",()=>{PREF.update({theme:v});themes.querySelectorAll("button").forEach(x=>x.classList.toggle("is-selected",x.dataset.theme===v))},"ct-settings-theme-option"+(p.theme===v?" is-selected":""));b.dataset.theme=v;b.append(el("span","",ic),el("strong","",l),el("small","ct-settings-muted",sub));themes.append(b)});themeCard.append(themes,btn("Save appearance",()=>PREF.update({theme:themes.querySelector(".is-selected")?.dataset.theme||p.theme}),"ct-settings-button ct-settings-button-primary"));ps.appearance.append(themeCard);
+let exp=select([["csv","CSV"],["xlsx","Excel (.xlsx)"],["json","JSON"],["pdf","PDF"]],p.reports.exportFormat,"exportFormat"),range=select([["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["365","Last 12 months"]],p.reports.dateRange,"dateRange"),arch=check("Include archived records by default where permitted",p.reports.includeArchived,"includeArchived");ps.data.append(formCard("Data and report defaults","Defaults only; saving them does not create, export, or modify report data.","▤",[field("Default export format",exp),field("Report date range",range),arch.wrap],async()=>PREF.update({reports:{exportFormat:exp.value,dateRange:range.value,includeArchived:arch.input.checked}}),"Save data preferences"));ps.data.append(card("Format helpers","Shared date, time-zone and currency formatters are available for screens that adopt them."));
+let integrations=card("Integrations","Future settings only—no third-party service is connected by this screen.","⌘");[["WhatsApp","Message delivery"],["Email services","Transactional email provider"],["Maps","Maps and locations"],["Third-party tools","Future connectors"],["API settings","Authorized API keys and webhooks"]].forEach(([k,v])=>{let r=el("div","ct-settings-integration-row"),x=el("div");x.append(el("strong","",k),el("p","ct-settings-muted",v));r.append(x,el("span","ct-settings-tag","Not connected yet"));integrations.append(r)});ps.integrations.append(integrations);
+let help=card("Help Center","Dedicated help and issue-reporting destinations have not been configured.","?");[["Help Center","#help"],["Getting Started Guide","#guide"],["Contact Support","#support"],["Report a problem","#problem"],["Share feedback","#feedback"]].forEach(([l,h])=>{let a=el("a","ct-settings-link",l);a.href=h;a.addEventListener("click",e=>{e.preventDefault();alert("This help/support destination is not configured in the current app.")});help.append(a)});ps.help.append(help);
+let legal=card("Legal documents","Only published documents are linked. Other policies must be published before use.","§");[["Terms and Conditions","legal/terms.html"],["Privacy Policy","legal/privacy.html"]].forEach(([l,h])=>{let a=el("a","ct-settings-link",l);a.href=h;a.target="_blank";a.rel="noopener";legal.append(a)});["Cookie policy","Third-party licences and acknowledgements","Data-processing information"].forEach(l=>{let r=el("div","ct-settings-integration-row");r.append(el("span","",l),el("span","ct-settings-tag","Not published"));legal.append(r)});ps.legal.append(legal);
+let about=card("About CleanTrack","Operations management for teams, tasks, locations, reviews, and accountability.","ⓘ");[["Product","CleanTrack"],["Version",document.querySelector('meta[name="app-version"]')?.content||"Version not configured"],["Release information","No release feed configured"],["Credits","No credits page published"]].forEach(([k,v])=>about.append(el("p","ct-settings-info-row",k+": "+v)));about.append(btn("Check for updates",()=>alert("Automatic update checking is not configured.")));ps.about.append(about);
+let actions=card("Account actions","Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.","↗");actions.append(btn("Log out",async()=>{if(!confirm("Log out on this device?"))return;try{await AUTH.logout()}finally{location.reload()}},"ct-settings-button ct-settings-button-primary"),btn("Deactivate account",()=>alert("Account deactivation is not enabled; no change was made.")),btn("Request account deletion",()=>alert("Account deletion requests are not enabled because organization records and retention must be handled server-side."),"ct-settings-button ct-settings-button-danger"));ps.actions.append(actions);
+container.append(root);let initial=location.hash.startsWith("#settings-")?location.hash.slice(10):"account";panel(root,ps[initial]?initial:"account");PREF.applyTheme();PREF.applyLanguage();
+}
+window.CleanTrackSettings=Object.freeze({render});
 })();
