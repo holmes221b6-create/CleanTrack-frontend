@@ -45,7 +45,8 @@ function rollupTrend(){
 }
 function renderInsights(){
  const wrap=root.querySelector("[data-team-insights]");if(!wrap)return;wrap.replaceChildren();
- const total=(key)=>teams.reduce((n,t)=>n+Number(t[key]||0),0);
+ const activeTeams=teams.filter(t=>String(t.status||"active")!=="archived");
+ const total=(key)=>activeTeams.reduce((n,t)=>n+Number(t[key]||0),0);
  const totalMembers=total("member_count"),locations=total("location_count"),zones=total("zone_count"),tasks=total("task_count"),activeTasks=total("active_task_count"),overdue=total("overdue_task_count");
  const dueRows=[];for(const item of teamInsights.values())for(const row of (item.performance||[]))if(Number(row.due_dated_completions||0)>0)dueRows.push(row);
  let dueN=0,onTime=0;dueRows.forEach(row=>{const n=Number(row.due_dated_completions||0);dueN+=n;if(row.compliance_rate!==null&&row.compliance_rate!==undefined)onTime+=Math.round(Number(row.compliance_rate)*n/100)});
@@ -53,7 +54,7 @@ function renderInsights(){
  const header=el("div","ct-team-section-heading");header.append(el("h2","","Team overview"),el("span","ct-team-muted","Calculated from current organization records"));wrap.append(header);
  const metrics=el("div","ct-team-insight-metrics");
  [
-  ["Teams",teams.filter(t=>String(t.status||"active")!=="archived").length,"Active teams"],
+  ["Teams",activeTeams.length,"Active teams"],
   ["Team members",totalMembers,"Current assignments"],
   ["Locations / zones",locations+" / "+zones,"Assigned operational areas"],
   ["Open workload",activeTasks,overdue+" overdue · "+tasks+" linked tasks"],
@@ -74,7 +75,7 @@ function renderInsights(){
  const allActivity=[];for(const [teamId,item] of teamInsights.entries()){const t=getTeam(teamId);for(const a of (item.activity||[]))allActivity.push({...a,team_name:t?.name||("Team #"+teamId)})}
  allActivity.sort((a,b)=>String(b.created_at||"").localeCompare(String(a.created_at||"")));
  if(!allActivity.length)timeline.append(el("p","ct-team-muted","No recorded team or task activity yet."));
- else {const list=el("div","ct-team-activity-list");allActivity.slice(0,10).forEach(a=>{const row=el("div","ct-team-activity-item"),dot=el("span","ct-team-activity-dot","");const body=el("div","ct-team-activity-copy"),when=el("small","ct-team-muted",dateTime(a.created_at));const detail=a.details||{};const description=detail.message||detail.task_title||detail.name||detail.after?.name||"";body.append(el("strong","",String(a.action||"Activity").replaceAll("."," · ")),el("p","",a.team_name+(description?" — "+description:"")),when);row.append(dot,body);list.append(row)});timeline.append(list)}
+ else {const list=el("div","ct-team-activity-list");allActivity.slice(0,10).forEach(a=>{const row=el("div","ct-team-activity-item"),dot=el("span","ct-team-activity-dot","");const body=el("div","ct-team-activity-copy"),when=el("small","ct-team-muted",dateTime(a.created_at));const detail=a.details||{};const description=detail.message||detail.task_title||detail.name||detail.after?.name||"";body.append(el("strong","",String(a.action||"Activity").replaceAll("."," · ")),el("p","",a.team_name+(a.actor_name?" · "+a.actor_name:"")+(description?" — "+description:"")),when);row.append(dot,body);list.append(row)});timeline.append(list)}
  wrap.append(timeline);
 }
 function renderBulkActions(visible){
