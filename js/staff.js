@@ -528,9 +528,10 @@
     });
     if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open","");
   }
-  function openWhatsAppSetup() {
-    if (savedWhatsAppGroupLink) { window.open(savedWhatsAppGroupLink,"_blank","noopener,noreferrer"); return; }
-    const win = window.open("https://web.whatsapp.com/","_blank","noopener,noreferrer");
+  function openWhatsAppSetup(forceEdit) {
+    if (savedWhatsAppGroupLink && !forceEdit) { window.open(savedWhatsAppGroupLink,"_blank","noopener,noreferrer"); return; }
+    let win = null;
+    if (!savedWhatsAppGroupLink) { win = window.open("https://web.whatsapp.com/","_blank"); if (win) win.opener = null; }
     const dialog = el("dialog","ct-staff-dialog");
     const form = el("form","ct-staff-dialog-form"); form.method="dialog";
     form.append(el("p","ct-staff-eyebrow","SUPERVISOR WHATSAPP GROUP"),el("h2","","Connect the supervisor group"),
@@ -573,7 +574,7 @@
       }catch(error){notice(pageRoot,error.message||"Could not save the group link.","error");save.disabled=false;save.textContent="Save group link";}
     });
     if (typeof dialog.showModal==="function") dialog.showModal(); else dialog.setAttribute("open","");
-    if(!win) notice(pageRoot,"Your browser blocked the new tab. Use Open WhatsApp in the setup panel.","error");
+    if(!savedWhatsAppGroupLink && !win) notice(pageRoot,"Your browser blocked the new tab. Use Open WhatsApp in the setup panel.","error");
   }
   async function importFile(file) {
     if (!file) return;
@@ -682,7 +683,9 @@
     waButton.innerHTML=WA_ICON;waButton.title="Create supervisor WhatsApp group";
     const waLabel=el("span","ct-staff-sr-only","Supervisor WhatsApp group");
     waButton.appendChild(waLabel);
-    toolbar.append(importButton,csvButton,xlsxButton,pdfButton,waButton,fileInput);
+    const waEditButton=button("✎","ct-staff-icon-button ct-staff-whatsapp-edit",function(){openWhatsAppSetup(true);},"Edit supervisor WhatsApp group link");
+    waEditButton.title="Edit supervisor WhatsApp group link";
+    toolbar.append(importButton,csvButton,xlsxButton,pdfButton,waButton,waEditButton,fileInput);
     fileInput.addEventListener("change",function(){const file=fileInput.files&&fileInput.files[0];if(file)importFile(file);fileInput.value="";});
     header.append(intro,toolbar);pageRoot.appendChild(header);
     const note=el("div","ct-staff-notice");note.dataset.staffNotice="true";note.hidden=true;note.setAttribute("role","status");pageRoot.appendChild(note);
