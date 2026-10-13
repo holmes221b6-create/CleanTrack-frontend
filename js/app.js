@@ -340,6 +340,8 @@
     if (!pageContent) return;
 
     pageContent.replaceChildren();
+    // Re-apply the signed-in user's display preference as routes change.
+    if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
     if (pageId === "settings") {
       if (window.CleanTrackSettings && typeof window.CleanTrackSettings.render === "function") {
