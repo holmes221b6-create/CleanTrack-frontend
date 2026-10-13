@@ -234,7 +234,7 @@
       return "<tr>" + Object.values(r).map(function (v) { return "<td>" + String(v === null || v === undefined ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</td>"; }).join("") + "</tr>";
     }).join("");
     const title = "CleanTrack Supervisor Directory";
-    const win = window.open("", "_blank", "noopener,noreferrer");
+    const win = window.open("", "_blank");
     if (!win) { notice(pageRoot, "Pop-up blocked. Use Export CSV or Export Excel instead.", "error"); return; }
     const headers = records.length ? Object.keys(records[0]) : ["name","email","status","teams"];
     win.document.write("<!doctype html><html><head><title>" + title + "</title><style>body{font:12px Arial,sans-serif;padding:20px;color:#111}h1{font-size:20px}p{color:#555}table{width:100%;border-collapse:collapse;font-size:9px}td,th{border:1px solid #ccc;padding:5px;text-align:left;overflow-wrap:anywhere}th{background:#eee} @media print{@page{size:landscape;margin:10mm}}</style></head><body><h1>" + title + "</h1><p>Generated " + new Date().toLocaleString() + ". Source: current CleanTrack supervisor directory.</p><table><thead><tr>" + headers.map(function (h) { return "<th>" + h.replace(/</g,"&lt;") + "</th>"; }).join("") + "</tr></thead><tbody>" + body + "</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>");
@@ -343,6 +343,7 @@
     host.append(el("span", "ct-staff-bulk-count", selected.length + " selected"));
     host.appendChild(button("Assign teams", "ct-staff-button", function () { openAssignTeams(selected); }));
     host.appendChild(button("Schedule termination", "ct-staff-button ct-staff-button--danger", function () { scheduleTermination(selected); }));
+    if (selected.some(function (m) { return m.account_status === "active" || m.account_status === "termination_pending"; })) host.appendChild(button("Suspend immediately", "ct-staff-button ct-staff-button--danger", function () { suspendMembers(selected); }));
     host.appendChild(button("Clear", "ct-staff-button ct-staff-button--quiet", function () { selectedIds.clear(); renderDirectory(); }));
   }
   function renderProfile() {
@@ -402,8 +403,12 @@
       row.append(el("span","ct-staff-mini-meta",assignedTeams.join(", ") || "Shared team"));
       if (member.account_status === "active") {
         row.appendChild(button("Terminate…", "ct-staff-button ct-staff-button--danger ct-staff-button--small", function () { scheduleTermination([member]); }));
+        row.appendChild(button("Suspend", "ct-staff-button ct-staff-button--danger ct-staff-button--small", function () { suspendMembers([member]); }));
       } else if (member.account_status === "termination_pending") {
         row.appendChild(button("Cancel termination", "ct-staff-button ct-staff-button--small", function () { cancelTermination(member); }));
+        row.appendChild(button("Suspend now", "ct-staff-button ct-staff-button--danger ct-staff-button--small", function () { suspendMembers([member]); }));
+      } else if (member.account_status === "suspended") {
+        row.appendChild(button("Restore access", "ct-staff-button ct-staff-button--small", function () { restoreSuspension(member); }));
       }
       employeeSection.appendChild(row);
     });
@@ -429,9 +434,13 @@
     const actions = el("div", "ct-staff-profile-actions");
     if (m.account_status === "active") {
       actions.appendChild(button("Schedule termination (7 days)", "ct-staff-button ct-staff-button--danger", function () { scheduleTermination([m]); }));
+      actions.appendChild(button("Suspend immediately", "ct-staff-button ct-staff-button--danger", function () { suspendMembers([m]); }));
     } else if (m.account_status === "termination_pending") {
       actions.appendChild(button("Cancel pending termination", "ct-staff-button", function () { cancelTermination(m); }));
-      actions.appendChild(el("p","ct-staff-muted","Effective date: "+dateTime(m.termination_effective_at)+". The member retains their existing access until the scheduled deadline."));
+      actions.appendChild(button("Suspend immediately", "ct-staff-button ct-staff-button--danger", function () { suspendMembers([m]); }));
+      actions.appendChild(el("p","ct-staff-muted","Effective date: "+dateTime(m.termination_effective_at)+". Existing access remains until the deadline unless an Admin suspends it."));
+    } else if (m.account_status === "suspended") {
+      actions.appendChild(button("Restore access", "ct-staff-button ct-staff-button--primary", function () { restoreSuspension(m); }));
     }
     actions.appendChild(button("Open supervisor team assignments", "ct-staff-button", function () {
       if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage("teams");
@@ -450,6 +459,29 @@
     }
     notice(pageRoot, "Termination scheduled for " + success + " member(s)." + (failed.length ? " Failed: " + failed.join("; ") : ""), failed.length ? "error" : "success");
     await loadData(false);
+  }
+  async function suspendMembers(records) {
+    const eligible = records.filter(function (m) { return m.account_status === "active" || m.account_status === "termination_pending"; });
+    if (!eligible.length) { notice(pageRoot, "Only active or termination-pending members can be suspended.", "error"); return; }
+    const reason = window.prompt("Document the urgent reason for immediate suspension (minimum 10 characters). This reason is recorded in the organization audit trail:");
+    if (reason === null) return;
+    if (reason.trim().length < 10) { notice(pageRoot, "Enter a documented suspension reason with at least 10 characters.", "error"); return; }
+    if (!window.confirm("Immediately suspend access for " + eligible.map(function (m) { return m.full_name || m.email || ("Member #" + m.id); }).join(", ") + "?\nThis is intended for a credible security threat, suspected account compromise, abuse, or another documented urgent reason.")) return;
+    let success=0, failed=[];
+    for (const member of eligible) {
+      try { await API.post("organizations/members/" + member.id + "/suspend", {reason:reason.trim()}); success++; }
+      catch(error) { failed.push((member.full_name || member.email || member.id) + ": " + (error.message || "failed")); }
+    }
+    notice(pageRoot, "Immediately suspended " + success + " member(s)." + (failed.length ? " Failed: " + failed.join("; ") : ""), failed.length ? "error" : "success");
+    await loadData(false);
+  }
+  async function restoreSuspension(member) {
+    if (!window.confirm("Restore access for " + (member.full_name || member.email || "this member") + "? If a seven-day termination is still scheduled, that schedule remains in force.")) return;
+    try {
+      const result=await API.post("organizations/members/" + member.id + "/suspend/restore", {});
+      notice(pageRoot, result.message || "Member access restored.", "success");
+      await loadData(false);
+    } catch(error) { notice(pageRoot, error.message || "Could not restore member access.", "error"); }
   }
   async function cancelTermination(member) {
     if (!window.confirm("Cancel the pending termination for " + (member.full_name || member.email) + "?")) return;
