@@ -156,6 +156,10 @@ function normalizeUser(user) {
       payload.phone = String(details.phone).trim();
     }
 
+    if (details.invitation_token) {
+      payload.invitation_token = String(details.invitation_token).trim();
+    }
+
     if (details.organization_name) {
       payload.organization_name =
         String(details.organization_name).trim();
