@@ -165,7 +165,7 @@
     const quickOrgActions = el("div", "ct-inv-actions");
     const quickOrgMessage = () => {
       const code = codeValue.dataset.value || "";
-      return code ? shareMessage(organizationJoinUrl(code, publicShareRole.value), orgShareText() + " Organization code: " + code) : "";
+      return code ? orgShareText() + " Organization code: " + code + ". An Admin must approve your request." : "";
     };
     quickOrgActions.append(
       channelLink("WhatsApp", "https://wa.me/"),
@@ -372,7 +372,7 @@
       submit.disabled=true;submit.textContent="Creating link…";
       try{
         const out=await API.post("invitations",{email:email.value.trim(),role:role.value});
-        showGenerated(generated,out.invite_url,out.message,i.email,i.role);
+        showGenerated(generated,out.invite_url,out.message,email.value.trim(),role.value);
         email.value="";showMessage(page,out.message,"success");
         await load(page,false);
       }catch(err){showMessage(page,err.message||"Could not create invitation.","error");}
