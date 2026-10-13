@@ -1142,3 +1142,258 @@ html[data-theme="dark"] body button:focus-visible,
 html[data-theme="dark"] body a:focus-visible {
   outline-color: #ffffff !important;
 }
+
+
+/* Complete light-mode shell override: replace every dark-only workspace chrome
+   element, including the global search UI which is styled with hard-coded colors
+   in professional-blue.css. Keep semantic status colors and primary actions intact. */
+html[data-theme="light"] body #workspace-view,
+html[data-theme="light"] body #workspace-view .ct-workspace-shell,
+html[data-theme="light"] body #workspace-view .ct-workspace-main,
+html[data-theme="light"] body #workspace-view .ct-workspace-toolbar,
+html[data-theme="light"] body #workspace-view #page-content,
+html[data-theme="light"] body #workspace-view .page-content {
+  background: #f7f9fc !important;
+  background-image: none !important;
+  color: #172536 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-workspace-toolbar {
+  background: rgb(255 255 255 / 98%) !important;
+  border-bottom: 1px solid #d6dee8 !important;
+  box-shadow: 0 4px 14px rgb(28 43 61 / 5%) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* Sidebar and all of its identity/navigation regions. */
+html[data-theme="light"] body #workspace-view .ct-sidebar,
+html[data-theme="light"] body #workspace-view .ct-workspace-shell > .ct-sidebar,
+html[data-theme="light"] body #workspace-view .ct-sidebar-mobile > .ct-sidebar {
+  background: #ffffff !important;
+  color: #172536 !important;
+  border-color: #d6dee8 !important;
+  box-shadow: 3px 0 18px rgb(26 43 62 / 5%) !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand,
+html[data-theme="light"] body #workspace-view .workspace-identity {
+  background: #ffffff !important;
+  border-color: #dfe5ed !important;
+  color: #24384d !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand strong,
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand small,
+html[data-theme="light"] body #workspace-view .ct-sidebar-label,
+html[data-theme="light"] body #workspace-view .workspace-identity *,
+html[data-theme="light"] body #workspace-view #workspace-organization,
+html[data-theme="light"] body #workspace-view #workspace-role {
+  color: #52647a !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand-mark {
+  background: #e7f0ec !important;
+  border-color: #c9ddd4 !important;
+  color: #17664f !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation button,
+html[data-theme="light"] body #workspace-view #workspace-navigation a {
+  background: transparent !important;
+  color: #34475c !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation button:hover,
+html[data-theme="light"] body #workspace-view #workspace-navigation a:hover {
+  background: #f0f4f8 !important;
+  color: #142b43 !important;
+  border-color: #dce4ed !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation .active,
+html[data-theme="light"] body #workspace-view #workspace-navigation [aria-current="page"],
+html[data-theme="light"] body #workspace-view #workspace-navigation .ct-nav-active {
+  background: #e8f1ed !important;
+  color: #12533f !important;
+  border-color: #c6ddd3 !important;
+  box-shadow: inset 3px 0 #17664f !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-toggle,
+html[data-theme="light"] body #workspace-view .ct-toolbar-actions > .ct-sidebar-toggle {
+  background: #ffffff !important;
+  color: #24384d !important;
+  border-color: #cbd6e2 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-hamburger > span {
+  background: #344a60 !important;
+}
+
+/* Global search: wrapper, input, keyboard hint and live result popover. */
+html[data-theme="light"] body #workspace-view .ct-global-search {
+  background: #ffffff !important;
+  color: #52647a !important;
+  border: 1px solid #ccd6e2 !important;
+  box-shadow: 0 2px 7px rgb(30 48 69 / 4%) !important;
+}
+html[data-theme="light"] body #workspace-view .ct-global-search:focus-within {
+  background: #ffffff !important;
+  border-color: #4d927e !important;
+  box-shadow: 0 0 0 3px rgb(23 102 79 / 12%) !important;
+}
+html[data-theme="light"] body #workspace-view #ct-global-search-input,
+html[data-theme="light"] body #workspace-view #ct-global-search-input:focus {
+  background: transparent !important;
+  color: #172536 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  caret-color: #17664f !important;
+}
+html[data-theme="light"] body #workspace-view #ct-global-search-input::placeholder {
+  color: #6b7b8e !important;
+  opacity: 1 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-global-search-icon,
+html[data-theme="light"] body #workspace-view .ct-global-search-shortcut {
+  color: #5b6e83 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-global-search-shortcut {
+  background: #f3f6fa !important;
+  border-color: #d6dee8 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-global-search-results {
+  background: #ffffff !important;
+  color: #172536 !important;
+  border-color: #cbd6e2 !important;
+  box-shadow: 0 16px 36px rgb(25 42 62 / 16%) !important;
+}
+html[data-theme="light"] body #workspace-view .ct-search-results-heading,
+html[data-theme="light"] body #workspace-view .ct-search-result-copy small,
+html[data-theme="light"] body #workspace-view .ct-search-result-enter,
+html[data-theme="light"] body #workspace-view .ct-search-empty {
+  color: #5e7084 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-search-result {
+  background: #ffffff !important;
+  color: #24384d !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] body #workspace-view .ct-search-result:hover,
+html[data-theme="light"] body #workspace-view .ct-search-result[aria-selected="true"] {
+  background: #edf4f1 !important;
+  color: #153e33 !important;
+  border-color: #c9ddd5 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-search-result-copy strong {
+  color: #172536 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-search-result-icon {
+  background: #eef3f7 !important;
+  border-color: #d6dee8 !important;
+  color: #17664f !important;
+}
+
+/* Notification/assistant/profile controls and the profile popover. */
+html[data-theme="light"] body #workspace-view .ct-toolbar-icon-button,
+html[data-theme="light"] body #workspace-view .ct-profile-trigger {
+  background: transparent !important;
+  color: #34475c !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] body #workspace-view .ct-toolbar-icon-button:hover,
+html[data-theme="light"] body #workspace-view .ct-toolbar-icon-button:focus-visible,
+html[data-theme="light"] body #workspace-view .ct-profile-trigger:hover,
+html[data-theme="light"] body #workspace-view .ct-profile-trigger:focus-visible {
+  background: #edf2f7 !important;
+  color: #172536 !important;
+  border-color: #d5dee8 !important;
+  outline-color: #17664f !important;
+}
+html[data-theme="light"] body #workspace-view .ct-profile-trigger-name {
+  color: #24384d !important;
+}
+html[data-theme="light"] body #workspace-view .ct-profile-chevron {
+  stroke: #52647a !important;
+}
+html[data-theme="light"] body #workspace-view .ct-profile-avatar {
+  background: #e0ebe6 !important;
+  border-color: #c5d9d0 !important;
+  color: #155941 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-profile-menu,
+html[data-theme="light"] body #workspace-view .ct-profile-dropdown,
+html[data-theme="light"] body #workspace-view .ct-account-menu,
+html[data-theme="light"] body #workspace-view .ct-profile-popover,
+html[data-theme="light"] body #app-modal {
+  background: #ffffff !important;
+  color: #172536 !important;
+  border-color: #d6dee8 !important;
+  box-shadow: 0 16px 40px rgb(25 42 62 / 15%) !important;
+}
+html[data-theme="light"] body #workspace-view .ct-profile-menu *,
+html[data-theme="light"] body #workspace-view .ct-profile-dropdown *,
+html[data-theme="light"] body #workspace-view .ct-account-menu *,
+html[data-theme="light"] body #workspace-view .ct-profile-popover * {
+  color: #24384d;
+}
+
+/* Override dark-only visual surfaces on home and shared module content. */
+html[data-theme="light"] body #page-content .ct-home-hero,
+html[data-theme="light"] body #page-content .ct-home-identity,
+html[data-theme="light"] body #page-content .ct-home-identity-card,
+html[data-theme="light"] body #page-content .ct-home-overview,
+html[data-theme="light"] body #page-content .ct-home-section,
+html[data-theme="light"] body #page-content .ct-home-member-search-wrap,
+html[data-theme="light"] body #page-content .ct-home-member-search-results,
+html[data-theme="light"] body #page-content .ct-home-member-result,
+html[data-theme="light"] body #page-content .ct-home-code-panel,
+html[data-theme="light"] body #page-content .ct-home-code-rules,
+html[data-theme="light"] body #page-content .ct-home-notice,
+html[data-theme="light"] body #page-content .ct-dash-panel,
+html[data-theme="light"] body #page-content .ct-dash-kpi,
+html[data-theme="light"] body #page-content .ct-dash-quick-action,
+html[data-theme="light"] body #page-content .ct-dash-activity-row,
+html[data-theme="light"] body #page-content .ct-dash-location-row,
+html[data-theme="light"] body #page-content .ct-team-card,
+html[data-theme="light"] body #page-content .ct-create-form,
+html[data-theme="light"] body #page-content .ct-details-panel {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #24384d !important;
+  border-color: #d7e0e9 !important;
+  box-shadow: 0 4px 16px rgb(26 43 62 / 5%) !important;
+}
+html[data-theme="light"] body #page-content .ct-home-member-search,
+html[data-theme="light"] body #page-content .ct-home-setup-form input,
+html[data-theme="light"] body #page-content .ct-home-member-search-wrap input {
+  background: #ffffff !important;
+  color: #172536 !important;
+  border-color: #c6d1de !important;
+}
+html[data-theme="light"] body #page-content .ct-home-member-search::placeholder,
+html[data-theme="light"] body #page-content .ct-home-member-search-wrap input::placeholder {
+  color: #687a8d !important;
+}
+html[data-theme="light"] body #page-content .ct-home-code-rules h3,
+html[data-theme="light"] body #page-content .ct-home-member-copy strong,
+html[data-theme="light"] body #page-content .ct-home-member-detail-top h3,
+html[data-theme="light"] body #page-content .ct-team-card__title,
+html[data-theme="light"] body #page-content .ct-dash-title,
+html[data-theme="light"] body #page-content .ct-dash-panel-title {
+  color: #1b2c40 !important;
+}
+html[data-theme="light"] body #page-content .ct-home-code-rules ul,
+html[data-theme="light"] body #page-content .ct-home-member-copy small,
+html[data-theme="light"] body #page-content .ct-home-member-email {
+  color: #5b6d81 !important;
+}
+html[data-theme="light"] body #page-content .ct-home-member-detail,
+html[data-theme="light"] body #page-content .ct-home-member-details dd,
+html[data-theme="light"] body .app-modal .ct-home-member-detail,
+html[data-theme="light"] body .app-modal .ct-home-member-details dd {
+  color: #24384d !important;
+}
+html[data-theme="light"] body #page-content .ct-home-member-detail-top,
+html[data-theme="light"] body .app-modal .ct-home-member-detail-top {
+  border-color: #d7e0e9 !important;
+}
+
+/* Use theme tokens in the fixed header and avoid inherited white-on-white controls. */
+html[data-theme="light"] body #workspace-view .ct-workspace-toolbar *,
+html[data-theme="light"] body #workspace-view .ct-sidebar *,
+html[data-theme="light"] body #app-header * {
+  text-shadow: none !important;
+}
