@@ -356,6 +356,10 @@
         (recipientEmail ? " (invitation for " + recipientEmail + ")" : "") +
         ". An Admin must approve your request.";
       const actions=el("div","ct-inv-actions");
+      if (!input.value) {
+        holder.append(input,el("p","ct-inv-muted","The server did not return an invitation URL, so there is nothing to share yet."));
+        return;
+      }
       actions.append(button("Copy link","ct-inv-button ct-inv-button--primary",async()=>{try{if(!input.value)throw new Error("Invitation URL is unavailable.");await copyText(input.value);showMessage(page,"Invitation link copied. Email was not sent.","success");}catch(e){showMessage(page,e.message||"Unable to copy the invitation link.","error");}}));
       actions.append(button("Share invite","ct-inv-button ct-inv-button--secondary",async()=>{
         if(!input.value) return showMessage(page,"Invitation URL is unavailable.","error");
@@ -397,6 +401,7 @@
         const code=org.code||org.organization_code||"";
         codeValue.textContent=code||"Organization code unavailable";
         codeValue.dataset.value=code;
+        refreshOrgShareTargets();
         requests=Array.isArray(responses[1].membership_requests)?responses[1].membership_requests:[];
         invitations=Array.isArray(responses[2].invitations)?responses[2].invitations:[];
         paintTabsAndLists();
