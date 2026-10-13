@@ -28,7 +28,7 @@
       { id: "reviews", label: "Logs and Reviews", icon: "✓" },
       { id: "analytics", label: "Analytics", icon: "▥" },
       { id: "reports", label: "Reports", icon: "▤" },
-      { id: "announcements", label: "Announcements and Alerts", icon: "♢" },
+      { id: "announcements", label: "Announcements & Alerts", icon: "♢" },
       { id: "audit", label: "Audit Trail", icon: "◷" },
       { id: "settings", label: "Settings", icon: "⚙" },
       { id: "org-settings", label: "Organization Settings", icon: "◇" },
