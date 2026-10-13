@@ -1,0 +1,271 @@
+/* Teams page — match the Home control-center visual language.
+   Loaded after the legacy Teams selectors so one consistent palette wins. */
+#page-content .ct-team-manager {
+  color: #e9e7ef;
+}
+#page-content .ct-team-manager .ct-team-eyebrow {
+  color: #a69acb;
+}
+#page-content .ct-team-manager .ct-team-manager-header h1,
+#page-content .ct-team-manager .ct-team-detail-identity h2,
+#page-content .ct-team-manager .ct-team-section-heading,
+#page-content .ct-team-manager .ct-team-section-heading h2,
+#page-content .ct-team-manager .ct-team-section-heading h3,
+#page-content .ct-team-manager .ct-team-card h3,
+#page-content .ct-team-manager .ct-team-overview > h3,
+#page-content .ct-team-manager .ct-team-insight-panel h3 {
+  color: #eeebf7 !important;
+}
+#page-content .ct-team-manager .ct-team-muted,
+#page-content .ct-team-manager .ct-team-status-bar span,
+#page-content .ct-team-manager .ct-team-metric small,
+#page-content .ct-team-manager .ct-team-metric span,
+#page-content .ct-team-manager .ct-team-card__summary {
+  color: #9290a0 !important;
+}
+#page-content .ct-team-manager .ct-team-notice,
+#page-content .ct-team-manager .ct-team-recent-panel,
+#page-content .ct-team-manager .ct-team-list-panel,
+#page-content .ct-team-manager .ct-team-create-form,
+#page-content .ct-team-manager .ct-team-detail,
+#page-content .ct-team-manager .ct-team-action-panel,
+#page-content .ct-team-manager .ct-team-bulk-panel,
+#page-content .ct-team-manager .ct-team-insight-panel {
+  border-color: #292c36 !important;
+  border-radius: 15px;
+  background: radial-gradient(ellipse at 100% 0%, rgb(118 101 164 / 7%), transparent 45%), #10141c !important;
+  box-shadow: none;
+}
+#page-content .ct-team-manager .ct-team-create-form {
+  border-color: #514566 !important;
+}
+#page-content .ct-team-manager .ct-team-card,
+#page-content .ct-team-manager .ct-team-metric,
+#page-content .ct-team-manager .ct-team-insight-panel,
+#page-content .ct-team-manager .ct-team-recent-item,
+#page-content .ct-team-manager .ct-team-check-row {
+  border-color: #292c36 !important;
+  border-radius: 13px;
+  background: linear-gradient(155deg, #13151d, #0f1118) !important;
+  color: #eeebf7 !important;
+  box-shadow: none;
+}
+#page-content .ct-team-manager .ct-team-card:hover,
+#page-content .ct-team-manager .ct-team-insight-panel:hover,
+#page-content .ct-team-manager .ct-team-recent-item:hover {
+  border-color: #514566 !important;
+}
+#page-content .ct-team-manager .ct-team-btn {
+  border-color: #373142;
+  border-radius: 8px;
+  background: #171720;
+  color: #dcd8e7;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+#page-content .ct-team-manager .ct-team-btn:hover,
+#page-content .ct-team-manager .ct-team-tab.is-active {
+  border-color: #655785;
+  background: #211d2c;
+  color: #f0ebfc;
+}
+#page-content .ct-team-manager .ct-team-btn--primary {
+  border-color: #3a705f !important;
+  background: #16352d !important;
+  color: #9fe0c8 !important;
+}
+#page-content .ct-team-manager .ct-team-btn--primary:hover {
+  border-color: #4a967f !important;
+  background: #1b4337 !important;
+  color: #cbf3e6 !important;
+}
+#page-content .ct-team-manager .ct-team-btn--danger {
+  border-color: #87515b !important;
+  color: #ff9ba7 !important;
+}
+#page-content .ct-team-manager .ct-team-input,
+#page-content .ct-team-manager .ct-team-search input {
+  border-color: #383246 !important;
+  border-radius: 9px;
+  background: #0d1017 !important;
+  color: #eeebf7 !important;
+}
+#page-content .ct-team-manager .ct-team-input::placeholder,
+#page-content .ct-team-manager .ct-team-search input::placeholder {
+  color: #706c7f !important;
+}
+#page-content .ct-team-manager .ct-team-input:focus-visible,
+#page-content .ct-team-manager .ct-team-btn:focus-visible {
+  outline-color: #a69acb;
+}
+#page-content .ct-team-manager .ct-team-table-wrap {
+  border-color: #292c36;
+}
+#page-content .ct-team-manager .ct-team-table {
+  background: #10141c;
+}
+#page-content .ct-team-manager .ct-team-table th {
+  background: #171522;
+  color: #c6bddc;
+}
+#page-content .ct-team-manager .ct-team-table td {
+  border-color: #292c36;
+  color: #d5d1e0;
+}
+#page-content .ct-team-manager .ct-team-status {
+  border-color: #514566;
+  background: #1a1725;
+  color: #b6a8db;
+}
+#page-content .ct-team-manager .ct-team-status.is-archived {
+  border-color: #65533a;
+  color: #d6b87e;
+}
+#page-content .ct-team-manager .ct-team-capacity__track,
+#page-content .ct-team-manager .ct-team-workload-track {
+  background: #292333;
+}
+#page-content .ct-team-manager .ct-team-capacity__fill,
+#page-content .ct-team-manager .ct-team-workload-fill {
+  background: linear-gradient(90deg, #7f6ba8, #b8a9d7);
+}
+#page-content .ct-team-manager .ct-team-capacity__fill.over {
+  background: #d6a366;
+}
+#page-content .ct-team-manager .ct-team-select input {
+  accent-color: #a69acb;
+}
+#page-content .ct-team-manager .ct-team-activity-item {
+  border-bottom-color: #292c36;
+}
+#page-content .ct-team-manager .ct-team-activity-dot {
+  background: #a69acb;
+  box-shadow: 0 0 0 4px rgb(166 154 203 / 10%);
+}
+#page-content .ct-team-manager .ct-team-activity-copy strong {
+  color: #d8d0eb;
+}
+#page-content .ct-team-manager .ct-team-activity-copy p {
+  color: #b0aabe;
+}
+#page-content .ct-team-manager .ct-team-activity-copy small {
+  color: #777485;
+}
+#page-content .ct-team-manager .ct-team-empty {
+  border-color: #514566;
+  background: #10141c;
+  color: #9290a0;
+}
+#page-content .ct-team-manager .ct-team-create-status.is-success {
+  color: #9fe0c8;
+}
+#page-content .ct-team-manager .ct-team-create-status.is-error {
+  color: #ff9ba7;
+}
+#page-content .ct-team-manager .ct-team-notice.success,
+#page-content .ct-team-manager .ct-team-notice--success {
+  border-color: #3a705f !important;
+  color: #9fe0c8;
+}
+#page-content .ct-team-manager .ct-team-notice.error,
+#page-content .ct-team-manager .ct-team-notice--error {
+  border-color: #87515b !important;
+  color: #ff9ba7;
+}
+
+/* Light mode is still controlled app-wide from Settings. */
+html[data-theme="light"] #page-content .ct-team-manager {
+  color: #19283a;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-manager-header h1,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-detail-identity h2,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-section-heading,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-section-heading h2,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-section-heading h3,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-card h3,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-insight-panel h3 {
+  color: #19283a !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-muted,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-card__summary,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-metric small,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-metric span {
+  color: #52647a !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-notice,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-recent-panel,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-list-panel,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-create-form,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-detail,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-action-panel,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-bulk-panel,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-insight-panel,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-card,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-metric,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-recent-item,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-check-row {
+  border-color: #c4ceda !important;
+  background: #eef2f6 !important;
+  color: #19283a !important;
+  box-shadow: 0 4px 14px rgb(39 55 75 / 7%) !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-btn {
+  border-color: #b8c5d3;
+  background: #e9eef3;
+  color: #263a4f;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-btn:hover {
+  border-color: #8aa99e;
+  background: #d7e1e9;
+  color: #172a3e;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-btn--primary {
+  border-color: #17664f !important;
+  background: #17664f !important;
+  color: #ffffff !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-btn--primary:hover {
+  background: #125541 !important;
+  border-color: #125541 !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-input,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-search input {
+  border-color: #a7b5c5 !important;
+  background: #ffffff !important;
+  color: #19283a !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-input::placeholder,
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-search input::placeholder {
+  color: #6b7c90 !important;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-table {
+  background: #eef2f6;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-table th {
+  background: #dfe6ed;
+  color: #263a4f;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-table td {
+  border-color: #c4ceda;
+  color: #35475b;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-empty {
+  border-color: #a7b5c5;
+  background: #eef2f6;
+  color: #52647a;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-status {
+  border-color: #acc9bd;
+  background: #d5e7df;
+  color: #17664f;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-status.is-archived {
+  border-color: #dec9a1;
+  background: #f5ead5;
+  color: #80520a;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-create-status.is-success {
+  color: #176746;
+}
+html[data-theme="light"] #page-content .ct-team-manager .ct-team-create-status.is-error {
+  color: #a8253b;
+}
