@@ -480,3 +480,113 @@ html[data-theme="light"] body .ct-settings-status.is-error,
 html[data-theme="light"] body .text-danger {
   color: #a8253b !important;
 }
+
+/* Organization Settings (Admin) — remove dark-purple hard-coded card and input styles. */
+html[data-theme="light"] body #page-content .ct-org-settings-page,
+html[data-theme="light"] body #page-content .ct-org-card,
+html[data-theme="light"] body #page-content .ct-org-code-card,
+html[data-theme="light"] body #page-content .ct-org-policy-card,
+html[data-theme="light"] body #page-content .ct-org-scope-group,
+html[data-theme="light"] body #page-content .ct-org-audit-event,
+html[data-theme="light"] body #page-content .ct-org-role-boundary,
+html[data-theme="light"] body #page-content .ct-org-summary-metric,
+html[data-theme="light"] body #page-content .ct-org-profile-top,
+html[data-theme="light"] body #page-content .ct-org-avatar-preview,
+html[data-theme="light"] body #page-content .ct-org-table-wrap,
+html[data-theme="light"] body #page-content .ct-org-team-editor[open],
+html[data-theme="light"] body #page-content .ct-org-table {
+  color: #19283a !important;
+  background-color: #eef2f6 !important;
+  background-image: none !important;
+  border-color: #c4ceda !important;
+  box-shadow: 0 5px 16px rgb(39 55 75 / 6%) !important;
+}
+html[data-theme="light"] body #page-content .ct-org-settings-page h1,
+html[data-theme="light"] body #page-content .ct-org-settings-page h2,
+html[data-theme="light"] body #page-content .ct-org-settings-page h3,
+html[data-theme="light"] body #page-content .ct-org-settings-page strong,
+html[data-theme="light"] body #page-content .ct-org-card-heading,
+html[data-theme="light"] body #page-content .ct-org-team-editor summary,
+html[data-theme="light"] body #page-content .ct-org-table th,
+html[data-theme="light"] body #page-content .ct-org-table td {
+  color: #19283a !important;
+}
+html[data-theme="light"] body #page-content .ct-org-muted,
+html[data-theme="light"] body #page-content .ct-org-settings-page p,
+html[data-theme="light"] body #page-content .ct-org-settings-page small,
+html[data-theme="light"] body #page-content .ct-org-settings-page label,
+html[data-theme="light"] body #page-content .ct-org-audit-event p,
+html[data-theme="light"] body #page-content .ct-org-summary-metric span,
+html[data-theme="light"] body #page-content .ct-org-summary-metric small,
+html[data-theme="light"] body #page-content .ct-org-archived-banner p {
+  color: #46586d !important;
+}
+html[data-theme="light"] body #page-content .ct-org-input,
+html[data-theme="light"] body #page-content .ct-org-team-multi,
+html[data-theme="light"] body #page-content .ct-org-team-multi option {
+  color: #19283a !important;
+  background: #f0f3f7 !important;
+  border-color: #aab8c8 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-button,
+html[data-theme="light"] body #page-content .ct-org-button-secondary,
+html[data-theme="light"] body #page-content .ct-settings-button-secondary {
+  color: #26384d !important;
+  background: #dfe6ed !important;
+  border-color: #b6c4d3 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-button-primary,
+html[data-theme="light"] body #page-content .ct-org-settings-page .ct-settings-button-primary {
+  color: #ffffff !important;
+  background: #17664f !important;
+  border-color: #17664f !important;
+}
+html[data-theme="light"] body #page-content .ct-org-eyebrow,
+html[data-theme="light"] body #page-content .ct-org-section-icon {
+  color: #17664f !important;
+}
+html[data-theme="light"] body #page-content .ct-org-status,
+html[data-theme="light"] body #page-content .ct-org-role-pill,
+html[data-theme="light"] body #page-content .ct-org-status-pill,
+html[data-theme="light"] body #page-content .ct-org-lock-pill {
+  color: #35475b !important;
+  background: #dfe6ed !important;
+  border-color: #c0ccd8 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-status-pill.is-active {
+  color: #155c3f !important;
+  background: #d7e9df !important;
+  border-color: #b7d5c5 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-status-pill.is-archived,
+html[data-theme="light"] body #page-content .ct-org-danger-card,
+html[data-theme="light"] body #page-content .ct-org-archived-banner {
+  color: #8b2639 !important;
+  background: #f0dce0 !important;
+  border-color: #ddbcc3 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-copy-feedback,
+html[data-theme="light"] body #page-content .ct-org-status.is-success {
+  color: #176746 !important;
+}
+html[data-theme="light"] body #page-content .ct-org-status.is-error {
+  color: #a8253b !important;
+}
+
+/* Keep the app's custom dashboard and home cards readable in both themes. */
+html[data-theme="light"] body #page-content [class*="ct-home-"],
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"],
+html[data-theme="light"] body #page-content [class*="ct-dash-"],
+html[data-theme="light"] body #page-content [class*="ct-overview-"] {
+  border-color: #c4ceda;
+}
+html[data-theme="light"] body #page-content [class*="ct-home-"],
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] {
+  color: #19283a;
+}
+html[data-theme="light"] body #page-content [class*="ct-home-"] p,
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] p,
+html[data-theme="light"] body #page-content [class*="ct-home-"] small,
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] small {
+  color: #46586d !important;
+}
