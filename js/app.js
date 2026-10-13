@@ -368,6 +368,27 @@
       return;
     }
 
+    if (pageId === "announcements" || pageId === "team-channel") {
+      const role = String(user?.role || "").toLowerCase();
+      const pageAllowed = pageId === "announcements"
+        ? ["admin", "employee"].includes(role)
+        : ["supervisor", "employee"].includes(role);
+      if (!pageAllowed) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "This announcements view is not available to your role."
+        }));
+        return;
+      }
+      if (window.CleanTrackAnnouncements && typeof window.CleanTrackAnnouncements.render === "function") {
+        await window.CleanTrackAnnouncements.render(pageContent, pageId);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Announcements could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
     if (pageId === "org-settings") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
         pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organization Settings are available to Admin users only." }));
