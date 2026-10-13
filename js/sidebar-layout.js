@@ -431,6 +431,28 @@ if (identity) {
         const settingsPage = menu.find(item => item.id === "settings");
         if (profilePage) appendDialogActions(actionsRow, [{ label: "Open My Profile", action: () => { document.getElementById("app-modal").close(); window.CleanTrackNavigation.setActivePage("profile"); } }]);
         if (settingsPage) appendDialogActions(actionsRow, [{ label: "Open Settings", action: () => { document.getElementById("app-modal").close(); window.CleanTrackNavigation.setActivePage("settings"); } }]);
+        appendDialogActions(actionsRow, [{
+          label: "Log out",
+          className: "ct-help-secondary-button ct-profile-logout-button",
+          action: async () => {
+            const modal = document.getElementById("app-modal");
+            const logoutButton = modal && modal.querySelector(".ct-profile-logout-button");
+            if (logoutButton) {
+              logoutButton.disabled = true;
+              logoutButton.textContent = "Signing out…";
+            }
+            try {
+              if (modal && modal.open) modal.close();
+              if (window.CleanTrackAuth && typeof window.CleanTrackAuth.logout === "function") {
+                await window.CleanTrackAuth.logout();
+              }
+            } catch (error) {
+              console.error("CleanTrack logout request failed; clearing the local session anyway.", error);
+            } finally {
+              window.location.reload();
+            }
+          }
+        }]);
         appendDialogActions(actionsRow, [{ label: "Close", action: () => document.getElementById("app-modal").close() }]);
         wrap.appendChild(actionsRow);
       });
