@@ -683,9 +683,8 @@
     waButton.innerHTML=WA_ICON;waButton.title="Create supervisor WhatsApp group";
     const waLabel=el("span","ct-staff-sr-only","Supervisor WhatsApp group");
     waButton.appendChild(waLabel);
-    const waEditButton=button("✎","ct-staff-icon-button ct-staff-whatsapp-edit",function(){openWhatsAppSetup(true);},"Edit supervisor WhatsApp group link");
-    waEditButton.title="Edit supervisor WhatsApp group link";
-    toolbar.append(importButton,csvButton,xlsxButton,pdfButton,waButton,waEditButton,fileInput);
+    // Keep one WhatsApp action in the toolbar; the separate pencil button was redundant.
+    toolbar.append(importButton,csvButton,xlsxButton,pdfButton,waButton,fileInput);
     fileInput.addEventListener("change",function(){const file=fileInput.files&&fileInput.files[0];if(file)importFile(file);fileInput.value="";});
     header.append(intro,toolbar);pageRoot.appendChild(header);
     const note=el("div","ct-staff-notice");note.dataset.staffNotice="true";note.hidden=true;note.setAttribute("role","status");pageRoot.appendChild(note);
