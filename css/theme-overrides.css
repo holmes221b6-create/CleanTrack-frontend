@@ -1842,3 +1842,53 @@ html[data-theme="light"] #page-content table thead th {
 }
 html[data-theme="light"] #page-content hr { border-color: #d7e0ea !important; }
 html[data-theme="light"] #page-content svg { filter: none !important; }
+
+
+/* White-mode cleanup for bespoke landing, welcome, and action tiles that use
+   hard-coded dark gradients rather than the shared theme variables. */
+html[data-theme="light"] #page-content [class*="welcome"],
+html[data-theme="light"] #page-content [class*="hero"],
+html[data-theme="light"] #page-content [class*="quick-action"],
+html[data-theme="light"] #page-content [class*="overview"],
+html[data-theme="light"] #page-content [class*="member-card"],
+html[data-theme="light"] #page-content [class*="detail-panel"],
+html[data-theme="light"] #page-content .ct-home-welcome,
+html[data-theme="light"] #page-content .ct-home-welcome::before,
+html[data-theme="light"] #page-content .ct-home-welcome::after,
+html[data-theme="light"] #page-content .ct-home-panel,
+html[data-theme="light"] #page-content .ct-home-card,
+html[data-theme="light"] #page-content .ct-home-member-details,
+html[data-theme="light"] #page-content .ct-admin-dashboard .dashboard-card,
+html[data-theme="light"] #page-content .ct-admin-dashboard .ct-dash-panel,
+html[data-theme="light"] #page-content .ct-admin-dashboard .ct-dash-quick-action {
+  color: #25384d !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #d7e0ea !important;
+  box-shadow: 0 2px 8px rgb(24 39 58 / 4%) !important;
+}
+html[data-theme="light"] #page-content [class*="welcome"] h1,
+html[data-theme="light"] #page-content [class*="welcome"] h2,
+html[data-theme="light"] #page-content [class*="welcome"] h3,
+html[data-theme="light"] #page-content [class*="welcome"] p,
+html[data-theme="light"] #page-content [class*="welcome"] span,
+html[data-theme="light"] #page-content [class*="hero"] h1,
+html[data-theme="light"] #page-content [class*="hero"] h2,
+html[data-theme="light"] #page-content [class*="hero"] p,
+html[data-theme="light"] #page-content [class*="hero"] span {
+  color: #25384d !important;
+}
+html[data-theme="light"] #page-content [class*="welcome"] .eyebrow,
+html[data-theme="light"] #page-content [class*="welcome"] .muted,
+html[data-theme="light"] #page-content [class*="hero"] .muted {
+  color: #586b80 !important;
+}
+html[data-theme="light"] #page-content [class*="welcome"] .button-primary,
+html[data-theme="light"] #page-content [class*="welcome"] .btn-primary,
+html[data-theme="light"] #page-content [class*="hero"] .button-primary,
+html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
+  color: #ffffff !important;
+  background: #17664f !important;
+  border-color: #17664f !important;
+}
