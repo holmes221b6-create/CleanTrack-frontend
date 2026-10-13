@@ -150,7 +150,7 @@
       top.append(el("span", "ct-settings-icon", "♧"));
       const copy = el("div");
       copy.append(el("h2", "", "Team scope"));
-      copy.append(el("p", "ct-settings-muted", "This is the team, location, and zone scope currently assigned to your account. Organization-wide permissions remain Admin-only."));
+      copy.append(el("p", "ct-settings-muted", "This is the team, location, and zone scope currently assigned to your account. Assigned scope is read-only here; ask an Admin to change assignments. Organization-wide permissions remain Admin-only."));
       top.appendChild(copy);
       scopeCard.appendChild(top);
       const scopeStatus = el("p", "ct-settings-muted", "Loading assigned scope…");
