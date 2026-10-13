@@ -215,9 +215,6 @@
       ? "Restore the organization to load and manage its active roster."
       : "Active, approved members from the organization database. Assigning a team below updates real team membership."));
     rosterHeader.appendChild(rosterTitle);
-    if (organization.status !== "archived") {
-      rosterHeader.appendChild(button("Open Staff", "ct-org-button ct-org-button-secondary", () => go("staff")));
-    }
     roster.appendChild(rosterHeader);
 
     if (organization.status === "archived") {
