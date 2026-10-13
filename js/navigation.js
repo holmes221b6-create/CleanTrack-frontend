@@ -31,6 +31,7 @@
       { id: "announcements", label: "Announcements and Alerts", icon: "♢" },
       { id: "audit", label: "Audit Trail", icon: "◷" },
       { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "org-settings", label: "Organization Settings", icon: "◇" },
       { id: "billing", label: "Billing", icon: "$" }
     ],
 
@@ -45,7 +46,8 @@
       { id: "reports", label: "Reports", icon: "▤" },
       { id: "team-pulse", label: "Team Pulse", icon: "♡" },
       { id: "skills", label: "Skills and Eligibility", icon: "★" },
-      { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" }
+      { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" },
+      { id: "settings", label: "Settings", icon: "⚙" }
     ],
 
     employee: [
@@ -56,7 +58,7 @@
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "skills", label: "My Skills", icon: "★" },
       { id: "billing", label: "Billing", icon: "$" },
-      { id: "profile", label: "My Profile", icon: "♙" }
+      { id: "settings", label: "Settings", icon: "⚙" }
     ]
   };
 
