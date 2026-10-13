@@ -1015,3 +1015,43 @@ html[data-theme="light"] body .ct-settings-status.is-error,
 html[data-theme="light"] body .ct-org-status.is-error {
   color: #b3261e !important;
 }
+
+
+/* Global right-to-left layout support for Arabic and Urdu preferences. */
+html[dir="rtl"] body { direction: rtl; text-align: right; }
+html[dir="rtl"] body #workspace-view .ct-workspace-shell { direction: rtl; }
+html[dir="rtl"] body #workspace-view .ct-sidebar { border-right: 0 !important; border-left: 1px solid var(--border, #1b3150) !important; }
+html[dir="rtl"] body #workspace-view #workspace-navigation button,
+html[dir="rtl"] body #workspace-view #workspace-navigation a,
+html[dir="rtl"] body #workspace-view .ct-sidebar-toggle { text-align: right !important; }
+html[dir="rtl"] body #workspace-view #workspace-navigation .active,
+html[dir="rtl"] body #workspace-view #workspace-navigation [aria-current="page"],
+html[dir="rtl"] body #workspace-view #workspace-navigation .ct-nav-active { box-shadow: inset -3px 0 var(--primary, #17664f) !important; }
+html[dir="rtl"] body #workspace-view .ct-sidebar-toggle { margin-inline-start: 0; margin-inline-end: 8px; }
+html[dir="rtl"] body #workspace-view .ct-workspace-toolbar,
+html[dir="rtl"] body .app-header,
+html[dir="rtl"] body .app-footer,
+html[dir="rtl"] body .page-header,
+html[dir="rtl"] body .ct-settings-header,
+html[dir="rtl"] body .ct-org-page-header,
+html[dir="rtl"] body .ct-settings-card-header,
+html[dir="rtl"] body .ct-org-card-header { direction: rtl; }
+html[dir="rtl"] body #workspace-view .ct-workspace-shell .ct-workspace-main { direction: rtl; }
+html[dir="rtl"] body #page-content input,
+html[dir="rtl"] body #page-content select,
+html[dir="rtl"] body #page-content textarea,
+html[dir="rtl"] body .ct-settings-page input,
+html[dir="rtl"] body .ct-settings-page select,
+html[dir="rtl"] body .ct-settings-page textarea { text-align: right; }
+html[dir="rtl"] body .ct-settings-layout { direction: rtl; }
+html[dir="rtl"] body .ct-settings-nav-item { text-align: right; }
+html[dir="rtl"] body .ct-settings-check { direction: rtl; }
+html[dir="rtl"] body table th,
+html[dir="rtl"] body table td { text-align: right; }
+html[dir="rtl"] body .ct-settings-integration-row { direction: rtl; }
+html[dir="rtl"] body .ct-settings-actions { justify-content: flex-start; }
+html[dir="rtl"] body .ct-sidebar-brand { direction: rtl; }
+html[dir="rtl"] body .ct-sidebar-brand small { letter-spacing: normal; }
+html[dir="rtl"] body .ct-sidebar-label { text-align: right; }
+html[data-theme="light"][dir="rtl"] body #workspace-view #workspace-navigation .active,
+html[data-theme="light"][dir="rtl"] body #workspace-view #workspace-navigation [aria-current="page"] { box-shadow: inset -3px 0 #17664f !important; }
