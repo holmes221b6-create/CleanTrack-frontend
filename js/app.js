@@ -120,8 +120,11 @@
   function showUnauthenticatedLayout() {
     setVisible(getElement("workspace-view"), false);
     setVisible(getElement("auth-view"), true);
-    setVisible(getElement("login-view"), true);
-    setVisible(getElement("register-view"), false);
+    const params = new URLSearchParams(window.location.search);
+    const joiningFromLink = params.has("invite") || params.has("join");
+    setVisible(getElement("login-view"), !joiningFromLink);
+    setVisible(getElement("register-view"), joiningFromLink);
+    setVisible(getElement("forgot-password-view"), false);
     updateFooterGuide(null);
   }
 
