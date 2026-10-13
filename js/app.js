@@ -872,6 +872,20 @@ function bindNavigation() {
     const form = getElement("login-form");
     if (!form) return;
 
+    // Keep password-recovery form honest while email delivery/reset tokens are not configured.
+    const recoveryForm = getElement("forgot-password-form");
+    if (recoveryForm && recoveryForm.dataset.bound !== "true") {
+      recoveryForm.dataset.bound = "true";
+      recoveryForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const message = getElement("forgot-password-message");
+        if (message) {
+          message.textContent = "Password recovery by email is not configured yet. No reset email was sent. Please contact your organization Admin or CleanTrack support.";
+          message.className = "form-message error";
+        }
+      });
+    }
+
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       clearMessage();
