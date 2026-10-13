@@ -30,6 +30,25 @@
     }
   }
 
+  async function fetchCsrfToken() {
+    try {
+      const response = await fetch(
+        config.apiBaseUrl + normalizePath("auth/csrf"),
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+          credentials: "include"
+        }
+      );
+      if (!response.ok) return "";
+      const data = await response.json();
+      return String(data && (data.csrf_token || data.csrf) || "");
+    } catch (_) {
+      // Let the protected request return its normal authentication/CSRF error.
+      return "";
+    }
+  }
+
   async function request(path, options = {}) {
     const controller = new AbortController();
     const timeoutMs = options.timeoutMs || config.requestTimeoutMs;
@@ -45,8 +64,15 @@
     // The active backend stores JWTs in HttpOnly cookies and protects mutating
     // requests with Flask-JWT-Extended's readable CSRF cookie.
     const method = String(options.method || "GET").toUpperCase();
-    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !headers.has("X-CSRF-TOKEN")) {
-      const csrfToken = readCsrfCookie();
+    const requestPath = String(path || "").replace(/^\\/+|\\/+$/g, "").split("?")[0];
+    const csrfExemptPaths = new Set(["auth/login", "auth/register"]);
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) &&
+        !headers.has("X-CSRF-TOKEN") &&
+        !csrfExemptPaths.has(requestPath)) {
+      // The access/CSRF cookies belong to the API host, not the frontend
+      // host, so document.cookie on the frontend cannot always read them.
+      const cookieToken = readCsrfCookie();
+      const csrfToken = cookieToken || await fetchCsrfToken();
       if (csrfToken) headers.set("X-CSRF-TOKEN", csrfToken);
     }
 
