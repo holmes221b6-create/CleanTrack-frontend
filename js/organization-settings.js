@@ -357,8 +357,29 @@
         item.appendChild(top);
         item.append(el("p", "", "By " + (event.actor_name || "Unknown account")));
         const fields = event.details && event.details.changed_fields;
+        const changes = event.details && event.details.changes;
         if (Array.isArray(fields) && fields.length) {
           item.append(el("p", "ct-org-muted", "Changed: " + fields.join(", ")));
+          if (changes) {
+            const changeList = el("ul", "ct-org-audit-changes");
+            fields.forEach(fieldName => {
+              const change = changes[fieldName];
+              if (!change) return;
+              const formatValue = value => {
+                if (value === null || value === undefined || value === "") return "empty";
+                const text = typeof value === "string" ? value : JSON.stringify(value);
+                return text.length > 110 ? text.slice(0, 107) + "…" : text;
+              };
+              changeList.appendChild(el("li", "", fieldName.replace(/_/g, " ") + ": " + formatValue(change.from) + " → " + formatValue(change.to)));
+            });
+            if (changeList.childElementCount) item.appendChild(changeList);
+          }
+        } else if (event.details && event.details.previous_teams && event.details.new_teams) {
+          const before = event.details.previous_teams.map(team => team.name).join(", ") || "none";
+          const after = event.details.new_teams.map(team => team.name).join(", ") || "none";
+          item.append(el("p", "ct-org-muted", (event.details.member_name || "Member") + " teams: " + before + " → " + after));
+        } else if (event.details && event.details.member_email && event.details.decision) {
+          item.append(el("p", "ct-org-muted", "Membership " + event.details.decision + " for " + event.details.member_email));
         } else if (event.details && event.details.message) {
           item.append(el("p", "ct-org-muted", event.details.message));
         }
