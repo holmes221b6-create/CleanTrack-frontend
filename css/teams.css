@@ -24,6 +24,16 @@
   --ct-home-text: #eeebf7;
   --ct-home-muted: #858194;
   --ct-home-accent: #a69acb;
+  --primary: #a69acb;
+  --primary-hover: #c0b1e8;
+  --primary-contrast: #100d17;
+  --success: #a69acb;
+  --text: #eeebf7;
+  --text-secondary: #858194;
+  --surface: #10141c;
+  --bg-elevated: #10141c;
+  --border: #292c36;
+  --border-strong: #383246;
   color: var(--ct-home-text);
 }
 #page-content .ct-team-manager .ct-team-eyebrow,
