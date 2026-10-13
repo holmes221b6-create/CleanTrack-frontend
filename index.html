@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="css/admin-dashboard.css">
     <link rel="stylesheet" href="css/admin-home.css">
     <link rel="stylesheet" href="css/organization-settings.css?v=20261013-settings-full">
+    <link rel="stylesheet" href="css/invitations.css?v=20261013-admin-invitations-v1">
     <link rel="stylesheet" href="css/settings.css?v=20261013-settings-overview-v1">
     <link rel="stylesheet" href="css/sidebar-layout.css">
     <link rel="stylesheet" href="css/professional-blue.css">
@@ -37,6 +38,7 @@
     <script src="js/preferences.js?v=20261013-global-i18n-overview-v1" defer></script>
     <script src="js/settings.js?v=20261013-settings-overview-v1" defer></script>
     <script src="js/organization-settings.js" defer></script>
+    <script src="js/invitations.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/teams.js" defer></script>
     <script src="js/sidebar-layout.js" defer></script>
@@ -285,6 +287,13 @@
                                 >
                                 <small class="field-error" data-error-for="email"></small>
                             </div>
+
+                            <div class="form-field">
+                                <label for="register-phone">Phone number (optional)</label>
+                                <input id="register-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="Your phone number">
+                            </div>
+                            <input type="hidden" id="register-invitation-token" name="invitation_token">
+                            <p id="register-invitation-notice" class="field-hint" hidden></p>
 
                             <div class="form-field">
                                 <label for="register-password">Create password</label>
