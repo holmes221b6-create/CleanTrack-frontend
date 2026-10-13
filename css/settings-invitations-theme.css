@@ -220,3 +220,237 @@ html[data-theme="light"] body #page-content .ct-settings-header {
 html[data-theme="light"] body #page-content .ct-settings-header h1 {
   color: #172536 !important;
 }
+
+
+/* Staff page: match the Home control-center visual language in dark mode. */
+html:not([data-theme="light"]) body #page-content .ct-staff-page {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: clamp(22px, 3.2vw, 36px);
+  border: 1px solid #2c2938;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at 92% 0%, rgb(118 101 164 / 16%), transparent 42%), linear-gradient(135deg, #14131e, #0f1219 72%);
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-header::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 190px;
+  height: 190px;
+  right: -76px;
+  bottom: -120px;
+  border: 1px solid rgb(118 101 164 / 22%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgb(118 101 164 / 4%), 0 0 0 46px rgb(118 101 164 / 3%);
+  pointer-events: none;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-header h1 {
+  color: #eeebf7 !important;
+  font-size: clamp(25px, 3vw, 35px);
+  font-weight: 750;
+  letter-spacing: -.04em;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-header .ct-staff-muted {
+  color: #a19bad !important;
+  font-size: 13px;
+  line-height: 1.65;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-eyebrow {
+  color: #a69acb !important;
+  font-size: 10px;
+  letter-spacing: .16em;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-kpi,
+html:not([data-theme="light"]) body #page-content .ct-staff-card,
+html:not([data-theme="light"]) body #page-content .ct-staff-sidebar {
+  color: #e9e7ef !important;
+  border-color: #292c36 !important;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #11141c, #0d1017) !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-card {
+  background: #10141c !important;
+  border-radius: 14px;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-kpi span,
+html:not([data-theme="light"]) body #page-content .ct-staff-mini-meta,
+html:not([data-theme="light"]) body #page-content .ct-staff-muted {
+  color: #9290a0;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-kpi strong {
+  color: #eeeaf7;
+  font-weight: 750;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-button {
+  border-color: #373142;
+  border-radius: 8px;
+  background: #171720;
+  color: #dcd8e7;
+  box-shadow: none;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-button:hover {
+  border-color: #655785;
+  background: #211d2c;
+  color: #f0ebfc;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-button--primary {
+  border-color: #3a705f;
+  background: #16352d;
+  color: #9fe0c8;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-button--primary:hover {
+  border-color: #4a967f;
+  background: #1b4337;
+  color: #cbf3e6;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-button--danger {
+  border-color: #65404a;
+  background: #24161d;
+  color: #ff9eac;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-side-filter,
+html:not([data-theme="light"]) body #page-content .ct-staff-side-item,
+html:not([data-theme="light"]) body #page-content .ct-staff-directory-row,
+html:not([data-theme="light"]) body #page-content .ct-staff-profile-metric,
+html:not([data-theme="light"]) body #page-content .ct-staff-detail-item,
+html:not([data-theme="light"]) body #page-content .ct-staff-bulk,
+html:not([data-theme="light"]) body #page-content .ct-staff-audit-event,
+html:not([data-theme="light"]) body #page-content .ct-staff-whatsapp-contacts,
+html:not([data-theme="light"]) body #page-content .ct-staff-check,
+html:not([data-theme="light"]) body #page-content .ct-staff-notice,
+html:not([data-theme="light"]) body #page-content .ct-staff-empty {
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-side-filter,
+html:not([data-theme="light"]) body #page-content .ct-staff-side-item {
+  color: #aaa5ba;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-side-filter.is-active,
+html:not([data-theme="light"]) body #page-content .ct-staff-side-item:hover,
+html:not([data-theme="light"]) body #page-content .ct-staff-side-item.is-selected {
+  color: #f0ebfc;
+  border-color: #514566;
+  background: #1b1926;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-side-item.is-selected {
+  box-shadow: inset 3px 0 #a99ad8;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-avatar {
+  background: #1a1725;
+  color: #b3a6db;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-directory-row,
+html:not([data-theme="light"]) body #page-content .ct-staff-profile-metric,
+html:not([data-theme="light"]) body #page-content .ct-staff-input,
+html:not([data-theme="light"]) body #page-content .ct-staff-whatsapp-contacts {
+  background: #0c1017;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-directory-row.is-selected {
+  background: #171522;
+  border-color: #655785;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-input {
+  color: #e9e7ef;
+  border-color: #343341;
+  border-radius: 9px;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-input:focus {
+  outline-color: #7668a5;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-status {
+  background: #191722;
+  border-color: #383246;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-status--active {
+  color: #9fe0c8;
+  border-color: #326b58;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-status--termination-pending {
+  color: #f4d28b;
+  border-color: #655332;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-status--terminated,
+html:not([data-theme="light"]) body #page-content .ct-staff-status--suspended {
+  color: #ff9eac;
+  border-color: #65404a;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-dialog {
+  color: #e9e7ef;
+  border-color: #383246;
+  background: #10141c;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-notice {
+  color: #c7bedf;
+  background: #191722;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-invite-card {
+  border-color: #383246;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 100% 0%, rgb(57 122 101 / 9%), transparent 45%), #10141c;
+}
+html:not([data-theme="light"]) body #page-content .ct-staff-share-link {
+  border-color: #383246;
+  background: #191722;
+  color: #c7bedf;
+}
+
+/* Use the same understated Home-style panels throughout Settings. */
+html:not([data-theme="light"]) body #page-content .ct-settings-nav {
+  background: #10141c !important;
+  border-color: #292c36 !important;
+  border-radius: 14px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-nav-item {
+  border-radius: 9px;
+  font-size: 12px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-panel {
+  display: grid;
+  gap: 14px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-card {
+  padding: clamp(17px, 2.4vw, 25px);
+  border-color: #292c36 !important;
+  border-radius: 14px;
+  box-shadow: none !important;
+  background: #10141c !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-card h2 {
+  font-size: 15px;
+  letter-spacing: -.02em;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-button {
+  min-height: 35px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-grid {
+  gap: 15px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-nav-item .ct-settings-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+@media(max-width: 760px) {
+  html:not([data-theme="light"]) body #page-content .ct-staff-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  html:not([data-theme="light"]) body #page-content .ct-staff-toolbar {
+    justify-content: flex-start;
+  }
+}
