@@ -84,8 +84,14 @@
 
   function quickShareLinks(container, url, message, emailAddress) {
     const encoded = encodeURIComponent(message + " " + url);
+    // Keep a single WhatsApp destination in each share-action group, even if
+    // the group is refreshed more than once.
+    const hasWhatsApp = Array.from(container.querySelectorAll("a[href]")).some(link => {
+      try { return new URL(link.href).hostname.toLowerCase() === "wa.me"; }
+      catch (_) { return false; }
+    });
     container.append(
-      channelLink("WhatsApp", "https://wa.me/?text=" + encoded),
+      ...(hasWhatsApp ? [] : [channelLink("WhatsApp", "https://wa.me/?text=" + encoded)]),
       channelLink("SMS / Messages", "sms:?body=" + encoded)
     );
     if (emailAddress) {
@@ -167,11 +173,6 @@
       const code = codeValue.dataset.value || "";
       return code ? orgShareText() + " Organization code: " + code + ". An Admin must approve your request." : "";
     };
-    quickOrgActions.append(
-      channelLink("WhatsApp", "https://wa.me/"),
-      channelLink("SMS / Messages", "sms:"),
-      channelLink("Email app", "mailto:")
-    );
     function refreshOrgShareTargets() {
       quickOrgActions.replaceChildren();
       const code = codeValue.dataset.value || "";
