@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth;
-let root=null,teams=[],busy=false,archived=false,query="";
+let root=null,teams=[],busy=false,archived=false,query="",selected=new Set(),teamInsights=new Map();
 const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n};
 function button(x,c,fn,type){const n=el("button",c||"ct-team-btn",x);n.type=type||"button";if(fn)n.addEventListener("click",fn);return n}
 function txt(x,otherwise){return x===null||x===undefined||x===""?(otherwise||"—"):String(x)}
@@ -22,7 +22,7 @@ function createOpen(open){const f=root.querySelector("[data-team-create]");f.hid
 function card(t){
  const c=el("article","ct-team-card"),top=el("div","ct-team-card__top"),ident=el("div");
  ident.append(el("h3","",t.name),el("p","ct-team-muted",t.description||"No description provided."));
- top.append(ident,el("span","ct-team-status"+(t.status==="archived"?" is-archived":""),t.status==="archived"?"Archived":"Active"));c.append(top);
+ const pick=el("label","ct-team-select");const selectBox=el("input");selectBox.type="checkbox";selectBox.checked=selected.has(String(t.id));selectBox.setAttribute("aria-label","Select "+t.name);selectBox.addEventListener("change",()=>{if(selectBox.checked)selected.add(String(t.id));else selected.delete(String(t.id));renderList()});pick.append(selectBox,el("span","ct-team-sr-only","Select team"));top.append(pick,ident,el("span","ct-team-status"+(t.status==="archived"?" is-archived":""),t.status==="archived"?"Archived":"Active"));c.append(top);
  const meta=el("div","ct-team-card__summary");
  [txt(t.member_count,"0")+" people",txt(t.location_count,"0")+" locations",txt(t.zone_count,"0")+" zones"].forEach(x=>meta.append(el("span","",x)));c.append(meta);
  const load=el("div","ct-team-card__summary");
@@ -31,13 +31,91 @@ function card(t){
  const foot=el("div","ct-team-card__footer"),pin=pins().includes(String(t.id));
  foot.append(el("small","ct-team-muted",t.created_at?"Created "+date(t.created_at):"Team record"),button(pin?"★ Pinned":"☆ Pin team","ct-team-btn ct-team-btn--quiet",()=>{let p=pins().filter(x=>x!==String(t.id));if(!pin)p.push(String(t.id));write("ct.team.pins."+userKey(),p);renderList()}),button("Open team →","ct-team-btn ct-team-btn--primary",()=>openTeam(t.id)));c.append(foot);return c
 }
+
+function rollupTrend(){
+ const weeks=new Map();
+ for(const item of teamInsights.values())for(const row of (item.performance||[])){
+  const key=String(row.week_start||"");if(!key)continue;
+  if(!weeks.has(key))weeks.set(key,{week_start:key,tasks_created:0,tasks_completed:0,due_dated_completions:0,on_time:0});
+  const aggregate=weeks.get(key);aggregate.tasks_created+=Number(row.tasks_created||0);aggregate.tasks_completed+=Number(row.tasks_completed||0);
+  const due=Number(row.due_dated_completions||0);aggregate.due_dated_completions+=due;
+  if(row.compliance_rate!==null&&row.compliance_rate!==undefined)aggregate.on_time+=Math.round(Number(row.compliance_rate)*due/100);
+ }
+ return [...weeks.values()].sort((a,b)=>a.week_start.localeCompare(b.week_start)).map(x=>({...x,compliance_rate:x.due_dated_completions?Math.round(x.on_time/x.due_dated_completions*1000)/10:null}));
+}
+function renderInsights(){
+ const wrap=root.querySelector("[data-team-insights]");if(!wrap)return;wrap.replaceChildren();
+ const total=(key)=>teams.reduce((n,t)=>n+Number(t[key]||0),0);
+ const totalMembers=total("member_count"),locations=total("location_count"),zones=total("zone_count"),tasks=total("task_count"),activeTasks=total("active_task_count"),overdue=total("overdue_task_count");
+ const dueRows=[];for(const item of teamInsights.values())for(const row of (item.performance||[]))if(Number(row.due_dated_completions||0)>0)dueRows.push(row);
+ let dueN=0,onTime=0;dueRows.forEach(row=>{const n=Number(row.due_dated_completions||0);dueN+=n;if(row.compliance_rate!==null&&row.compliance_rate!==undefined)onTime+=Math.round(Number(row.compliance_rate)*n/100)});
+ const overallCompliance=dueN?Math.round(onTime/dueN*1000)/10:null;
+ const header=el("div","ct-team-section-heading");header.append(el("h2","","Team overview"),el("span","ct-team-muted","Calculated from current organization records"));wrap.append(header);
+ const metrics=el("div","ct-team-insight-metrics");
+ [
+  ["Teams",teams.filter(t=>String(t.status||"active")!=="archived").length,"Active teams"],
+  ["Team members",totalMembers,"Current assignments"],
+  ["Locations / zones",locations+" / "+zones,"Assigned operational areas"],
+  ["Open workload",activeTasks,overdue+" overdue · "+tasks+" linked tasks"],
+  ["Due-task compliance",overallCompliance===null?"—":overallCompliance+"%",dueN?dueN+" due-dated completions in the trend window":"No comparable due-dated completions"]
+ ].forEach(x=>metrics.append(metric(x[0],x[1],x[2],x[0]==="Open workload"&&overdue>0)));
+ wrap.append(metrics);
+ const grid=el("div","ct-team-insight-grid");
+ const workload=el("section","ct-team-insight-panel");workload.append(el("h3","","Team workload"),el("p","ct-team-muted","Open and overdue tasks linked to each team, location, or zone."));
+ const workloadRows=teams.filter(t=>String(t.status||"active")!=="archived").slice().sort((a,b)=>Number(b.active_task_count||0)-Number(a.active_task_count||0));
+ if(!workloadRows.length)workload.append(el("p","ct-team-muted","No active teams to display."));
+ workloadRows.forEach(t=>{const row=el("div","ct-team-workload-row"),top=el("div","ct-team-workload-top");const open=button(t.name,"ct-team-inline-link",()=>openTeam(t.id));top.append(open,el("span","",Number(t.active_task_count||0)+" open · "+Number(t.overdue_task_count||0)+" overdue"));row.append(top);const bar=el("div","ct-team-workload-track"),fill=el("span","ct-team-workload-fill");const max=Math.max(1,...workloadRows.map(x=>Number(x.active_task_count||0)));fill.style.width=(Number(t.active_task_count||0)/max*100)+"%";bar.append(fill);row.append(bar);workload.append(row)});
+ grid.append(workload);
+ const trend=el("section","ct-team-insight-panel");trend.append(el("h3","","Performance trend"),el("p","ct-team-muted","Eight-week totals from recorded task history. Compliance is unavailable without due-dated completions."));
+ const weeks=rollupTrend();
+ trend.append(table(["Week starting","Created","Completed","On-time compliance"],weeks.map(x=>[date(x.week_start),x.tasks_created,x.tasks_completed,x.compliance_rate===null?"—":x.compliance_rate+"%"])));
+ grid.append(trend);wrap.append(grid);
+ const timeline=el("section","ct-team-insight-panel ct-team-timeline-panel");timeline.append(el("h3","","Recent activity"),el("p","ct-team-muted","Latest available team changes and linked task history."));
+ const allActivity=[];for(const [teamId,item] of teamInsights.entries()){const t=getTeam(teamId);for(const a of (item.activity||[]))allActivity.push({...a,team_name:t?.name||("Team #"+teamId)})}
+ allActivity.sort((a,b)=>String(b.created_at||"").localeCompare(String(a.created_at||"")));
+ if(!allActivity.length)timeline.append(el("p","ct-team-muted","No recorded team or task activity yet."));
+ else {const list=el("div","ct-team-activity-list");allActivity.slice(0,10).forEach(a=>{const row=el("div","ct-team-activity-item"),dot=el("span","ct-team-activity-dot","");const body=el("div","ct-team-activity-copy"),when=el("small","ct-team-muted",dateTime(a.created_at));const detail=a.details||{};const description=detail.message||detail.task_title||detail.name||detail.after?.name||"";body.append(el("strong","",String(a.action||"Activity").replaceAll("."," · ")),el("p","",a.team_name+(description?" — "+description:"")),when);row.append(dot,body);list.append(row)});timeline.append(list)}
+ wrap.append(timeline);
+}
+function renderBulkActions(visible){
+ const panel=root.querySelector("[data-team-bulk]");if(!panel)return;panel.replaceChildren();
+ const count=selected.size;const header=el("div","ct-team-bulk-head");header.append(el("strong","","Bulk actions"),el("span","ct-team-muted",count+" selected"));panel.append(header);
+ const controls=el("div","ct-team-bulk-controls");
+ controls.append(button("Select visible","ct-team-btn ct-team-btn--quiet",()=>{visible.forEach(t=>selected.add(String(t.id)));renderList()}));
+ controls.append(button("Clear selection","ct-team-btn ct-team-btn--quiet",()=>{selected.clear();renderList()}));
+ controls.append(button("Pin selected","ct-team-btn ct-team-btn--quiet",()=>{const values=new Set(pins());selected.forEach(id=>values.add(id));write("ct.team.pins."+userKey(),[...values]);renderList();notice("Selected teams pinned for this account.","success")}));
+ const activeIds=[...selected].filter(id=>getTeam(id)&&String(getTeam(id).status||"active")!=="archived");
+ const archivedIds=[...selected].filter(id=>getTeam(id)&&String(getTeam(id).status||"active")==="archived");
+ controls.append(button("Archive selected active","ct-team-btn ct-team-btn--danger",()=>bulkLifecycle("archive",activeIds)));
+ controls.append(button("Restore selected archived","ct-team-btn ct-team-btn--primary",()=>bulkLifecycle("restore",archivedIds)));
+ panel.append(controls);
+ if(!count)panel.classList.add("is-empty");else panel.classList.remove("is-empty");
+}
+async function bulkLifecycle(action,ids){
+ if(busy)return;if(!ids.length){notice("Select one or more eligible teams first.","error");return}
+ const verb=action==="archive"?"archive":"restore";
+ if(!confirm(verb.charAt(0).toUpperCase()+verb.slice(1)+" "+ids.length+" selected team(s)?"))return;
+ busy=true;notice("Updating selected teams…","info");
+ const failed=[];
+ try{
+  for(const id of ids){try{await API.post("teams/"+encodeURIComponent(id)+"/"+action,{})}catch(e){failed.push({id,message:e.message||"Request failed"})}}
+  selected=new Set([...selected].filter(id=>failed.some(x=>x.id===id)));
+  archived=action==="archive";
+  await load();
+  if(failed.length)notice((ids.length-failed.length)+" team(s) updated; "+failed.length+" failed: "+failed.map(x=>getTeam(x.id)?.name||("Team #"+x.id)).join(", "),"error");
+  else notice(ids.length+" team(s) "+(action==="archive"?"archived":"restored")+" successfully. History is retained.","success");
+ }catch(e){notice(e.message||"Bulk action failed.","error")}
+ finally{busy=false;renderList()}
+}
+
 function renderRecent(){const w=root.querySelector("[data-team-recent]");w.replaceChildren();const section=el("section","ct-team-recent-panel"),head=el("div","ct-team-section-heading");head.append(el("h2","","Recently opened teams"),el("small","ct-team-muted","Last 3"));section.append(head);const items=recent().map(getTeam).filter(Boolean);
  if(!items.length)section.append(el("p","ct-team-muted","Teams you open will appear here."));else{const list=el("div","ct-team-recent-list");items.forEach(t=>list.append(button(t.name+" · "+(t.status==="archived"?"Archived":"Active"),"ct-team-recent-item",()=>openTeam(t.id))));section.append(list)}w.append(section)}
 function renderList(){const out=root.querySelector("[data-team-results]");if(!out)return;out.replaceChildren();const p=pins(),q=query.toLowerCase().trim();const visible=teams.filter(t=>(String(t.status||"active")==="archived")===archived&&(!q||(String(t.name||"")+" "+String(t.description||"")).toLowerCase().includes(q))).sort((a,b)=>Number(p.includes(String(b.id)))-Number(p.includes(String(a.id)))||String(a.name).localeCompare(String(b.name)));
  root.querySelector("[data-team-count]").textContent=visible.length+" teams";root.querySelector("[data-team-list-heading]").textContent=archived?"Archived teams":"All teams";
  root.querySelector('[data-filter="active"]').classList.toggle("is-active",!archived);root.querySelector('[data-filter="archived"]').classList.toggle("is-active",archived);
- if(!visible.length){const empty=el("div","ct-team-empty",archived?"No archived teams found.":q?"No teams match your search.":"No teams yet. Create your first team.");if(!archived&&!q)empty.append(button("+ Create team","ct-team-btn ct-team-btn--primary",()=>createOpen(true)));out.append(empty)}else visible.forEach(t=>out.append(card(t)));renderRecent()}
-async function load(){const response=await API.get("teams");teams=Array.isArray(response.teams)?response.teams:[];renderList()}
+ if(!visible.length){const empty=el("div","ct-team-empty",archived?"No archived teams found.":q?"No teams match your search.":"No teams yet. Create your first team.");if(!archived&&!q)empty.append(button("+ Create team","ct-team-btn ct-team-btn--primary",()=>createOpen(true)));out.append(empty)}else visible.forEach(t=>out.append(card(t)));
+ renderRecent();renderBulkActions(visible);renderInsights()}
+async function load(){const response=await API.get("teams");teams=Array.isArray(response.teams)?response.teams:[];teamInsights=new Map((Array.isArray(response.insights)?response.insights:[]).map(x=>[String(x.team_id),x]));const valid=new Set(teams.map(t=>String(t.id)));selected=new Set([...selected].filter(id=>valid.has(id)));renderList()}
 function table(headers,rows){const wrap=el("div","ct-team-table-wrap"),t=el("table","ct-team-table"),h=el("thead"),tr=el("tr");headers.forEach(x=>tr.append(el("th","",x)));h.append(tr);t.append(h);const b=el("tbody");if(!rows.length){const r=el("tr"),cell=el("td","ct-team-muted","No records available.");cell.colSpan=headers.length;r.append(cell);b.append(r)}rows.forEach(vals=>{const r=el("tr");vals.forEach(x=>{const cell=el("td");if(x instanceof Node)cell.append(x);else cell.textContent=txt(x);r.append(cell)});b.append(r)});t.append(b);wrap.append(t);return wrap}
 function checkRow(name,desc,checked,disabled,id){const l=el("label","ct-team-check-row"+(disabled?" disabled":"")),input=el("input");input.type="checkbox";input.value=String(id);input.checked=checked;input.disabled=disabled;const words=el("span","");words.append(el("strong","",name),el("small","ct-team-muted",desc));l.append(input,words);return l}
 async function act(label,fn){if(busy)return;busy=true;notice(label,"info");try{await fn()}catch(e){notice(e.message||"Unable to save the change.","error")}finally{busy=false}}
@@ -68,8 +146,24 @@ function actionPanel(d,mode){
   const locs=new Map((d.available_locations||[]).map(x=>[String(x.id),x])),set=new Set(d.zones.map(x=>String(x.id))),list=el("div","ct-team-check-list");
   (d.available_zones||[]).forEach(z=>{const loc=locs.get(String(z.location_id)),locked=Boolean(loc?.team_id&&String(loc.team_id)!==String(t.id));list.append(checkRow(z.name,"Location: "+(loc?.name||("Location #"+z.location_id))+(locked?" · assigned to another team":""),set.has(String(z.id)),locked,z.id))});
   f.append(list,button("Save Zones","ct-team-btn ct-team-btn--primary",null,"submit"));f.addEventListener("submit",e=>{e.preventDefault();const ids=[...list.querySelectorAll("input:checked")].map(x=>Number(x.value));act("Saving zones…",async()=>{await API.put("teams/"+t.id+"/zones",{zone_ids:ids});await reloadTeam(t.id);notice("Zone assignments saved and audited.","success")})});p.append(f)
+ }else if(mode==="create-task"){
+  const f=el("form","ct-team-form"),t=d.team;
+  const title=input("","title"),description=textarea("","description"),type=el("select","ct-team-input");
+  [["General","General"],["Cleaning","Cleaning"],["Inspection","Inspection"],["Maintenance","Maintenance"],["Safety","Safety"],["Other","Other"]].forEach(([v,l])=>{const o=el("option","",l);o.value=v;type.append(o)});
+  const location=el("select","ct-team-input");location.append(Object.assign(el("option","","No location"),{value:""}));
+  (d.locations||[]).forEach(x=>{const o=el("option","",x.name);o.value=String(x.id);location.append(o)});
+  const zone=el("select","ct-team-input");zone.append(Object.assign(el("option","","No zone"),{value:""}));
+  const refreshZones=()=>{zone.replaceChildren(Object.assign(el("option","","No zone"),{value:""}));(d.zones||[]).filter(x=>!location.value||String(x.location_id)===String(location.value)).forEach(x=>{const o=el("option","",x.name);o.value=String(x.id);zone.append(o)});if(zone.value&&!Array.from(zone.options).some(o=>o.value===zone.value))zone.value=""};
+  location.addEventListener("change",refreshZones);refreshZones();
+  const assignee=el("select","ct-team-input");assignee.append(Object.assign(el("option","","Leave unassigned"),{value:""}));
+  (d.members||[]).forEach(x=>{const o=el("option","",x.name+" · "+x.role);o.value=String(x.id);assignee.append(o)});
+  const due=input("","due_at","datetime-local");title.required=true;title.maxLength=200;
+  f.append(field("Task title",title),field("Description",description),field("Task type",type),field("Team location",location),field("Zone",zone),field("Assign to team member",assignee),field("Due date and time",due));
+  f.append(el("p","ct-team-muted","This creates a real Operations record for this team. Any location or zone must already be assigned to this team."));
+  f.append(button("Create and assign task","ct-team-btn ct-team-btn--primary",null,"submit"));
+  f.addEventListener("submit",e=>{e.preventDefault();act("Creating task…",async()=>{const locationId=location.value?Number(location.value):null;const zoneId=zone.value?Number(zone.value):null;const memberId=assignee.value?Number(assignee.value):null;if(zoneId&&!locationId)throw Error("Choose a location for the selected zone.");await API.post("operations",{title:title.value.trim(),description:description.value.trim(),task_type:type.value,team_id:Number(t.id),location_id:locationId,zone_id:zoneId,assigned_to_id:memberId,due_at:due.value?new Date(due.value).toISOString():null});await reloadTeam(t.id);notice("Task created and linked to this team.","success")})});p.append(f);
  }else{
-  p.append(el("p","ct-team-muted","This list contains actual tasks linked to the team, its locations or its zones."),button("Open Tasks and Operations","ct-team-btn ct-team-btn--primary",()=>window.CleanTrackNavigation?.setActivePage("operations")),table(["Task","Status","Due","Overdue"],(d.operations||[]).map(x=>[x.title,x.status,date(x.due_at),x.overdue_calculated?"Yes":"No"])))
+  p.append(el("p","ct-team-muted","This list contains actual tasks linked to the team, its locations or its zones."),button("Open Tasks and Operations","ct-team-btn ct-team-btn--primary",()=>window.CleanTrackNavigation?.setActivePage("operations")),button("Create & Assign Task","ct-team-btn ct-team-btn--primary",()=>actionPanel(d,"create-task")),table(["Task","Status","Due","Overdue"],(d.operations||[]).map(x=>[x.title,x.status,date(x.due_at),x.overdue_calculated?"Yes":"No"])))
  }
 }
 function renderTabs(d,panel){
@@ -95,7 +189,7 @@ async function openTeam(id){
 function renderDetail(d,p){
  const t=d.team;p.replaceChildren();const head=el("header","ct-team-detail-header"),ident=el("div","ct-team-detail-identity");ident.append(el("p","ct-team-eyebrow","TEAM DETAILS"),el("h2","",t.name),el("p","ct-team-muted",t.description||"No description provided."),el("span","ct-team-status"+(t.status==="archived"?" is-archived":""),t.status==="archived"?"Archived":"Active"));head.append(ident,button("Close Team","ct-team-btn ct-team-btn--quiet",()=>{p.hidden=true;p.replaceChildren()}));p.append(head);
  const actions=el("div","ct-team-quick-actions"),isArchived=t.status==="archived";
- if(!isArchived)[["Edit Team","edit"],["Assign People","people"],["Assign Location","locations"],["Assign Zones","zones"],["Manage Tasks","tasks"]].forEach(x=>actions.append(button(x[0],"ct-team-btn",()=>actionPanel(d,x[1]))));
+ if(!isArchived)[["Edit Team","edit"],["Assign People","people"],["Assign Location","locations"],["Assign Zones","zones"],["Create & Assign Task","create-task"],["Manage Tasks","tasks"]].forEach(x=>actions.append(button(x[0],"ct-team-btn",()=>actionPanel(d,x[1]))));
  else actions.append(button("Restore Team","ct-team-btn ct-team-btn--primary",()=>{if(confirm("Restore this team? Historical records remain intact."))act("Restoring team…",async()=>{await API.post("teams/"+t.id+"/restore",{});archived=false;await load();await openTeam(t.id);notice("Team restored.","success")})}));
  const exportWrap=el("div","ct-team-export"),format=el("select","ct-team-input");[["csv","CSV"],["xlsx","Excel (.xlsx)"],["pdf","PDF"]].forEach(x=>{const o=el("option","",x[1]);o.value=x[0];format.append(o)});exportWrap.append(format,button("Export Team Data","ct-team-btn ct-team-btn--primary",()=>act("Preparing export…",async()=>{await download(t.id,format.value);notice("Team report downloaded.","success")})));actions.append(exportWrap);
  if(!isArchived)actions.append(button("Archive Team","ct-team-btn ct-team-btn--danger",()=>{if(confirm("Archive "+t.name+"? This retains task, assignment and activity history."))act("Archiving team…",async()=>{await API.post("teams/"+t.id+"/archive",{});archived=true;await load();await openTeam(t.id);notice("Team archived. Historical records were retained.","success")})}));
@@ -118,13 +212,16 @@ async function download(id,format){
 async function render(container){
  const user=AUTH?.getCurrentUser?.();container.replaceChildren();
  if(String(user?.role||"").toLowerCase()!=="admin"){container.append(el("p","ct-team-error","Team management is available to Admin users only."));return}
- root=el("section","ct-team-manager");const header=el("header","ct-team-manager-header"),copy=el("div");copy.append(el("p","ct-team-eyebrow","ORGANIZATION MANAGEMENT"),el("h1","","Teams"),el("p","ct-team-muted","Create and manage teams, assignments, workload, reports, and historical records."));header.append(copy,button("+ Create Team","ct-team-btn ct-team-btn--primary",()=>createOpen(true)));root.append(header);
+ root=el("section","ct-team-manager");const header=el("header","ct-team-manager-header"),copy=el("div");copy.append(el("p","ct-team-eyebrow","ORGANIZATION MANAGEMENT"),el("h1","","Teams"),el("p","ct-team-muted","Create and manage teams, assignments, workload, reports, and historical records."));header.append(copy,button("+ Create Team","ct-team-btn ct-team-btn--primary",()=>{createOpen(true);root.querySelector("[data-team-create]")?.scrollIntoView({behavior:"smooth",block:"center"})}));root.append(header);
  const note=el("div","ct-team-notice");note.dataset.teamNotice="1";note.hidden=true;root.append(note);const recentNode=el("div");recentNode.dataset.teamRecent="1";root.append(recentNode);
+ const insights=el("section","ct-team-insights");insights.dataset.teamInsights="1";root.append(insights);
+ const bulk=el("section","ct-team-bulk-panel");bulk.dataset.teamBulk="1";root.append(bulk);
  const form=el("form","ct-team-create-form");form.dataset.teamCreate="1";form.hidden=true;form.append(el("h2","","Create a team"));
  const name=input("","name"),desc=textarea("","description"),capacity=input("","capacity","number");name.required=true;name.maxLength=120;name.placeholder="Team name";desc.placeholder="Team description";capacity.min="1";capacity.placeholder="Optional people capacity";
  const grid=el("div","ct-team-form-grid");grid.append(field("Team name",name),field("Team description",desc),field("Capacity (optional)",capacity,"Set a number to flag when membership exceeds capacity."));form.append(grid);
- const formActions=el("div","ct-team-form-actions");formActions.append(button("Cancel","ct-team-btn ct-team-btn--quiet",()=>{form.reset();createOpen(false)}),button("Create Team","ct-team-btn ct-team-btn--primary",null,"submit"));form.append(formActions);
- form.addEventListener("submit",async e=>{e.preventDefault();if(busy)return;busy=true;const submit=form.querySelector('[type="submit"]');submit.disabled=true;try{const raw=capacity.value.trim(),cap=raw?Number(raw):null;if(!name.value.trim())throw Error("Team name is required.");if(cap!==null&&(!Number.isInteger(cap)||cap<1))throw Error("Capacity must be a positive whole number or blank.");const r=await API.post("teams",{name:name.value.trim(),description:desc.value.trim(),capacity:cap});form.reset();createOpen(false);await load();notice(r.message||"Team created.","success");if(r.team?.id)await openTeam(r.team.id)}catch(err){notice(err.message||"Could not create team.","error")}finally{busy=false;submit.disabled=false}});root.append(form);
+ const formActions=el("div","ct-team-form-actions"),cancelBtn=button("Cancel","ct-team-btn ct-team-btn--quiet",()=>{form.reset();createOpen(false)}),submitBtn=button("Create Team","ct-team-btn ct-team-btn--primary",null,"submit");submitBtn.dataset.createTeamSubmit="1";formActions.append(cancelBtn,submitBtn);form.append(formActions);
+ const createStatus=el("p","ct-team-create-status","");createStatus.hidden=true;createStatus.setAttribute("role","status");form.append(createStatus);
+ form.addEventListener("submit",async e=>{e.preventDefault();if(busy)return;busy=true;submitBtn.disabled=true;submitBtn.textContent="Creating team…";createStatus.hidden=true;try{const raw=capacity.value.trim(),cap=raw?Number(raw):null;if(!name.value.trim())throw Error("Team name is required.");if(cap!==null&&(!Number.isInteger(cap)||cap<1))throw Error("Capacity must be a positive whole number or blank.");const r=await API.post("teams",{name:name.value.trim(),description:desc.value.trim(),capacity:cap});if(!r||!r.team||r.team.id===undefined)throw Error("The server did not confirm a team was created. Refresh the team list before retrying.");form.reset();createOpen(false);await load();notice(r.message||"Team created.","success");if(r.team?.id)await openTeam(r.team.id)}catch(err){const message=err.message||"Could not create team.";createStatus.textContent=message;createStatus.className="ct-team-create-status is-error";createStatus.hidden=false;notice(message,"error")}finally{busy=false;submitBtn.disabled=false;submitBtn.textContent="Create Team"}});root.append(form);
  const listPanel=el("section","ct-team-list-panel"),toolbar=el("div","ct-team-toolbar"),search=input("","search");search.type="search";search.placeholder="Search team names…";search.setAttribute("aria-label","Search teams");search.addEventListener("input",()=>{query=search.value.trim();renderList()});const sw=el("label","ct-team-search");sw.append(el("span","ct-team-sr-only","Search team names"),search);toolbar.append(sw);
  const filters=el("div","ct-team-filter-buttons"),active=button("Active Teams","ct-team-btn ct-team-filter is-active",()=>{archived=false;renderList()}),arch=button("Archived Teams","ct-team-btn ct-team-filter",()=>{archived=true;renderList()});active.dataset.filter="active";arch.dataset.filter="archived";filters.append(active,arch);toolbar.append(filters);const count=el("span","ct-team-muted","Loading…");count.dataset.teamCount="1";toolbar.append(count);
  const heading=el("h2","ct-team-section-heading","All teams");heading.dataset.teamListHeading="1";const results=el("div","ct-team-grid");results.dataset.teamResults="1";results.append(el("div","ct-team-empty","Loading teams…"));listPanel.append(toolbar,heading,results);root.append(listPanel);
