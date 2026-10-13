@@ -78,23 +78,28 @@
     const n = el("p", "ct-ann-status" + (isError ? " is-error" : " is-success"), message || "");
     n.setAttribute("role", "status"); return n;
   }
-  function attachmentLink(item) {
-    const a = el("a","ct-ann-attachment", "↧ " + item.filename + " (" + Math.max(1, Math.round((item.size||0)/1024)) + " KB)");
+  async function attachmentBlob(item) {
     const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
     const rawPath = String(item.download_url || "");
     const path = rawPath.startsWith("/api/") ? rawPath.slice(4) : rawPath;
     const root = base.endsWith("/") ? base.slice(0,-1) : base;
+    const headers = new Headers();
+    const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : "";
+    if (token) headers.set("Authorization","Bearer "+token);
+    const response = await fetch(root + path, {method:"GET",headers,credentials:"include"});
+    if (!response.ok) throw new Error(response.status === 401 || response.status === 403
+      ? "You are not authorized to access this attachment."
+      : "The attachment could not be loaded.");
+    return response.blob();
+  }
+  function attachmentLink(item) {
+    const a = el("a","ct-ann-attachment", "↧ " + item.filename + " (" + Math.max(1, Math.round((item.size||0)/1024)) + " KB)");
     a.href = "#";
     a.addEventListener("click", async event => {
       event.preventDefault();
       a.setAttribute("aria-busy","true");
       try {
-        const headers = new Headers();
-        const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : "";
-        if (token) headers.set("Authorization","Bearer "+token);
-        const response = await fetch(root + path, {method:"GET",headers,credentials:"include"});
-        if (!response.ok) throw new Error(response.status === 401 || response.status === 403 ? "You are not authorized to download this attachment." : "The attachment could not be downloaded.");
-        const blob = await response.blob();
+        const blob = await attachmentBlob(item);
         const url = URL.createObjectURL(blob);
         const download = document.createElement("a");
         download.href = url;
@@ -108,6 +113,41 @@
       }
     });
     return a;
+  }
+  function voicePlayer(item) {
+    const wrap = el("div","ct-ann-voice-player");
+    const play = button("▶ Listen to voice note","ct-ann-button ct-ann-button-secondary",null);
+    const audio = el("audio","ct-ann-audio");
+    audio.controls = true; audio.preload = "none"; audio.hidden = true;
+    let objectUrl = "";
+    play.addEventListener("click", async () => {
+      if (audio.src && !audio.paused) { audio.pause(); return; }
+      play.disabled = true; play.textContent = "Loading voice note…";
+      try {
+        if (!objectUrl) {
+          const blob = await attachmentBlob(item);
+          objectUrl = URL.createObjectURL(blob);
+          audio.src = objectUrl;
+          audio.hidden = false;
+          audio.addEventListener("ended", () => { play.textContent = "▶ Listen again"; }, {once:false});
+          audio.addEventListener("error", () => { play.textContent = "▶ Retry voice note"; }, {once:false});
+        }
+        await audio.play();
+        play.textContent = "Ⅱ Pause voice note";
+      } catch (error) {
+        window.alert(apiError(error));
+        play.textContent = "▶ Retry voice note";
+      } finally {
+        play.disabled = false;
+      }
+    });
+    audio.addEventListener("pause", () => {
+      if (!audio.ended && objectUrl) play.textContent = "▶ Resume voice note";
+    });
+    audio.addEventListener("play", () => { play.textContent = "Ⅱ Pause voice note"; });
+    audio.addEventListener("ended", () => { play.textContent = "▶ Listen again"; });
+    wrap.append(play,audio);
+    return wrap;
   }
   function announcementPayload(item, overrides) {
     return Object.assign({
@@ -149,6 +189,8 @@
 
     const state = { items:[], options:{teams:[],locations:[],zones:[]}, filterType:"all", filterStatus:"all", query:"", error:"" };
     const notice = el("div","ct-ann-global-status"); notice.hidden = true; notice.setAttribute("role","status"); page.appendChild(notice);
+    const teamGroupsHost = el("div","ct-ann-team-groups-host");
+    if (pageMode === "team-channel") page.appendChild(teamGroupsHost);
     const metrics = el("div","ct-ann-metrics");
     const metricNodes = [
       ["Published",el("strong","","0"),"ct-ann-metric"],
@@ -183,6 +225,7 @@
         ]);
         state.items = Array.isArray(list.announcements) ? list.announcements : [];
         state.options = opts || {teams:[],locations:[],zones:[]};
+        renderTeamGroups();
         renderList();
         updateMetrics();
         refresh.textContent = "↻ Refresh"; refresh.disabled=false;
@@ -193,6 +236,31 @@
         refresh.textContent = "↻ Retry"; refresh.disabled=false;
       }
     }
+    function renderTeamGroups() {
+      if (pageMode !== "team-channel") return;
+      teamGroupsHost.replaceChildren();
+      const rows = (state.options.teams || []).filter(t => typeof t.whatsapp_group_url === "string" && t.whatsapp_group_url.startsWith("https://chat.whatsapp.com/"));
+      const box = el("section","ct-ann-team-groups");
+      const top = el("div","ct-ann-team-groups-top");
+      top.append(el("h2","","WhatsApp team group"), el("p","ct-ann-muted","Optional external team chat. CleanTrack announcements and acknowledgements remain recorded in CleanTrack."));
+      box.appendChild(top);
+      if (!rows.length) {
+        box.appendChild(el("p","ct-ann-muted","No WhatsApp group link is configured for your assigned team yet. Ask an Admin to add one under Teams."));
+      } else {
+        const list = el("div","ct-ann-team-group-list");
+        rows.forEach(team => {
+          const item = el("div","ct-ann-team-group");
+          const info = el("div","");
+          info.append(el("strong","",team.name),el("p","ct-ann-muted","Opens the team's external WhatsApp group."));
+          const link = el("a","ct-ann-button ct-ann-button-secondary","Open WhatsApp");
+          link.href = team.whatsapp_group_url; link.target = "_blank"; link.rel = "noopener noreferrer";
+          item.append(info,link); list.appendChild(item);
+        });
+        box.appendChild(list);
+      }
+      teamGroupsHost.appendChild(box);
+    }
+
     function updateMetrics() {
       const published = state.items.filter(a=>a.status==="published" && !a.archived_at).length;
       const alerts = state.items.filter(a=>a.announcement_type==="alert" && a.status==="published" && a.alert_status!=="resolved").length;
@@ -250,7 +318,7 @@
 
       if(item.attachments && item.attachments.length) {
         const attach=el("div","ct-ann-attachments");
-        item.attachments.forEach(a=>{const link=attachmentLink(a);attach.appendChild(link);if(canManage(item))attach.appendChild(button("Remove","ct-ann-icon-button",async()=>{if(!confirm("Remove attachment "+a.filename+"?"))return;try{await API.delete("announcements/attachments/"+a.id);await load();}catch(e){showNotice(apiError(e),true);}}));});
+        item.attachments.forEach(a=>{const link=attachmentLink(a);attach.appendChild(link);if(a.category==="voice")attach.appendChild(voicePlayer(a));if(canManage(item))attach.appendChild(button("Remove","ct-ann-icon-button",async()=>{if(!confirm("Remove attachment "+a.filename+"?"))return;try{await API.delete("announcements/attachments/"+a.id);await load();}catch(e){showNotice(apiError(e),true);}}));});
         card.appendChild(attach);
       }
       const actions=el("div","ct-ann-card-actions");
