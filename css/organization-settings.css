@@ -351,3 +351,23 @@ textarea.ct-settings-input { min-height: 110px; resize: vertical; }
 @media (max-width: 760px) {
   .ct-org-role-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* High-visibility sign-out/destructive actions in personal Settings */
+.ct-settings-button-danger {
+  color: #fff !important;
+  background: #b42332 !important;
+  border: 1px solid #d92d3f !important;
+  font-weight: 750;
+  box-shadow: 0 4px 12px rgb(180 35 50 / 22%);
+}
+.ct-settings-button-danger:hover,
+.ct-settings-button-danger:focus-visible {
+  background: #921b29 !important;
+  border-color: #ff6474 !important;
+  color: #fff !important;
+}
+.ct-settings-button-danger:focus-visible {
+  outline: 3px solid rgb(255 100 116 / 45%);
+  outline-offset: 2px;
+}
