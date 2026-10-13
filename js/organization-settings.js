@@ -72,7 +72,9 @@
   function dateText(value) {
     if (!value) return "Date not available";
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "Date not available" : date.toLocaleString();
+    if (Number.isNaN(date.getTime())) return "Date not available";
+    const prefs = window.CleanTrackPreferences;
+    return prefs?.formatDate ? prefs.formatDate(date) + " " + (prefs.formatTime ? prefs.formatTime(date) : date.toLocaleTimeString()) : date.toLocaleString();
   }
 
   function initials(value) {
