@@ -582,7 +582,7 @@
           const message = document.createElement("p");
           message.textContent = item.message || "";
           const meta = document.createElement("small");
-          meta.textContent = item.created_at ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.created_at)) : "";
+          meta.textContent = item.created_at ? (window.CleanTrackPreferences?.formatDate ? window.CleanTrackPreferences.formatDate(item.created_at) + " " + window.CleanTrackPreferences.formatTime(item.created_at) : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.created_at))) : "";
           row.append(heading, message, meta);
           const actions = document.createElement("div");
           actions.className = "ct-notification-actions";
