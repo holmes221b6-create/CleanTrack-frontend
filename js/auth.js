@@ -62,6 +62,7 @@ function normalizeUser(user) {
     id: user.id ?? null,
     name: user.name || user.full_name || "",
     email: user.email || "",
+    phone: user.phone || "",
     role: String(user.role || "").toLowerCase(),
 
     organizationId:
