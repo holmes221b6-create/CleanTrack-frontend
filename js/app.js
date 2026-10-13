@@ -909,6 +909,10 @@ function bindNavigation() {
     state.started = true;
     bindFooterHelp();
     bindNotificationsButton();
+    if (!state.notificationPollingStarted) {
+      state.notificationPollingStarted = true;
+      window.setInterval(refreshNotificationBadge, 60000);
+    }
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
   bindRegistrationForm();
