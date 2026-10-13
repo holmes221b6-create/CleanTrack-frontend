@@ -42,7 +42,7 @@
     card.append(top);
     card.append(el("p", "ct-team-card__description", team.description || "No description provided."));
     const meta = el("div", "ct-team-card__meta", "Created team record");
-    if (team.created_at) meta.textContent = "Created " + new Date(team.created_at).toLocaleDateString();
+    if (team.created_at) meta.textContent = "Created " + (window.CleanTrackPreferences?.formatDate ? window.CleanTrackPreferences.formatDate(team.created_at) : new Date(team.created_at).toLocaleDateString());
     card.append(meta);
     card.append(button("View details", "ct-button ct-button--secondary", () => onOpen(team)));
     return card;
