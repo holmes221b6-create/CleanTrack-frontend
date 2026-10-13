@@ -85,7 +85,7 @@
       ["Missed tasks", member.missed_tasks || 0],
       ["Phone", member.phone || "Not provided"],
       ["Account status", member.is_active ? "Active" : "Inactive"],
-      ["Joined", member.created_at ? new Date(member.created_at).toLocaleDateString() : "Not available"]
+      ["Joined", member.created_at ? (window.CleanTrackPreferences?.formatDate ? window.CleanTrackPreferences.formatDate(member.created_at) : new Date(member.created_at).toLocaleDateString()) : "Not available"]
     ].forEach(([label, value]) => {
       details.append(el("dt", "", label));
       details.append(el("dd", "", value));
