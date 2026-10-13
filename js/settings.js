@@ -3,7 +3,7 @@
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
 const LANG=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
 const CUR=["USD","EUR","GBP","INR","CNY","JPY","KRW","AED","SAR","QAR","KWD","SGD","AUD","CAD","CHF","NZD","HKD","THB","IDR","MYR","PHP","VND","BDT","PKR","LKR","NPR","ZAR","NGN","KES","EGP","TRY","BRL","MXN","ARS","CLP","COP","PLN","SEK","NOK","DKK","RUB"];
-const SECTIONS=[["overview","Overview","⌂"],["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
+const SECTIONS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
 function el(t,c,x){let n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=String(x);return n}
 function btn(x,fn,c="ct-settings-button"){let n=el("button",c,x);n.type="button";n.addEventListener("click",fn);return n}
 function input(t,v,name){let n=el("input","ct-settings-input");n.type=t;n.value=v==null?"":String(v);n.name=name||"";return n}
@@ -20,30 +20,7 @@ let role=String(user.role||"").toLowerCase(),p=PREF.get(),root=el("section","ct-
 head.append(el("p","ct-settings-eyebrow","YOUR WORKSPACE"),el("h1","","Settings"),el("p","ct-settings-muted","Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section."));root.append(head);
 let layout=el("div","ct-settings-layout"),nav=el("nav","ct-settings-nav"),body=el("div","ct-settings-panels"),ps={};nav.setAttribute("aria-label","Settings sections");
 SECTIONS.forEach(([id,label,icon])=>{let b=btn("",()=>panel(root,id),"ct-settings-nav-item");b.dataset.nav=id;b.append(el("span","ct-settings-icon",icon),el("span","",label));nav.append(b);let s=el("section","ct-settings-panel");s.dataset.panel=id;s.hidden=true;ps[id]=s;body.append(s)});layout.append(nav,body);root.append(layout);
-const overviewCard=card("Settings overview","Choose a section to configure your personal account and app preferences. Organization-wide settings are managed separately by Admins.","⌂");
-const overviewGrid=el("div","ct-settings-overview-grid");
-const overviewDescriptions={
-account:"Profile, contact details, and password.",
-preferences:"Language, date, time, time zone, and currency.",
-privacy:"Privacy preferences and session security.",
-notifications:"Choose your preferred notification categories.",
-appearance:"Select a light or dark app theme.",
-data:"Set export format and report defaults.",
-integrations:"Future connectors; no third-party service is connected yet.",
-help:"Help, guide, support, and feedback destinations.",
-legal:"Published terms and privacy documents.",
-about:"Product version and release information.",
-actions:"Sign out and account lifecycle options."
-};
-SECTIONS.filter(([id])=>id!=="overview").forEach(([id,label,icon])=>{
-  const item=card(label,overviewDescriptions[id]||"",icon);
-  item.classList.add("ct-settings-overview-card");
-  item.append(btn("Open section",()=>panel(root,id),"ct-settings-button"));
-  overviewGrid.append(item);
-});
-overviewCard.append(btn("Open Account",()=>panel(root,"account"),"ct-settings-button ct-settings-button-primary"));
-if(role==="admin") overviewCard.append(btn("Open Organization Settings",()=>window.CleanTrackNavigation?.setActivePage("org-settings"),"ct-settings-button"));
-ps.overview.append(overviewCard,overviewGrid);
+
 let av=user.avatar_url||""
 let name=input("text",user.full_name||user.name,"full_name");name.required=true;name.minLength=2;name.maxLength=120;let phone=input("tel",user.phone,"phone");phone.maxLength=30;let email=input("email",user.email,"email");email.readOnly=true;email.title="Email changes are not enabled yet.";let avatar=input("url",av,"avatar_url");avatar.placeholder="https://…";
 ps.account.append(formCard("Personal profile","Name, phone, and avatar URL are stored on your account. Email changes are not enabled yet.","♙",[field("Full name",name),field("Email address",email,"Email changes are not supported by the current API."),field("Phone number",phone),field("Profile avatar URL",avatar,"Use a trusted HTTPS image URL; avatar uploads are not configured.")],async()=>{let r=await API.patch("auth/me",{full_name:name.value.trim(),phone:phone.value.trim(),avatar_url:avatar.value.trim()});user={...user,...(r.user||{}),name:(r.user||{}).full_name||name.value.trim()};if(AUTH.getCurrentUser())Object.assign(AUTH.getCurrentUser(),{name:user.name,phone:phone.value.trim(),avatarUrl:avatar.value.trim()||null});let h=document.getElementById("header-user-name");if(h)h.textContent=user.name||user.email;let a=document.getElementById("header-avatar");if(a){a.textContent=(user.name||"U").trim()[0].toUpperCase();a.style.backgroundImage=avatar.value.trim()?"url('"+avatar.value.trim().replace(/['()\\]/g,"")+"')":"";a.style.backgroundSize="cover";a.style.color=avatar.value.trim()?"transparent":""}},"Save account details"));
@@ -64,7 +41,7 @@ let help=card("Help Center","Open the in-app guide and help resources where avai
 let legal=card("Legal documents","Only published documents are linked. Other policies must be published before use.","§");[["Terms and Conditions","legal/terms.html"],["Privacy Policy","legal/privacy.html"]].forEach(([l,h])=>{let a=el("a","ct-settings-link",l);a.href=h;a.target="_blank";a.rel="noopener";legal.append(a)});["Cookie policy","Third-party licences and acknowledgements","Data-processing information"].forEach(l=>{let r=el("div","ct-settings-integration-row");r.append(el("span","",l),el("span","ct-settings-tag","Not published"));legal.append(r)});ps.legal.append(legal);
 let about=card("About CleanTrack","Operations management for teams, tasks, locations, reviews, and accountability.","ⓘ");[["Product","CleanTrack"],["Version",document.querySelector('meta[name="app-version"]')?.content||"Version not configured"],["Release information","No release feed configured"],["Credits","No credits page published"]].forEach(([k,v])=>about.append(el("p","ct-settings-info-row",k+": "+v)));about.append(btn("Check for updates",()=>alert("Automatic update checking is not configured.")));ps.about.append(about);
 let actions=card("Account actions","Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.","↗");actions.append(btn("Log out",async(event)=>{if(!confirm("Log out of CleanTrack on this device?"))return;const logoutButton=event.currentTarget;logoutButton.disabled=true;try{await AUTH.logout();window.location.replace(window.location.pathname)}catch(error){alert(error.message||"Sign out could not be completed. Please try again.");logoutButton.disabled=false}}),btn("Deactivate account",()=>alert("Account deactivation is not enabled; no change was made.")),btn("Request account deletion",()=>alert("Account deletion requests are not enabled because organization records and retention must be handled server-side.")));ps.actions.append(actions);
-container.append(root);let initial=location.hash.startsWith("#settings-")?location.hash.slice(10):"overview";panel(root,ps[initial]?initial:"overview");PREF.applyTheme();PREF.applyLanguage();
+container.append(root);let initial=location.hash.startsWith("#settings-")?location.hash.slice(10):"account";panel(root,ps[initial]?initial:"account");PREF.applyTheme();PREF.applyLanguage();
 }
 window.CleanTrackSettings=Object.freeze({render});
 })();
