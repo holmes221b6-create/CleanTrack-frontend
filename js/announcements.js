@@ -81,7 +81,9 @@
   function attachmentLink(item) {
     const a = el("a","ct-ann-attachment", "↧ " + item.filename + " (" + Math.max(1, Math.round((item.size||0)/1024)) + " KB)");
     const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
-    const path = String(item.download_url || "").replace(/^\\/api(?=\\/)/, "");
+    const rawPath = String(item.download_url || "");
+    const path = rawPath.startsWith("/api/") ? rawPath.slice(4) : rawPath;
+    const root = base.endsWith("/") ? base.slice(0,-1) : base;
     a.href = "#";
     a.addEventListener("click", async event => {
       event.preventDefault();
@@ -90,7 +92,7 @@
         const headers = new Headers();
         const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : "";
         if (token) headers.set("Authorization","Bearer "+token);
-        const response = await fetch(base.replace(/\\/+$/,"") + path, {method:"GET",headers,credentials:"include"});
+        const response = await fetch(root + path, {method:"GET",headers,credentials:"include"});
         if (!response.ok) throw new Error(response.status === 401 || response.status === 403 ? "You are not authorized to download this attachment." : "The attachment could not be downloaded.");
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
