@@ -639,6 +639,24 @@
             });
             actions.appendChild(open);
           }
+          if (item.resource_type === "Announcement") {
+            const openAnnouncement = document.createElement("button");
+            openAnnouncement.type = "button";
+            openAnnouncement.className = "ct-help-action-button";
+            openAnnouncement.textContent = "Open announcements";
+            openAnnouncement.addEventListener("click", async function () {
+              if (!item.is_read) {
+                try {
+                  await window.CleanTrackApi.patch("notifications/" + item.id + "/read", {});
+                } catch (_) {}
+              }
+              if (dialog.close) dialog.close(); else dialog.removeAttribute("open");
+              const role = String(auth.getCurrentUser()?.role || "").toLowerCase();
+              navigation.setActivePage(role === "admin" ? "announcements" : "team-channel");
+              refreshNotificationBadge();
+            });
+            actions.appendChild(openAnnouncement);
+          }
           if (actions.childNodes.length) row.appendChild(actions);
           content.appendChild(row);
         });
