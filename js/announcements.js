@@ -114,7 +114,7 @@
     const page = el("section","ct-ann-page");
     const header = el("header","ct-ann-header");
     const eyebrow = el("p","ct-ann-eyebrow", isAdmin ? "ORGANIZATION COMMUNICATIONS" : isSupervisor ? "TEAM COMMUNICATIONS" : "YOUR WORKSPACE");
-    const heading = el("h1","", isAdmin ? "Announcements & Alerts" : isSupervisor || pageMode === "team-channel" ? "Supervisor Team Channel" : "Announcements");
+    const heading = el("h1","", isAdmin ? "Announcements & Alerts" : isSupervisor ? "Supervisor Team Channel" : pageMode === "team-channel" ? "Team Channel" : "Announcements");
     const subtitle = el("p","ct-ann-muted",isAdmin
       ? "Publish organization updates, instructions and operational alerts. This is separate from automatic system notifications."
       : isSupervisor
@@ -230,10 +230,10 @@
         card.appendChild(attach);
       }
       const actions=el("div","ct-ann-card-actions");
-      if(receipt.state!=="issued" && receipt.state!=="read" && receipt.state!=="acknowledged" && item.status==="published") {
+      if(item.can_mark_read && receipt.state!=="read" && receipt.state!=="acknowledged" && item.status==="published") {
         actions.appendChild(button("Mark as read","ct-ann-button ct-ann-button-secondary",async()=>{try{await API.post("announcements/"+item.id+"/read",{});await load();}catch(e){showNotice(apiError(e),true);}}));
       }
-      if(item.requires_acknowledgement && receipt.state!=="acknowledged" && item.status==="published") {
+      if(item.can_acknowledge && receipt.state!=="acknowledged" && item.status==="published") {
         actions.appendChild(button("Acknowledge","ct-ann-button ct-ann-button-primary",async()=>{if(!confirm("Confirm that you have read and understood this notice?"))return;try{await API.post("announcements/"+item.id+"/acknowledge",{});await load();}catch(e){showNotice(apiError(e),true);}}));
       }
       if(item.announcement_type==="alert" && item.alert_status!=="resolved" && (isAdmin || (isSupervisor && item.created_by_id===user.id))) {
@@ -414,8 +414,8 @@
     search.addEventListener("input",()=>{state.query=search.value;renderList();});
     typeFilter.addEventListener("change",renderList);
     statusFilter.addEventListener("change",load);
-    if(canCreate) renderComposer(null);
     await load();
+    if(canCreate) renderComposer(null);
   }
 
   window.CleanTrackAnnouncements = Object.freeze({render});
