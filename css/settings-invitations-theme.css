@@ -1,0 +1,157 @@
+/* Align Settings and Invitations with the dark Home control-center palette.
+   The app-wide light theme remains available when selected in Settings. */
+html:not([data-theme="light"]) body #page-content .ct-settings-page,
+html:not([data-theme="light"]) body #page-content .ct-invitations-page,
+html:not([data-theme="light"]) body #page-content .ct-org-settings-page {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-header h1,
+html:not([data-theme="light"]) body #page-content .ct-settings-card h2,
+html:not([data-theme="light"]) body #page-content .ct-settings-card h3,
+html:not([data-theme="light"]) body #page-content .ct-inv-header h1,
+html:not([data-theme="light"]) body #page-content .ct-inv-card h2,
+html:not([data-theme="light"]) body #page-content .ct-inv-request h3,
+html:not([data-theme="light"]) body #page-content .ct-org-settings-page h1,
+html:not([data-theme="light"]) body #page-content .ct-org-settings-page h2,
+html:not([data-theme="light"]) body #page-content .ct-org-settings-page h3 {
+  color: #eeebf7 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-card,
+html:not([data-theme="light"]) body #page-content .ct-settings-nav,
+html:not([data-theme="light"]) body #page-content .ct-settings-panel,
+html:not([data-theme="light"]) body #page-content .ct-inv-card,
+html:not([data-theme="light"]) body #page-content .ct-org-code-card,
+html:not([data-theme="light"]) body #page-content .ct-org-profile-card,
+html:not([data-theme="light"]) body #page-content .ct-org-policy-card {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  background-image: none !important;
+  border-color: #292c36 !important;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 20%) !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-nav-item,
+html:not([data-theme="light"]) body #page-content .ct-settings-check,
+html:not([data-theme="light"]) body #page-content .ct-settings-theme-option,
+html:not([data-theme="light"]) body #page-content .ct-settings-integration-row,
+html:not([data-theme="light"]) body #page-content .ct-settings-info-row {
+  color: #e9e7ef !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-nav-item:hover,
+html:not([data-theme="light"]) body #page-content .ct-settings-nav-item.is-active,
+html:not([data-theme="light"]) body #page-content .ct-settings-theme-option.is-selected {
+  color: #f0ebfc !important;
+  background: #1b1926 !important;
+  border-color: #514566 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-icon {
+  color: #b3a6db !important;
+  background: #1a1725 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-eyebrow,
+html:not([data-theme="light"]) body #page-content .ct-inv-eyebrow {
+  color: #a59acb !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-muted,
+html:not([data-theme="light"]) body #page-content .ct-inv-muted,
+html:not([data-theme="light"]) body #page-content .ct-org-muted {
+  color: #9290a0 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-input,
+html:not([data-theme="light"]) body #page-content .ct-inv-input,
+html:not([data-theme="light"]) body #page-content .ct-org-input,
+html:not([data-theme="light"]) body #page-content .ct-org-team-multi {
+  color: #e9e7ef !important;
+  background: #0c1017 !important;
+  border-color: #343341 !important;
+  caret-color: #b3a6db !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-input::placeholder,
+html:not([data-theme="light"]) body #page-content .ct-inv-input::placeholder {
+  color: #777485 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-button,
+html:not([data-theme="light"]) body #page-content .ct-inv-button,
+html:not([data-theme="light"]) body #page-content .ct-org-button {
+  color: #e9e7ef !important;
+  background: #191722 !important;
+  border-color: #383246 !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-button:hover,
+html:not([data-theme="light"]) body #page-content .ct-inv-button:hover,
+html:not([data-theme="light"]) body #page-content .ct-org-button:hover {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #655785 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-inv-button--primary,
+html:not([data-theme="light"]) body #page-content .ct-org-button-primary {
+  color: #c6f5e4 !important;
+  background: #183a34 !important;
+  border-color: #326b58 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-inv-button--primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-org-button-primary:hover {
+  color: #d8fff0 !important;
+  background: #1a403a !important;
+  border-color: #64d8b0 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-status,
+html:not([data-theme="light"]) body #page-content .ct-inv-notice,
+html:not([data-theme="light"]) body #page-content .ct-inv-code-row,
+html:not([data-theme="light"]) body #page-content .ct-inv-request,
+html:not([data-theme="light"]) body #page-content .ct-inv-details-body {
+  color: #e9e7ef;
+  background: #0c1017 !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-inv-tab {
+  color: #aaa5ba;
+  background: transparent;
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .ct-inv-tab.is-active {
+  color: #eeeaf7;
+  background: #1b1926;
+  border-color: #514566;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-link,
+html:not([data-theme="light"]) body #page-content .ct-settings-tag {
+  color: #c7bedf;
+  background: #191722;
+  border-color: #383246;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-chip-list li {
+  color: #d5cde8;
+  background: #191722;
+  border-color: #383246;
+}
+html:not([data-theme="light"]) body #page-content .ct-inv-status {
+  background: #191722;
+  border-color: #383246;
+}
+.ct-inv-share-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+}
+.ct-inv-share-tools > select {
+  flex: 1 1 155px;
+  width: auto;
+  max-width: 240px;
+}
+.ct-inv-actions a.ct-inv-button,
+.ct-inv-share-tools a.ct-inv-button {
+  text-decoration: none;
+}
+@media(max-width:520px) {
+  .ct-inv-share-tools > select { flex: 1 1 100%; max-width: none; }
+  .ct-inv-share-tools > .ct-inv-button,
+  .ct-inv-actions > .ct-inv-button,
+  .ct-inv-actions > a.ct-inv-button { flex: 1 1 calc(50% - 8px); }
+}
