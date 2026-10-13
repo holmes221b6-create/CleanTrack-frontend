@@ -86,3 +86,16 @@
 @media(max-width:1080px){.ct-ann-main-grid{grid-template-columns:minmax(0,1fr) minmax(290px,350px)}.ct-ann-toolbar{grid-template-columns:minmax(160px,1fr) 1fr 1fr auto}}
 @media(max-width:820px){.ct-ann-main-grid{grid-template-columns:1fr}.ct-ann-compose-card{position:static;order:-1}.ct-ann-composer-host{order:-1}.ct-ann-toolbar{grid-template-columns:1fr 1fr}.ct-ann-toolbar input{grid-column:1/-1}.ct-ann-toolbar button{grid-column:1/-1}.ct-ann-metrics{gap:9px}.ct-ann-metric{padding:13px;display:flex;flex-direction:column;align-items:flex-start;gap:5px}}
 @media(max-width:500px){.ct-ann-page{padding-top:2px}.ct-ann-card,.ct-ann-compose-card,.ct-ann-empty{padding:14px}.ct-ann-metrics{grid-template-columns:1fr}.ct-ann-metric{flex-direction:row;align-items:center}.ct-ann-toolbar{grid-template-columns:1fr}.ct-ann-toolbar input,.ct-ann-toolbar button{grid-column:auto}.ct-ann-receipt-row{align-items:flex-start;gap:10px}.ct-ann-receipt-timing{white-space:normal}.ct-ann-badge{font-size:.66rem}}
+
+/* Shared WhatsApp group and voice playback controls */
+.ct-ann-team-groups{margin:0 0 18px;padding:16px 18px;border:1px solid var(--border,#29374d);border-radius:14px;background:var(--bg-elevated,#10182a)}
+.ct-ann-team-groups-top h2{font-size:1rem;margin:0 0 6px}
+.ct-ann-team-groups-top p{margin-bottom:12px}
+.ct-ann-team-group-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ct-ann-team-group{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--border,#29374d);border-radius:11px;background:var(--surface,#141e31);padding:12px;min-width:0}
+.ct-ann-team-group strong{overflow-wrap:anywhere}
+.ct-ann-team-group .ct-ann-muted{margin:4px 0 0;font-size:.75rem}
+.ct-ann-voice-player{display:grid;gap:7px;min-width:min(100%,290px)}
+.ct-ann-audio{width:min(100%,360px);height:40px;accent-color:var(--primary,#64d8b0)}
+.ct-ann-audio[hidden]{display:none!important}
+@media(max-width:650px){.ct-ann-team-group-list{grid-template-columns:1fr}.ct-ann-team-group{align-items:flex-start;flex-direction:column}}
