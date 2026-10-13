@@ -341,3 +341,13 @@ textarea.ct-settings-input { min-height: 110px; resize: vertical; }
   .ct-org-header-actions { width: 100%; }
   .ct-org-header-actions button { width: 100%; }
 }
+
+.ct-org-role-boundaries { margin-top: 20px; }
+.ct-org-role-boundaries > h3 { margin: 0 0 10px; font-size: 13px; }
+.ct-org-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ct-org-role-boundary { min-width: 0; padding: 13px; border: 1px solid var(--ct-border, rgba(255,255,255,.1)); border-radius: 11px; background: rgba(255,255,255,.02); }
+.ct-org-role-boundary strong { font-size: 12px; }
+.ct-org-role-boundary p { margin: 5px 0 0; color: var(--ct-text-muted, #a6a6b4); font-size: 11px; line-height: 1.55; }
+@media (max-width: 760px) {
+  .ct-org-role-grid { grid-template-columns: minmax(0, 1fr); }
+}
