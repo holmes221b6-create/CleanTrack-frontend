@@ -673,23 +673,85 @@ function bindNavigation() {
     const codeGroup = getElement("organization-code-group");
     const organizationName = getElement("register-organization-name");
     const organizationCode = getElement("register-organization-code");
+    const invitationTokenInput = getElement("register-invitation-token");
+    const invitationNotice = getElement("register-invitation-notice");
+    const emailInput = getElement("register-email");
+    const phoneInput = getElement("register-phone");
     const message = getElement("register-message");
     const submit = getElement("register-submit");
     const roleInputs = Array.from(form.querySelectorAll('input[name="role"]'));
 
+    function clearInvitationContext() {
+      if (invitationTokenInput) invitationTokenInput.value = "";
+      if (emailInput) emailInput.readOnly = false;
+      if (invitationNotice) invitationNotice.hidden = true;
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("invite");
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      } catch (_) {}
+    }
+
     function updateRoleFields() {
       const selected = form.querySelector('input[name="role"]:checked');
       const role = selected ? selected.value : "";
+      const hasInvitation = Boolean(invitationTokenInput && invitationTokenInput.value);
       const isAdmin = role === "admin";
       const isJoining = role === "supervisor" || role === "employee";
       if (nameGroup) nameGroup.hidden = !isAdmin;
-      if (codeGroup) codeGroup.hidden = !isJoining;
+      if (codeGroup) codeGroup.hidden = !isJoining || hasInvitation;
       if (organizationName) organizationName.required = isAdmin;
-      if (organizationCode) organizationCode.required = isJoining;
-      if (submit) submit.textContent = isAdmin ? "Create organization" : "Request to join";
+      if (organizationCode) organizationCode.required = isJoining && !hasInvitation;
+      if (invitationNotice && hasInvitation) invitationNotice.hidden = false;
+      if (submit) submit.textContent = isAdmin ? "Create organization" : hasInvitation ? "Submit join request" : "Request to join";
     }
+
     roleInputs.forEach(input => input.addEventListener("change", updateRoleFields));
     updateRoleFields();
+
+    async function prefillInvitationFromUrl() {
+      const token = new URLSearchParams(window.location.search).get("invite");
+      if (!token || !invitationTokenInput) return;
+      invitationTokenInput.value = token;
+      if (invitationNotice) {
+        invitationNotice.hidden = false;
+        invitationNotice.textContent = "Checking this invitation link…";
+      }
+      const loginView = getElement("login-view");
+      const registerView = getElement("register-view");
+      const forgotView = getElement("forgot-password-view");
+      const organizationView = getElement("organization-view");
+      if (loginView) loginView.hidden = true;
+      if (registerView) registerView.hidden = false;
+      if (forgotView) forgotView.hidden = true;
+      if (organizationView) organizationView.hidden = true;
+      updateRoleFields();
+
+      try {
+        const response = await window.CleanTrackApi.get("invitations/resolve?token=" + encodeURIComponent(token));
+        const invite = response.invitation || {};
+        if (emailInput) {
+          emailInput.value = invite.email || "";
+          emailInput.readOnly = true;
+        }
+        roleInputs.forEach(input => { input.checked = input.value === String(invite.role || "").toLowerCase(); });
+        if (invitationNotice) invitationNotice.textContent =
+          "Invitation for " + (invite.organization_name || "your organization") +
+          " · Requested role: " + (invite.role || "not specified") +
+          ". " + (response.message || "An Admin must approve the join request.");
+        updateRoleFields();
+      } catch (error) {
+        if (invitationTokenInput) invitationTokenInput.value = "";
+        if (emailInput) emailInput.readOnly = false;
+        if (invitationNotice) {
+          invitationNotice.hidden = false;
+          invitationNotice.textContent = (error.message || "This invitation link could not be verified.") +
+            " You can still request to join using an organization code.";
+        }
+        updateRoleFields();
+      }
+    }
+    prefillInvitationFromUrl();
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -718,13 +780,16 @@ function bindNavigation() {
         const result = await auth.register({
           name: data.get("name"),
           email: data.get("email"),
+          phone: data.get("phone"),
           password: data.get("password"),
           role,
           organization_name: data.get("organization_name"),
           organization_code: data.get("organization_code"),
+          invitation_token: data.get("invitation_token"),
           accept_terms: data.get("accept_terms") === "on"
         });
 
+        clearInvitationContext();
         if (result.user && result.membershipStatus !== "pending") {
           showAuthenticatedLayout(result.user);
           navigation.setActivePage(navigation.getDefaultPage(result.user.role) || "home");
