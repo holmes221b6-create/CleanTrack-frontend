@@ -56,6 +56,19 @@
     if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage(page);
   }
 
+  function syncWorkspaceOrganization() {
+    if (!organization) return;
+    const user = window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser
+      ? window.CleanTrackAuth.getCurrentUser()
+      : null;
+    if (user) {
+      user.organization_name = organization.name || "";
+      user.organizationName = organization.name || "";
+    }
+    const label = document.getElementById("workspace-organization");
+    if (label) label.textContent = organization.name || "Organization";
+  }
+
   function dateText(value) {
     if (!value) return "Date not available";
     const date = new Date(value);
@@ -440,6 +453,7 @@
     try {
       const response = await API.get("organizations/current");
       organization = response.organization || null;
+      syncWorkspaceOrganization();
       if (!organization) {
         content.replaceChildren();
         content.appendChild(el("p", "ct-org-empty", "No organization profile is linked to this Admin account yet."));
