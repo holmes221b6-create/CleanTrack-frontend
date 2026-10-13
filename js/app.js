@@ -341,6 +341,28 @@
 
     pageContent.replaceChildren();
 
+    if (pageId === "settings") {
+      if (window.CleanTrackSettings && typeof window.CleanTrackSettings.render === "function") {
+        await window.CleanTrackSettings.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Settings could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
+    if (pageId === "org-settings") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organization Settings are available to Admin users only." }));
+        return;
+      }
+      if (window.CleanTrackOrganizationSettings && typeof window.CleanTrackOrganizationSettings.render === "function") {
+        await window.CleanTrackOrganizationSettings.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organization Settings could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     // Home is the admin landing/control page; Dashboard remains the deeper analytics page.
     if (pageId === "home" && String(user?.role || "").toLowerCase() === "admin") {
       if (window.CleanTrackAdminHome && typeof window.CleanTrackAdminHome.render === "function") {
