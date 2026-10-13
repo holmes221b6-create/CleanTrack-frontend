@@ -146,7 +146,8 @@ if (identity) {
       skills: "skills eligibility training qualification",
       coverage: "delegation coverage shifts handover responsibilities",
       audit: "audit trail access changes accountability events",
-      settings: "settings preferences organization account configuration",
+      settings: "settings preferences personal account profile",
+      "org-settings": "organization settings company profile organization code membership policies archive audit trail permissions",
       billing: "billing plan subscription invoice payment",
       profile: "profile account personal information email role organization"
     };
