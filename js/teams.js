@@ -230,7 +230,42 @@ async function render(container){
  const grid=el("div","ct-team-form-grid");grid.append(field("Team name",name),field("Team description",desc),field("Capacity (optional)",capacity,"Set a number to flag when membership exceeds capacity."));form.append(grid);
  const formActions=el("div","ct-team-form-actions"),cancelBtn=button("Cancel","ct-team-btn ct-team-btn--quiet",()=>{form.reset();createOpen(false)}),submitBtn=button("Create Team","ct-team-btn ct-team-btn--primary",null,"submit");submitBtn.dataset.createTeamSubmit="1";formActions.append(cancelBtn,submitBtn);form.append(formActions);
  const createStatus=el("p","ct-team-create-status","");createStatus.hidden=true;createStatus.setAttribute("role","status");form.append(createStatus);
- form.addEventListener("submit",async e=>{e.preventDefault();if(busy)return;busy=true;submitBtn.disabled=true;submitBtn.textContent="Creating team…";createStatus.hidden=true;try{const raw=capacity.value.trim(),cap=raw?Number(raw):null;if(!name.value.trim())throw Error("Team name is required.");if(cap!==null&&(!Number.isInteger(cap)||cap<1))throw Error("Capacity must be a positive whole number or blank.");const r=await API.post("teams",{name:name.value.trim(),description:desc.value.trim(),capacity:cap});if(!r||!r.team||r.team.id===undefined)throw Error("The server did not confirm a team was created. Refresh the team list before retrying.");form.reset();createOpen(false);await load();notice(r.message||"Team created.","success");if(r.team?.id)await openTeam(r.team.id)}catch(err){const message=err.message||"Could not create team.";createStatus.textContent=message;createStatus.className="ct-team-create-status is-error";createStatus.hidden=false;notice(message,"error")}finally{busy=false;submitBtn.disabled=false;submitBtn.textContent="Create Team"}});root.append(form);
+ form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(busy)return;
+ busy=true;submitBtn.disabled=true;submitBtn.textContent="Creating team…";createStatus.hidden=true;
+ try{
+  const raw=capacity.value.trim(),cap=raw?Number(raw):null;
+  if(!name.value.trim())throw Error("Team name is required.");
+  if(cap!==null&&(!Number.isInteger(cap)||cap<1))throw Error("Capacity must be a positive whole number or blank.");
+  const r=await API.post("teams",{name:name.value.trim(),description:desc.value.trim(),capacity:cap});
+  if(!r||!r.team||r.team.id===undefined)throw Error("The server did not confirm a team was created. Check the team list before retrying.");
+  const created=r.team;
+  form.reset();createOpen(false);
+  // The POST response is authoritative. Show the saved record immediately;
+  // a later list/insights failure must not be misreported as a create failure.
+  teams=[created,...teams.filter(t=>String(t.id)!==String(created.id))];
+  renderList();
+  createStatus.textContent=r.message||"Team created successfully.";
+  createStatus.className="ct-team-create-status is-success";
+  createStatus.hidden=false;
+  notice(r.message||"Team created successfully.","success");
+  try{
+   await load();
+  }catch(refreshError){
+   teams=[created,...teams.filter(t=>String(t.id)!==String(created.id))];
+   renderList();
+   const detail=refreshError&&refreshError.message?": "+refreshError.message:"";
+   notice("Team created and saved. The team list could not refresh"+detail,"success");
+  }
+ }catch(err){
+  const message=err.message||"Could not create team.";
+  createStatus.textContent=message;createStatus.className="ct-team-create-status is-error";createStatus.hidden=false;
+  notice(message,"error");
+ }finally{
+  busy=false;submitBtn.disabled=false;submitBtn.textContent="Create Team";
+ }
+});root.append(form);
  const listPanel=el("section","ct-team-list-panel"),toolbar=el("div","ct-team-toolbar"),search=input("","search");search.type="search";search.placeholder="Search team names…";search.setAttribute("aria-label","Search teams");search.addEventListener("input",()=>{query=search.value.trim();renderList()});const sw=el("label","ct-team-search");sw.append(el("span","ct-team-sr-only","Search team names"),search);toolbar.append(sw);
  const filters=el("div","ct-team-filter-buttons"),active=button("Active Teams","ct-team-btn ct-team-filter is-active",()=>{archived=false;renderList()}),arch=button("Archived Teams","ct-team-btn ct-team-filter",()=>{archived=true;renderList()});active.dataset.filter="active";arch.dataset.filter="archived";filters.append(active,arch);toolbar.append(filters);const count=el("span","ct-team-muted","Loading…");count.dataset.teamCount="1";toolbar.append(count);
  const heading=el("h2","ct-team-section-heading","All teams");heading.dataset.teamListHeading="1";const results=el("div","ct-team-grid");results.dataset.teamResults="1";results.append(el("div","ct-team-empty","Loading teams…"));listPanel.append(toolbar,heading,results);root.append(listPanel);
