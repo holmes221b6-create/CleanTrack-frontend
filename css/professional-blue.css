@@ -1921,3 +1921,188 @@ html:not([data-theme="light"]) body #page-content .ct-org-settings-page .ct-org-
   html:not([data-theme="light"]) body #page-content:has(.ct-home-welcome) { padding: 15px !important; border-radius: 15px; }
   html:not([data-theme="light"]) body #page-content .ct-org-settings-page { padding: 15px !important; border-radius: 15px; }
 }
+
+
+/* Personal Settings: match the charcoal/purple-gray surface treatment of Home.
+   Dark mode only, so the user-selected light appearance remains intact. */
+html:not([data-theme="light"]) body #page-content .ct-settings-page {
+  --ct-bg: #080b10;
+  --ct-page: #080b10;
+  --ct-surface: #10141c;
+  --ct-panel: #10141c;
+  --ct-panel-raised: #151720;
+  --ct-border: #292c36;
+  --ct-text: #e9e7ef;
+  --ct-text-muted: #9290a0;
+  --ct-accent: #b4a7dc;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  padding: clamp(16px, 2.4vw, 30px) !important;
+  color: #e9e7ef !important;
+  background: #080b10 !important;
+  border: 1px solid #20232c;
+  border-radius: 20px;
+  gap: 18px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-header h1 {
+  color: #e9e7ef !important;
+  letter-spacing: -.04em;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-eyebrow {
+  color: #a59acb !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-muted,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-field > span,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-tag {
+  color: #9290a0 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-nav {
+  color: #e9e7ef !important;
+  background: linear-gradient(160deg, #10141c, #0c0e14) !important;
+  border-color: #292c36 !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-nav-item {
+  color: #c4bfd2 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-nav-item:hover {
+  color: #f0ebfc !important;
+  background: #191722 !important;
+  border-color: #383246 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-nav-item.is-active {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #514566 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-nav-item .ct-settings-icon,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-icon {
+  color: #b4a7dc !important;
+  background: #1b1926 !important;
+  border-color: #3b334d !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-card {
+  color: #e9e7ef !important;
+  background: linear-gradient(145deg, #10141c, #0f1219 92%) !important;
+  border-color: #292c36 !important;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 20%) !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-card h2,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-card h3,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-card strong,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-account-data dd {
+  color: #e9e7ef !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-account-data {
+  background: #0c1017 !important;
+  border-color: #292c36 !important;
+  border-radius: 12px;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-account-data dt {
+  color: #9290a0 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-input,
+html:not([data-theme="light"]) body #page-content .ct-settings-page select,
+html:not([data-theme="light"]) body #page-content .ct-settings-page textarea {
+  color: #e9e7ef !important;
+  color-scheme: dark;
+  background: #0c0e14 !important;
+  border-color: #302d3b !important;
+  box-shadow: none;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-input:focus,
+html:not([data-theme="light"]) body #page-content .ct-settings-page select:focus,
+html:not([data-theme="light"]) body #page-content .ct-settings-page textarea:focus {
+  border-color: #655785 !important;
+  box-shadow: 0 0 0 3px rgb(118 101 164 / 16%) !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page select option {
+  color: #e9e7ef;
+  background: #0c0e14;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-check {
+  color: #dcd8e7 !important;
+  background: #12151d !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-check input {
+  accent-color: #a59acb;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-theme-option {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-theme-option:hover {
+  background: #191722 !important;
+  border-color: #514566 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-theme-option.is-selected {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #655785 !important;
+  box-shadow: 0 0 0 2px rgb(118 101 164 / 12%) !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-integration-row,
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-info-row {
+  color: #e9e7ef !important;
+  border-bottom-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-link {
+  color: #c4bbdf !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-link:hover {
+  color: #f0ebfc !important;
+  background: #191722 !important;
+  border-color: #514566 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button {
+  color: #dcd8e7 !important;
+  background: #151720 !important;
+  border-color: #34303e !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button:hover {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #655785 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button-primary {
+  color: #a5e3cf !important;
+  background: #15332f !important;
+  border-color: #355b58 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button-primary:hover {
+  color: #c6f5e4 !important;
+  background: #1a403a !important;
+  border-color: #64d8b0 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button-danger {
+  color: #f2aab7 !important;
+  background: #24151c !important;
+  border-color: #512d38 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-button-danger:hover {
+  background: #311923 !important;
+  border-color: #854454 !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-status.is-success { color: #9fe0c8 !important; }
+html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-status.is-error { color: #e3a4b1 !important; }
+@media (max-width: 760px) {
+  html:not([data-theme="light"]) body #page-content .ct-settings-page {
+    padding: 15px !important;
+    border-radius: 15px;
+  }
+}
+@media (max-width: 560px) {
+  html:not([data-theme="light"]) body #page-content .ct-settings-page {
+    padding: 12px !important;
+  }
+  html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings-card {
+    padding: 16px !important;
+  }
+}
