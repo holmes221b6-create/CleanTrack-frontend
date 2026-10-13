@@ -55,3 +55,12 @@
 .ct-inv-error{border-color:var(--danger,#ff7f91);color:var(--danger,#ff7f91)}
 @media(max-width:760px){.ct-inv-create-form{grid-template-columns:1fr 1fr}.ct-inv-create-form>.ct-inv-button{grid-column:1/-1}.ct-inv-toolbar{align-items:stretch;flex-direction:column}.ct-inv-toolbar>.ct-inv-input{max-width:none}.ct-inv-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-inv-header{align-items:stretch;flex-direction:column}.ct-inv-header>.ct-inv-button{align-self:flex-start}}
 @media(max-width:420px){.ct-inv-create-form{grid-template-columns:1fr}.ct-inv-create-form>.ct-inv-button{grid-column:auto}.ct-inv-code-row{align-items:stretch;flex-direction:column}.ct-inv-code-row .ct-inv-button{align-self:flex-start}.ct-inv-request-main{flex-direction:column;align-items:flex-start}.ct-inv-actions .ct-inv-button{flex:1 1 100%}}
+
+/* Header notification popover/dialog content */
+.ct-notifications-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 0 12px;border-bottom:1px solid var(--border,#29374d);margin-bottom:12px}
+.ct-notifications-toolbar p{margin:0;color:var(--text-secondary,#a9b8cc)}
+.ct-notification-item{display:grid;gap:5px;padding:14px;margin:9px 0;border:1px solid var(--border,#29374d);border-radius:10px;background:var(--surface,#141e31)}
+.ct-notification-item.is-unread{border-color:color-mix(in srgb,var(--primary,#64d8b0) 58%,var(--border,#29374d));background:color-mix(in srgb,var(--primary,#64d8b0) 5%,var(--surface,#141e31))}
+.ct-notification-item p{margin:0;color:var(--text-secondary,#a9b8cc);overflow-wrap:anywhere}
+.ct-notification-item small{color:var(--text-muted,#7e90aa)}
+.ct-notification-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
