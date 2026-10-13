@@ -125,3 +125,64 @@
   .ct-ann-toolbar>.ct-ann-control[type="search"]{grid-column:auto}
   .ct-ann-toolbar>.ct-ann-button{grid-column:auto}
 }
+
+/* Home-page visual theme: charcoal surfaces, lavender accents and restrained green actions.
+   Intentionally limited to presentation; announcements behavior and data handling are unchanged. */
+.ct-ann-page{color:#e9e7ef}
+.ct-ann-header{margin-bottom:24px}
+.ct-ann-eyebrow{color:#b4a7dc}
+.ct-ann-header h1,.ct-ann-card-title,.ct-ann-compose-card h2,.ct-ann-empty h2,.ct-ann-team-groups-top h2,.ct-ann-dialog-head h2{color:#e9e7ef}
+.ct-ann-muted,.ct-ann-metric span,.ct-ann-meta,.ct-ann-receipt-summary{color:#9290a0}
+.ct-ann-metrics{gap:12px}
+.ct-ann-metric{border-color:#292c36;background:linear-gradient(145deg,#11141c,#0d1017);color:#e9e7ef;border-radius:13px}
+.ct-ann-metric strong{color:#eeeaf7}
+.ct-ann-metric-alert strong{color:#d88994}
+.ct-ann-global-status,.ct-ann-status{border-color:#292c36;background:#10141c;color:#dcd8e7}
+.ct-ann-global-status.is-error,.ct-ann-status.is-error{border-color:#5a303b;color:#e6a0a8;background:#191217}
+.ct-ann-global-status.is-success,.ct-ann-status.is-success{border-color:#315346;color:#9fe0c8;background:#111c19}
+.ct-ann-control{border-color:#302d3b;background:#0b0f14;color:#e9e7ef;border-radius:9px}
+.ct-ann-control::placeholder{color:#706c7f}
+.ct-ann-control:focus{border-color:#695a90;box-shadow:0 0 0 3px rgb(109 95 152 / 15%)}
+.ct-ann-card,.ct-ann-compose-card,.ct-ann-empty,.ct-ann-team-groups{border-color:#292c36;background:#10141c;color:#e9e7ef;border-radius:13px;box-shadow:0 5px 18px rgb(0 0 0 / 13%)}
+.ct-ann-card{border-left-color:#383246}
+.ct-ann-card.is-pinned{border-left-color:#7668a5}
+.ct-ann-card.is-alert{border-left-color:#a95665}
+.ct-ann-badge,.ct-ann-issued{border-color:#383246;background:#191722;color:#d5cde8}
+.ct-ann-badge.type-alert,.ct-ann-badge.severity-high,.ct-ann-badge.severity-critical{color:#e2a0aa;border-color:#62404b;background:#21161b}
+.ct-ann-badge.severity-medium{color:#d8bc82}
+.ct-ann-badge.status-published,.ct-ann-badge.status-resolved{color:#9fe0c8;border-color:#315346;background:#14231e}
+.ct-ann-badge.status-scheduled{color:#b4b8dd;border-color:#413b5b;background:#1a1926}
+.ct-ann-badge.status-draft{color:#d8bc82;border-color:#514633;background:#211d17}
+.ct-ann-message{color:#e9e7ef}
+.ct-ann-meta{border-top-color:#292c36}
+.ct-ann-read-state{color:#777485}
+.ct-ann-read-state.state-acknowledged{color:#9fe0c8}
+.ct-ann-read-state.state-read{color:#b4b8dd}
+.ct-ann-read-state.state-unread{color:#d8bc82}
+.ct-ann-attachment{border-color:#383246;background:#191722;color:#dcd8e7}
+.ct-ann-attachment:hover{border-color:#655785;color:#c6b9ec}
+.ct-ann-button,.ct-ann-icon-button{border-color:#373142;background:#171720;color:#dcd8e7;border-radius:8px}
+.ct-ann-button:hover,.ct-ann-icon-button:hover{border-color:#655785;background:#211d2c;color:#f0ebfc}
+.ct-ann-button-primary{border-color:#3a705f;background:#16352d;color:#9fe0c8}
+.ct-ann-button-primary:hover{border-color:#4a967f;background:#1b4337;color:#cbf3e6}
+.ct-ann-button-danger{border-color:#57313b;color:#e6a0a8;background:#20151a}
+.ct-ann-button-danger:hover{border-color:#8b4d5a;background:#2a1820;color:#ffdfe3}
+.ct-ann-empty-icon{border-color:#393149;background:#1b1926;color:#b4a7dc}
+.ct-ann-form{color:#e9e7ef}
+.ct-ann-field-label{color:#dcd8e7}
+.ct-ann-compose-options{border-color:#383246;background:#15141e}
+.ct-ann-check{color:#c4bfd2}
+.ct-ann-check input{accent-color:#7668a5}
+.ct-ann-escalation-box{border-color:#514633;background:#17150f}
+.ct-ann-team-group{border-color:#292c36;background:#151720}
+.ct-ann-team-group strong{color:#e9e7ef}
+.ct-ann-views{scrollbar-color:#383246 transparent}
+.ct-ann-view{border-color:#292c36;background:#10141c;color:#aaa5ba}
+.ct-ann-view:hover{border-color:#514566;color:#e9e7ef;background:#171522}
+.ct-ann-view.is-active{border-color:#514566;background:#1b1926;color:#eeeaf7}
+.ct-ann-view-count{background:#191722;color:#c4bfd2}
+.ct-ann-view.is-active .ct-ann-view-count{background:#7668a5;color:#f0ebfc}
+.ct-ann-dialog{border-color:#383246;background:#10141c;color:#e9e7ef}
+.ct-ann-dialog-head{border-bottom-color:#292c36}
+.ct-ann-receipt-row{border-bottom-color:#292c36}
+.ct-ann-page button:focus-visible,.ct-ann-page a:focus-visible,.ct-ann-page input:focus-visible,.ct-ann-page select:focus-visible,.ct-ann-page textarea:focus-visible{outline:2px solid #7668a5;outline-offset:2px}
