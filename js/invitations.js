@@ -48,6 +48,53 @@
     temp.remove();
     if (!copied) throw new Error("Copy was blocked. Select the link and copy it manually.");
   }
+
+  function organizationJoinUrl(code, role) {
+    const url = new URL("/", window.location.origin);
+    url.searchParams.set("join", code);
+    url.searchParams.set("role", role || "employee");
+    return url.href;
+  }
+
+  function channelLink(label, href) {
+    const link = el("a", "ct-inv-button ct-inv-button--secondary", label);
+    link.href = href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    return link;
+  }
+
+  function shareMessage(url, details) {
+    return (details || "You are invited to request access to our organization on CleanTrack.") +
+      " An Admin must approve your request: " + url;
+  }
+
+  function openNativeShare(data, fallbackMessage) {
+    if (typeof navigator.share !== "function") {
+      showMessage(fallbackMessage.root, fallbackMessage.text, "info");
+      return Promise.resolve(false);
+    }
+    return navigator.share(data).then(() => true).catch(error => {
+      if (!error || error.name !== "AbortError") {
+        showMessage(fallbackMessage.root, "Sharing could not be opened. Use WhatsApp, SMS, or Copy instead.", "error");
+      }
+      return false;
+    });
+  }
+
+  function quickShareLinks(container, url, message, emailAddress) {
+    const encoded = encodeURIComponent(message + " " + url);
+    container.append(
+      channelLink("WhatsApp", "https://wa.me/?text=" + encoded),
+      channelLink("SMS / Messages", "sms:?body=" + encoded)
+    );
+    if (emailAddress) {
+      const subject = encodeURIComponent("Your CleanTrack invitation");
+      container.append(channelLink("Email app", "mailto:" + encodeURIComponent(emailAddress) + "?subject=" + subject + "&body=" + encoded));
+    } else {
+      container.append(channelLink("Email app", "mailto:?subject=" + encodeURIComponent("Join us on CleanTrack") + "&body=" + encoded));
+    }
+  }
   function render(root) {
     root.replaceChildren();
     const user = AUTH && AUTH.getCurrentUser ? AUTH.getCurrentUser() : null;
@@ -84,6 +131,59 @@
     });
     codeRow.append(codeValue, copyCode);
     codeCard.appendChild(codeRow);
+
+    const publicShareRole = el("select", "ct-inv-input");
+    publicShareRole.setAttribute("aria-label", "Role requested by the organization invite link");
+    [["employee","Employee"],["supervisor","Supervisor"]].forEach(([value,label]) => {
+      const option = el("option", "", label);
+      option.value = value;
+      publicShareRole.appendChild(option);
+    });
+    const orgShareText = () => "Join our organization on CleanTrack as a " + publicShareRole.value +
+      ". The link opens a join request; an Admin must approve you.";
+    const orgInviteActions = el("div", "ct-inv-share-tools");
+    const shareOrgInvite = button("Share invite", "ct-inv-button ct-inv-button--primary", async () => {
+      const code = codeValue.dataset.value || "";
+      if (!code) return showMessage(page, "The organization code has not loaded yet.", "error");
+      const url = organizationJoinUrl(code, publicShareRole.value);
+      await openNativeShare({
+        title: "Join our organization on CleanTrack",
+        text: orgShareText() + " Organization code: " + code,
+        url
+      }, {root:page,text:"Your browser doesn't offer the device share sheet. Choose WhatsApp, SMS / Messages, or Email below."});
+    });
+    const copyOrgInvite = button("Copy invite link", "ct-inv-button ct-inv-button--secondary", async () => {
+      const code = codeValue.dataset.value || "";
+      if (!code) return showMessage(page, "The organization code has not loaded yet.", "error");
+      try {
+        await copyText(organizationJoinUrl(code, publicShareRole.value));
+        showMessage(page, "Join link copied. Admin approval is still required.", "success");
+      } catch (error) { showMessage(page, error.message || "Unable to copy the join link.", "error"); }
+    });
+    orgInviteActions.append(publicShareRole, shareOrgInvite, copyOrgInvite);
+    codeCard.appendChild(orgInviteActions);
+    const quickOrgActions = el("div", "ct-inv-actions");
+    const quickOrgMessage = () => {
+      const code = codeValue.dataset.value || "";
+      return code ? shareMessage(organizationJoinUrl(code, publicShareRole.value), orgShareText() + " Organization code: " + code) : "";
+    };
+    quickOrgActions.append(
+      channelLink("WhatsApp", "https://wa.me/"),
+      channelLink("SMS / Messages", "sms:"),
+      channelLink("Email app", "mailto:")
+    );
+    function refreshOrgShareTargets() {
+      quickOrgActions.replaceChildren();
+      const code = codeValue.dataset.value || "";
+      if (!code) {
+        quickOrgActions.append(el("span", "ct-inv-muted", "Share options will be ready when the organization code loads."));
+        return;
+      }
+      quickShareLinks(quickOrgActions, organizationJoinUrl(code, publicShareRole.value), quickOrgMessage(), "");
+    }
+    publicShareRole.addEventListener("change", refreshOrgShareTargets);
+    refreshOrgShareTargets();
+    codeCard.appendChild(quickOrgActions);
     page.appendChild(codeCard);
 
     const createCard = el("section", "ct-inv-card");
@@ -229,7 +329,7 @@
           actions.append(button(s==="expired"?"Renew link":"Resend / rotate link","ct-inv-button ct-inv-button--secondary",async()=>{
             try{
               const out=await API.post("invitations/"+i.id+"/resend",{});
-              showGenerated(generated,out.invite_url,out.message);
+              showGenerated(generated,out.invite_url,out.message,i.email,i.role);
               showMessage(page,out.message,"success");
               await load(page,false);
             }catch(e){showMessage(page,e.message||"Could not renew invitation.","error");}
@@ -246,19 +346,25 @@
     function paintTabsAndLists(){renderRequests();renderInvitations();}
     reqSearch.addEventListener("input",renderRequests);
     invSearch.addEventListener("input",renderInvitations);
-    function showGenerated(holder,url,message) {
+    function showGenerated(holder,url,message,recipientEmail,recipientRole) {
       holder.replaceChildren();
       holder.hidden=false;
       holder.append(el("strong","","Invitation link ready"),el("p","ct-inv-muted",message||"Copy or share this link with the invited person."));
       const input=el("input","ct-inv-input");input.type="url";input.readOnly=true;input.value=url||"";input.setAttribute("aria-label","Generated invitation link");
+      const details = "You've been invited to request access to CleanTrack" +
+        (recipientRole ? " as a " + recipientRole : "") +
+        (recipientEmail ? " (invitation for " + recipientEmail + ")" : "") +
+        ". An Admin must approve your request.";
       const actions=el("div","ct-inv-actions");
-      actions.append(button("Copy link","ct-inv-button ct-inv-button--primary",async()=>{try{await copyText(input.value);showMessage(page,"Invitation link copied. Email was not sent.","success");}catch(e){showMessage(page,e.message,"error");}}));
-      actions.append(button("Share…","ct-inv-button ct-inv-button--secondary",async()=>{
-        try{
-          if(navigator.share){await navigator.share({title:"CleanTrack invitation",text:"You've been invited to request access to CleanTrack. An Admin must approve your request.",url:input.value});}
-          else {const url="https://wa.me/?text="+encodeURIComponent("You've been invited to request access to CleanTrack. An Admin must approve your request: "+input.value);window.open(url,"_blank","noopener");}
-        }catch(err){if(err&&err.name!=="AbortError")showMessage(page,"Sharing was not available. Copy the link instead.","error");}
+      actions.append(button("Copy link","ct-inv-button ct-inv-button--primary",async()=>{try{if(!input.value)throw new Error("Invitation URL is unavailable.");await copyText(input.value);showMessage(page,"Invitation link copied. Email was not sent.","success");}catch(e){showMessage(page,e.message||"Unable to copy the invitation link.","error");}}));
+      actions.append(button("Share invite","ct-inv-button ct-inv-button--secondary",async()=>{
+        if(!input.value) return showMessage(page,"Invitation URL is unavailable.","error");
+        try {
+          await openNativeShare({title:"CleanTrack invitation",text:details,url:input.value},
+            {root:page,text:"Your browser doesn't offer the device share sheet. Choose WhatsApp, SMS / Messages, or Email below."});
+        } catch(err) { showMessage(page,err.message||"Sharing isn't available.","error"); }
       }));
+      quickShareLinks(actions, input.value, details, recipientEmail);
       holder.append(input,actions);
     }
     inviteForm.addEventListener("submit",async event=>{
@@ -266,7 +372,7 @@
       submit.disabled=true;submit.textContent="Creating link…";
       try{
         const out=await API.post("invitations",{email:email.value.trim(),role:role.value});
-        showGenerated(generated,out.invite_url,out.message);
+        showGenerated(generated,out.invite_url,out.message,i.email,i.role);
         email.value="";showMessage(page,out.message,"success");
         await load(page,false);
       }catch(err){showMessage(page,err.message||"Could not create invitation.","error");}
