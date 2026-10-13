@@ -86,6 +86,7 @@
     if (nameElement) {
       nameElement.textContent = user.name || user.email || "User";
     }
+    refreshNotificationBadge();
 
     if (roleElement) {
       roleElement.textContent = formatRole(user.role);
@@ -365,6 +366,19 @@
       return;
     }
 
+    if (pageId === "invitations") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Invitations are available to organization Admins only." }));
+        return;
+      }
+      if (window.CleanTrackInvitations && typeof window.CleanTrackInvitations.render === "function") {
+        await window.CleanTrackInvitations.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "The Invitations module could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     // Home is the admin landing/control page; Dashboard remains the deeper analytics page.
     if (pageId === "home" && String(user?.role || "").toLowerCase() === "admin") {
       if (window.CleanTrackAdminHome && typeof window.CleanTrackAdminHome.render === "function") {
@@ -472,7 +486,124 @@
     pageContent.appendChild(message);
   }
 
-    function bindLogoutButton() {
+  
+  async function refreshNotificationBadge() {
+    const badge = getElement("notification-count");
+    if (!badge || !window.CleanTrackApi || !auth.isAuthenticated()) return;
+    try {
+      const data = await window.CleanTrackApi.get("notifications");
+      const count = Number(data.unread_count || 0);
+      badge.textContent = count > 99 ? "99+" : String(count);
+      badge.hidden = count <= 0;
+    } catch (_) {
+      // The badge remains hidden if notification retrieval is unavailable.
+    }
+  }
+
+  function bindNotificationsButton() {
+    const button = getElement("notifications-button");
+    if (!button || button.dataset.notificationsReady === "true") return;
+    button.dataset.notificationsReady = "true";
+    button.addEventListener("click", async function () {
+      const dialog = getElement("app-modal");
+      const title = getElement("modal-title");
+      const content = getElement("modal-content");
+      if (!dialog || !title || !content || !window.CleanTrackApi) return;
+      title.textContent = "Notifications";
+      content.replaceChildren();
+      const loading = document.createElement("p");
+      loading.textContent = "Loading notifications…";
+      content.appendChild(loading);
+      if (typeof dialog.showModal === "function") {
+        if (!dialog.open) dialog.showModal();
+      } else dialog.setAttribute("open", "");
+      try {
+        const data = await window.CleanTrackApi.get("notifications");
+        const rows = Array.isArray(data.notifications) ? data.notifications : [];
+        content.replaceChildren();
+        const toolbar = document.createElement("div");
+        toolbar.className = "ct-notifications-toolbar";
+        const summary = document.createElement("p");
+        summary.textContent = Number(data.unread_count || 0) + " unread";
+        toolbar.appendChild(summary);
+        const readAll = document.createElement("button");
+        readAll.type = "button";
+        readAll.className = "ct-help-secondary-button";
+        readAll.textContent = "Mark all as read";
+        readAll.addEventListener("click", async function () {
+          try {
+            await window.CleanTrackApi.post("notifications/read-all", {});
+            await refreshNotificationBadge();
+            button.click();
+          } catch (error) {
+            summary.textContent = error.message || "Could not mark notifications as read.";
+          }
+        });
+        toolbar.appendChild(readAll);
+        content.appendChild(toolbar);
+        if (!rows.length) {
+          const empty = document.createElement("p");
+          empty.textContent = "No notifications have been recorded for your account.";
+          content.appendChild(empty);
+        }
+        rows.forEach(function (item) {
+          const row = document.createElement("article");
+          row.className = "ct-notification-item" + (item.is_read ? "" : " is-unread");
+          const heading = document.createElement("strong");
+          heading.textContent = item.title || "Notification";
+          const message = document.createElement("p");
+          message.textContent = item.message || "";
+          const meta = document.createElement("small");
+          meta.textContent = item.created_at ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.created_at)) : "";
+          row.append(heading, message, meta);
+          const actions = document.createElement("div");
+          actions.className = "ct-notification-actions";
+          if (!item.is_read) {
+            const mark = document.createElement("button");
+            mark.type = "button";
+            mark.className = "ct-help-secondary-button";
+            mark.textContent = "Mark read";
+            mark.addEventListener("click", async function () {
+              try {
+                await window.CleanTrackApi.patch("notifications/" + item.id + "/read", {});
+                await refreshNotificationBadge();
+                row.classList.remove("is-unread");
+                mark.remove();
+              } catch (error) {
+                message.textContent = error.message || "Could not update notification.";
+              }
+            });
+            actions.appendChild(mark);
+          }
+          if (item.resource_type === "MembershipRequest") {
+            const open = document.createElement("button");
+            open.type = "button";
+            open.className = "ct-help-action-button";
+            open.textContent = "Open join requests";
+            open.addEventListener("click", async function () {
+              if (!item.is_read) {
+                try { await window.CleanTrackApi.patch("notifications/" + item.id + "/read", {}); } catch (_) {}
+              }
+              if (dialog.close) dialog.close(); else dialog.removeAttribute("open");
+              navigation.setActivePage("invitations");
+              refreshNotificationBadge();
+            });
+            actions.appendChild(open);
+          }
+          if (actions.childNodes.length) row.appendChild(actions);
+          content.appendChild(row);
+        });
+        await refreshNotificationBadge();
+      } catch (error) {
+        content.replaceChildren();
+        const message = document.createElement("p");
+        message.textContent = error.message || "Notifications could not be loaded.";
+        content.appendChild(message);
+      }
+    });
+  }
+
+  function bindLogoutButton() {
     const button = getElement("logout-button");
 
     if (!button) {
@@ -664,6 +795,7 @@ function bindNavigation() {
 
     state.started = true;
     bindFooterHelp();
+    bindNotificationsButton();
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
   bindRegistrationForm();
