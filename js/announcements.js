@@ -258,7 +258,7 @@
       if(item.can_acknowledge && receipt.state!=="acknowledged" && item.status==="published") {
         actions.appendChild(button("Acknowledge","ct-ann-button ct-ann-button-primary",async()=>{if(!confirm("Confirm that you have read and understood this notice?"))return;try{await API.post("announcements/"+item.id+"/acknowledge",{});await load();}catch(e){showNotice(apiError(e),true);}}));
       }
-      if(item.announcement_type==="alert" && item.alert_status!=="resolved" && (isAdmin || (isSupervisor && item.created_by_id===user.id))) {
+      if(item.announcement_type==="alert" && item.alert_status!=="resolved" && (isAdmin || (isSupervisor && item.audience_scope==="team" && state.options.teams.some(t=>Number(t.id)===Number(item.team_id))))) {
         actions.appendChild(button("Mark resolved","ct-ann-button ct-ann-button-secondary",async()=>{if(!confirm("Mark this alert as resolved?"))return;try{await API.post("announcements/"+item.id+"/resolve",{});showNotice("Alert marked resolved.",false);await load();}catch(e){showNotice(apiError(e),true);}}));
       }
       if(canManage(item)) {
@@ -267,9 +267,9 @@
           catch(e){showNotice(apiError(e),true);}
         }));
         actions.appendChild(button("Edit","ct-ann-button ct-ann-button-secondary",()=>renderComposer(item)));
-        actions.appendChild(button("Receipts","ct-ann-button ct-ann-button-secondary",()=>showReceipts(item)));
         actions.appendChild(button("Remove","ct-ann-button ct-ann-button-danger",async()=>{if(!confirm("Remove this announcement from active views? It will be retained in audit history."))return;try{await API.delete("announcements/"+item.id);showNotice("Announcement removed from active views.",false);await load();}catch(e){showNotice(apiError(e),true);}}));
-      } else if(isAdmin) {
+      }
+      if (canReviewReceipts(item)) {
         actions.appendChild(button("Read receipts","ct-ann-button ct-ann-button-secondary",()=>showReceipts(item)));
       }
       if(actions.childNodes.length) card.appendChild(actions);
@@ -287,6 +287,10 @@
     function canManage(item) {
       if(isAdmin)return true;
       return isSupervisor && item.created_by_id===user.id && Boolean(item.team_id) && state.options.teams.some(t=>Number(t.id)===Number(item.team_id));
+    }
+    function canReviewReceipts(item) {
+      if(isAdmin)return true;
+      return isSupervisor && item.audience_scope==="team" && Boolean(item.team_id) && state.options.teams.some(t=>Number(t.id)===Number(item.team_id)) && item.status==="published";
     }
     function showNotice(message,isError) {
       notice.textContent=message; notice.className="ct-ann-global-status "+(isError?"is-error":"is-success"); notice.hidden=false;
@@ -372,6 +376,8 @@
         teamField.classList.toggle("is-disabled",!teamNeeded);
         if(!teamNeeded)team.value="";
         escalationBox.hidden=kind.value!=="alert" || isAdmin;
+        voiceField.hidden=isAdmin && audience.value!=="supervisors";
+        if(voiceField.hidden) voice.value="";
         severityField.hidden=kind.value!=="alert";
         escalates.input.disabled=kind.value!=="alert";
         if(kind.value!=="alert"){escalates.input.checked=false;}
