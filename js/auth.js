@@ -108,7 +108,7 @@ function normalizeUser(user) {
     }
 
     // Load this user's saved theme and locale as soon as authentication succeeds.
-    window.CleanTrackPreferences?.setUser(currentUser.id);
+    if (typeof window.CleanTrackPreferences?.setUser === "function") { window.CleanTrackPreferences.setUser(currentUser.id); }
     emitAuthEvent("cleantrack:login", currentUser);
     return currentUser;
   }
@@ -207,7 +207,7 @@ function normalizeUser(user) {
       currentUser = normalizeUser(user);
 
       // Apply the signed-in user's saved preferences on every restored session.
-      if (currentUser) window.CleanTrackPreferences?.setUser(currentUser.id);
+      if (currentUser) if (typeof window.CleanTrackPreferences?.setUser === "function") { window.CleanTrackPreferences.setUser(currentUser.id); }
       emitAuthEvent("cleantrack:session-restored", currentUser);
       return currentUser;
     } catch (error) {
