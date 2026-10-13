@@ -590,3 +590,428 @@ html[data-theme="light"] body #page-content [class*="ct-home-"] small,
 html[data-theme="light"] body #page-content [class*="ct-admin-home-"] small {
   color: #46586d !important;
 }
+
+
+/* ================================================================
+   Light theme v2 — app-wide neutral light surfaces.
+   Loaded last to override dark-only page styles and component palettes.
+   ================================================================ */
+html[data-theme="light"] {
+  color-scheme: light !important;
+  --bg: #f8f9fa !important;
+  --bg-elevated: #ffffff !important;
+  --surface: #ffffff !important;
+  --surface-hover: #f1f3f4 !important;
+  --surface-raised: #f8fafd !important;
+  --border: #dadce0 !important;
+  --border-strong: #bdc1c6 !important;
+  --text: #202124 !important;
+  --text-secondary: #5f6368 !important;
+  --text-muted: #70757a !important;
+  --primary: #1a73e8 !important;
+  --primary-hover: #1765cc !important;
+  --primary-contrast: #ffffff !important;
+  --accent: #1a73e8 !important;
+  --success: #188038 !important;
+  --warning: #b06000 !important;
+  --danger: #d93025 !important;
+  --info: #1967d2 !important;
+  --ct-bg: #f8f9fa !important;
+  --ct-page: #f8f9fa !important;
+  --ct-surface: #ffffff !important;
+  --ct-panel: #ffffff !important;
+  --ct-panel-raised: #f8fafd !important;
+  --ct-border: #dadce0 !important;
+  --ct-text: #202124 !important;
+  --ct-muted: #5f6368 !important;
+  --ct-blue: #1a73e8 !important;
+  --ct-blue-hover: #1765cc !important;
+  --ct-focus: #1a73e8 !important;
+  --ct-green: #e6f4ea !important;
+  --ct-green-light: #137333 !important;
+  --ct-accent: #1a73e8 !important;
+  --focus-ring: 0 0 0 3px rgb(26 115 232 / 18%) !important;
+  --shadow-sm: 0 1px 3px rgb(60 64 67 / 12%) !important;
+  --shadow-md: 0 4px 12px rgb(60 64 67 / 14%) !important;
+}
+
+/* Universal app canvas, authenticated workspace and page roots. */
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] #app,
+html[data-theme="light"] #main-content,
+html[data-theme="light"] #workspace-view,
+html[data-theme="light"] #workspace-view .ct-workspace-shell,
+html[data-theme="light"] #workspace-view .ct-workspace-main,
+html[data-theme="light"] #workspace-view #page-content,
+html[data-theme="light"] #page-content,
+html[data-theme="light"] .page-content {
+  background: #f8f9fa !important;
+  background-image: none !important;
+  color: #202124 !important;
+  color-scheme: light !important;
+}
+html[data-theme="light"] body::before,
+html[data-theme="light"] body::after {
+  background-image: none !important;
+}
+
+/* Familiar white top bar, sidebar, menus and dialogs. */
+html[data-theme="light"] body .app-header,
+html[data-theme="light"] body #workspace-view .ct-workspace-toolbar,
+html[data-theme="light"] body .profile-menu,
+html[data-theme="light"] body .dropdown-menu,
+html[data-theme="light"] body .popover,
+html[data-theme="light"] body .tooltip,
+html[data-theme="light"] body .app-modal,
+html[data-theme="light"] body #app-modal,
+html[data-theme="light"] body #workspace-view .ct-sidebar,
+html[data-theme="light"] body #workspace-view .sidebar,
+html[data-theme="light"] body .sidebar,
+html[data-theme="light"] body #app-footer {
+  color: #202124 !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #dadce0 !important;
+  box-shadow: 0 1px 4px rgb(60 64 67 / 10%) !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand,
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand-mark {
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand-mark {
+  background: #e8f0fe !important;
+  color: #174ea6 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-brand strong,
+html[data-theme="light"] body #workspace-view .sidebar-brand-text,
+html[data-theme="light"] body #workspace-view .brand-name,
+html[data-theme="light"] body .app-header .brand-name,
+html[data-theme="light"] body #workspace-view #workspace-organization,
+html[data-theme="light"] body #workspace-view #workspace-role,
+html[data-theme="light"] body #workspace-view .workspace-identity,
+html[data-theme="light"] body #workspace-view .ct-sidebar-label {
+  color: #5f6368 !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation button,
+html[data-theme="light"] body #workspace-view #workspace-navigation a {
+  color: #3c4043 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation button:hover,
+html[data-theme="light"] body #workspace-view #workspace-navigation a:hover {
+  color: #202124 !important;
+  background: #f1f3f4 !important;
+  border-color: #e8eaed !important;
+}
+html[data-theme="light"] body #workspace-view #workspace-navigation .active,
+html[data-theme="light"] body #workspace-view #workspace-navigation [aria-current="page"],
+html[data-theme="light"] body #workspace-view #workspace-navigation .ct-nav-active {
+  color: #174ea6 !important;
+  background: #e8f0fe !important;
+  border-color: #d2e3fc !important;
+  box-shadow: inset 3px 0 #1a73e8 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar-toggle {
+  background: #ffffff !important;
+  color: #3c4043 !important;
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-hamburger > span {
+  background: #5f6368 !important;
+}
+
+/* Headings, regular copy and links across all pages. */
+html[data-theme="light"] body #page-content h1,
+html[data-theme="light"] body #page-content h2,
+html[data-theme="light"] body #page-content h3,
+html[data-theme="light"] body #page-content h4,
+html[data-theme="light"] body #page-content h5,
+html[data-theme="light"] body #page-content h6,
+html[data-theme="light"] body #page-content label,
+html[data-theme="light"] body #page-content p,
+html[data-theme="light"] body #page-content li,
+html[data-theme="light"] body #page-content dt,
+html[data-theme="light"] body #page-content dd,
+html[data-theme="light"] body #page-content .muted,
+html[data-theme="light"] body #page-content .text-muted,
+html[data-theme="light"] body #page-content .ct-muted,
+html[data-theme="light"] body #page-content .ct-settings-muted,
+html[data-theme="light"] body #page-content .ct-org-muted {
+  color: #202124;
+}
+html[data-theme="light"] body #page-content small,
+html[data-theme="light"] body #page-content .muted,
+html[data-theme="light"] body #page-content .text-muted,
+html[data-theme="light"] body #page-content .ct-muted,
+html[data-theme="light"] body #page-content .ct-settings-muted,
+html[data-theme="light"] body #page-content .ct-org-muted,
+html[data-theme="light"] body #page-content .ct-page-description {
+  color: #5f6368 !important;
+}
+html[data-theme="light"] body #page-content a,
+html[data-theme="light"] body .app-footer a,
+html[data-theme="light"] body #workspace-view #workspace-navigation a {
+  color: #1a73e8;
+}
+html[data-theme="light"] body #page-content a:hover,
+html[data-theme="light"] body .app-footer a:hover {
+  color: #174ea6;
+}
+
+/* Core cards, panels, widgets, table wrappers and settings surfaces. */
+html[data-theme="light"] body #page-content .ct-admin-dashboard,
+html[data-theme="light"] body #page-content .ct-dash-panel,
+html[data-theme="light"] body #page-content .ct-dash-kpi,
+html[data-theme="light"] body #page-content .ct-dash-quick-action,
+html[data-theme="light"] body #page-content .ct-dash-activity-row,
+html[data-theme="light"] body #page-content .ct-dash-location-row,
+html[data-theme="light"] body #page-content .ct-dash-control-label,
+html[data-theme="light"] body #page-content .ct-dash-custom-controls,
+html[data-theme="light"] body #page-content .ct-dash-select,
+html[data-theme="light"] body #page-content .ct-home-welcome,
+html[data-theme="light"] body #page-content .ct-home-stat,
+html[data-theme="light"] body #page-content .ct-home-card,
+html[data-theme="light"] body #page-content .ct-home-panel,
+html[data-theme="light"] body #page-content .ct-home-section,
+html[data-theme="light"] body #page-content .ct-home-member-card,
+html[data-theme="light"] body #page-content .ct-home-member-filters,
+html[data-theme="light"] body #page-content .ct-home-team-editor,
+html[data-theme="light"] body #page-content .ct-team-card,
+html[data-theme="light"] body #page-content .ct-overview-item,
+html[data-theme="light"] body #page-content .ct-details-panel,
+html[data-theme="light"] body #page-content .ct-settings-card,
+html[data-theme="light"] body #page-content .ct-settings-nav,
+html[data-theme="light"] body #page-content .ct-settings-panel,
+html[data-theme="light"] body #page-content .ct-org-card,
+html[data-theme="light"] body #page-content .ct-org-section,
+html[data-theme="light"] body #page-content .ct-org-panel,
+html[data-theme="light"] body #page-content .ct-card,
+html[data-theme="light"] body #page-content .card,
+html[data-theme="light"] body #page-content .panel,
+html[data-theme="light"] body #page-content .section-card,
+html[data-theme="light"] body #page-content .stat-card,
+html[data-theme="light"] body #page-content .table-container,
+html[data-theme="light"] body #page-content .table-wrapper,
+html[data-theme="light"] body #page-content .data-table-container,
+html[data-theme="light"] body #page-content .empty-state {
+  color: #202124 !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #dadce0 !important;
+  box-shadow: 0 1px 3px rgb(60 64 67 / 8%) !important;
+}
+
+/* Admin dashboard used its own intentionally dark-only design tokens. */
+html[data-theme="light"] body #page-content .ct-admin-dashboard {
+  color-scheme: light !important;
+  --dash-bg: #ffffff !important;
+  --dash-panel: #ffffff !important;
+  --dash-panel-alt: #f8fafd !important;
+  --dash-border: #dadce0 !important;
+  --dash-text: #202124 !important;
+  --dash-muted: #5f6368 !important;
+  --dash-green: #188038 !important;
+  --dash-blue: #1a73e8 !important;
+  --dash-red: #d93025 !important;
+  --dash-amber: #b06000 !important;
+  background: #ffffff !important;
+  border-color: #dadce0 !important;
+  color: #202124 !important;
+}
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-panel,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-kpi,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-quick,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-quick-action,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-activity-row,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-location-row,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-control,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-control-label,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-select,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-date-input,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-custom-controls {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #dadce0 !important;
+  color: #202124 !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-panel-head,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-kpi-head {
+  border-color: #e8eaed !important;
+}
+html[data-theme="light"] body #page-content .ct-admin-dashboard [class*="ct-dash-"],
+html[data-theme="light"] body #page-content .ct-admin-dashboard [class*="ct-dash-"] strong,
+html[data-theme="light"] body #page-content .ct-admin-dashboard [class*="ct-dash-"] span,
+html[data-theme="light"] body #page-content .ct-admin-dashboard [class*="ct-dash-"] label {
+  color: inherit;
+}
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-muted,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-kpi-hint,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-panel-subtitle,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-activity-copy p,
+html[data-theme="light"] body #page-content .ct-admin-dashboard .ct-dash-quick-copy small {
+  color: #5f6368 !important;
+}
+
+/* Admin Home previously painted a dark gradient directly on its welcome card. */
+html[data-theme="light"] body #page-content .ct-home-welcome {
+  background: #ffffff !important;
+  border-color: #dadce0 !important;
+  color: #202124 !important;
+  box-shadow: 0 1px 3px rgb(60 64 67 / 8%) !important;
+}
+html[data-theme="light"] body #page-content .ct-home-welcome::after {
+  display: none !important;
+}
+html[data-theme="light"] body #page-content .ct-home-welcome h1,
+html[data-theme="light"] body #page-content .ct-home-welcome h2,
+html[data-theme="light"] body #page-content .ct-home-welcome p,
+html[data-theme="light"] body #page-content .ct-home-welcome small,
+html[data-theme="light"] body #page-content .ct-home-welcome strong,
+html[data-theme="light"] body #page-content .ct-home-welcome span {
+  color: #202124 !important;
+}
+html[data-theme="light"] body #page-content [class*="ct-home-"],
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] {
+  border-color: #dadce0;
+}
+html[data-theme="light"] body #page-content [class*="ct-home-"] p,
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] p,
+html[data-theme="light"] body #page-content [class*="ct-home-"] small,
+html[data-theme="light"] body #page-content [class*="ct-admin-home-"] small {
+  color: #5f6368 !important;
+}
+
+/* Inputs and tables are readable and consistent throughout every section. */
+html[data-theme="light"] body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="light"] body select,
+html[data-theme="light"] body textarea,
+html[data-theme="light"] body #page-content .ct-settings-input,
+html[data-theme="light"] body #page-content .ct-dash-select,
+html[data-theme="light"] body #page-content .ct-dash-date-input {
+  color: #202124 !important;
+  background: #ffffff !important;
+  border-color: #dadce0 !important;
+  box-shadow: none !important;
+  color-scheme: light !important;
+}
+html[data-theme="light"] body input::placeholder,
+html[data-theme="light"] body textarea::placeholder {
+  color: #80868b !important;
+}
+html[data-theme="light"] body #page-content table,
+html[data-theme="light"] body #page-content thead,
+html[data-theme="light"] body #page-content tbody,
+html[data-theme="light"] body #page-content tr,
+html[data-theme="light"] body #page-content td {
+  color: #202124;
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body #page-content thead th,
+html[data-theme="light"] body #page-content th {
+  color: #3c4043 !important;
+  background: #f1f3f4 !important;
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body #page-content tbody tr:nth-child(even) {
+  background: #f8fafd !important;
+}
+html[data-theme="light"] body #page-content tbody tr:hover {
+  background: #f1f3f4 !important;
+}
+
+/* Standard blue controls for light mode. Preserve semantic danger/success badges. */
+html[data-theme="light"] body #page-content button:not(.ct-settings-button-danger):not([class*="danger"]):not([class*="delete"]),
+html[data-theme="light"] body #page-content .button:not(.button-danger),
+html[data-theme="light"] body #page-content .btn:not(.btn-danger) {
+  border-color: #dadce0;
+}
+html[data-theme="light"] body #page-content .ct-settings-button,
+html[data-theme="light"] body #page-content .ct-settings-button-primary,
+html[data-theme="light"] body #page-content button.ct-button-primary,
+html[data-theme="light"] body #page-content .button-primary,
+html[data-theme="light"] body #page-content .btn-primary {
+  color: #ffffff !important;
+  background: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] body #page-content .ct-settings-button:hover,
+html[data-theme="light"] body #page-content .ct-settings-button-primary:hover,
+html[data-theme="light"] body #page-content .button-primary:hover,
+html[data-theme="light"] body #page-content .btn-primary:hover {
+  color: #ffffff !important;
+  background: #1765cc !important;
+  border-color: #1765cc !important;
+}
+html[data-theme="light"] body #page-content .ct-settings-button:not(.ct-settings-button-primary),
+html[data-theme="light"] body #page-content .button-secondary,
+html[data-theme="light"] body #page-content .btn-secondary {
+  color: #3c4043 !important;
+  background: #ffffff !important;
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body #page-content .ct-settings-nav-item {
+  color: #3c4043 !important;
+  background: transparent !important;
+}
+html[data-theme="light"] body #page-content .ct-settings-nav-item:hover,
+html[data-theme="light"] body #page-content .ct-settings-nav-item.is-active {
+  color: #174ea6 !important;
+  background: #e8f0fe !important;
+  border-color: #d2e3fc !important;
+}
+
+/* Auth/sign-in screens also follow the chosen display theme. */
+html[data-theme="light"] body .auth-layout,
+html[data-theme="light"] body .auth-panel {
+  background: #f8f9fa !important;
+  color: #202124 !important;
+}
+html[data-theme="light"] body .auth-card,
+html[data-theme="light"] body .auth-panel .auth-card {
+  background: #ffffff !important;
+  color: #202124 !important;
+  border-color: #dadce0 !important;
+  box-shadow: 0 1px 4px rgb(60 64 67 / 12%) !important;
+}
+html[data-theme="light"] body .auth-card h1,
+html[data-theme="light"] body .auth-card h2,
+html[data-theme="light"] body .auth-card h3,
+html[data-theme="light"] body .auth-card p,
+html[data-theme="light"] body .auth-card label,
+html[data-theme="light"] body .auth-card .field-hint {
+  color: #202124 !important;
+}
+html[data-theme="light"] body .auth-intro {
+  color: #ffffff !important;
+}
+html[data-theme="light"] body .auth-intro h1,
+html[data-theme="light"] body .auth-intro p,
+html[data-theme="light"] body .auth-intro li {
+  color: #ffffff !important;
+}
+html[data-theme="light"] body .auth-card input,
+html[data-theme="light"] body .auth-card select {
+  background: #ffffff !important;
+  color: #202124 !important;
+  border-color: #dadce0 !important;
+}
+
+/* Modal/form validation and feedback remain visible in both themes. */
+html[data-theme="light"] body .app-modal,
+html[data-theme="light"] body #modal-content {
+  color: #202124 !important;
+  background: #ffffff !important;
+  border-color: #dadce0 !important;
+}
+html[data-theme="light"] body .ct-settings-status.is-success,
+html[data-theme="light"] body .ct-org-status.is-success {
+  color: #137333 !important;
+}
+html[data-theme="light"] body .ct-settings-status.is-error,
+html[data-theme="light"] body .ct-org-status.is-error {
+  color: #b3261e !important;
+}
