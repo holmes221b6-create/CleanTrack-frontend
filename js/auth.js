@@ -160,6 +160,10 @@ function normalizeUser(user) {
       payload.invitation_token = String(details.invitation_token).trim();
     }
 
+    if (details.membership_message) {
+      payload.message = String(details.membership_message).trim();
+    }
+
     if (details.organization_name) {
       payload.organization_name =
         String(details.organization_name).trim();
