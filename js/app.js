@@ -79,9 +79,21 @@
     updateFooterGuide(user);
 
     const nameElement = getElement("header-user-name");
+    const avatarElement = getElement("header-avatar");
     const roleElement = getElement("workspace-role");
     const organizationElement = getElement("workspace-organization");
     const menuElement = getElement("workspace-navigation");
+
+    // Restore this user's browser-local avatar preference whenever a session is shown.
+    if (avatarElement && user && user.id !== undefined && user.id !== null) {
+      let avatarUrl = "";
+      try { avatarUrl = localStorage.getItem("cleantrack.avatar." + user.id) || ""; } catch (_) {}
+      avatarElement.textContent = (user.name || user.email || "U").trim().charAt(0).toUpperCase() || "U";
+      avatarElement.style.backgroundImage = avatarUrl ? "url('" + avatarUrl.replace(/['()\\]/g, "") + "')" : "";
+      avatarElement.style.backgroundSize = avatarUrl ? "cover" : "";
+      avatarElement.style.backgroundPosition = avatarUrl ? "center" : "";
+      avatarElement.style.color = avatarUrl ? "transparent" : "";
+    }
 
     if (nameElement) {
       nameElement.textContent = user.name || user.email || "User";
