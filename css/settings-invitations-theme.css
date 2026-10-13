@@ -155,3 +155,68 @@ html:not([data-theme="light"]) body #page-content .ct-inv-status {
   .ct-inv-actions > .ct-inv-button,
   .ct-inv-actions > a.ct-inv-button { flex: 1 1 calc(50% - 8px); }
 }
+
+
+/* Make the Settings hero echo the Home control-center banner. */
+html:not([data-theme="light"]) body #page-content .ct-settings-header {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin: 0 0 4px;
+  padding: clamp(22px, 3.2vw, 36px);
+  border: 1px solid #2c2938;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 92% 0%, rgb(118 101 164 / 16%), transparent 42%),
+    linear-gradient(135deg, #14131e, #0f1219 72%);
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-header::after {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -76px;
+  bottom: -120px;
+  border: 1px solid rgb(118 101 164 / 22%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgb(118 101 164 / 4%), 0 0 0 46px rgb(118 101 164 / 3%);
+  pointer-events: none;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-header > * {
+  position: relative;
+  z-index: 1;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-header h1 {
+  margin: 0;
+  color: #eeebf7 !important;
+  font-size: clamp(25px, 3vw, 35px);
+  font-weight: 750;
+  letter-spacing: -.04em;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-header > p:last-child {
+  max-width: 680px;
+  margin: 0;
+  color: #a19bad !important;
+  font-size: 13px;
+  line-height: 1.65;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-card {
+  border-radius: 14px;
+  background: #10141c !important;
+}
+html:not([data-theme="light"]) body #page-content .ct-settings-overview-card {
+  gap: 11px;
+}
+html[data-theme="light"] body #page-content .ct-settings-header {
+  display: grid;
+  gap: 8px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid #d8e0eb;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #edf2f7);
+}
+html[data-theme="light"] body #page-content .ct-settings-header h1 {
+  color: #172536 !important;
+}
