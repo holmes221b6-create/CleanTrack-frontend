@@ -154,3 +154,173 @@ Object.assign(D.ur, {"Admin Dashboard":"ایڈمن ڈیش بورڈ","Admin Guide
 Object.assign(D.zh, {"Admin Dashboard":"管理员仪表盘","Admin Guide":"管理员指南","Supervisor Guide":"主管指南","Employee Guide":"员工指南","Getting Started Guide":"入门指南","Contact Support":"联系支持","Create organization":"创建组织","Request to join":"申请加入","Choose the role you are registering for.":"选择您要注册的角色。","Your request was submitted.":"您的请求已提交。","Unable to create the account. Please check the details and try again.":"无法创建账户。请检查信息后重试。","You are now signed in.":"您已登录。","Unable to sign in. Please try again.":"无法登录，请重试。","In progress":"进行中","Needs review":"需要审核","No locations have been added to your organization yet.":"您的组织尚未添加地点。","No recent activity has been recorded yet.":"暂无近期活动记录。","Total tasks":"任务总数","Currently being performed":"正在执行","Awaiting start or assignment":"等待开始或分配","Requires attention":"需要关注","Registered work locations":"已登记的工作地点","Approved by a reviewer":"已由审核人批准","Task overview":"任务概览","Recent activity":"近期活动","Quick actions":"快捷操作","Organization member":"组织成员","Not assigned":"未分配","No team assigned":"未分配团队","No assigned zones":"未分配区域","Performance rank":"绩效排名","No task history":"暂无任务记录","Missed tasks":"错过的任务","Not provided":"未提供","Team assignments":"团队分配","Save team assignments":"保存团队分配","Team assignments saved.":"团队分配已保存。","Unable to save team assignments.":"无法保存团队分配。","Ranked members":"排名成员","Not ranked yet":"尚未排名","Highest compliance":"合规率最高","Most tasks completed":"完成任务最多","Most missed tasks":"错过任务最多","All roles":"所有角色","All locations":"所有地点","All teams":"所有团队","All zones":"所有区域","All rankings":"所有排名","No active approved members are available in this organization yet.":"该组织目前没有可用的活跃已批准成员。","No location":"无地点","Not ranked":"未排名","Copy code":"复制代码","Organization summary":"组织摘要","Organization teams":"组织团队","Managed locations":"管理的地点","Operational zones":"运营区域","Search members of this organization":"搜索此组织成员","Performance ranking":"绩效排名","Rank period":"排名周期","Sort results":"排序结果","Date not available":"日期不可用","Organization avatar":"组织头像","Organization contact email":"组织联系邮箱","Save organization profile":"保存组织资料","Organization profile saved.":"组织资料已保存。","Organization profile could not be saved.":"无法保存组织资料。","Assigned teams":"已分配团队","Manage teams":"管理团队","Save assignments":"保存分配","Team assignments could not be saved.":"无法保存团队分配。","Policies and operating guidance":"政策与运营指南","Save policy notes":"保存政策说明","Organization policy notes saved.":"组织政策说明已保存。","Policy notes could not be saved.":"无法保存政策说明。","Current status":"当前状态","Restore organization":"恢复组织","Organization archived.":"组织已归档。","Roster unavailable while archived":"归档期间成员列表不可用","Active, approved accounts":"活跃且已批准的账户","Team details":"团队详情","Enter a team name.":"输入团队名称。","Team created successfully.":"团队创建成功。","Could not create the team.":"无法创建团队。","Create team":"创建团队","Team name":"团队名称","Team description":"团队描述","Describe this team":"描述此团队","Search teams":"搜索团队","Search teams by name":"按名称搜索团队","Main navigation":"主导航","Collapse sidebar":"折叠侧边栏","Collapse or expand navigation":"折叠或展开导航","Workspace tools":"工作区工具","Search across CleanTrack":"搜索 CleanTrack","Open profile and account data":"打开个人资料和账户信息","Profile and account":"个人资料和账户","Open page":"打开页面","Open announcements and alerts":"打开公告和提醒","Ask CleanTrack Assistant":"询问 CleanTrack 助手","Suggested pages will appear here.":"建议页面将在此处显示。","Open My Profile":"打开我的个人资料","Open navigation":"打开导航","Close navigation":"关闭导航","Forgot password?":"忘记密码？","Create an account":"创建账户","Already registered?":"已经注册？","Welcome back":"欢迎回来","Password":"密码","Remember me":"记住我","Continue":"继续"});
 
 Object.assign(D.ar, {"Admin Dashboard":"لوحة تحكم المسؤول","Admin Guide":"دليل المسؤول","Supervisor Guide":"دليل المشرف","Employee Guide":"دليل الموظف","Getting Started Guide":"دليل البدء","Contact Support":"التواصل مع الدعم","Create organization":"إنشاء مؤسسة","Request to join":"طلب الانضمام","Choose the role you are registering for.":"اختر الدور الذي تسجل له.","Your request was submitted.":"تم إرسال طلبك.","Unable to create the account. Please check the details and try again.":"تعذر إنشاء الحساب. تحقق من التفاصيل وحاول مرة أخرى.","You are now signed in.":"تم تسجيل دخولك.","Unable to sign in. Please try again.":"تعذر تسجيل الدخول. حاول مرة أخرى.","In progress":"قيد التنفيذ","Needs review":"يتطلب المراجعة","No locations have been added to your organization yet.":"لم تتم إضافة مواقع إلى مؤسستك بعد.","No recent activity has been recorded yet.":"لم يتم تسجيل نشاط حديث بعد.","Total tasks":"إجمالي المهام","Currently being performed":"قيد التنفيذ حاليًا","Awaiting start or assignment":"بانتظار البدء أو التعيين","Requires attention":"يتطلب الانتباه","Registered work locations":"مواقع العمل المسجلة","Approved by a reviewer":"تمت الموافقة بواسطة مراجع","Task overview":"نظرة عامة على المهام","Recent activity":"النشاط الأخير","Quick actions":"إجراءات سريعة","Organization member":"عضو المؤسسة","Not assigned":"غير معيّن","No team assigned":"لا يوجد فريق معيّن","No assigned zones":"لا توجد مناطق معيّنة","Performance rank":"ترتيب الأداء","No task history":"لا يوجد سجل للمهام","Missed tasks":"المهام الفائتة","Not provided":"غير متوفر","Team assignments":"تعيينات الفريق","Save team assignments":"حفظ تعيينات الفريق","Team assignments saved.":"تم حفظ تعيينات الفريق.","Unable to save team assignments.":"تعذر حفظ تعيينات الفريق.","Ranked members":"الأعضاء المصنفون","Not ranked yet":"لم يتم التصنيف بعد","Highest compliance":"أعلى نسبة امتثال","Most tasks completed":"أكثر المهام إنجازًا","Most missed tasks":"أكثر المهام الفائتة","All roles":"كل الأدوار","All locations":"كل المواقع","All teams":"كل الفرق","All zones":"كل المناطق","All rankings":"كل التصنيفات","No active approved members are available in this organization yet.":"لا يوجد أعضاء نشطون معتمدون متاحون في هذه المؤسسة بعد.","No location":"لا يوجد موقع","Not ranked":"غير مصنف","Copy code":"نسخ الرمز","Organization summary":"ملخص المؤسسة","Organization teams":"فرق المؤسسة","Managed locations":"المواقع المُدارة","Operational zones":"المناطق التشغيلية","Search members of this organization":"البحث عن أعضاء هذه المؤسسة","Performance ranking":"تصنيف الأداء","Rank period":"فترة التصنيف","Sort results":"ترتيب النتائج","Date not available":"التاريخ غير متاح","Organization avatar":"صورة المؤسسة","Organization contact email":"البريد الإلكتروني للتواصل مع المؤسسة","Save organization profile":"حفظ ملف المؤسسة","Organization profile saved.":"تم حفظ ملف المؤسسة.","Organization profile could not be saved.":"تعذر حفظ ملف المؤسسة.","Assigned teams":"الفرق المعيّنة","Manage teams":"إدارة الفرق","Save assignments":"حفظ التعيينات","Team assignments could not be saved.":"تعذر حفظ تعيينات الفريق.","Policies and operating guidance":"السياسات وإرشادات التشغيل","Save policy notes":"حفظ ملاحظات السياسة","Organization policy notes saved.":"تم حفظ ملاحظات سياسات المؤسسة.","Policy notes could not be saved.":"تعذر حفظ ملاحظات السياسة.","Current status":"الحالة الحالية","Restore organization":"استعادة المؤسسة","Organization archived.":"تمت أرشفة المؤسسة.","Roster unavailable while archived":"قائمة الأعضاء غير متاحة أثناء الأرشفة","Active, approved accounts":"الحسابات النشطة المعتمدة","Team details":"تفاصيل الفريق","Enter a team name.":"أدخل اسم الفريق.","Team created successfully.":"تم إنشاء الفريق بنجاح.","Could not create the team.":"تعذر إنشاء الفريق.","Create team":"إنشاء فريق","Team name":"اسم الفريق","Team description":"وصف الفريق","Describe this team":"صف هذا الفريق","Search teams":"البحث عن الفرق","Search teams by name":"البحث عن الفرق بالاسم","Main navigation":"التنقل الرئيسي","Collapse sidebar":"طي الشريط الجانبي","Collapse or expand navigation":"طي أو توسيع التنقل","Workspace tools":"أدوات مساحة العمل","Search across CleanTrack":"البحث في CleanTrack","Open profile and account data":"فتح الملف الشخصي وبيانات الحساب","Profile and account":"الملف الشخصي والحساب","Open page":"فتح الصفحة","Open announcements and alerts":"فتح الإعلانات والتنبيهات","Ask CleanTrack Assistant":"اسأل مساعد CleanTrack","Suggested pages will appear here.":"ستظهر الصفحات المقترحة هنا.","Open My Profile":"فتح ملفي الشخصي","Open navigation":"فتح التنقل","Close navigation":"إغلاق التنقل","Forgot password?":"هل نسيت كلمة المرور؟","Create an account":"إنشاء حساب","Already registered?":"هل لديك حساب بالفعل؟","Welcome back":"مرحبًا بعودتك","Password":"كلمة المرور","Remember me":"تذكرني","Continue":"متابعة"});
+
+Object.assign(D.es, {"YOUR WORKSPACE":"TU ESPACIO DE TRABAJO"});
+
+Object.assign(D.hi, {"YOUR WORKSPACE":"आपका कार्यक्षेत्र"});
+
+Object.assign(D.ur, {"YOUR WORKSPACE":"آپ کا ورک اسپیس"});
+
+Object.assign(D.zh, {"YOUR WORKSPACE":"您的工作区"});
+
+Object.assign(D.ar, {"YOUR WORKSPACE":"مساحة العمل الخاصة بك"});
+
+Object.assign(D.es, {"Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section.":"Tus ajustes personales. Los controles de toda la organización están en la sección independiente de Configuración de la organización, exclusiva para administradores."});
+
+Object.assign(D.hi, {"Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section.":"आपकी व्यक्तिगत सेटिंग्स। संगठन-स्तरीय नियंत्रण अलग व्यवस्थापक-केवल संगठन सेटिंग्स अनुभाग में हैं।"});
+
+Object.assign(D.ur, {"Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section.":"آپ کی ذاتی ترتیبات۔ تنظیم کے تمام کنٹرول الگ صرف ایڈمن کے لیے تنظیمی ترتیبات کے حصے میں ہیں۔"});
+
+Object.assign(D.zh, {"Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section.":"您的个人设置。组织级控制位于单独的管理员专用组织设置区域。"});
+
+Object.assign(D.ar, {"Your personal settings. Organization-wide controls remain in the separate Admin-only Organization Settings section.":"إعداداتك الشخصية. توجد عناصر التحكم على مستوى المؤسسة في قسم إعدادات المؤسسة المنفصل والمخصص للمسؤولين فقط."});
+
+Object.assign(D.es, {"Name and phone save to your account. Avatar URL is stored in this browser for this account.":"El nombre y el teléfono se guardan en tu cuenta. La URL del avatar se guarda en este navegador para esta cuenta."});
+
+Object.assign(D.hi, {"Name and phone save to your account. Avatar URL is stored in this browser for this account.":"नाम और फ़ोन आपके खाते में सहेजे जाते हैं। अवतार URL इस ब्राउज़र में इस खाते के लिए सहेजा जाता है।"});
+
+Object.assign(D.ur, {"Name and phone save to your account. Avatar URL is stored in this browser for this account.":"نام اور فون آپ کے اکاؤنٹ میں محفوظ ہوتے ہیں۔ اوتار کا URL اس اکاؤنٹ کے لیے اسی براؤزر میں محفوظ ہوتا ہے۔"});
+
+Object.assign(D.zh, {"Name and phone save to your account. Avatar URL is stored in this browser for this account.":"姓名和电话会保存到您的账户。头像 URL 会在此浏览器中为此账户保存。"});
+
+Object.assign(D.ar, {"Name and phone save to your account. Avatar URL is stored in this browser for this account.":"يتم حفظ الاسم والهاتف في حسابك. ويتم حفظ رابط الصورة الرمزية في هذا المتصفح لهذا الحساب."});
+
+Object.assign(D.es, {"Email changes are not enabled yet.":"Los cambios de correo electrónico aún no están habilitados."});
+
+Object.assign(D.hi, {"Email changes are not enabled yet.":"ईमेल बदलने की सुविधा अभी सक्षम नहीं है।"});
+
+Object.assign(D.ur, {"Email changes are not enabled yet.":"ای میل تبدیل کرنے کی سہولت ابھی فعال نہیں۔"});
+
+Object.assign(D.zh, {"Email changes are not enabled yet.":"目前尚未启用邮箱修改功能。"});
+
+Object.assign(D.ar, {"Email changes are not enabled yet.":"تغيير البريد الإلكتروني غير متاح بعد."});
+
+Object.assign(D.es, {"Current password is required. Forgotten-password email recovery is not configured.":"Se requiere la contraseña actual. La recuperación por correo de una contraseña olvidada no está configurada."});
+
+Object.assign(D.hi, {"Current password is required. Forgotten-password email recovery is not configured.":"वर्तमान पासवर्ड आवश्यक है। भूले हुए पासवर्ड के लिए ईमेल रिकवरी कॉन्फ़िगर नहीं है।"});
+
+Object.assign(D.ur, {"Current password is required. Forgotten-password email recovery is not configured.":"موجودہ پاس ورڈ درکار ہے۔ بھولے ہوئے پاس ورڈ کی ای میل ریکوری ترتیب نہیں دی گئی۔"});
+
+Object.assign(D.zh, {"Current password is required. Forgotten-password email recovery is not configured.":"需要当前密码。尚未配置通过邮件找回密码的功能。"});
+
+Object.assign(D.ar, {"Current password is required. Forgotten-password email recovery is not configured.":"كلمة المرور الحالية مطلوبة. لم يتم إعداد استعادة كلمة المرور عبر البريد الإلكتروني."});
+
+Object.assign(D.es, {"Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.":"Se guarda en este navegador. Existen formateadores compartidos; cada pantalla debe utilizarlos para aplicar los formatos."});
+
+Object.assign(D.hi, {"Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.":"यह इस ब्राउज़र में सहेजा जाता है। साझा फ़ॉर्मैटर उपलब्ध हैं; हर स्क्रीन को सभी प्रारूप लागू करने के लिए उनका उपयोग करना होगा।"});
+
+Object.assign(D.ur, {"Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.":"یہ اس براؤزر میں محفوظ ہوتا ہے۔ مشترکہ فارمیٹر دستیاب ہیں؛ ہر اسکرین کو فارمیٹس لاگو کرنے کے لیے انہیں استعمال کرنا ہوگا۔"});
+
+Object.assign(D.zh, {"Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.":"设置保存在此浏览器中。共享格式化工具已提供；各应用页面需要调用它们才能采用这些格式。"});
+
+Object.assign(D.ar, {"Stored in this browser. Shared format helpers are available; each app screen must use them to adopt every format.":"يتم حفظها في هذا المتصفح. تتوفر أدوات تنسيق مشتركة، ويجب على كل شاشة استخدامها لتطبيق التنسيقات."});
+
+Object.assign(D.es, {"Saved as personal preferences only; delivery rules must be connected to the notification service to control the sends.":"Se guarda solo como preferencia personal; las reglas de entrega deben conectarse al servicio de notificaciones."});
+
+Object.assign(D.hi, {"Saved as personal preferences only; delivery rules must be connected to the notification service to control the sends.":"यह केवल व्यक्तिगत प्राथमिकता के रूप में सहेजा जाता है; सूचनाएँ भेजने को नियंत्रित करने के लिए इसे सूचना सेवा से जोड़ना होगा।"});
+
+Object.assign(D.ur, {"Saved as personal preferences only; delivery rules must be connected to the notification service to control the sends.":"یہ صرف ذاتی ترجیح کے طور پر محفوظ ہوتا ہے؛ اطلاعات کی ترسیل کنٹرول کرنے کے لیے اسے نوٹیفکیشن سروس سے جوڑنا ہوگا۔"});
+
+Object.assign(D.zh, {"Saved as personal preferences only; delivery rules must be connected to the notification service to control the sends.":"这里只保存为个人偏好；必须连接通知服务才能控制实际发送。"});
+
+Object.assign(D.ar, {"Saved as personal preferences only; delivery rules must be connected to the notification service to control the sends.":"يتم حفظها كتفضيلات شخصية فقط؛ يجب ربطها بخدمة الإشعارات للتحكم في الإرسال."});
+
+Object.assign(D.es, {"Notification preferences saved on this device. Delivery controls will take effect when notification delivery is connected.":"Preferencias guardadas en este dispositivo. Los controles de entrega funcionarán cuando se conecte el servicio de notificaciones."});
+
+Object.assign(D.hi, {"Notification preferences saved on this device. Delivery controls will take effect when notification delivery is connected.":"सूचना प्राथमिकताएँ इस डिवाइस पर सहेजी गईं। सूचना वितरण सेवा जुड़ने पर नियंत्रण प्रभावी होंगे।"});
+
+Object.assign(D.ur, {"Notification preferences saved on this device. Delivery controls will take effect when notification delivery is connected.":"اطلاعات کی ترجیحات اس ڈیوائس پر محفوظ ہیں۔ ترسیل کی سروس منسلک ہونے پر کنٹرول مؤثر ہوں گے۔"});
+
+Object.assign(D.zh, {"Notification preferences saved on this device. Delivery controls will take effect when notification delivery is connected.":"通知偏好已保存在此设备上。连接通知服务后，发送控制才会生效。"});
+
+Object.assign(D.ar, {"Notification preferences saved on this device. Delivery controls will take effect when notification delivery is connected.":"تم حفظ تفضيلات الإشعارات على هذا الجهاز. ستعمل عناصر التحكم في الإرسال عند ربط خدمة الإشعارات."});
+
+Object.assign(D.es, {"The backend does not yet provide an active-device list or remote session revocation.":"El servidor aún no ofrece una lista de dispositivos activos ni revocación remota de sesiones."});
+
+Object.assign(D.hi, {"The backend does not yet provide an active-device list or remote session revocation.":"बैकएंड अभी सक्रिय डिवाइस सूची या दूरस्थ सत्र रद्द करने की सुविधा नहीं देता।"});
+
+Object.assign(D.ur, {"The backend does not yet provide an active-device list or remote session revocation.":"بیک اینڈ ابھی فعال ڈیوائسز کی فہرست یا ریموٹ سیشن ختم کرنے کی سہولت نہیں دیتا۔"});
+
+Object.assign(D.zh, {"The backend does not yet provide an active-device list or remote session revocation.":"后端目前不提供活动设备列表或远程撤销会话功能。"});
+
+Object.assign(D.ar, {"The backend does not yet provide an active-device list or remote session revocation.":"لا يوفر الخادم الخلفي حتى الآن قائمة بالأجهزة النشطة أو إلغاء الجلسات عن بُعد."});
+
+Object.assign(D.es, {"Choose a theme to preview it immediately across CleanTrack. Save your choice to keep it for this account on this browser.":"Elige un tema para previsualizarlo al instante en CleanTrack. Guarda tu elección para conservarla para esta cuenta en este navegador."});
+
+Object.assign(D.hi, {"Choose a theme to preview it immediately across CleanTrack. Save your choice to keep it for this account on this browser.":"थीम चुनें और उसे तुरंत पूरे CleanTrack में देखें। इस ब्राउज़र में इस खाते के लिए इसे रखने हेतु चुनाव सहेजें।"});
+
+Object.assign(D.ur, {"Choose a theme to preview it immediately across CleanTrack. Save your choice to keep it for this account on this browser.":"تھیم منتخب کریں اور اسے فوراً پورے CleanTrack میں دیکھیں۔ اس براؤزر میں اس اکاؤنٹ کے لیے انتخاب محفوظ کریں۔"});
+
+Object.assign(D.zh, {"Choose a theme to preview it immediately across CleanTrack. Save your choice to keep it for this account on this browser.":"选择主题后会立即在整个 CleanTrack 中预览。保存选择可在此浏览器中为此账户保留主题。"});
+
+Object.assign(D.ar, {"Choose a theme to preview it immediately across CleanTrack. Save your choice to keep it for this account on this browser.":"اختر مظهرًا لمعاينته فورًا عبر CleanTrack. احفظ اختيارك للاحتفاظ به لهذا الحساب في هذا المتصفح."});
+
+Object.assign(D.es, {"Appearance saved and applied immediately across CleanTrack. You do not need to log out.":"La apariencia se guardó y aplicó en todo CleanTrack. No necesitas cerrar sesión."});
+
+Object.assign(D.hi, {"Appearance saved and applied immediately across CleanTrack. You do not need to log out.":"रूप-रंग सहेजा गया और पूरे CleanTrack में तुरंत लागू हुआ। लॉग आउट करने की आवश्यकता नहीं है।"});
+
+Object.assign(D.ur, {"Appearance saved and applied immediately across CleanTrack. You do not need to log out.":"ظاہری شکل محفوظ کرکے پورے CleanTrack میں فوراً لاگو کر دی گئی۔ لاگ آؤٹ کرنے کی ضرورت نہیں۔"});
+
+Object.assign(D.zh, {"Appearance saved and applied immediately across CleanTrack. You do not need to log out.":"外观设置已保存并立即应用到整个 CleanTrack。无需退出登录。"});
+
+Object.assign(D.ar, {"Appearance saved and applied immediately across CleanTrack. You do not need to log out.":"تم حفظ المظهر وتطبيقه فورًا عبر CleanTrack. لا تحتاج إلى تسجيل الخروج."});
+
+Object.assign(D.es, {"Shared date, time-zone and currency formatters are available for screens that adopt them.":"Hay formateadores compartidos de fecha, zona horaria y moneda disponibles para las pantallas que los utilicen."});
+
+Object.assign(D.hi, {"Shared date, time-zone and currency formatters are available for screens that adopt them.":"दिनांक, समय क्षेत्र और मुद्रा के साझा फ़ॉर्मैटर उन स्क्रीन के लिए उपलब्ध हैं जो उनका उपयोग करती हैं।"});
+
+Object.assign(D.ur, {"Shared date, time-zone and currency formatters are available for screens that adopt them.":"تاریخ، ٹائم زون اور کرنسی کے مشترکہ فارمیٹر ان اسکرینز کے لیے دستیاب ہیں جو انہیں استعمال کرتی ہیں۔"});
+
+Object.assign(D.zh, {"Shared date, time-zone and currency formatters are available for screens that adopt them.":"共享日期、时区和货币格式化工具已提供，供采用这些工具的页面使用。"});
+
+Object.assign(D.ar, {"Shared date, time-zone and currency formatters are available for screens that adopt them.":"تتوفر أدوات تنسيق مشتركة للتاريخ والمنطقة الزمنية والعملة للشاشات التي تستخدمها."});
+
+Object.assign(D.es, {"Dedicated help and issue-reporting destinations have not been configured.":"Aún no se han configurado destinos específicos de ayuda y reporte de problemas."});
+
+Object.assign(D.hi, {"Dedicated help and issue-reporting destinations have not been configured.":"समर्पित सहायता और समस्या रिपोर्टिंग गंतव्य अभी कॉन्फ़िगर नहीं हैं।"});
+
+Object.assign(D.ur, {"Dedicated help and issue-reporting destinations have not been configured.":"مخصوص مدد اور مسئلہ رپورٹ کرنے کے مقامات ابھی ترتیب نہیں دیے گئے۔"});
+
+Object.assign(D.zh, {"Dedicated help and issue-reporting destinations have not been configured.":"尚未配置专用帮助和问题报告入口。"});
+
+Object.assign(D.ar, {"Dedicated help and issue-reporting destinations have not been configured.":"لم يتم إعداد وجهات مخصصة للمساعدة والإبلاغ عن المشكلات."});
+
+Object.assign(D.es, {"Only published documents are linked. Other policies must be published before use.":"Solo se enlazan documentos publicados. Las demás políticas deben publicarse antes de usarlas."});
+
+Object.assign(D.hi, {"Only published documents are linked. Other policies must be published before use.":"केवल प्रकाशित दस्तावेज़ लिंक किए गए हैं। अन्य नीतियों को उपयोग से पहले प्रकाशित करना होगा।"});
+
+Object.assign(D.ur, {"Only published documents are linked. Other policies must be published before use.":"صرف شائع شدہ دستاویزات کے لنکس ہیں۔ دیگر پالیسیوں کو استعمال سے پہلے شائع کرنا ہوگا۔"});
+
+Object.assign(D.zh, {"Only published documents are linked. Other policies must be published before use.":"这里只链接已发布的文档。其他政策需先发布才能使用。"});
+
+Object.assign(D.ar, {"Only published documents are linked. Other policies must be published before use.":"يتم ربط المستندات المنشورة فقط. يجب نشر السياسات الأخرى قبل استخدامها."});
+
+Object.assign(D.es, {"Operations management for teams, tasks, locations, reviews, and accountability.":"Gestión operativa de equipos, tareas, ubicaciones, revisiones y responsabilidad."});
+
+Object.assign(D.hi, {"Operations management for teams, tasks, locations, reviews, and accountability.":"टीमों, कार्यों, स्थानों, समीक्षाओं और जवाबदेही के लिए संचालन प्रबंधन।"});
+
+Object.assign(D.ur, {"Operations management for teams, tasks, locations, reviews, and accountability.":"ٹیموں، کاموں، مقامات، جائزوں اور جواب دہی کے لیے آپریشنز مینجمنٹ۔"});
+
+Object.assign(D.zh, {"Operations management for teams, tasks, locations, reviews, and accountability.":"用于团队、任务、地点、审核和责任管理的运营平台。"});
+
+Object.assign(D.ar, {"Operations management for teams, tasks, locations, reviews, and accountability.":"إدارة العمليات للفرق والمهام والمواقع والمراجعات والمساءلة."});
+
+Object.assign(D.es, {"Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.":"Cerrar sesión funciona. La desactivación o eliminación requiere verificación de identidad en el servidor y procesos de retención de datos de la organización."});
+
+Object.assign(D.hi, {"Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.":"साइन आउट उपलब्ध है। निष्क्रिय करने या हटाने के लिए सर्वर-साइड पहचान सत्यापन और संगठन डेटा-प्रतिधारण प्रक्रिया आवश्यक है।"});
+
+Object.assign(D.ur, {"Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.":"سائن آؤٹ دستیاب ہے۔ غیر فعال کرنے یا حذف کے لیے سرور پر شناخت کی تصدیق اور تنظیم کے ڈیٹا کو برقرار رکھنے کا عمل درکار ہے۔"});
+
+Object.assign(D.zh, {"Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.":"退出登录可用。停用或删除需要服务器端身份验证及组织数据保留流程。"});
+
+Object.assign(D.ar, {"Sign out works. Deactivation/deletion need server-side identity verification and organization-retention workflows.":"تسجيل الخروج متاح. يتطلب التعطيل أو الحذف التحقق من الهوية على الخادم وإجراءات الاحتفاظ ببيانات المؤسسة."});
+
+Object.assign(D.es, {"Account deletion requests are not enabled because organization records and retention must be handled server-side.":"Las solicitudes de eliminación de cuenta no están habilitadas porque los registros y la retención de la organización deben gestionarse en el servidor."});
+
+Object.assign(D.hi, {"Account deletion requests are not enabled because organization records and retention must be handled server-side.":"खाता हटाने के अनुरोध सक्षम नहीं हैं क्योंकि संगठन रिकॉर्ड और प्रतिधारण को सर्वर पर संभालना होगा।"});
+
+Object.assign(D.ur, {"Account deletion requests are not enabled because organization records and retention must be handled server-side.":"اکاؤنٹ حذف کرنے کی درخواستیں فعال نہیں کیونکہ تنظیمی ریکارڈ اور ڈیٹا برقرار رکھنے کا انتظام سرور پر ہونا ضروری ہے۔"});
+
+Object.assign(D.zh, {"Account deletion requests are not enabled because organization records and retention must be handled server-side.":"账户删除请求尚未启用，因为组织记录和数据保留必须由服务器处理。"});
+
+Object.assign(D.ar, {"Account deletion requests are not enabled because organization records and retention must be handled server-side.":"طلبات حذف الحساب غير مفعّلة لأن سجلات المؤسسة والاحتفاظ بالبيانات يجب أن تتم معالجتها على الخادم."});
