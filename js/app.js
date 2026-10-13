@@ -457,6 +457,19 @@
     }
     
     
+    if (pageId === "staff") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Staff administration is available to organization Admins only." }));
+        return;
+      }
+      if (window.CleanTrackStaff && typeof window.CleanTrackStaff.render === "function") {
+        await window.CleanTrackStaff.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "The Staff module could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     if (pageId === "teams") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
         const message = document.createElement("p");
