@@ -64,7 +64,7 @@
     // The active backend stores JWTs in HttpOnly cookies and protects mutating
     // requests with Flask-JWT-Extended's readable CSRF cookie.
     const method = String(options.method || "GET").toUpperCase();
-    const requestPath = String(path || "").replace(/^\\/+|\\/+$/g, "").split("?")[0];
+    const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
     const csrfExemptPaths = new Set(["auth/login", "auth/register"]);
     if (["POST", "PUT", "PATCH", "DELETE"].includes(method) &&
         !headers.has("X-CSRF-TOKEN") &&
