@@ -130,5 +130,12 @@ function setUser(id){const nextKey=id===null||id===undefined||id===""?KEY:KEY+".
 function formatDate(v){let d=new Date(v);if(Number.isNaN(+d))return "—";let o={timeZone:p.timeZone,year:"numeric",month:"2-digit",day:"2-digit"};if(p.dateFormat==="MM/DD/YYYY")return new Intl.DateTimeFormat("en-US",o).format(d);if(p.dateFormat==="DD Mon YYYY")return new Intl.DateTimeFormat(p.language,{...o,day:"2-digit",month:"short"}).format(d);return new Intl.DateTimeFormat(p.dateFormat==="DD/MM/YYYY"?"en-GB":"en-CA",o).format(d)}
 function formatTime(v){return new Intl.DateTimeFormat(p.language,{timeZone:p.timeZone,hour:"2-digit",minute:"2-digit",hour12:p.timeFormat==="12"}).format(new Date(v))}
 applyTheme();if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",applyLanguage,{once:true});else applyLanguage();new MutationObserver(rs=>rs.forEach(r=>r.type==="childList"?r.addedNodes.forEach(node):node(r.target))).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+
+// Bind preferences to the signed-in account as soon as authentication resolves.
+// This applies theme/language immediately after login or session restoration.
+window.addEventListener("cleantrack:login",e=>setUser(e.detail?.user?.id));
+window.addEventListener("cleantrack:session-restored",e=>setUser(e.detail?.user?.id));
+window.addEventListener("cleantrack:logout",()=>setUser(null));
+
 window.CleanTrackPreferences=Object.freeze({get,update,setUser,translate,applyLanguage,applyTheme,formatCurrency,formatDate,formatTime});
 })();
