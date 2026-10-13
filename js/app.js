@@ -575,7 +575,7 @@
             });
             actions.appendChild(mark);
           }
-          if (item.resource_type === "MembershipRequest") {
+          if (item.resource_type === "MembershipRequest" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "admin") {
             const open = document.createElement("button");
             open.type = "button";
             open.className = "ct-help-action-button";
