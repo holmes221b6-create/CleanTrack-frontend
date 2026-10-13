@@ -63,6 +63,11 @@ function normalizeUser(user) {
     name: user.name || user.full_name || "",
     email: user.email || "",
     phone: user.phone || "",
+    avatarUrl: user.avatar_url || user.avatarUrl || null,
+    preferences: user.preferences && typeof user.preferences === "object" ? user.preferences : {},
+    account_status: user.account_status || "",
+    created_at: user.created_at || null,
+    email_verified: Boolean(user.email_verified ?? user.emailVerified),
     role: String(user.role || "").toLowerCase(),
 
     organizationId:
