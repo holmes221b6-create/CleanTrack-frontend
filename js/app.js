@@ -86,8 +86,8 @@
 
     // Restore this user's browser-local avatar preference whenever a session is shown.
     if (avatarElement && user && user.id !== undefined && user.id !== null) {
-      let avatarUrl = "";
-      try { avatarUrl = localStorage.getItem("cleantrack.avatar." + user.id) || ""; } catch (_) {}
+      let avatarUrl = user.avatarUrl || user.avatar_url || "";
+      try { if (!avatarUrl) avatarUrl = localStorage.getItem("cleantrack.avatar." + user.id) || ""; } catch (_) {}
       avatarElement.textContent = (user.name || user.email || "U").trim().charAt(0).toUpperCase() || "U";
       avatarElement.style.backgroundImage = avatarUrl ? "url('" + avatarUrl.replace(/['()\\]/g, "") + "')" : "";
       avatarElement.style.backgroundSize = avatarUrl ? "cover" : "";
