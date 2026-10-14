@@ -17,6 +17,7 @@
 
   let currentUser = null;
   let authToken = "";
+  let refreshToken = "";
 
   function persistToken(token) {
     authToken = String(token || "");
@@ -26,6 +27,30 @@
     } catch (error) {
       // Keep the in-memory token for the current page when storage is unavailable.
     }
+  }
+
+  function persistRefreshToken(token) {
+    refreshToken = String(token || "");
+    try {
+      if (refreshToken) window.sessionStorage.setItem("cleantrack_refresh_token", refreshToken);
+      else window.sessionStorage.removeItem("cleantrack_refresh_token");
+    } catch (error) {
+      // Keep the in-memory refresh token for the current page if storage is unavailable.
+    }
+  }
+
+  function getRefreshToken() {
+    if (refreshToken) return refreshToken;
+    try {
+      refreshToken = window.sessionStorage.getItem("cleantrack_refresh_token") || "";
+    } catch (error) {
+      refreshToken = "";
+    }
+    return refreshToken;
+  }
+
+  function setAuthToken(token) {
+    persistToken(token);
   }
 
   function getAuthToken() {
@@ -101,6 +126,7 @@ function normalizeUser(user) {
     });
 
     persistToken(response.token || response.data?.token || "");
+    persistRefreshToken(response.refresh_token || response.data?.refresh_token || "");
     currentUser = normalizeUser(
       response.user || response.data?.user
     );
@@ -207,6 +233,7 @@ function normalizeUser(user) {
     } finally {
       currentUser = null;
       persistToken("");
+      persistRefreshToken("");
       emitAuthEvent("cleantrack:logout", null);
     }
   }
@@ -290,6 +317,8 @@ function normalizeUser(user) {
     restoreSession: restoreSession,
     getCurrentUser: getCurrentUser,
     getAuthToken: getAuthToken,
+    getRefreshToken: getRefreshToken,
+    setAuthToken: setAuthToken,
     isAuthenticated: isAuthenticated,
     hasRole: hasRole
   });
