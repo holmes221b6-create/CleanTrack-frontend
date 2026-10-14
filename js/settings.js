@@ -3,7 +3,7 @@
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
 const LANGS=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
 const CURS="USD EUR GBP INR CNY JPY KRW AED SAR QAR KWD SGD AUD CAD CHF NZD HKD THB IDR MYR PHP VND BDT PKR LKR NPR ZAR NGN KES EGP TRY BRL MXN ARS CLP COP PLN SEK NOK DKK RUB".split(" ");
-const SECS=[["overview","Overview","⌂"],["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
+const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
 function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n}
 function btn(x,c,fn){const n=el("button",c||"ct-settings-button",x);n.type="button";n.addEventListener("click",fn);return n}
 function fld(x,n,h){const w=el("label","ct-settings-field");w.append(el("span","",x),n);if(h)w.appendChild(el("small","ct-settings-muted",h));return w}
@@ -19,29 +19,6 @@ container.replaceChildren();let user=AUTH?.getCurrentUser?.();if(!user){containe
 let detail={};try{detail=(await API.get("auth/me")).user||{}}catch(_){}user={...user,...detail};const role=String(user.role||"").toLowerCase(),pr=PREF.get(),page=el("section","ct-settings-page"),head=el("header","ct-settings-header");head.append(el("p","ct-settings-eyebrow","YOUR WORKSPACE"),el("h1","","Settings"),el("p","ct-settings-muted","Personal account settings. Organization-wide controls remain in the separate Admin-only section."));page.appendChild(head);
 const layout=el("div","ct-settings-layout"),nav=el("nav","ct-settings-nav"),panels=el("div","ct-settings-panels"),p={};nav.setAttribute("aria-label","Settings sections");
 SECS.forEach(([id,label,ico])=>{const b=btn("", "ct-settings-nav-item",()=>open(page,id));b.dataset.settingsNav=id;b.append(el("span","ct-settings-icon",ico),el("span","",label));nav.appendChild(b);p[id]=el("section","ct-settings-panel");p[id].dataset.settingsPanel=id;p[id].hidden=true;panels.appendChild(p[id])});layout.append(nav,panels);page.appendChild(layout);
-// OVERVIEW — Overview plus the eleven settings categories.
-const overview=card("Settings overview","Choose a section to configure your personal account and app preferences. Organization-wide settings are managed separately by Admins.","⌂");
-const overviewGrid=el("div","ct-settings-overview-grid");
-const overviewDescriptions={
-account:"Profile, contact details, and password.",
-preferences:"Language, date, time, time zone, and currency.",
-privacy:"Privacy preferences and session security.",
-notifications:"Choose your preferred notification categories.",
-appearance:"Select a light or dark app theme.",
-data:"Set export format and report defaults.",
-integrations:"Future connectors; no third-party service is connected yet.",
-help:"Help, guide, support, and feedback destinations.",
-legal:"Published terms and privacy documents.",
-about:"Product version and release information.",
-actions:"Sign out and account lifecycle options."
-};
-SECS.filter(([id])=>id!=="overview").forEach(([id,label,ico])=>{
- const tile=el("article","ct-settings-overview-item");
- tile.append(el("span","ct-settings-icon",ico),el("h3","",label),el("p","ct-settings-muted",overviewDescriptions[id]));
- tile.appendChild(btn("Open section","ct-settings-button",()=>open(page,id)));
- overviewGrid.appendChild(tile);
-});
-overview.appendChild(overviewGrid);p.overview.appendChild(overview);
 // ACCOUNT
 const a=p.account,avKey="cleantrack.avatar."+user.id,av=inp("url",user.avatar_url||localRead(avKey),"avatar_url"),nm=inp("text",user.full_name||user.name,"full_name"),ph=inp("tel",user.phone,"phone"),em=inp("email",user.email,"email");nm.required=true;nm.minLength=2;nm.maxLength=120;ph.maxLength=30;em.readOnly=true;const headerAvatar=document.getElementById("header-avatar");if(headerAvatar){headerAvatar.textContent=(user.full_name||user.name||"U").trim().charAt(0).toUpperCase();if(user.avatar_url){headerAvatar.style.backgroundImage="url(\'"+user.avatar_url.replace(/[\'()\\\\]/g,"")+"\')";headerAvatar.style.backgroundSize="cover";headerAvatar.style.color="transparent";}}
 a.appendChild(formcard("Personal profile","Update details for your own account. Email editing is not enabled yet.","♙",[fld("Full name",nm),fld("Email address",em,"Read-only until account email change is supported."),fld("Phone number",ph),fld("Profile avatar URL",av,"Optional public image URL, saved to your account.")],async()=>{const r=await API.patch("auth/me",{full_name:nm.value.trim(),phone:ph.value.trim(),avatar_url:av.value.trim()}),u=r.user||{},name=u.full_name||nm.value.trim();Object.assign(user,{name,full_name:name,phone:u.phone||ph.value.trim(),avatar_url:u.avatar_url||av.value.trim()});if(AUTH.getCurrentUser())Object.assign(AUTH.getCurrentUser(),{name,phone:user.phone});try{localStorage.setItem(avKey,av.value.trim())}catch(_){}const h=document.getElementById("header-user-name");if(h)h.textContent=name;const icon=document.getElementById("header-avatar");if(icon){icon.textContent=name[0]?.toUpperCase()||"U";icon.style.backgroundImage=av.value.trim()?"url('"+av.value.trim().replace(/['()\\]/g,"")+"')":"";icon.style.backgroundSize="cover";icon.style.color=av.value.trim()?"transparent":""}},"Save account details"));
@@ -75,7 +52,7 @@ const legal=card("Legal documents","Available published legal documents.","§"),
 const about=card("About CleanTrack","Operations management for teams, locations, tasks, reviews and accountability.","ⓘ"),version=document.querySelector('meta[name="app-version"]')?.content||"Release metadata not configured";[["Product","CleanTrack"],["Version",version],["Release notes","Not configured"],["Credits","Not published"]].forEach(([x,y])=>about.appendChild(el("div","ct-settings-info-row",x+": "+y)));about.appendChild(btn("Check for updates","ct-settings-button",()=>alert("Automatic update checking is not configured. No update check was performed.")));p.about.appendChild(about);
 // ACCOUNT ACTIONS
 const actions=card("Account actions","Sign out works. Deactivation and deletion are unavailable until server-side retention and approval workflows are added.","↗");actions.appendChild(btn("Log out","ct-settings-button ct-settings-button-primary",async()=>{if(!confirm("Log out of CleanTrack on this device?"))return;try{await AUTH.logout()}finally{window.location.reload()}}));actions.appendChild(btn("Deactivate account","ct-settings-button",()=>alert("Account deactivation is not enabled. Your account has not changed.")));actions.appendChild(btn("Request account deletion","ct-settings-button ct-settings-button-danger",()=>alert("Account deletion requests are not enabled. Nothing was submitted.")));p.actions.appendChild(actions);
-container.appendChild(page);const requested=location.hash.startsWith("#settings-")?location.hash.slice(10):"overview";open(page,p[requested]?requested:"account");PREF.applyTheme();PREF.applyLanguage();
+container.appendChild(page);const requested=location.hash.startsWith("#settings-")?location.hash.slice(10):"account";open(page,p[requested]?requested:"account");PREF.applyTheme();PREF.applyLanguage();
 }
 window.CleanTrackSettings=Object.freeze({render});
 })();
