@@ -121,6 +121,31 @@
       }
 
       if (!response.ok) {
+        // Access cookies expire well before the refresh cookie. When a
+        // protected request gets a 401, renew the access cookie once and
+        // retry the original request. Never recurse on the refresh endpoint.
+        const refreshExcluded = new Set([
+          "auth/login", "auth/register", "auth/refresh", "auth/csrf", "auth/logout"
+        ]);
+        if (response.status === 401 && !options._authRetried && !refreshExcluded.has(requestPath)) {
+          try {
+            const refreshResponse = await fetch(
+              config.apiBaseUrl + normalizePath("auth/refresh"),
+              {
+                method: "GET",
+                headers: { Accept: "application/json" },
+                credentials: "include",
+                cache: "no-store"
+              }
+            );
+            if (refreshResponse.ok) {
+              return await request(path, { ...options, _authRetried: true });
+            }
+          } catch (_) {
+            // Preserve the original protected-request error if renewal fails.
+          }
+        }
+
         const message =
           data && (data.message || data.error)
             ? (data.message || data.error)
