@@ -47,7 +47,8 @@
       { id: "team-pulse", label: "Team Pulse", icon: "♡" },
       { id: "skills", label: "Skills and Eligibility", icon: "★" },
       { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" },
-      { id: "settings", label: "Settings", icon: "⚙" }
+      { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "audit", label: "Settings & Audit History", icon: "◷" }
     ],
 
     employee: [
@@ -58,7 +59,8 @@
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "skills", label: "My Skills", icon: "★" },
       { id: "billing", label: "Billing", icon: "$" },
-      { id: "settings", label: "Settings", icon: "⚙" }
+      { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "audit", label: "My Activity", icon: "◷" }
     ]
   };
 
