@@ -129,16 +129,23 @@
         ]);
         if (response.status === 401 && !options._authRetried && !refreshExcluded.has(requestPath)) {
           try {
+            const refreshHeaders = new Headers({ Accept: "application/json" });
+            const refreshToken = window.CleanTrackAuth?.getRefreshToken?.();
+            if (refreshToken) refreshHeaders.set("Authorization", "Bearer " + refreshToken);
             const refreshResponse = await fetch(
               config.apiBaseUrl + normalizePath("auth/refresh"),
               {
                 method: "GET",
-                headers: { Accept: "application/json" },
+                headers: refreshHeaders,
                 credentials: "include",
                 cache: "no-store"
               }
             );
             if (refreshResponse.ok) {
+              const refreshed = await refreshResponse.json().catch(() => ({}));
+              if (refreshed.token && window.CleanTrackAuth?.setAuthToken) {
+                window.CleanTrackAuth.setAuthToken(refreshed.token);
+              }
               return await request(path, { ...options, _authRetried: true });
             }
           } catch (_) {
