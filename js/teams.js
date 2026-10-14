@@ -270,7 +270,15 @@ async function render(container){
  const filters=el("div","ct-team-filter-buttons"),active=button("Active Teams","ct-team-btn ct-team-filter is-active",()=>{archived=false;renderList()}),arch=button("Archived Teams","ct-team-btn ct-team-filter",()=>{archived=true;renderList()});active.dataset.filter="active";arch.dataset.filter="archived";filters.append(active,arch);toolbar.append(filters);const count=el("span","ct-team-muted","Loading…");count.dataset.teamCount="1";toolbar.append(count);
  const heading=el("h2","ct-team-section-heading","All teams");heading.dataset.teamListHeading="1";const results=el("div","ct-team-grid");results.dataset.teamResults="1";results.append(el("div","ct-team-empty","Loading teams…"));listPanel.append(toolbar,heading,results);root.append(listPanel);
  const detail=el("section","ct-team-detail");detail.dataset.teamDetail="1";detail.hidden=true;root.append(detail);container.append(root);
- try{await load()}catch(e){notice(e.message||"Could not load teams.","error")}
+ try{await load()}catch(e){
+  const authFailure = e.status === 401 || /authentication required|session expired|sign in again/i.test(e.message||"");
+  const message = authFailure
+   ? "Your session could not be renewed. Please sign in again, then reopen Teams."
+   : (e.message||"Could not load teams.");
+  notice(message,"error");
+  const results=root.querySelector("[data-team-results]");
+  if(results) results.replaceChildren(el("p","ct-team-error",message));
+ }
 }
 window.CleanTrackTeams=Object.freeze({render});
 })();
