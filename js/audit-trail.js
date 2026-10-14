@@ -77,13 +77,14 @@
     search.setAttribute("aria-label", "Search audit records");
     const category = el("select", "ct-audit-input"); addOptions(category, categories, "");
     const outcome = el("select", "ct-audit-input"); addOptions(outcome, outcomes, "");
+    const actor = el("select", "ct-audit-input"); addOptions(actor, [["","All actors"]], "");
     const from = el("input", "ct-audit-input"); from.type = "date"; from.name = "from";
     const to = el("input", "ct-audit-input"); to.type = "date"; to.name = "to";
     const now = new Date(), cutoffDate = new Date(now.getTime() - 7*24*60*60*1000);
     from.min = localYmd(cutoffDate); from.max = localYmd(now);
     to.min = localYmd(cutoffDate); to.max = localYmd(now);
     const filtersTop = el("div", "ct-audit-filter-grid");
-    filtersTop.append(field("Search", search), field("Action category", category), field("Outcome", outcome), field("From date", from), field("To date", to));
+    filtersTop.append(field("Search", search), field("Action category", category), field("Outcome", outcome), field("Actor", actor), field("From date", from), field("To date", to));
     const submit = el("button", "ct-audit-button ct-audit-button-primary", "Apply filters"); submit.type = "submit";
     const clear = button("Clear filters", "ct-audit-button", () => {
       toolbar.reset(); category.value = ""; outcome.value = ""; from.value = ""; to.value = ""; search.value = ""; state.offset = 0; load();
@@ -120,6 +121,7 @@
       if (search.value.trim()) params.set("q",search.value.trim());
       if (category.value) params.set("category",category.value);
       if (outcome.value) params.set("outcome",outcome.value);
+      if (actor.value) params.set("actor_id",actor.value);
       if (from.value) params.set("from",from.value);
       if (to.value) params.set("to",to.value);
       if (includePaging) {params.set("limit",String(PAGE_SIZE));params.set("offset",String(state.offset));}
@@ -165,6 +167,9 @@
       try {
         const data=await API.get("audit-trail?"+parameters(true).toString());
         state.entries=Array.isArray(data.entries)?data.entries:[];state.total=Number(data.total||0);
+        const selectedActor=actor.value;
+        const actorOptions=[["","All actors"],...(Array.isArray(data.actors)?data.actors.map(item=>[String(item.id),item.label+(item.role?" · "+item.role:"")]):[])];
+        actor.replaceChildren(); addOptions(actor,actorOptions,actorOptions.some(item=>item[0]===selectedActor)?selectedActor:"");
         renderRows(state.entries);
         counter.textContent=state.total+" record"+(state.total===1?"":"s")+" in your permitted seven-day window";
         const start=state.total?state.offset+1:0;const end=Math.min(state.offset+state.entries.length,state.total);
@@ -195,7 +200,7 @@
       finally {exportButton.disabled=state.total===0;}
     }
     toolbar.addEventListener("submit",event=>{event.preventDefault();state.offset=0;load();});
-    [category,outcome,from,to].forEach(control=>control.addEventListener("change",()=>{state.offset=0;load();}));
+    [category,outcome,actor,from,to].forEach(control=>control.addEventListener("change",()=>{state.offset=0;load();}));
     if(role!=="admin") {
       // Server-side scoping is authoritative. This text describes the expected
       // scope but never substitutes client checks for API permission controls.
