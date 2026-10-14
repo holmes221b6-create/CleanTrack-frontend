@@ -359,6 +359,15 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
+    if (pageId === "audit") {
+      if (window.CleanTrackAuditTrail && typeof window.CleanTrackAuditTrail.render === "function") {
+        await window.CleanTrackAuditTrail.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Audit Trail could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     if (pageId === "settings") {
       if (window.CleanTrackSettings && typeof window.CleanTrackSettings.render === "function") {
         await window.CleanTrackSettings.render(pageContent);
