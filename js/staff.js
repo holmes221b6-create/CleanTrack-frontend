@@ -671,7 +671,7 @@
     pageRoot=el("section","ct-staff-page");
     const header=el("header","ct-staff-header");
     const intro=el("div");
-    intro.append(el("p","ct-staff-eyebrow","PEOPLE AND ACCESS"),el("h1","","Supervisor Directory"),
+    intro.append(el("p","ct-staff-eyebrow","PEOPLE AND ACCESS"),el("h1","","Your Staff"),
       el("p","ct-staff-muted","Search supervisors, review teams and shared employees, monitor workload, and manage termination status. The Admin Staff page does not expose a separate employee directory."));
     const toolbar=el("div","ct-staff-toolbar");
     const fileInput=el("input","ct-staff-file-input");fileInput.type="file";fileInput.accept=".csv,.xlsx,.xls";fileInput.hidden=true;
