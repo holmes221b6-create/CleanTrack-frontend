@@ -5,3 +5,41 @@
 .ct-settings-overview-card .ct-settings-button{align-self:flex-start;margin-top:auto}
 .ct-settings-overview-card{gap:8px}
 @media(max-width:700px){.ct-settings-overview-grid{grid-template-columns:1fr}}
+
+/* Light mode overrides for the application, available to every role. */
+:root[data-theme="light"] {
+ color-scheme: light;
+ --bg:#f5f7fb; --bg-elevated:#ffffff; --surface:#ffffff; --surface-hover:#edf3f8; --surface-raised:#e7eef6;
+ --border:#d8e1eb; --border-strong:#bac9d8; --text:#1d2a3b; --text-secondary:#586a7d; --text-muted:#697d91;
+ --primary:#176c56; --primary-hover:#0e5945; --primary-contrast:#ffffff; --accent:#355eb8;
+ --success:#16784a; --warning:#8b5d00; --danger:#b02a37; --info:#155f9f;
+ --shadow-sm:0 5px 18px rgb(23 40 60 / 8%); --shadow-md:0 16px 40px rgb(23 40 60 / 12%);
+}
+:root[data-theme="light"] body { background:var(--bg); color:var(--text); }
+:root[data-theme="light"] .app-header,
+:root[data-theme="light"] .sidebar,
+:root[data-theme="light"] .sidebar-layout,
+:root[data-theme="light"] .main-content,
+:root[data-theme="light"] .page-content,
+:root[data-theme="light"] .app-footer,
+:root[data-theme="light"] .profile-menu,
+:root[data-theme="light"] .app-modal,
+:root[data-theme="light"] .modal-content {
+ background-color:var(--bg-elevated); color:var(--text); border-color:var(--border);
+}
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .dashboard-card,
+:root[data-theme="light"] .stat-card,
+:root[data-theme="light"] .table-container,
+:root[data-theme="light"] .content-card { background-color:var(--surface); color:var(--text); border-color:var(--border); }
+:root[data-theme="light"] input,
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea { background:#fff; color:#1d2a3b; border-color:#bac9d8; }
+.ct-settings-overview-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.ct-settings-overview-item { display:grid; grid-template-columns:30px minmax(0,1fr); align-items:start; column-gap:10px; padding:15px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.ct-settings-overview-item .ct-settings-icon { grid-row:span 3; }
+.ct-settings-overview-item h3 { margin:2px 0 3px; font-size:1rem; }
+.ct-settings-overview-item p { margin:0 0 12px; }
+.ct-settings-overview-item .ct-settings-button { justify-self:start; }
+@media(max-width:560px) { .ct-settings-overview-grid { grid-template-columns:1fr; } }
