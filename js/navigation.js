@@ -24,7 +24,7 @@
       { id: "teams", label: "Teams", icon: "♧" },
       { id: "locations", label: "Locations", icon: "⌖" },
       { id: "zones", label: "Zones", icon: "▦" },
-      { id: "operations", label: "Tasks and Operations", icon: "☷" },
+      { id: "operations", label: "Operations Management", icon: "☷" },
       { id: "reviews", label: "Logs and Reviews", icon: "✓" },
       { id: "analytics", label: "Analytics", icon: "▥" },
       { id: "reports", label: "Reports", icon: "▤" },
@@ -38,7 +38,7 @@
     supervisor: [
       { id: "workspace", label: "My Workspace", icon: "⌂" },
       { id: "personnel", label: "Personnel", icon: "♙" },
-      { id: "operations", label: "Operations", icon: "☷" },
+      { id: "operations", label: "Operations Management", icon: "☷" },
       { id: "reviews", label: "Review Queue", icon: "✓" },
       { id: "sites", label: "Sites and Zones", icon: "⌖" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
@@ -53,8 +53,8 @@
 
     employee: [
       { id: "my-desk", label: "My Desk", icon: "⌂" },
-      { id: "my-tasks", label: "My Tasks", icon: "☷" },
-      { id: "my-history", label: "My History", icon: "◷" },
+      { id: "my-tasks", label: "My Work", icon: "☷" },
+      { id: "my-history", label: "Work History", icon: "◷" },
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "skills", label: "My Skills", icon: "★" },
