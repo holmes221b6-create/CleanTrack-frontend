@@ -77,7 +77,7 @@ function positionCalendar(root){
  const trigger=root.querySelector("[data-op-calendar-trigger]");
  if(!panel||!trigger)return;
  const edge=8,gap=10,viewportW=window.innerWidth,viewportH=window.innerHeight;
- const width=Math.min(380,viewportW-edge*2);
+ const width=Math.min(330,viewportW-edge*2);
  panel.hidden=false;
  panel.style.width=width+"px";
  // Keep the moved location while this page is open, but never persist it.
