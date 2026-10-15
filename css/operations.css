@@ -569,3 +569,68 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-dialo
     grid-template-columns:repeat(7,minmax(64px,1fr));
   }
 }
+
+
+/* Compact in-page Operations calendar popover, aligned with the small date
+   panels used elsewhere in CleanTrack. It intentionally has no modal backdrop. */
+#page-content .ct-operations-page .ct-op-calendar-popover[hidden]{display:none!important}
+#page-content .ct-operations-page .ct-op-calendar-popover{
+ position:fixed!important;inset:auto auto auto auto!important;z-index:1200;
+ box-sizing:border-box;width:min(380px,calc(100vw - 16px));max-width:calc(100vw - 16px);
+ max-height:min(76dvh,620px);min-width:0;min-height:0;height:auto;resize:none;
+ margin:0;padding:12px;overflow:auto;border:1px solid #514566;border-radius:12px;
+ background:#11141c;color:#e9e7ef;box-shadow:0 14px 38px rgb(0 0 0 / 42%);
+ transform:none!important;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-toolbar{
+ position:static;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin:0 0 10px;padding:0;background:transparent;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-toolbar h2{
+ flex:1;min-width:0;font-size:.94rem;white-space:nowrap;color:#e9e7ef;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls{gap:4px;flex-wrap:nowrap}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls .ct-op-button{min-width:30px;padding:5px 8px}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-close{width:28px;min-width:28px;height:28px}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-board{min-height:0;overflow:visible}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-month-grid{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));min-width:0;overflow:visible;border:0;gap:2px;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-weekday{
+ min-width:0;padding:5px 0;border:0;border-radius:5px;background:transparent;text-align:center;font-size:.69rem;color:#a8a2b9;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date{
+ position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+ width:100%;min-width:0;height:34px;padding:3px 0;border:1px solid transparent;border-radius:7px;
+ background:transparent;color:#e9e7ef;font:inherit;font-size:.78rem;cursor:pointer;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date:hover{background:#211d2c;border-color:#514566}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-outside{color:#716d7c}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-today{border-color:#7668a5}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-selected{background:#7668a5;color:#fff}
+#page-content .ct-operations-page .ct-op-calendar-date-count{display:block;width:4px;height:4px;min-height:4px;border-radius:50%;background:#a99bd8;font-size:0;line-height:0}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected{border-top:1px solid #292c36;margin-top:8px;padding-top:8px}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected h3{font-size:.8rem;margin:0 0 6px;color:#e9e7ef}
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected .ct-op-muted{font-size:.76rem;margin:0;color:#9290a0}
+#page-content .ct-operations-page .ct-op-calendar-selected-event{
+ display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:7px 8px;margin-top:5px;
+ text-align:left;border:1px solid #302d3b;border-left:3px solid #7668a5;border-radius:7px;background:#171720;color:#e9e7ef;cursor:pointer;
+}
+#page-content .ct-operations-page .ct-op-calendar-selected-event strong{font-size:.77rem;font-weight:700}
+#page-content .ct-operations-page .ct-op-calendar-selected-event small{font-size:.7rem;color:#aaa5ba}
+#page-content .ct-operations-page .ct-op-calendar-selected-event.is-overdue,
+#page-content .ct-operations-page .ct-op-calendar-selected-event.is-rejected{border-left-color:#a95665}
+#page-content .ct-operations-page .ct-op-calendar-selected-event.is-completed,
+#page-content .ct-operations-page .ct-op-calendar-selected-event.is-approved,
+#page-content .ct-operations-page .ct-op-calendar-selected-event.is-verified{border-left-color:#3a705f}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover{background:#f7f9fc;border-color:#c4ceda;color:#19283a;box-shadow:0 14px 38px rgb(18 31 49 / 18%)}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-toolbar h2,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected h3{color:#19283a}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date{color:#19283a}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-outside{color:#8290a2}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-selected{color:#fff}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selected-event{background:#fff;color:#19283a;border-color:#d4dce6}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selected-event small{color:#637187}
+@media(max-width:420px){
+ #page-content .ct-operations-page .ct-op-calendar-popover{padding:9px}
+ #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls .ct-op-button{padding:5px 6px}
+}
