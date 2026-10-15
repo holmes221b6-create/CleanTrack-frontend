@@ -454,6 +454,20 @@
       return;
     }
 
+    // Operations is the role-scoped work engine. Employee routes reuse the same
+    // data-backed module but expose only operations assigned to the signed-in user.
+    if (["operations", "my-tasks", "my-history"].includes(pageId)) {
+      if (window.CleanTrackOperations && typeof window.CleanTrackOperations.render === "function") {
+        const mode = pageId === "my-history" ? "history" : pageId === "my-tasks" ? "work" : "operations";
+        await window.CleanTrackOperations.render(pageContent, mode);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Operations could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
     // Render the landing page instead of the generic placeholder.
     if (["home", "workspace", "my-desk"].includes(pageId)) {
       const intro = document.createElement("p");
