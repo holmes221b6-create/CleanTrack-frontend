@@ -336,4 +336,20 @@ Object.assign(D.ur, {"Overview":"جائزہ","Settings overview":"ترتیبات
 Object.assign(D.zh, {"Overview":"概览","Settings overview":"设置概览","Choose a section to configure your personal account and app preferences. Organization-wide settings are managed separately by Admins.":"选择一个部分来配置个人账户和应用偏好。组织级设置由管理员单独管理。","Open section":"打开部分","Open Account":"打开账户","Profile, contact details, and password.":"个人资料、联系方式和密码。","Language, date, time, time zone, and currency.":"语言、日期、时间、时区和货币。","Privacy preferences and session security.":"隐私偏好和会话安全。","Choose your preferred notification categories.":"选择偏好的通知类别。","Select a light or dark app theme.":"选择浅色或深色应用主题。","Set export format and report defaults.":"设置导出格式和报告默认值。","Future connectors; no third-party service is connected yet.":"未来集成；目前尚未连接第三方服务。","Help, guide, support, and feedback destinations.":"帮助、指南、支持和反馈入口。","Published terms and privacy documents.":"已发布的条款和隐私文件。","Product version and release information.":"产品版本和发布信息。","Sign out and account lifecycle options.":"退出登录和账户生命周期选项。"});
 Object.assign(D.ar, {"Overview":"نظرة عامة","Settings overview":"نظرة عامة على الإعدادات","Choose a section to configure your personal account and app preferences. Organization-wide settings are managed separately by Admins.":"اختر قسمًا لتهيئة حسابك الشخصي وتفضيلات التطبيق. يدير المسؤولون إعدادات المؤسسة بشكل منفصل.","Open section":"فتح القسم","Open Account":"فتح الحساب","Profile, contact details, and password.":"الملف الشخصي وبيانات الاتصال وكلمة المرور.","Language, date, time, time zone, and currency.":"اللغة والتاريخ والوقت والمنطقة الزمنية والعملة.","Privacy preferences and session security.":"تفضيلات الخصوصية وأمان الجلسة.","Choose your preferred notification categories.":"اختر فئات الإشعارات المفضلة.","Select a light or dark app theme.":"اختر مظهر التطبيق الفاتح أو الداكن.","Set export format and report defaults.":"حدد تنسيق التصدير والإعدادات الافتراضية للتقارير.","Future connectors; no third-party service is connected yet.":"تكاملات مستقبلية؛ لا توجد خدمة خارجية متصلة حاليًا.","Help, guide, support, and feedback destinations.":"وجهات المساعدة والدليل والدعم والملاحظات.","Published terms and privacy documents.":"الشروط ووثائق الخصوصية المنشورة.","Product version and release information.":"إصدار المنتج ومعلومات الإصدار.","Sign out and account lifecycle options.":"تسجيل الخروج وخيارات إدارة الحساب."});
 
+Object.assign(D.es, {
+  "Email-based password recovery is not configured in this deployment. No reset email was sent.":"La recuperación de contraseña por correo no está configurada. No se envió ningún correo de restablecimiento."
+});
+Object.assign(D.hi, {
+  "Email-based password recovery is not configured in this deployment. No reset email was sent.":"इस ऐप में ईमेल से पासवर्ड रिकवरी सेट नहीं है। कोई रीसेट ईमेल नहीं भेजा गया।"
+});
+Object.assign(D.ur, {
+  "Email-based password recovery is not configured in this deployment. No reset email was sent.":"اس ایپ میں ای میل کے ذریعے پاس ورڈ بحالی ترتیب نہیں دی گئی۔ کوئی ری سیٹ ای میل نہیں بھیجی گئی۔"
+});
+Object.assign(D.zh, {
+  "Email-based password recovery is not configured in this deployment. No reset email was sent.":"此版本尚未配置电子邮件密码恢复，未发送任何重置邮件。"
+});
+Object.assign(D.ar, {
+  "Email-based password recovery is not configured in this deployment. No reset email was sent.":"لم يتم إعداد استعادة كلمة المرور عبر البريد الإلكتروني في هذا الإصدار. لم يتم إرسال أي رسالة لإعادة التعيين."
+});
+
 })();
