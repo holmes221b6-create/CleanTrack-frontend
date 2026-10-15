@@ -213,8 +213,7 @@
     if(!map)return;
     map.setView([Number(location.latitude),Number(location.longitude)],19);
     if(buildingLayer&&!map.hasLayer(buildingLayer)){
-      buildingLayer.addTo(map);
-      loadBuildingFootprints(true);
+      buildingLayer.addTo(map); // overlayadd triggers the first footprint query
     }else loadBuildingFootprints(true);
     mapCardNode&&mapCardNode.scrollIntoView({behavior:"smooth",block:"start"});
   }
