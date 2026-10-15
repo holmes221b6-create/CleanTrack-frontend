@@ -186,3 +186,16 @@
 .ct-ann-dialog-head{border-bottom-color:#292c36}
 .ct-ann-receipt-row{border-bottom-color:#292c36}
 .ct-ann-page button:focus-visible,.ct-ann-page a:focus-visible,.ct-ann-page input:focus-visible,.ct-ann-page select:focus-visible,.ct-ann-page textarea:focus-visible{outline:2px solid #7668a5;outline-offset:2px}
+
+
+/* Native date/time picker visuals: match the Home charcoal + lavender palette. */
+.ct-ann-control[type="date"],.ct-ann-control[type="datetime-local"],.ct-ann-control[type="time"]{color-scheme:dark;accent-color:#7668a5}
+.ct-ann-control[type="date"]::-webkit-calendar-picker-indicator,
+.ct-ann-control[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.ct-ann-control[type="time"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.88;filter:invert(.82) sepia(.15) saturate(.55) hue-rotate(220deg)}
+html[data-theme="light"] .ct-ann-control[type="date"],
+html[data-theme="light"] .ct-ann-control[type="datetime-local"],
+html[data-theme="light"] .ct-ann-control[type="time"]{color-scheme:light}
+html[data-theme="light"] .ct-ann-control[type="date"]::-webkit-calendar-picker-indicator,
+html[data-theme="light"] .ct-ann-control[type="datetime-local"]::-webkit-calendar-picker-indicator,
+html[data-theme="light"] .ct-ann-control[type="time"]::-webkit-calendar-picker-indicator{filter:none}
