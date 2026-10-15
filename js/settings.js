@@ -38,7 +38,26 @@ const sec=card("Privacy and security","Security controls available for your acco
 // NOTIFICATIONS
 const nvals=pr.notifications||{},checks=[chk("In-app notifications",nvals.inApp,"inApp"),chk("Task assignment and status updates",nvals.taskUpdates,"taskUpdates"),chk("Announcements and alerts",nvals.announcements,"announcements"),chk("Security and account alerts",nvals.security,"security"),chk("Email notifications",nvals.email,"email")],nc=card("Notification preferences","Saved locally as personal preferences. Actual delivery controls need the notification service to be connected.","♧"),list=el("div","ct-settings-check-list");checks.forEach(x=>list.appendChild(x.wrap));nc.appendChild(list);nc.appendChild(btn("Save notification settings","ct-settings-button ct-settings-button-primary",async()=>{PREF.update({notifications:Object.fromEntries(checks.map(x=>[x.input.name,x.input.checked]))});try{await PREF.sync();alert("Notification preferences saved to your account. Actual delivery still depends on the notification service.")}catch(e){alert("Saved locally, but the account save failed: "+e.message)}}));p.notifications.appendChild(nc);
 // APPEARANCE
-const ac=card("Appearance","Applies throughout the app in this browser.","◐"),themes=el("div","ct-settings-theme-options");[["light","Light","☀","Bright interface"],["dark","Dark","☾","Low-light interface"]].forEach(([v,label,ico,desc])=>{const b=btn("", "ct-settings-theme-option"+(pr.theme===v?" is-selected":""),()=>{PREF.update({theme:v});themes.querySelectorAll("button").forEach(x=>{x.classList.toggle("is-selected",x===b);x.setAttribute("aria-pressed",String(x===b))});PREF.sync().catch(e=>alert("Theme changed on this device, but the account save failed: "+e.message))});b.setAttribute("aria-pressed",String(pr.theme===v));b.append(el("span","",ico),el("strong","",label),el("small","ct-settings-muted",desc));themes.appendChild(b)});ac.appendChild(themes);ac.appendChild(el("p","ct-settings-muted","Each account can choose its own theme; this does not change other users' preferences."));p.appearance.appendChild(ac);
+const ac=card("Appearance","Applies throughout the app in this browser.","◐"),themes=el("div","ct-settings-theme-options");
+[["light","Light","☀","Bright interface"],["dark","Dark","☾","Low-light interface"]].forEach(([v,label,ico,desc])=>{
+ const b=btn("", "ct-settings-theme-option"+(pr.theme===v?" is-selected":""),()=>{
+  PREF.update({theme:v});
+  themes.querySelectorAll("button").forEach(x=>{x.classList.toggle("is-selected",x===b);x.setAttribute("aria-pressed",String(x===b))});
+  PREF.sync().catch(e=>alert("Theme changed on this device, but the account save failed: "+e.message));
+ });
+ b.setAttribute("aria-pressed",String(pr.theme===v));
+ b.append(el("span","",ico),el("strong","",label),el("small","ct-settings-muted",desc));
+ themes.appendChild(b);
+});
+ac.appendChild(themes);
+const appearanceLanguage=sel(LANGS,pr.language||"en","appearanceLanguage");
+ac.appendChild(fld("Language",appearanceLanguage,"Changes the interface language across supported CleanTrack pages."));
+appearanceLanguage.addEventListener("change",()=>{
+ PREF.update({language:appearanceLanguage.value});
+ PREF.sync().catch(e=>alert("Language changed on this device, but the account save failed: "+e.message));
+});
+ac.appendChild(el("p","ct-settings-muted","Each account can choose its own theme and language; this does not change other users' preferences."));
+p.appearance.appendChild(ac);
 // DATA AND REPORTS
 const rv=pr.reports||{},fmt=sel([["csv","CSV"],["xlsx","Excel (.xlsx)"],["json","JSON"],["pdf","PDF"]],rv.exportFormat||"csv","exportFormat"),range=sel([["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["365","Last 12 months"]],rv.dateRange||"30","dateRange"),arch=chk("Include archived records by default where permitted",rv.includeArchived,"includeArchived");
 p.data.appendChild(formcard("Data and report defaults","These choices set personal defaults; they do not generate or export reports by themselves.","▤",[fld("Default export format",fmt),fld("Report date range",range),arch.wrap],async()=>{PREF.update({reports:{exportFormat:fmt.value,dateRange:range.value,includeArchived:arch.input.checked}});try{await PREF.sync()}catch(e){throw Error("Report defaults changed locally, but the account save failed: "+e.message)}},"Save data preferences"));
