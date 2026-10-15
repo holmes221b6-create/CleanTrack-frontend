@@ -454,6 +454,24 @@
       return;
     }
 
+    // Organization Analytics is deliberately limited to team comparison and team rankings.
+    if (pageId === "analytics") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Analytics is available to organization Admins only."
+        }));
+        return;
+      }
+      if (window.CleanTrackAnalytics && typeof window.CleanTrackAnalytics.render === "function") {
+        await window.CleanTrackAnalytics.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Team Analytics could not load. Refresh the page and try again."
+        }));
+      }
+      return;
+    }
+
     // Operations is the role-scoped work engine. Employee routes reuse the same
     // data-backed module but expose only operations assigned to the signed-in user.
     if (["operations", "my-tasks", "my-history"].includes(pageId)) {
