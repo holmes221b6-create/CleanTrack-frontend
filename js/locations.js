@@ -72,7 +72,7 @@
     const form=el("form","ct-loc-form"),name=inp("text",old?.name||candidate?.name||"","name","Building or location name");name.maxLength=150;name.required=true;
     const address=inp("text",old?.address||candidate?.address||"","address","Address, building, city");address.maxLength=300;
     const description=el("textarea","ct-loc-input");description.name="description";description.value=old?.description||"";description.rows=3;
-    const team=el("select","ct-loc-input");team.name="team_id";[["","No team assigned"],...teams.filter(t=>String(t.status||"active")!=="archived").map(t=>[String(t.id),t.name])].forEach(([v,l])=>{const o=el("option","",l);o.value=v;team.append(o);});team.value=old?.team_id==null?"":String(old.team_id);
+    const team=el("select","ct-loc-input");team.name="team_id";[["","No team assigned"],...teams.filter(t=>String(t.status||"active")==="active"||String(t.id)===String(old?.team_id)).map(t=>[String(t.id),t.name])].forEach(([v,l])=>{const o=el("option","",l);o.value=v;team.append(o);});team.value=old?.team_id==null?"":String(old.team_id);
     const lat=inp("number",old?.latitude??candidate?.lat??"","latitude","Latitude");lat.step="any";lat.min="-90";lat.max="90";lat.required=!editing;
     const lon=inp("number",old?.longitude??candidate?.lon??"","longitude","Longitude");lon.step="any";lon.min="-180";lon.max="180";lon.required=!editing;
     const status=el("select","ct-loc-input");status.name="status";[["active","Active"],["inactive","Inactive"],["archived","Archived"]].forEach(([v,l])=>{const o=el("option","",l);o.value=v;status.append(o);});status.value=old?.status||"active";
