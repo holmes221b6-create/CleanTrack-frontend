@@ -125,3 +125,8 @@ html[data-theme="light"] .ct-locations-page .ct-loc-card,
 html[data-theme="light"] .ct-locations-page .ct-loc-metric { background:var(--bg-elevated,#eef2f6); }
 html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7ee; }
 @media(max-width:560px){.ct-loc-map-head-actions{width:100%;justify-content:space-between;}}
+
+/* Location directory empty state and free-map guidance */
+
+.ct-loc-empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:16px}
+.ct-loc-map-guidance{margin:0 0 12px;font-size:.84rem}
