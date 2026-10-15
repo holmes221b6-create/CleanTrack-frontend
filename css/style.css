@@ -818,7 +818,8 @@ tbody tr:hover {
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* A persistent transform creates a containing block for fixed popovers. */
+    transform: none;
   }
 }
 
