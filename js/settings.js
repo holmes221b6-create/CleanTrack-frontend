@@ -3,7 +3,7 @@
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
 const LANGS=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
 const CURS="USD EUR GBP INR CNY JPY KRW AED SAR QAR KWD BHD OMR JOD SGD AUD CAD CHF NZD HKD TWD THB IDR MYR PHP VND BDT PKR LKR NPR ZAR NGN KES EGP TRY BRL MXN ARS CLP COP PEN UYU DOP PLN CZK HUF RON SEK NOK DKK ISK RUB ILS UAH MAD GHS UGX TZS ETB KZT MUR".split(" ");
-const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
+const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["places","Location & Places","⌖"],["actions","Account actions","↗"]];
 function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n}
 function btn(x,c,fn){const n=el("button",c||"ct-settings-button",x);n.type="button";n.addEventListener("click",fn);return n}
 function fld(x,n,h){const w=el("label","ct-settings-field");w.append(el("span","",x),n);if(h)w.appendChild(el("small","ct-settings-muted",h));return w}
@@ -64,6 +64,8 @@ p.data.appendChild(formcard("Data and report defaults","These choices set person
 p.data.appendChild(card("Formatting","Shared helpers are available for localized date, time and currency. Individual pages must use these helpers to reflect selections in all output.","◷"));
 // INTEGRATIONS
 const integrations=card("Integrations","These are reserved for future configuration. No external provider is connected by these controls.","⌘");[["WhatsApp","Messages and alerts"],["Email service","Delivery provider"],["Maps","Location and mapping"],["Third-party tools","Future integrations"],["API access","Keys and webhooks"]].forEach(([x,y])=>{const r=el("div","ct-settings-integration-row"),t=el("div");t.append(el("strong","",x),el("p","ct-settings-muted",y));r.append(t,el("span","ct-settings-tag","Not connected"));integrations.appendChild(r)});p.integrations.appendChild(integrations);
+// BUILDING-LEVEL PLACE DIRECTORY
+if(window.CleanTrackBuildingPlaces)window.CleanTrackBuildingPlaces.render(p.places);
 // HELP
 const help=card("Help and support","Available published help resources.","?");[["Help Center","center"],["User/Admin guide","guide"],["Contact support","contact"],["Report a problem","problem"],["Feedback","feedback"]].forEach(([label,id])=>help.appendChild(btn(label,"ct-settings-button",()=>{const target=document.querySelector('[data-help-action="'+id+'"]');if(target)target.click();else alert("No support destination is configured yet. No message was sent.")})));p.help.appendChild(help);
 // LEGAL
