@@ -387,6 +387,10 @@
           start_date: startDate.value,
           end_date: endDate.value
         });
+        if (selectA.value && selectB.value && String(selectA.value) !== String(selectB.value)) {
+          query.set("team_a", selectA.value);
+          query.set("team_b", selectB.value);
+        }
         const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl;
         if (!base) throw new Error("API configuration is unavailable.");
         const headers = new Headers({ Accept: format === "pdf" ? "application/pdf" : format === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "text/csv" });
@@ -404,7 +408,7 @@
         const disposition = response.headers.get("Content-Disposition") || "";
         const match = disposition.match(/filename="?([^";]+)"?/i);
         const extension = format === "xlsx" ? "xlsx" : format;
-        const filename = match ? match[1] : "cleantrack-team-rankings." + extension;
+        const filename = match ? match[1] : "cleantrack-team-analytics." + extension;
         const url = URL.createObjectURL(blob);
         const link = el("a", "");
         link.href = url; link.download = filename; link.style.display = "none";
