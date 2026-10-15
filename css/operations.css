@@ -494,7 +494,7 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-viewbar .ct-op
    panels used elsewhere in CleanTrack. It intentionally has no modal backdrop. */
 #page-content .ct-operations-page .ct-op-calendar-popover[hidden]{display:none!important}
 #page-content .ct-operations-page .ct-op-calendar-popover{
- position:fixed!important;inset:auto auto auto auto!important;z-index:1200;
+ position:fixed!important;right:auto!important;bottom:auto!important;z-index:1200;
  box-sizing:border-box;width:min(380px,calc(100vw - 16px));max-width:calc(100vw - 16px);
  max-height:min(76dvh,620px);min-width:0;min-height:0;height:auto;resize:none;
  margin:0;padding:12px;overflow:auto;border:1px solid #514566;border-radius:12px;
