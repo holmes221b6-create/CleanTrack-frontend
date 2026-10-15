@@ -419,4 +419,35 @@ Object.assign(D.ur, {"Language, date/time, timezone and currency preferences are
 Object.assign(D.zh, {"Language, date/time, timezone and currency preferences are saved to your account and reused on sign-in. Supported interface labels translate app-wide; unlisted content may remain in its source language.":"语言、日期、时间、时区和货币偏好会保存到您的账户，并在下次登录时使用。受支持的界面标签会在整个应用中翻译；未收录的内容可能保留原语言。"});
 Object.assign(D.ar, {"Language, date/time, timezone and currency preferences are saved to your account and reused on sign-in. Supported interface labels translate app-wide; unlisted content may remain in its source language.":"تُحفظ تفضيلات اللغة والتاريخ والوقت والمنطقة الزمنية والعملة في حسابك وتُستخدم عند تسجيل الدخول لاحقًا. تُترجم تسميات الواجهة المدعومة في التطبيق؛ وقد يبقى المحتوى غير المدرج بلغته الأصلية."});
 
+Object.assign(D.es, {
+  "Changes the interface language across supported CleanTrack pages.":"Cambia el idioma de la interfaz en las páginas compatibles de CleanTrack.",
+  "Each account can choose its own theme and language; this does not change other users' preferences.":"Cada cuenta puede elegir su propio tema e idioma; esto no cambia las preferencias de otras personas.",
+  "Theme changed on this device, but the account save failed: ":"El tema cambió en este dispositivo, pero no se pudo guardar en la cuenta: ",
+  "Language changed on this device, but the account save failed: ":"El idioma cambió en este dispositivo, pero no se pudo guardar en la cuenta: "
+});
+Object.assign(D.hi, {
+  "Changes the interface language across supported CleanTrack pages.":"यह समर्थित CleanTrack पृष्ठों में इंटरफ़ेस की भाषा बदलता है।",
+  "Each account can choose its own theme and language; this does not change other users' preferences.":"हर खाता अपनी थीम और भाषा चुन सकता है; इससे अन्य उपयोगकर्ताओं की प्राथमिकताएँ नहीं बदलतीं।",
+  "Theme changed on this device, but the account save failed: ":"इस डिवाइस पर थीम बदल गई, लेकिन खाता सेटिंग सहेजी नहीं जा सकी: ",
+  "Language changed on this device, but the account save failed: ":"इस डिवाइस पर भाषा बदल गई, लेकिन खाता सेटिंग सहेजी नहीं जा सकी: "
+});
+Object.assign(D.ur, {
+  "Changes the interface language across supported CleanTrack pages.":"یہ معاون CleanTrack صفحات میں انٹرفیس کی زبان تبدیل کرتا ہے۔",
+  "Each account can choose its own theme and language; this does not change other users' preferences.":"ہر اکاؤنٹ اپنی تھیم اور زبان منتخب کر سکتا ہے؛ اس سے دوسرے صارفین کی ترجیحات تبدیل نہیں ہوتیں۔",
+  "Theme changed on this device, but the account save failed: ":"اس آلے پر تھیم بدل گئی، لیکن اکاؤنٹ میں محفوظ نہیں ہو سکی: ",
+  "Language changed on this device, but the account save failed: ":"اس آلے پر زبان بدل گئی، لیکن اکاؤنٹ میں محفوظ نہیں ہو سکی: "
+});
+Object.assign(D.zh, {
+  "Changes the interface language across supported CleanTrack pages.":"更改 CleanTrack 支持页面中的界面语言。",
+  "Each account can choose its own theme and language; this does not change other users' preferences.":"每个账户都可以选择自己的主题和语言；这不会更改其他用户的偏好设置。",
+  "Theme changed on this device, but the account save failed: ":"此设备上的主题已更改，但无法保存到账户：",
+  "Language changed on this device, but the account save failed: ":"此设备上的语言已更改，但无法保存到账户："
+});
+Object.assign(D.ar, {
+  "Changes the interface language across supported CleanTrack pages.":"يغيّر لغة الواجهة في صفحات CleanTrack المدعومة.",
+  "Each account can choose its own theme and language; this does not change other users' preferences.":"يمكن لكل حساب اختيار المظهر واللغة الخاصين به؛ ولن يغيّر ذلك تفضيلات المستخدمين الآخرين.",
+  "Theme changed on this device, but the account save failed: ":"تم تغيير المظهر على هذا الجهاز، لكن تعذّر حفظه في الحساب: ",
+  "Language changed on this device, but the account save failed: ":"تم تغيير اللغة على هذا الجهاز، لكن تعذّر حفظها في الحساب: "
+});
+
 })();
