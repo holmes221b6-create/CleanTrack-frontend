@@ -433,6 +433,18 @@
       renderComparison();
     });
     loadReport();
+    // Rankings refresh from the backend every minute while this page is open.
+    // Changing the date fields without applying them does not silently change the period.
+    const refreshInterval = window.setInterval(() => {
+      if (!page.isConnected) {
+        window.clearInterval(refreshInterval);
+        return;
+      }
+      if (document.visibilityState !== "hidden" && report &&
+          startDate.value === report.period.start_date && endDate.value === report.period.end_date) {
+        loadReport();
+      }
+    }, 60000);
   }
 
   window.CleanTrackAnalytics = Object.freeze({ render });
