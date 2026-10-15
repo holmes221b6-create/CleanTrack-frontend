@@ -10,7 +10,7 @@
   const coords=x=>x&&x.latitude!==null&&x.latitude!==undefined&&x.longitude!==null&&x.longitude!==undefined&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude));
   const teamName=id=>teams.find(t=>String(t.id)===String(id))?.name||"Unassigned";
   const zonesAt=x=>zones.filter(z=>String(z.location_id)===String(x.id));
-  const opsAt=x=>{const ids=new Set(zonesAt(x).map(z=>String(z.id)));return operations.filter(o=>String(o.location_id)===String(x.id)||ids.has(String(o.zone_id));};
+  const opsAt=x=>{const ids=new Set(zonesAt(x).map(z=>String(z.id)));return operations.filter(o=>String(o.location_id)===String(x.id)||ids.has(String(o.zone_id)));};
   const dt=x=>!x?"—":(window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x)+" "+window.CleanTrackPreferences.formatTime(x):new Date(x).toLocaleString());
   const d=x=>!x?"—":(window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x):new Date(x).toLocaleDateString());
   const rows=(data,key)=>Array.isArray(data?.[key])?data[key]:[];
