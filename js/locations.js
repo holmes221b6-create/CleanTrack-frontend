@@ -7,7 +7,7 @@
   const btn=(x,c,fn,type)=>{const n=el("button",c||"ct-loc-btn",x);n.type=type||"button";if(fn)n.addEventListener("click",fn);return n;};
   const inp=(type,value,name,placeholder)=>{const n=el("input","ct-loc-input");n.type=type;n.name=name;n.value=value==null?"":String(value);if(placeholder)n.placeholder=placeholder;return n;};
   const txt=(value,fallback)=>value===null||value===undefined||value===""?(fallback||"—"):String(value);
-  const coords=x=>x&&x.latitude!==null&&x.latitude!==undefined&&x.longitude!==null&&x.longitude!==undefined&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude));
+  const coords=x=>{if(!x)return false;const lat=x.latitude,lon=x.longitude;if(lat===null||lat===undefined||lon===null||lon===undefined||String(lat).trim()===""||String(lon).trim()==="")return false;const a=Number(lat),b=Number(lon);return Number.isFinite(a)&&a>=-90&&a<=90&&Number.isFinite(b)&&b>=-180&&b<=180;};
   const teamName=id=>id===null||id===undefined||id===""?"Unassigned":(teams.find(t=>String(t.id)===String(id))?.name||(dataStatus.teams?"Team #"+id+" (not found)":"Team #"+id+" (team list unavailable)"));
   const zonesAt=x=>zones.filter(z=>String(z.location_id)===String(x.id));
   const opsAt=x=>{const ids=new Set(zonesAt(x).map(z=>String(z.id)));return operations.filter(o=>String(o.location_id)===String(x.id)||ids.has(String(o.zone_id)));};
@@ -26,24 +26,29 @@
     const box=root&&root.querySelector("#ct-location-map");
     if(!box)return;
     if(!window.L){box.replaceChildren(el("p","ct-loc-map-fallback","The map library did not load. Check your connection and open Browse map again to retry."));return;}
-    if(map){setTimeout(()=>map&&map.invalidateSize(),80);return;}
+    if(map&&map.getContainer()===box){setTimeout(()=>map&&map.invalidateSize(),80);return;}
+    // Always attach exactly one Leaflet map to the current page container.
+    if(map){try{map.off();map.remove();}catch(_){}}
+    map=null;layer=null;
     map=L.map(box,{scrollWheelZoom:true,preferCanvas:true}).setView([20,0],2);
-    const standard=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
-      maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+    // Single free, no-key basemap. Avoid offering multiple map layers/providers.
+    const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+      maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
     });
-    const detailed=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{
-      subdomains:"abcd",maxZoom:20,maxNativeZoom:19,
-      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'
-    });
-    [standard,detailed].forEach(tiles=>{
-      tiles.on("tileerror",()=>mapMsg("Some map tiles could not load. Check your connection or switch the map style. Saved locations remain available.",true));
-      tiles.on("load",()=>mapMsg("",false));
-    });
-    detailed.addTo(map);
-    L.control.layers({"Detailed labels":detailed,"OpenStreetMap standard":standard},null,{collapsed:true,position:"topright"}).addTo(map);
+    tiles.on("tileerror",()=>mapMsg("Map tiles could not load. Check your connection. You can still use the saved location directory and place search.",true));
+    tiles.addTo(map);
     layer=L.layerGroup().addTo(map);
-    map.on("click",e=>{if(!formNode||formNode.hidden)return;setPin(e.latlng.lat,e.latlng.lng,"Map pin");notice("Pin placed. Confirm the address and save the location.","success");});
-    renderMapPins();setTimeout(()=>map&&map.invalidateSize(),100);
+    map.on("click",e=>{
+      if(!formNode||formNode.hidden)return;
+      setPin(e.latlng.lat,e.latlng.lng,"Map pin");
+      notice("Pin placed. Confirm the address and save the location.","success");
+    });
+    renderMapPins();
+    // Frame actual saved location pins on first open rather than showing a
+    // world-scale map where an organization's points are almost invisible.
+    if(locations.some(coords))fitPins();
+    setTimeout(()=>map&&map.invalidateSize(),100);
   }
   function toggleMapPanel(forceOpen){
     if(!mapCardNode)return;
@@ -69,13 +74,13 @@
     noticeNode=el("div","ct-loc-notice");noticeNode.hidden=true;noticeNode.setAttribute("role","status");
     const metrics=el("div","ct-loc-metrics");
     const mapCard=el("section","ct-loc-card ct-loc-map-card");mapCard.hidden=true;mapCardNode=mapCard;
-    const mh=el("div","ct-loc-section-head"),mt=el("div");mt.append(el("h2","","Browse map"),el("p","ct-loc-muted","Search countries, cities, rivers, roads, landmarks and addresses. Choose a result to zoom to that place. Map labels depend on the map provider's available geographic data."));const mapHeadActions=el("div","ct-loc-map-head-actions");mapHeadActions.append(el("span","ct-loc-map-chip","OpenStreetMap + detailed labels"),btn("Close map","ct-loc-btn ct-loc-btn-small",()=>toggleMapPanel(false)));mh.append(mt,mapHeadActions);
-    const sf=el("form","ct-loc-map-search"),sq=inp("search","","place_query","Search e.g. Hyderabad, India or Hyderabad, Pakistan");searchBoxNode=sq;sq.autocomplete="off";const sb=btn("Search places","ct-loc-btn ct-loc-btn-primary",null,"submit");sf.append(sq,sb);searchResultsNode=el("div","ct-loc-search-results");
+    const mh=el("div","ct-loc-section-head"),mt=el("div");mt.append(el("h2","","Browse map"),el("p","ct-loc-muted","Search real countries, cities, roads, landmarks and addresses. Select a result to preview it. A place is added to your organization's directory only after you save it."));const mapHeadActions=el("div","ct-loc-map-head-actions");mapHeadActions.append(el("span","ct-loc-map-chip","Free OpenStreetMap · no API key"),btn("Close map","ct-loc-btn ct-loc-btn-small",()=>toggleMapPanel(false)));mh.append(mt,mapHeadActions);
+    const sf=el("form","ct-loc-map-search"),sq=inp("search","","place_query","Search a real place, city, landmark or address");searchBoxNode=sq;sq.autocomplete="off";const sb=btn("Search places","ct-loc-btn ct-loc-btn-primary",null,"submit");sf.append(sq,sb);const guidance=el("p","ct-loc-muted ct-loc-map-guidance","Search results come from OpenStreetMap and are previews, not saved organization records. Use Add Location and Save to put a place in your directory.");searchResultsNode=el("div","ct-loc-search-results");
     sf.addEventListener("submit",e=>{e.preventDefault();searchPlaces(sq.value.trim());});
     mapNotice=el("div","ct-loc-map-notice");mapNotice.hidden=true;
     const mapWrap=el("div","ct-loc-map-wrap"),mapEl=el("div","ct-loc-map");mapEl.id="ct-location-map";mapWrap.append(mapEl);
     const mf=el("div","ct-loc-map-footer");mf.append(el("p","ct-loc-muted","Geographic reference only: this is not indoor routing or employee tracking."),btn("Show all saved pins","ct-loc-btn ct-loc-btn-small",fitPins));
-    mapCard.append(mh,sf,searchResultsNode,mapNotice,mapWrap,mf);
+    mapCard.append(mh,sf,guidance,searchResultsNode,mapNotice,mapWrap,mf);
     const add=el("section","ct-loc-card ct-loc-add-card");add.hidden=true;formNode=add;
     detailNode=el("section","ct-loc-card ct-loc-detail-card");detailNode.hidden=true;
     const dir=el("section","ct-loc-card ct-loc-directory"),dh=el("div","ct-loc-section-head"),di=el("div");di.append(el("h2","","Location directory"),el("p","ct-loc-muted","Saved records, team assignments, zones and operation links."));
@@ -88,7 +93,18 @@
   function renderMetrics(box){if(!box)return;box.replaceChildren();const active=locations.filter(x=>String(x.status||"active")==="active").length,mapped=locations.filter(coords).length,open=operations.filter(x=>!["completed","complete","approved","done","closed","cancelled","canceled"].includes(String(x.status||"").toLowerCase())).length;
     [[locations.length,"Locations","Saved in this organization"],[active,"Active","Available for new work"],[mapped,"Mapped","Have GPS coordinates"],[dataStatus.operations?open:"—","Open operations",dataStatus.operations?"Across linked records":"Operations API unavailable"]].forEach(([v,l,h])=>{const c=el("article","ct-loc-metric");c.append(el("span","ct-loc-metric-icon","⌖"),el("strong","",String(v)),el("span","",l),el("small","",h));box.append(c);});}
   function renderDirectory(){if(!root)return;const box=root.querySelector("[data-directory]");if(!box)return;box.replaceChildren();const q=query.trim().toLowerCase();const filtered=locations.filter(x=>(statusFilter==="all"||String(x.status||"active").toLowerCase()===statusFilter)&&(!q||[x.name,x.address,x.description,teamName(x.team_id)].join(" ").toLowerCase().includes(q)));
-    if(!filtered.length){const empty=el("div","ct-loc-empty");empty.append(el("strong","","No matching locations"),el("p","","Add a location or import a CSV/GeoJSON file to populate this directory with actual organization records."));box.append(empty);return;}
+    if(!filtered.length){
+      const empty=el("div","ct-loc-empty");
+      if(!locations.length){
+        empty.append(el("strong","","No saved locations yet"),el("p","","This directory lists only locations saved in your organization database; it does not insert sample places. Search for a real place on the map, or add a location and save it here."));
+        const actions=el("div","ct-loc-empty-actions");
+        actions.append(btn("Find a place on the map","ct-loc-btn ct-loc-btn-primary",()=>{toggleMapPanel(true);if(searchBoxNode)searchBoxNode.focus({preventScroll:true});}),btn("+ Add Location","ct-loc-btn",addLocation));
+        empty.appendChild(actions);
+      }else{
+        empty.append(el("strong","","No matching locations"),el("p","","No saved location matches the current search and status filters. Clear the search or choose another status."));
+      }
+      box.append(empty);return;
+    }
     const wrap=el("div","ct-loc-table-wrap"),table=el("table","ct-loc-table"),thead=el("thead"),hr=el("tr");["Location","Assigned team","Zones","Operations","Coordinates","Status","Actions"].forEach(v=>hr.append(el("th","",v)));thead.append(hr);const tb=el("tbody");
     filtered.forEach(x=>{const tr=el("tr"),td=el("td","ct-loc-name-cell");td.append(btn(x.name,"ct-loc-text-button",()=>showDetails(x.id,true)),el("small","",x.address||"Address not recorded"));const countZones=x.zone_count??zonesAt(x).length,countOps=x.operation_count??opsAt(x).length,coord=coords(x)?Number(x.latitude).toFixed(5)+", "+Number(x.longitude).toFixed(5):"Not pinned";const st=el("td"),pill=el("span","ct-loc-status status-"+String(x.status||"active").toLowerCase(),txt(x.status,"active"));st.append(pill);const acts=el("td","ct-loc-row-actions");acts.append(btn("Details","ct-loc-btn ct-loc-btn-small",()=>showDetails(x.id,true)),btn("Edit","ct-loc-btn ct-loc-btn-small",()=>editLocation(x.id)));tr.append(td,el("td","",teamName(x.team_id)),el("td","",String(countZones)),el("td","",String(countOps)),el("td","",coord),st,acts);tb.append(tr);});
     table.append(thead,tb);wrap.append(table);box.append(wrap,el("p","ct-loc-table-foot",filtered.length+" of "+locations.length+" records · Loaded from CleanTrack database."));}
@@ -160,6 +176,13 @@
   function csv(v){const s=v==null?"":String(v);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
   function downloadTemplate(){const blob=new Blob(["name,address,description,latitude,longitude,team_id\r\n"],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob),a=el("a");a.href=url;a.download="cleantrack-location-import-template.csv";a.click();URL.revokeObjectURL(url);notice("Downloaded a blank CSV template. Fill it with your locations and re-import it; use coordinates from your map or address search.","success");}
   function exportCSV(){const head=["id","name","address","description","team_id","team_name","latitude","longitude","status","zone_count","operation_count","created_at"];const all=[head,...locations.map(x=>[x.id,x.name,x.address,x.description,x.team_id,teamName(x.team_id),x.latitude,x.longitude,x.status,zonesAt(x).length,opsAt(x).length,x.created_at])];const blob=new Blob(["\ufeff"+all.map(r=>r.map(csv).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob),a=el("a");a.href=url;a.download="cleantrack-locations.csv";a.click();URL.revokeObjectURL(url);notice("Exported "+locations.length+" database location records to CSV.","success");}
-  async function render(container){if(String(AUTH?.getCurrentUser?.()?.role||"").toLowerCase()!=="admin"){container.replaceChildren(el("p","ct-loc-notice error","Location administration is available to organization Admins only."));return;}root=container;container.replaceChildren(el("p","ct-loc-muted","Loading organization locations…"));try{await load();query="";statusFilter="all";selectedId=null;candidate=null;createPage(container);}catch(err){container.replaceChildren();const p=el("section","ct-locations-page");p.append(el("h1","","Locations"),el("p","ct-loc-notice error",err.message||"Locations could not load."),btn("Retry","ct-loc-btn ct-loc-btn-primary",()=>render(container)));container.append(p);}}
+  async function render(container){
+    // Clean up the previous Leaflet instance before route navigation/remounts.
+    // Without this, Leaflet can retain a detached container and the next visit
+    // may produce a blank map or stale map UI.
+    if(map){try{map.off();map.remove();}catch(_){}}
+    map=null;layer=null;root=null;mapCardNode=null;mapToggleButton=null;searchBoxNode=null;mapNotice=null;noticeNode=null;formNode=null;detailNode=null;searchResultsNode=null;
+    if(String(AUTH?.getCurrentUser?.()?.role||"").toLowerCase()!=="admin"){container.replaceChildren(el("p","ct-loc-notice error","Location administration is available to organization Admins only."));return;}
+    root=container;container.replaceChildren(el("p","ct-loc-muted","Loading organization locations…"));try{await load();query="";statusFilter="all";selectedId=null;candidate=null;createPage(container);}catch(err){container.replaceChildren();const p=el("section","ct-locations-page");p.append(el("h1","","Locations"),el("p","ct-loc-notice error",err.message||"Locations could not load."),btn("Retry","ct-loc-btn ct-loc-btn-primary",()=>render(container)));container.append(p);}}
   window.CleanTrackLocations=Object.freeze({render,refresh:async()=>{await load();if(root){renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();}}});
 })();
