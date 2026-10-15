@@ -76,36 +76,31 @@ function positionCalendar(root){
  const panel=root.querySelector("[data-op-calendar]");
  const trigger=root.querySelector("[data-op-calendar-trigger]");
  if(!panel||!trigger)return;
- const rect=trigger.getBoundingClientRect();
  const edge=8,gap=10,viewportW=window.innerWidth,viewportH=window.innerHeight;
  const width=Math.min(380,viewportW-edge*2);
  panel.hidden=false;
  panel.style.width=width+"px";
- // Measure the opened panel before choosing the placement.
- panel.style.left=edge+"px";
- panel.style.top=edge+"px";
- const measured=panel.getBoundingClientRect();
- const height=Math.min(measured.height,viewportH-edge*2);
- // If the user moved the popover, restore its saved viewport position.
- let savedPosition=null;
- try{savedPosition=JSON.parse(localStorage.getItem("cleantrack.operations-calendar-panel.position")||"null");}catch(_){}
- if(savedPosition&&Number.isFinite(savedPosition.x)&&Number.isFinite(savedPosition.y)){
-  const x=Math.max(edge,Math.min(viewportW-width-edge,savedPosition.x));
-  const y=Math.max(edge,Math.min(viewportH-height-edge,savedPosition.y));
-  panel.dataset.userPositioned="true";panel.style.left=x+"px";panel.style.top=y+"px";
+ // Keep the moved location while this page is open, but never persist it.
+ if(panel.dataset.userPositioned==="true"){
+  const current=panel.getBoundingClientRect();
+  const height=Math.min(current.height,viewportH-edge*2);
+  const x=Math.max(edge,Math.min(viewportW-current.width-edge,current.left));
+  const y=Math.max(edge,Math.min(viewportH-height-edge,current.top));
+  panel.style.left=x+"px";panel.style.top=y+"px";
   return;
  }
+ const rect=trigger.getBoundingClientRect();
+ panel.style.left=edge+"px";panel.style.top=edge+"px";
+ const measured=panel.getBoundingClientRect();
+ const height=Math.min(measured.height,viewportH-edge*2);
  const spaceRight=viewportW-rect.right-edge-gap;
  const spaceLeft=rect.left-edge-gap;
  let left,top;
- // On desktop, open beside the Operations Calendar trigger instead of
- // dropping down the page. Fall back to the side with more room.
  if(spaceRight>=width || spaceRight>=spaceLeft){
    if(spaceRight>=Math.min(width,260)) left=rect.right+gap;
    else if(spaceLeft>=Math.min(width,260)) left=rect.left-width-gap;
  }
  if(left===undefined){
-   // Narrow viewports cannot fit the calendar beside the button.
    left=Math.max(edge,Math.min(viewportW-width-edge,rect.left));
    top=rect.bottom+gap;
    if(top+height>viewportH-edge)top=rect.top-height-gap;
@@ -120,11 +115,11 @@ function positionCalendar(root){
 function makeCalendarPanelMovable(root,panel){
  const handle=panel.querySelector(".ct-op-calendar-toolbar");
  if(!handle)return;
- const key="cleantrack.operations-calendar-panel.position",pad=8;
+ const pad=8;
  const clamp=(v,min,max)=>Math.max(min,Math.min(Math.max(min,max),v));
  let drag=null,moved=false;
  handle.style.cursor="grab";handle.style.touchAction="none";handle.style.userSelect="none";
- handle.title="Drag this toolbar to move the calendar. Use Reset position to return it beside the launcher.";
+ handle.title="Drag this toolbar to move the calendar anywhere in the visible page. Position resets to the default after refresh.";
  handle.addEventListener("pointerdown",event=>{
   if(event.button!==undefined&&event.button!==0)return;
   if(event.target.closest("button,input,select,textarea,a,[role='button']"))return;
@@ -150,7 +145,6 @@ function makeCalendarPanelMovable(root,panel){
    const rect=panel.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
    const x=clamp(rect.left,pad,vw-rect.width-pad),y=clamp(rect.top,pad,vh-rect.height-pad);
    panel.style.left=x+"px";panel.style.top=y+"px";panel.dataset.userPositioned="true";
-   try{localStorage.setItem(key,JSON.stringify({x,y}));}catch(_){}
   }
   panel.classList.remove("is-dragging");drag=null;moved=false;
  };
@@ -166,9 +160,6 @@ function makeCalendarPanelMovable(root,panel){
  });
 }
 function makeCalendarTriggerMovable(root,trigger){
- const key="cleantrack.operations-calendar-trigger.position";
- let saved=null;
- try{saved=JSON.parse(localStorage.getItem(key)||"null");}catch(_){}
  const clamp=(value,min,max)=>Math.max(min,Math.min(Math.max(min,max),value));
  const bounds=()=>({w:trigger.getBoundingClientRect().width||156,h:trigger.getBoundingClientRect().height||40});
  const apply=(x,y,persist=false)=>{
@@ -177,9 +168,7 @@ function makeCalendarTriggerMovable(root,trigger){
   const top=clamp(Number(y)||0,pad,window.innerHeight-size.h-pad);
   trigger.classList.add("ct-op-calendar-trigger-floating");
   trigger.style.left=left+"px";trigger.style.top=top+"px";
-  if(persist){try{localStorage.setItem(key,JSON.stringify({x:left,y:top}));}catch(_){}}
  };
- if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y))apply(saved.x,saved.y,false);
  let pointer=null,moved=false,suppressClick=false;
  trigger.addEventListener("pointerdown",event=>{
   if(event.button!==undefined&&event.button!==0)return;
@@ -200,7 +189,7 @@ function makeCalendarTriggerMovable(root,trigger){
  const endDrag=event=>{
   if(!pointer||event.pointerId!==pointer.id)return;
   if(moved){
-   const rect=trigger.getBoundingClientRect();apply(rect.left,rect.top,true);
+   const rect=trigger.getBoundingClientRect();apply(rect.left,rect.top,false);
    suppressClick=true;
    window.setTimeout(()=>{suppressClick=false;},0);
   }
@@ -215,17 +204,16 @@ function makeCalendarTriggerMovable(root,trigger){
  trigger.addEventListener("keydown",event=>{
   if(event.key==="Escape"&&trigger.classList.contains("ct-op-calendar-trigger-floating")){
    trigger.classList.remove("ct-op-calendar-trigger-floating");trigger.style.left="";trigger.style.top="";
-   try{localStorage.removeItem(key);}catch(_){}
-  }
+     }
  });
  window.addEventListener("resize",()=>{
   if(!trigger.classList.contains("ct-op-calendar-trigger-floating"))return;
-  const rect=trigger.getBoundingClientRect();apply(rect.left,rect.top,true);
+  const rect=trigger.getBoundingClientRect();apply(rect.left,rect.top,false);
   const panel=root.querySelector("[data-op-calendar]");
   if(panel&&!panel.hidden)positionCalendar(root);
  });
- trigger.title="Operations calendar. Drag to move; press Escape to reset its position.";
- trigger.setAttribute("aria-label","Operations calendar. Drag to move. Press Escape to reset its position.");
+ trigger.title="Operations calendar. Drag to reposition this launcher for the current session; refresh to restore its default position.";
+ trigger.setAttribute("aria-label","Operations calendar. Drag to reposition this launcher. Refresh to restore its default position.");
  trigger.classList.add("ct-op-calendar-trigger-draggable");
 }
 function makeCalendarPanel(root){
