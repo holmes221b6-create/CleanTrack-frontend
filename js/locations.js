@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   const API=window.CleanTrackApi, AUTH=window.CleanTrackAuth;
-  let root=null,map=null,layer=null,locations=[],teams=[],zones=[],operations=[],selectedId=null,editingId=null,candidate=null,mapCardNode=null,mapToggleButton=null,searchBoxNode=null;
+  let root=null,map=null,layer=null,buildingLayer=null,buildingRefreshTimer=null,lastBuildingFetchAt=0,lastBuildingBounds="",locations=[],teams=[],zones=[],operations=[],selectedId=null,editingId=null,candidate=null,mapCardNode=null,mapToggleButton=null,searchBoxNode=null;
   let query="",statusFilter="all",dataStatus={teams:true,zones:true,operations:true},lastPlaceSearchAt=0,noticeNode=null,mapNotice=null,formNode=null,detailNode=null,searchResultsNode=null,busy=false,importBusy=false;
   const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n;};
   const btn=(x,c,fn,type)=>{const n=el("button",c||"ct-loc-btn",x);n.type=type||"button";if(fn)n.addEventListener("click",fn);return n;};
@@ -30,16 +30,31 @@
     // Always attach exactly one Leaflet map to the current page container.
     if(map){try{map.off();map.remove();}catch(_){}}
     map=null;layer=null;
-    map=L.map(box,{scrollWheelZoom:true,preferCanvas:true,worldCopyJump:false}).setView([20,0],3);
+    map=L.map(box,{scrollWheelZoom:true,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20}).setView([20,0],3);
     // Single free, no-key basemap. Avoid offering multiple map layers/providers.
     const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
-      maxZoom:19,
+      maxZoom:20,
+      maxNativeZoom:19,
       noWrap:true,
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
     });
     tiles.on("tileerror",()=>mapMsg("Map tiles could not load. Check your connection. You can still use the saved location directory and place search.",true));
     tiles.addTo(map);
     layer=L.layerGroup().addTo(map);
+    buildingLayer=L.layerGroup();
+    L.control.layers(
+      {"Street map":tiles},
+      {"Building footprints (OpenStreetMap)":buildingLayer},
+      {collapsed:true,position:"topright"}
+    ).addTo(map);
+    map.on("overlayadd",e=>{
+      if(e.layer===buildingLayer) loadBuildingFootprints(true);
+    });
+    map.on("moveend",()=>{
+      if(!buildingLayer||!map.hasLayer(buildingLayer))return;
+      if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
+      buildingRefreshTimer=window.setTimeout(()=>loadBuildingFootprints(false),900);
+    });
     map.on("click",e=>{
       if(!formNode||formNode.hidden)return;
       setPin(e.latlng.lat,e.latlng.lng,"Map pin");
@@ -134,7 +149,75 @@
   function addLocation(){editingId=null;formNode.hidden=false;buildForm();formNode.scrollIntoView({behavior:"smooth",block:"start"});if(candidate&&map)map.setView([candidate.lat,candidate.lon],Math.max(14,map.getZoom()));}
   function editLocation(id){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;selectedId=x.id;editingId=x.id;candidate=coords(x)?{lat:Number(x.latitude),lon:Number(x.longitude),label:x.name}:null;formNode.hidden=false;buildForm();renderMapPins();formNode.scrollIntoView({behavior:"smooth",block:"start"});}
   function cancelForm(){formNode.hidden=true;editingId=null;candidate=null;renderMapPins();}
-  function fitPins(){if(!map||!window.L)return;const pts=locations.filter(coords).map(x=>[Number(x.latitude),Number(x.longitude)]);if(pts.length===1)map.setView(pts[0],14);else if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:14});else map.setView([20,0],3);}
+  function fitPins(){if(!map||!window.L)return;const pts=locations.filter(coords).map(x=>[Number(x.latitude),Number(x.longitude)]);if(pts.length===1)map.setView(pts[0],17);else if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:17});else map.setView([20,0],3);}
+  async function loadBuildingFootprints(force){
+    if(!map||!buildingLayer||!map.hasLayer(buildingLayer))return;
+    const bounds=map.getBounds(),zoom=map.getZoom();
+    if(zoom<17){
+      mapMsg("Building footprints are detailed data. Zoom in to level 17 or closer, then enable the building layer again.",false);
+      buildingLayer.clearLayers();lastBuildingBounds="";
+      return;
+    }
+    const south=bounds.getSouth(),west=bounds.getWest(),north=bounds.getNorth(),east=bounds.getEast();
+    const spanLat=north-south,spanLon=east-west;
+    if(spanLat>0.025||spanLon>0.035||spanLat*spanLon>0.00045){
+      mapMsg("Zoom in one more level for building footprints. This keeps the map query small and responsive.",false);
+      return;
+    }
+    const boundsKey=[south,west,north,east].map(v=>v.toFixed(5)).join(",");
+    if(!force&&boundsKey===lastBuildingBounds)return;
+    const elapsed=Date.now()-lastBuildingFetchAt;
+    if(!force&&elapsed<1400){
+      if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
+      buildingRefreshTimer=window.setTimeout(()=>loadBuildingFootprints(false),1400-elapsed);
+      return;
+    }
+    lastBuildingFetchAt=Date.now();lastBuildingBounds=boundsKey;
+    mapMsg("Loading real building footprints from OpenStreetMap…",false);
+    const query='[out:json][timeout:18];way["building"]('+south+','+west+','+north+','+east+');out geom;';
+    try{
+      const response=await fetch("https://overpass-api.de/api/interpreter",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},
+        body:new URLSearchParams({data:query})
+      });
+      if(!response.ok)throw new Error("Building map data is temporarily unavailable (HTTP "+response.status+").");
+      const data=await response.json();
+      if(!map||!buildingLayer||!map.hasLayer(buildingLayer)||map.getBounds().getSouthWest().distanceTo(bounds.getSouthWest())>350)return;
+      buildingLayer.clearLayers();
+      const elements=Array.isArray(data.elements)?data.elements:[];
+      let count=0;
+      elements.forEach(item=>{
+        const tags=item.tags||{},geometry=Array.isArray(item.geometry)?item.geometry.map(p=>[Number(p.lat),Number(p.lon)]):[];
+        if(geometry.length<4||geometry.some(p=>!Number.isFinite(p[0])||!Number.isFinite(p[1])))return;
+        const polygon=L.polygon(geometry,{color:"#e2a33b",weight:1.5,opacity:.95,fillColor:"#f6bf51",fillOpacity:.18});
+        const popup=el("div","ct-loc-building-popup");
+        popup.append(el("strong","",tags.name||tags["addr:housenumber"]||("Mapped building #"+item.id)));
+        const metadata=[tags.building&&("Type: "+tags.building),tags["building:levels"]&&("Floors: "+tags["building:levels"]),tags["addr:street"],tags["addr:city"]].filter(Boolean);
+        if(metadata.length)popup.append(el("div","",metadata.join(" · ")));
+        popup.append(el("small","", "Building footprint from OpenStreetMap · map data may be incomplete."));
+        polygon.bindPopup(popup);
+        if(tags.name)polygon.bindTooltip(tags.name,{sticky:true});
+        polygon.addTo(buildingLayer);count++;
+      });
+      if(count)mapMsg(count+" real building footprint"+(count===1?"":"s")+" loaded. Select an outline to view available map details.",false);
+      else mapMsg("No building footprints are mapped in this small area. Try moving the map or check a place with more OpenStreetMap building data.",false);
+    }catch(error){
+      lastBuildingBounds="";
+      mapMsg((error.message||"Building footprints could not be loaded.")+" The street map and saved locations are still available.",true);
+    }
+  }
+  function focusBuilding(location){
+    if(!location||!coords(location))return;
+    toggleMapPanel(true);
+    if(!map)return;
+    map.setView([Number(location.latitude),Number(location.longitude)],19);
+    if(buildingLayer&&!map.hasLayer(buildingLayer)){
+      buildingLayer.addTo(map);
+      loadBuildingFootprints(true);
+    }else loadBuildingFootprints(true);
+    mapCardNode&&mapCardNode.scrollIntoView({behavior:"smooth",block:"start"});
+  }
   async function searchPlaces(value){if(!value)return;const button=root.querySelector(".ct-loc-map-search button");button.disabled=true;button.textContent="Searching…";searchResultsNode.replaceChildren(el("p","ct-loc-muted","Searching OpenStreetMap place names…"));try{const wait=Math.max(0,1100-(Date.now()-lastPlaceSearchAt));if(wait)await new Promise(resolve=>setTimeout(resolve,wait));lastPlaceSearchAt=Date.now();const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&limit=10&q="+encodeURIComponent(value);const response=await fetch(url,{headers:{"Accept":"application/json","Accept-Language":document.documentElement.lang||"en"}});if(!response.ok)throw new Error("Place search is unavailable right now (HTTP "+response.status+").");searchResultsNode.replaceChildren();const results=await response.json();if(!Array.isArray(results)||!results.length){searchResultsNode.append(el("p","ct-loc-muted","No results found. Try a more specific address or place a pin manually."));return;}results.forEach(place=>{
       const title=place.name||String(place.display_name||"").split(",")[0]||"Map result";
       const country=place.address?.country||"Country not identified";
@@ -150,16 +233,18 @@
         if(map&&bbox.length===4&&bbox.every(Number.isFinite)){
           const south=bbox[0],north=bbox[1],west=bbox[2],east=bbox[3];
           if(Math.abs(north-south)>0.02||Math.abs(east-west)>0.02)map.fitBounds([[south,west],[north,east]],{padding:[24,24],maxZoom:14});
-          else map.fitBounds([[south,west],[north,east]],{padding:[30,30],maxZoom:17});
-        }else if(map){const kindLower=String(place.type||"").toLowerCase();const zoom=["country","state","region"].includes(kindLower)?6:["city","administrative","municipality"].includes(kindLower)?12:["suburb","neighbourhood","quarter","village"].includes(kindLower)?14:17;map.setView([lat,lon],zoom);}
+          else map.fitBounds([[south,west],[north,east]],{padding:[30,30],maxZoom:19});
+        }else if(map){const kindLower=String(place.type||"").toLowerCase();const zoom=["country","state","region"].includes(kindLower)?6:["city","administrative","municipality"].includes(kindLower)?12:["suburb","neighbourhood","quarter","village"].includes(kindLower)?14:["house","building","residential","address","road"].includes(kindLower)?19:17;map.setView([lat,lon],zoom);}
         if(!formNode.hidden){const n=formNode.querySelector('[name="name"]'),a=formNode.querySelector('[name="address"]');if(n&&!n.value)n.value=title;if(a&&!a.value)a.value=place.display_name||"";}
         searchResultsNode.replaceChildren(el("p","ct-loc-search-picked","Selected "+title+" · "+country+". This is a map reference only until you save it as a CleanTrack location."));
         notice("Map centered on "+title+", "+country+". Save it with Add Location only if you want it in your organization's directory.","info");
       }));
       searchResultsNode.append(row);
     });}catch(err){searchResultsNode.replaceChildren(el("p","ct-loc-notice error",err.message||"Address search failed. You can pin manually."));}finally{button.disabled=false;button.textContent="Browse location";}}
-  async function showDetails(id,zoom){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;selectedId=x.id;if(zoom&&coords(x))toggleMapPanel(true);renderMapPins();renderDirectory();detailNode.hidden=false;detailNode.replaceChildren();if(zoom&&coords(x)&&map)map.setView([Number(x.latitude),Number(x.longitude)],Math.max(map.getZoom(),15));
+  async function showDetails(id,zoom){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;selectedId=x.id;if(zoom&&coords(x))toggleMapPanel(true);renderMapPins();renderDirectory();detailNode.hidden=false;detailNode.replaceChildren();if(zoom&&coords(x)&&map)map.setView([Number(x.latitude),Number(x.longitude)],Math.max(map.getZoom(),18));
     const head=el("div","ct-loc-section-head"),identity=el("div");identity.append(el("p","ct-loc-eyebrow","SAVED LOCATION"),el("h2","",x.name),el("p","ct-loc-muted",x.address||"Address not recorded"));const actions=el("div","ct-loc-detail-actions");
+    if(coords(x))actions.append(btn("Building view","ct-loc-btn ct-loc-btn-primary",()=>focusBuilding(x)));
+    if(coords(x))actions.append(btn("Satellite view","ct-loc-btn",()=>window.open("https://www.google.com/maps/@?api=1&map_action=map&center="+encodeURIComponent(x.latitude+","+x.longitude)+"&zoom=20&basemap=satellite","_blank","noopener")));
     if(coords(x))actions.append(btn("Directions","ct-loc-btn",()=>window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(x.latitude+","+x.longitude),"_blank","noopener")));
     actions.append(btn("Edit","ct-loc-btn ct-loc-btn-primary",()=>editLocation(x.id)));
     if(x.status==="archived")actions.append(btn("Restore","ct-loc-btn",()=>changeStatus(x,"active")));else actions.append(btn("Archive","ct-loc-btn ct-loc-btn-danger",()=>archiveLocation(x)));
@@ -184,7 +269,7 @@
     // Without this, Leaflet can retain a detached container and the next visit
     // may produce a blank map or stale map UI.
     if(map){try{map.off();map.remove();}catch(_){}}
-    map=null;layer=null;root=null;mapCardNode=null;mapToggleButton=null;searchBoxNode=null;mapNotice=null;noticeNode=null;formNode=null;detailNode=null;searchResultsNode=null;
+    map=null;layer=null;buildingLayer=null;root=null;mapCardNode=null;mapToggleButton=null;searchBoxNode=null;mapNotice=null;noticeNode=null;formNode=null;detailNode=null;searchResultsNode=null;
     if(String(AUTH?.getCurrentUser?.()?.role||"").toLowerCase()!=="admin"){container.replaceChildren(el("p","ct-loc-notice error","Location administration is available to organization Admins only."));return;}
     root=container;container.replaceChildren(el("p","ct-loc-muted","Loading organization locations…"));try{await load();query="";statusFilter="all";selectedId=null;candidate=null;createPage(container);}catch(err){container.replaceChildren();const p=el("section","ct-locations-page");p.append(el("h1","","Locations"),el("p","ct-loc-notice error",err.message||"Locations could not load."),btn("Retry","ct-loc-btn ct-loc-btn-primary",()=>render(container)));container.append(p);}}
   window.CleanTrackLocations=Object.freeze({render,refresh:async()=>{await load();if(root){renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();}}});
