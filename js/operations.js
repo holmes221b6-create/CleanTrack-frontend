@@ -23,7 +23,7 @@ function iso(v){if(!v)return null;const d=new Date(v);return Number.isNaN(d.getT
 function status(op){return norm(op.status);}
 function completed(op){return["completed","approved","verified"].includes(status(op));}
 function cancelled(op){return["cancelled","canceled"].includes(status(op));}
-function overdue(op){if(completed(op)||cancelled(op))return false;const d=op.due_at?new Date(op.due_at):null;return Boolean(d&&!Number.isNaN(d.getTime())&&d<new Date());}
+function overdue(op){if(typeof op.overdue==="boolean")return op.overdue;if(completed(op)||cancelled(op))return false;const d=op.due_at?new Date(op.due_at):null;if(!d||Number.isNaN(d.getTime()))return false;if(["submitted","completed","approved","verified"].includes(status(op))){const submitted=op.submitted_at?new Date(op.submitted_at):null;return Boolean(submitted&&submitted>d);}return d<new Date();}
 function sLabel(op){return overdue(op)?"Overdue":(op.status||"Pending");}
 function idName(list,id){const x=(list||[]).find(v=>String(v.id)===String(id));return x?(x.name||x.title||""):"";}
 function canManage(op){if(role()==="admin")return true;return role()==="supervisor"&&(String(op.assigned_supervisor_id)===String(AUTH.getCurrentUser()?.id)||String(op.assigned_to_id)===String(AUTH.getCurrentUser()?.id)||opts.teams.some(t=>String(t.id)===String(op.team_id)));}
@@ -105,6 +105,7 @@ const params=new URLSearchParams(window.location.search);
 const locationId=params.get("location_id")||params.get("location")||"";
 const zoneId=params.get("zone_id")||params.get("zone")||"";
 const supervisorId=role()==="admin"?(params.get("supervisor_id")||""):"";
+if(supervisorId)filter.supervisor=supervisorId;
 if(locationId||zoneId){filter.location=locationId;filter.zone=zoneId;}
 makeFilters(root);renderStats(root);renderRows(root);
 const context=root.querySelector("[data-op-notice]");
