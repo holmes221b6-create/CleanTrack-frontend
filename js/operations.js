@@ -77,15 +77,35 @@ function positionCalendar(root){
  const trigger=root.querySelector("[data-op-calendar-trigger]");
  if(!panel||!trigger)return;
  const rect=trigger.getBoundingClientRect();
+ const edge=8,gap=10,viewportW=window.innerWidth,viewportH=window.innerHeight;
+ const width=Math.min(380,viewportW-edge*2);
  panel.hidden=false;
- panel.style.left="8px";panel.style.top="8px";
- const width=Math.min(380,window.innerWidth-16);
  panel.style.width=width+"px";
- const left=Math.max(8,Math.min(window.innerWidth-width-8,rect.left));
- panel.style.left=left+"px";
+ // Measure the opened panel before choosing the placement.
+ panel.style.left=edge+"px";
+ panel.style.top=edge+"px";
  const measured=panel.getBoundingClientRect();
- let top=rect.bottom+8;
- if(top+measured.height>window.innerHeight-8)top=Math.max(8,rect.top-measured.height-8);
+ const height=Math.min(measured.height,viewportH-edge*2);
+ const spaceRight=viewportW-rect.right-edge-gap;
+ const spaceLeft=rect.left-edge-gap;
+ let left,top;
+ // On desktop, open beside the Operations Calendar trigger instead of
+ // dropping down the page. Fall back to the side with more room.
+ if(spaceRight>=width || spaceRight>=spaceLeft){
+   if(spaceRight>=Math.min(width,260)) left=rect.right+gap;
+   else if(spaceLeft>=Math.min(width,260)) left=rect.left-width-gap;
+ }
+ if(left===undefined){
+   // Narrow viewports cannot fit the calendar beside the button.
+   left=Math.max(edge,Math.min(viewportW-width-edge,rect.left));
+   top=rect.bottom+gap;
+   if(top+height>viewportH-edge)top=rect.top-height-gap;
+ }else{
+   top=Math.max(edge,Math.min(viewportH-height-edge,rect.top));
+ }
+ left=Math.max(edge,Math.min(viewportW-width-edge,left));
+ top=Math.max(edge,Math.min(viewportH-height-edge,top));
+ panel.style.left=left+"px";
  panel.style.top=top+"px";
 }
 function makeCalendarPanel(root){
