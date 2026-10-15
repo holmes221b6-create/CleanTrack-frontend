@@ -112,6 +112,11 @@ function makeCalendarPanel(root){
  head.append(title,controls,closeButton);
  const board=el("div","ct-op-calendar-board");board.dataset.opCalendarBoard="true";
  panel.append(head,board);
+ root.addEventListener("pointerdown",event=>{
+  const trigger=root.querySelector("[data-op-calendar-trigger]");
+  if(!panel.hidden&&!panel.contains(event.target)&&!trigger?.contains(event.target))panel.hidden=true;
+ });
+ panel.addEventListener("keydown",event=>{if(event.key==="Escape")panel.hidden=true;});
  return panel;
 }
 function setView(root,view){
