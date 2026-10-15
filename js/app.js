@@ -534,6 +534,23 @@
     }
     
     
+    if (pageId === "locations") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Location administration is available to organization Admins only."
+        }));
+        return;
+      }
+      if (window.CleanTrackLocations && typeof window.CleanTrackLocations.render === "function") {
+        await window.CleanTrackLocations.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "The Locations map could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
     if (pageId === "staff") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
         pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Staff administration is available to organization Admins only." }));
