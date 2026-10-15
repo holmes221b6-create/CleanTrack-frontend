@@ -442,6 +442,12 @@
     } else if (m.account_status === "suspended") {
       actions.appendChild(button("Restore access", "ct-staff-button ct-staff-button--primary", function () { restoreSuspension(m); }));
     }
+    actions.appendChild(button("View operations calendar", "ct-staff-button", function () {
+      const query = new URLSearchParams(window.location.search);
+      query.set("supervisor_id", String(m.id));
+      history.replaceState(null, "", window.location.pathname + "?" + query.toString());
+      if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage("operations");
+    }));
     actions.appendChild(button("Open supervisor team assignments", "ct-staff-button", function () {
       if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage("teams");
     }));
