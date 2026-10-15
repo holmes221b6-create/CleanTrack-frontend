@@ -220,3 +220,80 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-cell{
 html[data-theme="light"] #page-content .ct-operations-page .ct-op-input{background:var(--ct-bg,#e7ecf2);border-color:var(--ct-border,#c4ceda);color:var(--text,#19283a);color-scheme:light}
 @media(max-width:740px){#page-content .ct-operations-page .ct-op-calendar-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:500px){#page-content .ct-operations-page .ct-op-calendar-filters{grid-template-columns:minmax(0,1fr)}#page-content .ct-operations-page .ct-op-calendar-view{padding:8px 10px}}
+
+
+/* Home-theme consistency and date picker styling shared with Announcements & Alerts. */
+#page-content .ct-operations-page{color:#e9e7ef}
+#page-content .ct-operations-page .ct-op-header h1{color:#eeebf7!important;font-weight:750;letter-spacing:-.04em}
+#page-content .ct-operations-page .ct-op-eyebrow{color:#b4a7dc}
+#page-content .ct-operations-page .ct-op-card,
+#page-content .ct-operations-page .ct-op-stat,
+#page-content .ct-operations-page .ct-op-calendar-panel{
+ border-color:#292c36;border-radius:13px;background:linear-gradient(145deg,#11141c,#0d1017);
+ color:#e9e7ef;box-shadow:0 5px 18px rgb(0 0 0 / 13%);
+}
+#page-content .ct-operations-page .ct-op-card-head h2,
+#page-content .ct-operations-page .ct-op-detail-header h2,
+#page-content .ct-operations-page .ct-op-card h3,
+#page-content .ct-operations-page .ct-op-calendar-toolbar h2{color:#e9e7ef}
+#page-content .ct-operations-page .ct-op-muted,
+#page-content .ct-operations-page .ct-op-field>span,
+#page-content .ct-operations-page .ct-op-stat-label,
+#page-content .ct-operations-page .ct-op-row small,
+#page-content .ct-operations-page .ct-op-calendar-event small,
+#page-content .ct-operations-page .ct-op-agenda-row time{color:#9290a0}
+#page-content .ct-operations-page .ct-op-input,
+#page-content .ct-operations-page .ct-op-input[type="date"],
+#page-content .ct-operations-page .ct-op-input[type="datetime-local"],
+#page-content .ct-operations-page .ct-op-input[type="time"]{
+ background:#0b0f14;border:1px solid #302d3b;color:#e9e7ef;border-radius:9px;color-scheme:dark;accent-color:#7668a5;
+}
+#page-content .ct-operations-page .ct-op-input::placeholder{color:#706c7f}
+#page-content .ct-operations-page .ct-op-input:focus{outline:0;border-color:#695a90;box-shadow:0 0 0 3px rgb(109 95 152 / 15%)}
+#page-content .ct-operations-page .ct-op-input::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.88;filter:invert(.82) sepia(.15) saturate(.55) hue-rotate(220deg)}
+#page-content .ct-operations-page .ct-op-calendar-month-grid{border-color:#292c36}
+#page-content .ct-operations-page .ct-op-calendar-weekday{background:#15141e;color:#9290a0;border-color:#292c36}
+#page-content .ct-operations-page .ct-op-calendar-cell{background:#10141c;border-color:#292c36}
+#page-content .ct-operations-page .ct-op-calendar-cell.is-outside{background:#0d1017;opacity:.58}
+#page-content .ct-operations-page .ct-op-calendar-cell.is-today{box-shadow:inset 0 0 0 2px #7668a5}
+#page-content .ct-operations-page .ct-op-calendar-day{color:#dcd8e7}
+#page-content .ct-operations-page .ct-op-calendar-event{border-color:#373142;border-left-color:#655785;border-radius:8px;background:#171720;color:#e9e7ef}
+#page-content .ct-operations-page .ct-op-calendar-event:hover{border-color:#7668a5;background:#211d2c}
+#page-content .ct-operations-page .ct-op-calendar-event.is-overdue,
+#page-content .ct-operations-page .ct-op-calendar-event.is-rejected{border-left-color:#a95665}
+#page-content .ct-operations-page .ct-op-calendar-event.is-completed,
+#page-content .ct-operations-page .ct-op-calendar-event.is-approved,
+#page-content .ct-operations-page .ct-op-calendar-event.is-verified{border-left-color:#3a705f}
+#page-content .ct-operations-page .ct-op-viewbar .ct-op-button,
+#page-content .ct-operations-page .ct-op-calendar-view{border-color:#292c36;background:#10141c;color:#aaa5ba}
+#page-content .ct-operations-page .ct-op-viewbar .ct-op-button.is-active,
+#page-content .ct-operations-page .ct-op-calendar-view.is-active{border-color:#514566;background:#1b1926;color:#eeeaf7}
+#page-content .ct-operations-page .ct-op-button{border-color:#373142;border-radius:8px;background:#171720;color:#dcd8e7}
+#page-content .ct-operations-page .ct-op-button:hover{border-color:#655785;background:#211d2c;color:#f0ebfc}
+#page-content .ct-operations-page .ct-op-button-primary{border-color:#3a705f;background:#16352d;color:#9fe0c8}
+#page-content .ct-operations-page .ct-op-button-primary:hover{border-color:#4a967f;background:#1b4337;color:#cbf3e6}
+#page-content .ct-operations-page .ct-op-row,
+#page-content .ct-operations-page .ct-op-history li,
+#page-content .ct-operations-page .ct-op-execution-attempt,
+#page-content .ct-operations-page .ct-op-evidence-item{border-color:#292c36;background:#10141c}
+#page-content .ct-operations-page .ct-op-calendar-more{color:#9290a0}
+#page-content .ct-operations-page button:focus-visible,
+#page-content .ct-operations-page a:focus-visible,
+#page-content .ct-operations-page input:focus-visible,
+#page-content .ct-operations-page select:focus-visible,
+#page-content .ct-operations-page textarea:focus-visible{outline:2px solid #7668a5;outline-offset:2px}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-input,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="date"],
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="datetime-local"],
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="time"]{background:#fff;border-color:#bac9d8;color:#19283a;color-scheme:light}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-input::-webkit-calendar-picker-indicator{filter:none}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-cell,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-weekday{background:var(--ct-surface,#eef2f6);border-color:var(--ct-border,#c4ceda);color:var(--text,#19283a)}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-day,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-event{color:var(--text,#19283a)}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-event{background:#fff;border-color:#c4ceda}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-event:hover{background:#f0edf8;border-color:#7668a5}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-viewbar .ct-op-button,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-view{background:#fff;color:#46586d;border-color:#c4ceda}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-viewbar .ct-op-button.is-active,
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-view.is-active{background:#ece7f7;border-color:#a89acb;color:#35284f}
