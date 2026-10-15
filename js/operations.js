@@ -4,7 +4,7 @@ const API=window.CleanTrackApi, AUTH=window.CleanTrackAuth;
 const CATS=["Cleaning Operations","Delivery & Logistics","Assignments & Documentation","Employee Operations","General Operations","Other Operations"];
 const PRIORITIES=["Low","Normal","High","Urgent"];
 const STATUSES=["Pending","Assigned","In Progress","Submitted","Completed","Overdue","Rejected","Cancelled"];
-let host=null, rows=[], opts={teams:[],locations:[],zones:[],members:[]}, chosen=null, busy=false, activeView="directory", calendarView="month", calendarCursor=new Date(), remoteSupervisorScope="";
+let host=null, rows=[], opts={teams:[],locations:[],zones:[],members:[]}, chosen=null, busy=false, activeView="directory", calendarView="month", calendarCursor=new Date(), calendarSelectedDate=new Date(), remoteSupervisorScope="";
 let filter={q:"",status:"",category:"",location:"",zone:"",team:"",supervisor:"",priority:"",from:"",to:""};
 const role=()=>String(AUTH?.getCurrentUser()?.role||"").toLowerCase();
 const norm=x=>String(x||"").trim().toLowerCase();
@@ -35,67 +35,103 @@ function dayKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,
 function shiftDate(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
 function eventButton(op){const b=button("", "ct-op-calendar-event",()=>openDetail(op.id));b.append(el("strong","",op.title||"Untitled operation"),el("small","",(date(op.due_at)+" · "+(op.priority||"Normal"))));b.classList.add("is-"+norm(sLabel(op)).replace(/\s+/g,"-"));return b;}
 function calendarEvents(d,all){const key=dayKey(d);return all.filter(op=>op.due_at&&dayKey(new Date(op.due_at))===key).sort((a,b)=>new Date(a.due_at)-new Date(b.due_at));}
-function renderCalendar(root){const board=root?.querySelector("[data-op-calendar-board]");if(!board)return;board.replaceChildren();const all=filtered().filter(op=>op.due_at);const title=root.querySelector("[data-op-calendar-title]");if(title)title.textContent=new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(calendarCursor);const startWeek=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;};const dayName=d=>new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(d);
-if(calendarView==="agenda"){const upcoming=all.slice().sort((a,b)=>new Date(a.due_at)-new Date(b.due_at));if(!upcoming.length)board.appendChild(el("p","ct-op-empty","No operations with due dates match the current filters."));upcoming.forEach(op=>{const row=el("div","ct-op-agenda-row");row.append(el("time","",date(op.due_at)),el("span","",op.title),el("span","ct-op-pill ct-op-status-"+norm(sLabel(op)).replace(/\s+/g,"-"),sLabel(op)),button("Open","ct-op-button ct-op-button-secondary",()=>openDetail(op.id)));board.appendChild(row);});return;}
-if(calendarView==="day"){const day=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth(),calendarCursor.getDate());board.appendChild(el("div","ct-op-calendar-day-heading",new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(day)));const events=calendarEvents(day,all);if(!events.length)board.appendChild(el("p","ct-op-empty","No due operations on this day."));events.forEach(op=>board.appendChild(eventButton(op)));return;}
-if(calendarView==="week"){const start=startWeek(calendarCursor),grid=el("div","ct-op-calendar-week-grid");for(let i=0;i<7;i++){const d=shiftDate(start,i),cell=el("div","ct-op-calendar-cell");cell.appendChild(el("strong","ct-op-calendar-day",dayName(d)+" · "+d.getDate()));const events=calendarEvents(d,all);if(!events.length)cell.appendChild(el("small","ct-op-muted","No due work"));events.forEach(op=>cell.appendChild(eventButton(op)));grid.appendChild(cell);}board.appendChild(grid);return;}
-const first=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth(),1),gridStart=startWeek(first),grid=el("div","ct-op-calendar-month-grid");["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(name=>grid.appendChild(el("div","ct-op-calendar-weekday",name)));for(let i=0;i<42;i++){const d=shiftDate(gridStart,i),cell=el("div","ct-op-calendar-cell"+(d.getMonth()!==calendarCursor.getMonth()?" is-outside":"")+(dayKey(d)===dayKey(new Date())?" is-today":""));cell.appendChild(el("strong","ct-op-calendar-day",d.getDate()));const events=calendarEvents(d,all);events.slice(0,3).forEach(op=>cell.appendChild(eventButton(op)));if(events.length>3)cell.appendChild(el("small","ct-op-calendar-more","+"+(events.length-3)+" more"));grid.appendChild(cell);}board.appendChild(grid);}
+function renderCalendar(root){
+ const board=root?.querySelector("[data-op-calendar-board]");
+ if(!board)return;
+ board.replaceChildren();
+ const all=filtered().filter(op=>op.due_at);
+ const title=root.querySelector("[data-op-calendar-title]");
+ if(title)title.textContent=new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(calendarCursor);
+ const start=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth(),1);
+ const gridStart=new Date(start);
+ gridStart.setDate(start.getDate()-((start.getDay()+6)%7));
+ const grid=el("div","ct-op-calendar-month-grid");
+ ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(name=>grid.appendChild(el("div","ct-op-calendar-weekday",name)));
+ for(let i=0;i<42;i++){
+  const d=shiftDate(gridStart,i),key=dayKey(d),events=calendarEvents(d,all);
+  const cell=button(String(d.getDate()),"ct-op-calendar-date"+(d.getMonth()!==calendarCursor.getMonth()?" is-outside":"")+(key===dayKey(new Date())?" is-today":"")+(key===dayKey(calendarSelectedDate)?" is-selected":""),()=>{
+   calendarSelectedDate=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+   if(d.getMonth()!==calendarCursor.getMonth())calendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
+   renderCalendar(root);
+  });
+  cell.setAttribute("aria-label",new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(d)+(events.length?", "+events.length+" scheduled operation"+(events.length===1?"":"s"):""));
+  if(events.length){const mark=el("span","ct-op-calendar-date-count",String(events.length));mark.setAttribute("aria-hidden","true");cell.appendChild(mark);}
+  grid.appendChild(cell);
+ }
+ board.appendChild(grid);
+ const selected=calendarSelectedDate;
+ const selectedEvents=calendarEvents(selected,all);
+ const list=el("section","ct-op-calendar-selected");
+ list.appendChild(el("h3","","Operations · "+new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric"}).format(selected)));
+ if(!selectedEvents.length)list.appendChild(el("p","ct-op-muted","No operations due on this date."));
+ selectedEvents.forEach(op=>{
+  const item=button("","ct-op-calendar-selected-event",()=>{const panel=root.querySelector("[data-op-calendar]");if(panel)panel.hidden=true;openDetail(op.id);});
+  item.append(el("strong","",op.title||"Untitled operation"),el("small","",date(op.due_at)+" · "+sLabel(op)));
+  item.classList.add("is-"+norm(sLabel(op)).replace(/\\s+/g,"-"));
+  list.appendChild(item);
+ });
+ board.appendChild(list);
+}
+function positionCalendar(root){
+ const panel=root.querySelector("[data-op-calendar]");
+ const trigger=root.querySelector("[data-op-calendar-trigger]");
+ if(!panel||!trigger)return;
+ const rect=trigger.getBoundingClientRect();
+ panel.hidden=false;
+ panel.style.left="8px";panel.style.top="8px";
+ const width=Math.min(380,window.innerWidth-16);
+ panel.style.width=width+"px";
+ const left=Math.max(8,Math.min(window.innerWidth-width-8,rect.left));
+ panel.style.left=left+"px";
+ const measured=panel.getBoundingClientRect();
+ let top=rect.bottom+8;
+ if(top+measured.height>window.innerHeight-8)top=Math.max(8,rect.top-measured.height-8);
+ panel.style.top=top+"px";
+}
 function makeCalendarPanel(root){
-const panel=el("dialog","ct-op-card ct-op-calendar-panel ct-op-calendar-dialog");panel.dataset.opCalendar="true";panel.setAttribute("aria-label","Operations Calendar");
-const head=el("header","ct-op-calendar-toolbar"),title=el("h2","","Operations Calendar");title.dataset.opCalendarTitle="true";title.title="Drag to move calendar";title.classList.add("ct-op-calendar-drag-handle");
-const controls=el("div","ct-op-calendar-controls");
-const quickViews=el("nav","ct-op-calendar-views");quickViews.setAttribute("aria-label","Calendar views");
-[["day","Day"],["week","Week"],["month","Month"],["agenda","Agenda"]].forEach(([value,label])=>{const b=button(label,"ct-op-calendar-view"+(calendarView===value?" is-active":""),()=>{calendarView=value;makeCalendarViewButtons();renderCalendar(root);});b.dataset.calendarView=value;quickViews.appendChild(b);});
-function makeCalendarViewButtons(){quickViews.querySelectorAll("[data-calendar-view]").forEach(b=>{const active=b.dataset.calendarView===calendarView;b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));});}
-const prev=button("←","ct-op-button ct-op-button-secondary",()=>{calendarCursor=calendarView==="day"?shiftDate(calendarCursor,-1):calendarView==="week"?shiftDate(calendarCursor,-7):new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()-1,1);renderCalendar(root);});
-const next=button("→","ct-op-button ct-op-button-secondary",()=>{calendarCursor=calendarView==="day"?shiftDate(calendarCursor,1):calendarView==="week"?shiftDate(calendarCursor,7):new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+1,1);renderCalendar(root);});
-controls.append(button("Today","ct-op-button ct-op-button-secondary",()=>{calendarCursor=new Date();renderCalendar(root);}),prev,next);
-const closeButton=button("×","ct-op-button ct-op-button-secondary ct-op-calendar-close",()=>panel.close());closeButton.setAttribute("aria-label","Close operations calendar");closeButton.title="Close calendar";
-head.append(title,controls,closeButton);
-let dragState=null;
-title.addEventListener("pointerdown",event=>{
- if(event.button!==0||event.target.closest("button"))return;
- const rect=panel.getBoundingClientRect();
- dragState={x:event.clientX,y:event.clientY,left:rect.left,top:rect.top};
- panel.style.transform="none";panel.style.left=rect.left+"px";panel.style.top=rect.top+"px";
- title.setPointerCapture?.(event.pointerId);event.preventDefault();
-});
-title.addEventListener("pointermove",event=>{
- if(!dragState)return;
- const rect=panel.getBoundingClientRect();
- const left=Math.max(8,Math.min(window.innerWidth-rect.width-8,dragState.left+event.clientX-dragState.x));
- const top=Math.max(8,Math.min(window.innerHeight-90,dragState.top+event.clientY-dragState.y));
- panel.style.left=left+"px";panel.style.top=top+"px";
-});
-const endDrag=()=>{dragState=null;};
-title.addEventListener("pointerup",endDrag);title.addEventListener("pointercancel",endDrag);
-panel.addEventListener("click",event=>{if(event.target===panel)panel.close();});
-panel.addEventListener("close",()=>{
- if(panel.dataset.keepCalendarReturn==="true"){panel.dataset.keepCalendarReturn="false";return;}
- if(activeView==="calendar"){activeView="directory";root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="directory"));}
-});
-const filters=el("div","ct-op-calendar-filters");
-const statusFilter=select(STATUSES.map(x=>[x,x]),filter.status,"calendar_status","All statuses");
-const priorityFilter=select(PRIORITIES.map(x=>[x,x]),filter.priority,"calendar_priority","All priorities");
-const locationFilter=select(opts.locations,filter.location,"calendar_location","All locations");
-const zoneFilter=select(opts.zones,filter.zone,"calendar_zone","All zones");
-[[statusFilter,"status"],[priorityFilter,"priority"],[locationFilter,"location"],[zoneFilter,"zone"]].forEach(([node,key])=>node.addEventListener("change",()=>{filter[key]=node.value;renderCalendar(root);}));
-filters.append(field("Status",statusFilter),field("Priority",priorityFilter),field("Location",locationFilter),field("Zone",zoneFilter));
-const board=el("div","ct-op-calendar-board");board.dataset.opCalendarBoard="true";panel.append(head,quickViews,filters,board);
-return panel;
+ const panel=el("section","ct-op-card ct-op-calendar-panel ct-op-calendar-popover");
+ panel.dataset.opCalendar="true";panel.setAttribute("aria-label","Operations calendar");panel.hidden=true;
+ const head=el("header","ct-op-calendar-toolbar");
+ const title=el("h2","","Operations Calendar");title.dataset.opCalendarTitle="true";
+ const controls=el("div","ct-op-calendar-controls");
+ const prev=button("‹","ct-op-button ct-op-button-secondary",()=>{
+  calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()-1,1);
+  renderCalendar(root);
+ });
+ prev.setAttribute("aria-label","Previous month");
+ const next=button("›","ct-op-button ct-op-button-secondary",()=>{
+  calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+1,1);
+  renderCalendar(root);
+ });
+ next.setAttribute("aria-label","Next month");
+ controls.append(button("Today","ct-op-button ct-op-button-secondary",()=>{
+  calendarCursor=new Date();calendarSelectedDate=new Date();renderCalendar(root);
+ }),prev,next);
+ const closeButton=button("×","ct-op-button ct-op-button-secondary ct-op-calendar-close",()=>{panel.hidden=true;});
+ closeButton.setAttribute("aria-label","Close operations calendar");
+ head.append(title,controls,closeButton);
+ const board=el("div","ct-op-calendar-board");board.dataset.opCalendarBoard="true";
+ panel.append(head,board);
+ return panel;
 }
 function setView(root,view){
  activeView=view;
- const directory=root.querySelector("[data-op-directory]"),calendar=root.querySelector("[data-op-calendar]"),detail=root.querySelector("[data-op-detail]");
+ const directory=root.querySelector("[data-op-directory]");
+ const calendar=root.querySelector("[data-op-calendar]");
+ const detail=root.querySelector("[data-op-detail]");
+ const trigger=root.querySelector("[data-op-calendar-trigger]");
  if(view==="calendar"){
   if(directory)directory.hidden=false;
   if(detail)detail.hidden=true;
   root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="calendar"));
-  if(calendar&&!calendar.open){calendar.style.left="";calendar.style.top="";calendar.style.transform="";calendar.showModal();}
-  renderCalendar(root);
+  if(calendar){
+   const opening=calendar.hidden;
+   if(opening){positionCalendar(root);renderCalendar(root);}
+   else calendar.hidden=true;
+  }
   return;
  }
- if(calendar?.open)calendar.close();
+ if(calendar)calendar.hidden=true;
  if(directory)directory.hidden=view!=="directory";
  if(detail)detail.hidden=true;
  root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView===view));
@@ -157,7 +193,7 @@ return panel;
 async function openDetail(id){chosen=id;const detail=host?.querySelector("[data-op-detail]"),directory=host?.querySelector("[data-op-directory]");if(!detail||!directory)return;detail.dataset.returnView=activeView;detail.hidden=false;directory.hidden=true;const calendarPanel=host.querySelector("[data-op-calendar]");if(calendarPanel?.open){calendarPanel.dataset.keepCalendarReturn="true";calendarPanel.close();}detail.replaceChildren(el("p","ct-op-muted","Loading operation details…"));try{const res=await API.get("operations/"+id),op=res.operation||res,user=AUTH.getCurrentUser(),manage=canManage(op),s=status(op);detail.replaceChildren();const header=el("header","ct-op-detail-header"),back=button("← Back to operations","ct-op-button ct-op-button-secondary",()=>setView(host,detail.dataset.returnView||"directory"));const intro=el("div");const pill=el("div","ct-op-detail-pills");pill.appendChild(el("span","ct-op-pill ct-op-status-"+norm(sLabel(op)).replace(/\s+/g,"-"),sLabel(op)));intro.append(el("p","ct-op-eyebrow","OPERATION "+op.id),el("h2","",op.title||"Untitled operation"),pill);const actions=el("div","ct-op-actions");if(["supervisor","employee"].includes(role())&&String(op.assigned_to_id)===String(user.id)&&["assigned","pending","rejected"].includes(s))actions.appendChild(button("Start work","ct-op-button ct-op-button-primary",()=>action("start",op.id)));if(manage&&!["completed","approved","cancelled","canceled"].includes(s)){actions.appendChild(button("Edit","ct-op-button ct-op-button-secondary",()=>{setView(host,detail.dataset.returnView||"directory");showForm(host,op);}));actions.appendChild(button("Reassign","ct-op-button ct-op-button-secondary",()=>reassign(detail,op)));if(s==="submitted"&&String(op.assigned_to_id)!==String(user.id)){actions.appendChild(button("Verify and complete","ct-op-button ct-op-button-primary",()=>review(op.id,"approve")));actions.appendChild(button("Reject with reason","ct-op-button ct-op-button-danger",()=>review(op.id,"reject")));}actions.appendChild(button("Cancel operation","ct-op-button ct-op-button-danger",()=>cancel(op.id)));}header.append(back,intro,actions);detail.appendChild(header);
 const grid=el("div","ct-op-detail-grid"),info=card("Operation information"),dl=el("dl","ct-op-detail-data");const infoRows=[["Operation type",op.task_type||op.category],["Priority",op.priority],["Description",op.description],["Instructions",op.instructions],["Created by",op.created_by_name||("User "+op.created_by_id)],["Current assignee",op.assigned_to_name||"Unassigned"],["Original assignment",op.original_assigned_to_name||"Not recorded"],["Supervisor",op.assigned_supervisor_name||"Not assigned"],["Team",idName(opts.teams,op.team_id)||"Not assigned"],["Location",idName(opts.locations,op.location_id)||"Not assigned"],["Zone",idName(opts.zones,op.zone_id)||"Not assigned"],["Due date",date(op.due_at)],["Original deadline",date(op.original_due_at)],["Schedule",op.schedule_type||"one_time"],["Time estimate",op.estimated_minutes?op.estimated_minutes+" minutes":"Not set"],["Verification",op.requires_verification===false?"Not required":"Required"],["Submitted",date(op.submitted_at)],["Reviewed",date(op.reviewed_at)]];infoRows.forEach(([k,v])=>dl.append(el("dt","",k),el("dd","",v||"—")));info.appendChild(dl);grid.appendChild(info);grid.appendChild(buildExecutionCard(op));const ev=card("Checklist and execution evidence","Evidence is recorded against execution, not attached to the reusable operation definition.");const list=el("ul","ct-op-checklist");(op.checklist||[]).forEach(x=>list.appendChild(el("li","",x)));if(!list.childElementCount)list.appendChild(el("li","ct-op-muted","No checklist defined."));ev.append(el("h3","","Checklist"),list,el("h3","","Required evidence"));const required=el("ul","ct-op-checklist");(op.required_evidence||[]).forEach(x=>required.appendChild(el("li","",({photo:"Photo evidence (any stage)",before_photo:"Before-work photo",after_photo:"After-work photo",document:"Document or attachment",note:"Completion note"})[x]||x)));if(!required.childElementCount)required.appendChild(el("li","ct-op-muted","No evidence types required."));ev.append(required);const uploaded=Array.isArray(op.evidence)?op.evidence:[],uploadedList=el("div","ct-op-evidence-list");if(!uploaded.length)uploadedList.appendChild(el("p","ct-op-muted","No execution evidence has been uploaded yet."));uploaded.forEach(item=>{const row=el("div","ct-op-evidence-item"),copy=el("div");copy.append(el("strong","",item.original_filename||"Evidence file"),el("small","ct-op-muted",(item.evidence_type||"document")+" · "+(item.stage||"execution")+(item.execution_id&&Array.isArray(op.executions)?" · Attempt "+((op.executions.find(x=>String(x.id)===String(item.execution_id))||{}).attempt_number||"—"):"")+" · "+(item.uploaded_by_name||("User "+item.uploaded_by_id))+" · "+date(item.created_at)));const download=button("Download","ct-op-button ct-op-button-secondary",()=>downloadEvidence(op.id,item));row.append(copy,download);uploadedList.appendChild(row);});ev.appendChild(uploadedList);if(["in progress","submitted","completed","approved","verified"].includes(s)){const uploadForm=el("form","ct-op-evidence-upload"),fileInput=input("file",null,"file"),stageSelect=select([["before","Before-work photo"],["after","After-work photo"],["general","General evidence"]],"after","stage","Photo stage");fileInput.accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.doc,.docx";fileInput.required=true;fileInput.addEventListener("change",()=>{const file=fileInput.files&&fileInput.files[0];if(!file)return;if(file.type.startsWith("image/")){if(stageSelect.value==="general")stageSelect.value="after";}else{stageSelect.value="general";}});const statusNote=el("p","ct-op-notice");statusNote.hidden=true;const uploadButton=el("button","ct-op-button ct-op-button-primary","Upload execution evidence");uploadButton.type="submit";uploadForm.append(field("Photo or document (up to 8 MB)",fileInput,"Before/after photos are attached to the execution record; voice notes are not accepted here."),field("Photo stage",stageSelect,"For documents, the backend records the execution stage."),uploadButton,statusNote);uploadForm.addEventListener("submit",async event=>{event.preventDefault();const file=fileInput.files&&fileInput.files[0];if(!file)return;const body=new FormData();body.append("file",file);body.append("stage",stageSelect.value);uploadButton.disabled=true;try{const response=await API.post("operations/"+op.id+"/evidence",body);notice(statusNote,response.message||"Evidence uploaded.");await loadData();await openDetail(op.id);}catch(error){notice(statusNote,error.message||"Evidence could not be uploaded.",true);}finally{uploadButton.disabled=false;}});ev.appendChild(uploadForm);}else{ev.appendChild(el("p","ct-op-muted","Evidence upload becomes available after work has started."));}if(op.review_feedback)ev.append(el("h3","","Latest review / rejection reason"),el("p","ct-op-review-feedback",op.review_feedback));grid.appendChild(ev);detail.appendChild(grid);
 const history=card("Work history","Chronological operation state changes, review decisions and reassignment reasons.");const events=el("ol","ct-op-history");(op.history||[]).forEach(h=>{const li=el("li","");li.append(el("strong","",String(h.action||"updated").replace(/[._]/g," ")),el("p","",h.message||"No note recorded"),el("small","ct-op-muted",date(h.created_at)+(h.previous_status||h.new_status?" · "+(h.previous_status||"—")+" → "+(h.new_status||"—"):"")));events.appendChild(li);});if(!events.childElementCount)history.appendChild(el("p","ct-op-muted","No history is recorded yet."));else history.appendChild(events);detail.appendChild(history);}catch(err){detail.replaceChildren(el("p","ct-op-error",err.message||"Details could not be loaded."),button("Back","ct-op-button",()=>setView(host,detail.dataset.returnView||"directory")));}}
-function shell(container,mode){container.replaceChildren();const root=el("section","ct-operations-page"),user=AUTH.getCurrentUser(),isEmployee=role()==="employee",header=el("header","ct-op-header"),intro=el("div");intro.append(el("p","ct-op-eyebrow",isEmployee?"ASSIGNED WORK":"OPERATIONS MANAGEMENT"),el("h1","",mode==="history"?"Work History":isEmployee?"My Work":"Operations Management"),el("p","ct-op-muted",isEmployee?"Review assigned work, follow instructions, and submit completion for verification.":"Manage real operation records, assignments, deadlines and verification. Execution history is separate from the operation definition."));const actions=el("div","ct-op-header-actions");actions.appendChild(button("↻ Refresh","ct-op-button ct-op-button-secondary",async()=>{try{await loadData();renderStats(root);makeFilters(root);renderRows(root);actionNotice("Operations refreshed from the database.");}catch(e){actionNotice(e.message,true);}}));if(["admin","supervisor"].includes(role()))actions.appendChild(button("+ Create operation","ct-op-button ct-op-button-primary",()=>showForm(root)));header.append(intro,actions);root.appendChild(header);const msg=el("p","ct-op-notice");msg.hidden=true;msg.dataset.opNotice="true";root.appendChild(msg);const stats=el("div","ct-op-stats");stats.dataset.opStats="true";root.appendChild(stats);const viewbar=el("div","ct-op-viewbar");viewbar.append(button("Operations directory","ct-op-button ct-op-button-secondary",()=>setView(root,"directory")),button("Operations calendar","ct-op-button ct-op-button-secondary",()=>setView(root,"calendar")));Array.from(viewbar.children).forEach((x,i)=>{x.dataset.opView=i===0?"directory":"calendar";});const queryContext=new URLSearchParams(window.location.search);if(queryContext.has("supervisor_id")||queryContext.has("location_id")||queryContext.has("zone_id")||queryContext.has("location")||queryContext.has("zone")){viewbar.appendChild(button("Clear QR / supervisor view","ct-op-button ct-op-button-secondary",()=>{["supervisor_id","location_id","zone_id","location","zone"].forEach(k=>queryContext.delete(k));const q=queryContext.toString();history.replaceState(null,"",window.location.pathname+(q?"?"+q:"")+window.location.hash);filter={q:"",status:"",category:"",location:"",zone:"",team:"",supervisor:"",priority:"",from:"",to:""};activeView="directory";render(host,mode);}));}root.appendChild(viewbar);const directory=el("div","ct-op-directory");directory.dataset.opDirectory="true";const filtersCard=card("Operations directory","Search and narrow real operations by status, type, assignment and due date."),filters=el("div","ct-op-filters");filters.dataset.opFilters="true";filtersCard.appendChild(filters);const listCard=card("Work queue","Open an operation for its assignment details, checklist and full history."),toolbar=el("div","ct-op-list-toolbar"),count=el("p","ct-op-muted","");count.dataset.opCount="true";toolbar.appendChild(count);listCard.append(toolbar);const rowsBox=el("div","ct-op-rows");rowsBox.dataset.opRows="true";listCard.appendChild(rowsBox);directory.append(filtersCard,listCard);root.appendChild(directory);root.appendChild(makeCalendarPanel(root));const formPanel=el("section","ct-op-card ct-op-form-panel");formPanel.dataset.opFormPanel="true";formPanel.hidden=true;root.appendChild(formPanel);const detail=el("section","ct-op-detail");detail.dataset.opDetail="true";detail.hidden=true;root.appendChild(detail);container.appendChild(root);return root;}
+function shell(container,mode){container.replaceChildren();const root=el("section","ct-operations-page"),user=AUTH.getCurrentUser(),isEmployee=role()==="employee",header=el("header","ct-op-header"),intro=el("div");intro.append(el("p","ct-op-eyebrow",isEmployee?"ASSIGNED WORK":"OPERATIONS MANAGEMENT"),el("h1","",mode==="history"?"Work History":isEmployee?"My Work":"Operations Management"),el("p","ct-op-muted",isEmployee?"Review assigned work, follow instructions, and submit completion for verification.":"Manage real operation records, assignments, deadlines and verification. Execution history is separate from the operation definition."));const actions=el("div","ct-op-header-actions");actions.appendChild(button("↻ Refresh","ct-op-button ct-op-button-secondary",async()=>{try{await loadData();renderStats(root);makeFilters(root);renderRows(root);actionNotice("Operations refreshed from the database.");}catch(e){actionNotice(e.message,true);}}));if(["admin","supervisor"].includes(role()))actions.appendChild(button("+ Create operation","ct-op-button ct-op-button-primary",()=>showForm(root)));header.append(intro,actions);root.appendChild(header);const msg=el("p","ct-op-notice");msg.hidden=true;msg.dataset.opNotice="true";root.appendChild(msg);const stats=el("div","ct-op-stats");stats.dataset.opStats="true";root.appendChild(stats);const viewbar=el("div","ct-op-viewbar");viewbar.append(button("Operations directory","ct-op-button ct-op-button-secondary",()=>setView(root,"directory")),button("Operations calendar","ct-op-button ct-op-button-secondary",()=>setView(root,"calendar")));Array.from(viewbar.children).forEach((x,i)=>{x.dataset.opView=i===0?"directory":"calendar";if(i===1)x.dataset.opCalendarTrigger="true";});const queryContext=new URLSearchParams(window.location.search);if(queryContext.has("supervisor_id")||queryContext.has("location_id")||queryContext.has("zone_id")||queryContext.has("location")||queryContext.has("zone")){viewbar.appendChild(button("Clear QR / supervisor view","ct-op-button ct-op-button-secondary",()=>{["supervisor_id","location_id","zone_id","location","zone"].forEach(k=>queryContext.delete(k));const q=queryContext.toString();history.replaceState(null,"",window.location.pathname+(q?"?"+q:"")+window.location.hash);filter={q:"",status:"",category:"",location:"",zone:"",team:"",supervisor:"",priority:"",from:"",to:""};activeView="directory";render(host,mode);}));}root.appendChild(viewbar);const directory=el("div","ct-op-directory");directory.dataset.opDirectory="true";const filtersCard=card("Operations directory","Search and narrow real operations by status, type, assignment and due date."),filters=el("div","ct-op-filters");filters.dataset.opFilters="true";filtersCard.appendChild(filters);const listCard=card("Work queue","Open an operation for its assignment details, checklist and full history."),toolbar=el("div","ct-op-list-toolbar"),count=el("p","ct-op-muted","");count.dataset.opCount="true";toolbar.appendChild(count);listCard.append(toolbar);const rowsBox=el("div","ct-op-rows");rowsBox.dataset.opRows="true";listCard.appendChild(rowsBox);directory.append(filtersCard,listCard);root.appendChild(directory);root.appendChild(makeCalendarPanel(root));const formPanel=el("section","ct-op-card ct-op-form-panel");formPanel.dataset.opFormPanel="true";formPanel.hidden=true;root.appendChild(formPanel);const detail=el("section","ct-op-detail");detail.dataset.opDetail="true";detail.hidden=true;root.appendChild(detail);container.appendChild(root);return root;}
 async function render(container,mode="operations"){host=container;const root=shell(container,mode);if(!API||!AUTH?.getCurrentUser?.()){root.replaceChildren(el("p","ct-op-error","Sign in to view operations."));return;}if(mode==="operations"&&!["admin","supervisor"].includes(role())){root.replaceChildren(el("p","ct-op-error","Operations management is available to Admins and Supervisors. Open My Work to execute assigned operations."));return;}try{await loadData();buildForm(root);
 const params=new URLSearchParams(window.location.search);
 const locationId=params.get("location_id")||params.get("location")||"";
