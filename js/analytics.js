@@ -432,7 +432,6 @@
       }
       renderComparison();
     });
-    apply.addEventListener("click", loadReport);
     loadReport();
   }
 
