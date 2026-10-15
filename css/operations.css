@@ -573,7 +573,7 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
 
 /* Clean, conventional calendar styling — scoped to the floating calendar only. */
 #page-content .ct-operations-page .ct-op-calendar-popover{
-  background:#fff!important;
+  background:#e8edf2!important;
   color:#202938!important;
   border:1px solid #d7dee8!important;
   border-radius:14px!important;
@@ -585,7 +585,7 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
   gap:8px!important;
   margin:0 0 12px!important;
   padding:0 0 10px!important;
-  border-bottom:1px solid #e7ebf0!important;
+  border-bottom:1px solid #cbd4df!important;
   background:transparent!important;
   cursor:grab;
 }
@@ -596,27 +596,27 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls .ct-op-button{
   min-height:30px!important;
-  border:1px solid #dce2ea!important;
+  border:1px solid #cbd4df!important;
   border-radius:7px!important;
-  background:#f8fafc!important;
+  background:#e6ebf1!important;
   color:#334155!important;
   padding:5px 9px!important;
   font-weight:600;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls .ct-op-button:hover{
-  border-color:#b8c5d6!important;background:#eef2f7!important;
+  border-color:#b8c5d6!important;background:#dce3eb!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-month-grid{
   gap:3px!important;
   border:0!important;
-  background:#fff!important;
+  background:#e8edf2!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-weekday{
   padding:7px 0!important;
   border:0!important;
   border-radius:6px!important;
-  background:#f5f7fa!important;
-  color:#64748b!important;
+  background:#dfe5ec!important;
+  color:#526174!important;
   font-size:.7rem!important;
   font-weight:700!important;
 }
@@ -625,19 +625,19 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
   min-height:34px!important;
   border:1px solid transparent!important;
   border-radius:8px!important;
-  background:#fff!important;
+  background:#edf1f5!important;
   color:#273244!important;
   font-size:.8rem!important;
   font-weight:500;
   transition:background-color .12s ease,border-color .12s ease,color .12s ease,transform .12s ease;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date:hover{
-  background:#eff6ff!important;
-  border-color:#bfdbfe!important;
+  background:#dfe7f0!important;
+  border-color:#b9c7d8!important;
   color:#1d4ed8!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-outside{
-  color:#a3acba!important;background:#fafbfc!important;
+  color:#8b97a7!important;background:#e3e8ee!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date.is-today{
   border-color:#2563eb!important;
@@ -660,7 +660,7 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected{
   margin-top:11px!important;padding-top:10px!important;
-  border-top:1px solid #e7ebf0!important;
+  border-top:1px solid #cbd4df!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected .ct-op-muted{
   color:#64748b!important;
@@ -669,12 +669,12 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
   border:1px solid #e1e7ef!important;
   border-left:3px solid #3b82f6!important;
   border-radius:8px!important;
-  background:#f8fafc!important;
+  background:#e6ebf1!important;
   color:#202938!important;
   transition:background-color .12s ease,border-color .12s ease;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected-event:hover{
-  background:#eff6ff!important;border-color:#bfdbfe!important;
+  background:#d9e2ec!important;border-color:#b9c7d8!important;
 }
 #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-selected-event small{
   color:#64748b!important;
