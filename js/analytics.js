@@ -1,455 +1,98 @@
-(function () {
-  "use strict";
-
-  const API = window.CleanTrackApi;
-  const AUTH = window.CleanTrackAuth;
-
-  function el(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text !== undefined && text !== null) node.textContent = String(text);
-    return node;
-  }
-
-  function button(label, className, handler) {
-    const node = el("button", className || "ct-analytics-button", label);
-    node.type = "button";
-    node.addEventListener("click", handler);
-    return node;
-  }
-
-  function localDate(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return y + "-" + m + "-" + d;
-  }
-
-  function defaultDates() {
-    const end = new Date();
-    const start = new Date(end);
-    start.setDate(start.getDate() - 29);
-    return { start: localDate(start), end: localDate(end) };
-  }
-
-  function pct(value) {
-    return value === null || value === undefined ? "N/A" : Number(value).toFixed(1) + "%";
-  }
-
-  function number(value) {
-    return new Intl.NumberFormat().format(Number(value || 0));
-  }
-
-  function rateValue(value) {
-    return value === null || value === undefined ? null : Number(value);
-  }
-
-  function formatDiff(a, b, isRate) {
-    if (a === null || a === undefined || b === null || b === undefined) return "N/A";
-    const delta = Number(a) - Number(b);
-    const prefix = delta > 0 ? "+" : "";
-    return prefix + (isRate ? delta.toFixed(1) + " pp" : number(delta));
-  }
-
-  function fieldLabel(label, control) {
-    const wrap = el("label", "ct-analytics-field");
-    wrap.append(el("span", "", label), control);
-    return wrap;
-  }
-
-  function statusLine(message, isError) {
-    const status = el("p", "ct-analytics-status" + (isError ? " is-error" : ""), message || "");
-    status.setAttribute("role", "status");
-    status.setAttribute("aria-live", "polite");
-    return status;
-  }
-
-  async function render(container) {
-    container.replaceChildren();
-    const user = AUTH && AUTH.getCurrentUser ? AUTH.getCurrentUser() : null;
-    if (!user || String(user.role || "").toLowerCase() !== "admin") {
-      container.appendChild(el("p", "ct-analytics-muted", "Analytics is available to organization Admins only."));
-      return;
-    }
-
-    const dates = defaultDates();
-    const page = el("section", "ct-analytics-page");
-    const hero = el("header", "ct-analytics-hero");
-    hero.append(
-      el("p", "ct-analytics-kicker", "ORGANIZATION PERFORMANCE"),
-      el("h1", "", "Team Analytics"),
-      el("p", "ct-analytics-hero-copy", "Compare selected teams and review organization-wide team rankings from real work and completion records.")
-    );
-
-    const heroMeta = el("div", "ct-analytics-hero-meta");
-    heroMeta.append(
-      el("span", "ct-analytics-hero-chip", "Live organization data"),
-      el("span", "ct-analytics-hero-chip", "Compare teams"),
-      el("span", "ct-analytics-hero-chip", "Team rankings")
-    );
-    hero.appendChild(heroMeta);
-    page.appendChild(hero);
-
-    const toolbar = el("section", "ct-analytics-toolbar");
-    const dateGrid = el("div", "ct-analytics-date-grid");
-    const startDate = el("input", "ct-analytics-input");
-    startDate.type = "date"; startDate.name = "start_date"; startDate.value = dates.start; startDate.required = true;
-    const endDate = el("input", "ct-analytics-input");
-    endDate.type = "date"; endDate.name = "end_date"; endDate.value = dates.end; endDate.required = true;
-    dateGrid.append(fieldLabel("From", startDate), fieldLabel("To", endDate));
-    const apply = button("Apply period", "ct-analytics-button ct-analytics-button-primary", () => loadReport());
-    const exportGroup = el("div", "ct-analytics-export-group");
-    const exports = [
-      ["CSV", "csv"], ["Excel (.xlsx)", "xlsx"], ["PDF", "pdf"]
-    ];
-    const exportStatus = statusLine("");
-    exports.forEach(([label, format]) => {
-      exportGroup.appendChild(button("Export " + label, "ct-analytics-button ct-analytics-button-secondary", () => exportReport(format)));
-    });
-    const filterActions = el("div", "ct-analytics-filter-actions");
-    filterActions.append(apply, exportGroup);
-    toolbar.append(dateGrid, filterActions, exportStatus);
-    page.appendChild(toolbar);
-
-    const status = statusLine("Loading organization analytics…");
-    page.appendChild(status);
-
-    const summaryGrid = el("div", "ct-analytics-summary-grid");
-    const summaryCards = [
-      ["Teams", "team_count", "Teams in the organization"],
-      ["Tasks in period", "tasks_in_period", "Team-linked work created in this period"],
-      ["Completed tasks", "completed_tasks", "Currently recorded as completed"],
-      ["Overdue tasks", "overdue_tasks", "Open work past its due date"]
-    ];
-    const summaryValues = {};
-    summaryCards.forEach(([label, key, detail]) => {
-      const card = el("article", "ct-analytics-summary-card");
-      const top = el("div", "ct-analytics-summary-top");
-      top.append(el("span", "", label), el("span", "ct-analytics-summary-dot", "•"));
-      const value = el("strong", "ct-analytics-summary-value", "—");
-      const note = el("p", "ct-analytics-summary-note", detail);
-      card.append(top, value, note);
-      summaryValues[key] = value;
-      summaryGrid.appendChild(card);
-    });
-    page.appendChild(summaryGrid);
-
-    const comparePanel = el("section", "ct-analytics-panel");
-    const compareHeading = el("div", "ct-analytics-panel-heading");
-    compareHeading.append(el("p", "ct-analytics-section-kicker", "01 / COMPARE MODE"), el("h2", "", "Team A vs Team B"),
-      el("p", "ct-analytics-muted", "Choose two teams and compare the same date window. Rates are shown as percentage points in the difference column."));
-    comparePanel.appendChild(compareHeading);
-
-    const compareSelectors = el("div", "ct-analytics-compare-selectors");
-    const selectA = el("select", "ct-analytics-input"); selectA.name = "team_a"; selectA.setAttribute("aria-label", "Team A");
-    const selectB = el("select", "ct-analytics-input"); selectB.name = "team_b"; selectB.setAttribute("aria-label", "Team B");
-    compareSelectors.append(fieldLabel("Team A", selectA), fieldLabel("Team B", selectB));
-    comparePanel.appendChild(compareSelectors);
-    const compareNotice = el("p", "ct-analytics-muted", "Team metrics load with the selected period.");
-    comparePanel.appendChild(compareNotice);
-    const chartGrid = el("div", "ct-analytics-compare-chart-grid");
-    const rateChart = el("section", "ct-analytics-chart-card");
-    rateChart.append(el("h3", "", "Completion rate"));
-    const rateBars = el("div", "ct-analytics-bars");
-    rateChart.appendChild(rateBars);
-    const completedChart = el("section", "ct-analytics-chart-card");
-    completedChart.append(el("h3", "", "Completed work"));
-    const completedBars = el("div", "ct-analytics-bars");
-    completedChart.appendChild(completedBars);
-    chartGrid.append(rateChart, completedChart);
-    comparePanel.appendChild(chartGrid);
-    const compareTableWrap = el("div", "ct-analytics-table-wrap");
-    const compareTable = el("table", "ct-analytics-table");
-    compareTableWrap.appendChild(compareTable);
-    comparePanel.appendChild(compareTableWrap);
-    page.appendChild(comparePanel);
-
-    const rankingsPanel = el("section", "ct-analytics-panel");
-    const rankingHeading = el("div", "ct-analytics-panel-heading");
-    rankingHeading.append(el("p", "ct-analytics-section-kicker", "02 / TEAM RANKINGS"), el("h2", "", "All teams"),
-      el("p", "ct-analytics-muted", "Ordered by higher completion rate, then more completed tasks, then fewer overdue tasks. Teams with no tasks in this period appear at the bottom."));
-    rankingsPanel.appendChild(rankingHeading);
-    const rankingTableWrap = el("div", "ct-analytics-table-wrap");
-    const rankingTable = el("table", "ct-analytics-table ct-analytics-ranking-table");
-    rankingTableWrap.appendChild(rankingTable);
-    rankingsPanel.appendChild(rankingTableWrap);
-    const methodology = el("p", "ct-analytics-footnote", "Period basis: operations created during the selected date range. Completion and overdue values reflect their current recorded status. Unassigned work is excluded from team rankings.");
-    rankingsPanel.appendChild(methodology);
-    page.appendChild(rankingsPanel);
-
-    container.appendChild(page);
-
-    let report = null;
-    let requestToken = 0;
-
-    function optionValue(id) {
-      const row = report && report.teams.find(item => String(item.team_id) === String(id));
-      return row || null;
-    }
-
-    function fillTeamOptions(teams, previousA, previousB) {
-      [selectA, selectB].forEach(select => {
-        const old = select.value;
-        select.replaceChildren();
-        if (!teams.length) {
-          const option = el("option", "", "No teams available");
-          option.value = "";
-          select.appendChild(option);
-          select.disabled = true;
-          return;
-        }
-        teams.forEach(team => {
-          const option = el("option", "", team.team_name + (team.team_status && team.team_status.toLowerCase() !== "active" ? " (" + team.team_status + ")" : ""));
-          option.value = String(team.team_id);
-          select.appendChild(option);
-        });
-        select.disabled = false;
-        if (teams.some(team => String(team.team_id) === String(old))) select.value = old;
-      });
-      if (teams.length) {
-        if (!teams.some(team => String(team.team_id) === String(previousA))) selectA.value = String(teams[0].team_id);
-        else selectA.value = String(previousA);
-        const fallbackB = teams.find(team => String(team.team_id) !== String(selectA.value)) || teams[0];
-        if (!teams.some(team => String(team.team_id) === String(previousB)) || String(previousB) === String(selectA.value)) {
-          selectB.value = String(fallbackB.team_id);
-        } else {
-          selectB.value = String(previousB);
-        }
-      }
-    }
-
-    function metricCell(text) {
-      return el("td", "", text);
-    }
-
-    function renderCompareChart(containerNode, metric, teamA, teamB, isRate) {
-      containerNode.replaceChildren();
-      const values = [teamA, teamB].filter(Boolean);
-      const max = isRate ? 100 : Math.max(1, ...values.map(team => Number(team[metric] || 0)));
-      values.forEach((team, index) => {
-        const line = el("div", "ct-analytics-chart-row");
-        const label = el("div", "ct-analytics-chart-label");
-        label.append(el("strong", "", index === 0 ? "A · " + team.team_name : "B · " + team.team_name));
-        const value = isRate ? pct(team[metric]) : number(team[metric]);
-        label.append(el("span", "", value));
-        const track = el("div", "ct-analytics-chart-track");
-        const bar = el("span", "ct-analytics-chart-bar" + (index === 1 ? " is-secondary" : ""));
-        const numeric = rateValue(team[metric]);
-        bar.style.width = (numeric === null ? 0 : Math.max(0, Math.min(100, (numeric / max) * 100))) + "%";
-        track.appendChild(bar);
-        line.append(label, track);
-        containerNode.appendChild(line);
-      });
-      if (!values.length) containerNode.appendChild(el("p", "ct-analytics-empty", "Select two teams to compare."));
-    }
-
-    function renderComparison() {
-      const teamA = optionValue(selectA.value);
-      const teamB = optionValue(selectB.value);
-      rateBars.replaceChildren(); completedBars.replaceChildren(); compareTable.replaceChildren();
-      if (!teamA || !teamB) {
-        compareNotice.textContent = "At least one team is required to compare.";
-        compareTableWrap.hidden = true;
-        chartGrid.hidden = true;
-        return;
-      }
-      if (String(teamA.team_id) === String(teamB.team_id)) {
-        compareNotice.textContent = "Choose two different teams to compare.";
-        compareTableWrap.hidden = true;
-        chartGrid.hidden = true;
-        return;
-      }
-      compareNotice.textContent = "Comparing " + teamA.team_name + " with " + teamB.team_name + " for " + startDate.value + " through " + endDate.value + ".";
-      compareTableWrap.hidden = false;
-      chartGrid.hidden = false;
-      renderCompareChart(rateBars, "completion_rate", teamA, teamB, true);
-      renderCompareChart(completedBars, "completed_tasks", teamA, teamB, false);
-
-      const head = el("thead");
-      const headerRow = el("tr");
-      ["Metric", teamA.team_name, teamB.team_name, "A − B"].forEach(label => headerRow.appendChild(el("th", "", label)));
-      head.appendChild(headerRow);
-      compareTable.appendChild(head);
-      const body = el("tbody");
-      const metrics = [
-        ["Members", "member_count", false],
-        ["Tasks in period", "total_tasks", false],
-        ["Completed tasks", "completed_tasks", false],
-        ["Completion rate", "completion_rate", true],
-        ["Open tasks", "open_tasks", false],
-        ["Overdue tasks", "overdue_tasks", false],
-        ["Reviewed tasks", "reviewed_tasks", false],
-        ["On-time completion rate", "on_time_rate", true]
-      ];
-      metrics.forEach(([label, key, isRate]) => {
-        const tr = el("tr");
-        const a = teamA[key], b = teamB[key];
-        tr.appendChild(el("th", "", label));
-        tr.appendChild(metricCell(isRate ? pct(a) : number(a)));
-        tr.appendChild(metricCell(isRate ? pct(b) : number(b)));
-        tr.appendChild(metricCell(formatDiff(a, b, isRate)));
-        body.appendChild(tr);
-      });
-      compareTable.appendChild(body);
-    }
-
-    function renderRankings(teams) {
-      rankingTable.replaceChildren();
-      const thead = el("thead");
-      const trh = el("tr");
-      ["Rank", "Team", "Members", "Tasks", "Completed", "Completion rate", "Open", "Overdue", "On-time rate"].forEach(label => trh.appendChild(el("th", "", label)));
-      thead.appendChild(trh);
-      rankingTable.appendChild(thead);
-      const tbody = el("tbody");
-      if (!teams.length) {
-        const tr = el("tr"); const td = el("td", "ct-analytics-empty", "No teams have been created for this organization yet.");
-        td.colSpan = 9; tr.appendChild(td); tbody.appendChild(tr);
-      } else {
-        teams.forEach(team => {
-          const tr = el("tr");
-          const rank = el("td", "ct-analytics-rank", "#" + team.rank);
-          const nameCell = el("td", "ct-analytics-team-cell");
-          nameCell.append(el("strong", "", team.team_name), el("small", "", team.team_status || "active"));
-          const completion = el("td", "ct-analytics-completion-cell");
-          const rate = el("div", "ct-analytics-rate-meta");
-          rate.append(el("strong", "", pct(team.completion_rate)), el("span", "ct-analytics-muted", number(team.completed_tasks) + " / " + number(team.total_tasks)));
-          const track = el("div", "ct-analytics-ranking-track");
-          const bar = el("span", "ct-analytics-ranking-bar");
-          bar.style.width = (team.completion_rate === null ? 0 : Math.max(0, Math.min(100, Number(team.completion_rate)))) + "%";
-          track.appendChild(bar);
-          completion.append(rate, track);
-          tr.append(rank, nameCell, metricCell(number(team.member_count)), metricCell(number(team.total_tasks)), metricCell(number(team.completed_tasks)), completion, metricCell(number(team.open_tasks)), metricCell(number(team.overdue_tasks)), metricCell(pct(team.on_time_rate)));
-          tbody.appendChild(tr);
-        });
-      }
-      rankingTable.appendChild(tbody);
-    }
-
-    async function loadReport() {
-      if (!startDate.value || !endDate.value) {
-        status.textContent = "Choose both start and end dates.";
-        status.className = "ct-analytics-status is-error";
-        return;
-      }
-      if (startDate.value > endDate.value) {
-        status.textContent = "The start date must be on or before the end date.";
-        status.className = "ct-analytics-status is-error";
-        return;
-      }
-      const thisToken = ++requestToken;
-      apply.disabled = true;
-      status.textContent = "Loading organization analytics…";
-      status.className = "ct-analytics-status";
-      exportStatus.textContent = "";
-      const previousA = selectA.value;
-      const previousB = selectB.value;
-      try {
-        const query = new URLSearchParams({ start_date: startDate.value, end_date: endDate.value });
-        const data = await API.get("analytics/teams?" + query.toString());
-        if (thisToken !== requestToken) return;
-        report = data;
-        const summary = data.summary || {};
-        Object.entries(summaryValues).forEach(([key, value]) => { value.textContent = number(summary[key]); });
-        fillTeamOptions(Array.isArray(data.teams) ? data.teams : [], previousA, previousB);
-        renderCompareChart(rateBars, "completion_rate", optionValue(selectA.value), optionValue(selectB.value), true);
-        renderComparison();
-        renderRankings(Array.isArray(data.teams) ? data.teams : []);
-        const period = data.period || {};
-        status.textContent = "Data loaded for " + (period.start_date || startDate.value) + " through " + (period.end_date || endDate.value) +
-          ". Unassigned tasks excluded from team tables: " + number(summary.unassigned_tasks) + ".";
-        status.className = "ct-analytics-status is-success";
-      } catch (error) {
-        if (thisToken !== requestToken) return;
-        report = null;
-        Object.values(summaryValues).forEach(value => { value.textContent = "—"; });
-        fillTeamOptions([], "", "");
-        renderCompareChart(rateBars, "completion_rate", null, null, true);
-        renderComparison();
-        rankingTable.replaceChildren();
-        status.textContent = error.message || "Could not load team analytics.";
-        status.className = "ct-analytics-status is-error";
-      } finally {
-        if (thisToken === requestToken) apply.disabled = false;
-      }
-    }
-
-    async function exportReport(format) {
-      if (!report) {
-        exportStatus.textContent = "Load the analytics data before exporting.";
-        exportStatus.className = "ct-analytics-status is-error";
-        return;
-      }
-      exportStatus.textContent = "Preparing " + format.toUpperCase() + " export…";
-      exportStatus.className = "ct-analytics-status";
-      try {
-        const query = new URLSearchParams({
-          format,
-          start_date: startDate.value,
-          end_date: endDate.value
-        });
-        if (selectA.value && selectB.value && String(selectA.value) !== String(selectB.value)) {
-          query.set("team_a", selectA.value);
-          query.set("team_b", selectB.value);
-        }
-        const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl;
-        if (!base) throw new Error("API configuration is unavailable.");
-        const headers = new Headers({ Accept: format === "pdf" ? "application/pdf" : format === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "text/csv" });
-        const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
-        if (token) headers.set("Authorization", "Bearer " + token);
-        const response = await fetch(base.replace(/\/+$/, "") + "/analytics/teams/export?" + query.toString(), {
-          method: "GET", headers, credentials: "include"
-        });
-        if (!response.ok) {
-          let message = "The export request failed.";
-          try { const body = await response.json(); message = body.error || body.message || message; } catch (_) {}
-          throw new Error(message);
-        }
-        const blob = await response.blob();
-        const disposition = response.headers.get("Content-Disposition") || "";
-        const match = disposition.match(/filename="?([^";]+)"?/i);
-        const extension = format === "xlsx" ? "xlsx" : format;
-        const filename = match ? match[1] : "cleantrack-team-analytics." + extension;
-        const url = URL.createObjectURL(blob);
-        const link = el("a", "");
-        link.href = url; link.download = filename; link.style.display = "none";
-        document.body.appendChild(link); link.click(); link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-        exportStatus.textContent = "Export ready: " + filename;
-        exportStatus.className = "ct-analytics-status is-success";
-      } catch (error) {
-        exportStatus.textContent = error.message || "Export failed.";
-        exportStatus.className = "ct-analytics-status is-error";
-      }
-    }
-
-    selectA.addEventListener("change", () => {
-      if (String(selectA.value) === String(selectB.value) && report) {
-        const other = report.teams.find(team => String(team.team_id) !== String(selectA.value));
-        if (other) selectB.value = String(other.team_id);
-      }
-      renderComparison();
-    });
-    selectB.addEventListener("change", () => {
-      if (String(selectA.value) === String(selectB.value) && report) {
-        const other = report.teams.find(team => String(team.team_id) !== String(selectB.value));
-        if (other) selectA.value = String(other.team_id);
-      }
-      renderComparison();
-    });
-    loadReport();
-    // Rankings refresh from the backend every minute while this page is open.
-    // Changing the date fields without applying them does not silently change the period.
-    const refreshInterval = window.setInterval(() => {
-      if (!page.isConnected) {
-        window.clearInterval(refreshInterval);
-        return;
-      }
-      if (document.visibilityState !== "hidden" && report &&
-          startDate.value === report.period.start_date && endDate.value === report.period.end_date) {
-        loadReport();
-      }
-    }, 60000);
-  }
-
-  window.CleanTrackAnalytics = Object.freeze({ render });
+(function(){
+"use strict";
+const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,NS="http://www.w3.org/2000/svg";
+const $=(t,c,s)=>{const n=document.createElement(t);if(c)n.className=c;if(s!==undefined&&s!==null)n.textContent=String(s);return n;};
+const S=(t,a,s)=>{const n=document.createElementNS(NS,t);Object.entries(a||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));if(s!==undefined)n.textContent=String(s);return n;};
+const B=(s,c,fn)=>{const n=$("button",c,s);n.type="button";n.addEventListener("click",fn);return n;};
+const W=(s,n,h)=>{const x=$("label","ct-analytics3-field");x.append($("span","",s),n);if(h)x.appendChild($("small","",h));return x;};
+const SEL=(name,items,multi)=>{const n=$("select","ct-analytics3-input");n.name=name;if(multi){n.multiple=true;n.size=4;}items.forEach(([v,l])=>{const o=$("option","",l);o.value=v;n.appendChild(o);});return n;};
+const PICK=n=>Array.from(n.selectedOptions).map(o=>o.value).filter(Boolean);
+function options(n,rows,chosen,k,v){n.replaceChildren();if(!n.multiple){const o=$("option","","All");o.value="";n.appendChild(o);}rows.forEach(r=>{const o=$("option","",r[k]);o.value=String(r[v]);n.appendChild(o);});if(n.multiple){const allowed=new Set(rows.map(r=>String(r[v])));chosen.filter(x=>allowed.has(String(x))).forEach(x=>{const o=Array.from(n.options).find(y=>y.value===String(x));if(o)o.selected=true;});}else n.value=rows.some(r=>String(r[v])===String(chosen))?String(chosen):"";}
+const NUM=v=>v===null||v===undefined||v===""?"—":new Intl.NumberFormat().format(Number(v));
+const PCT=v=>v===null||v===undefined?"N/A":Number(v).toFixed(1)+"%";
+const NAMES={total_tasks:"Tasks created",completed_tasks:"Completed tasks",completion_rate:"Completion rate",open_tasks:"Open tasks",overdue_tasks:"Overdue tasks",overdue_rate:"Overdue rate",on_time_rate:"On-time rate",average_completion_hours:"Average completion time"};
+const TRENDS=[["all","All work trends"],["created","Tasks created"],["completed","Completion events"],["approved","Approval events"],["rejected","Rejection events"],["submitted","Submission events"]];
+const METRICS=Object.keys(NAMES).map(k=>[k,NAMES[k]]);
+function render(container){
+container.replaceChildren();const user=AUTH&&AUTH.getCurrentUser?AUTH.getCurrentUser():null;
+if(!user||String(user.role||"").toLowerCase()!=="admin"){container.appendChild($("p","ct-analytics-muted","Organization Analytics is available to Admin users only."));return;}
+const page=$("section","ct-analytics3-page"),hero=$("header","ct-analytics3-hero");
+hero.append($("p","ct-analytics3-eyebrow","ORGANIZATION PERFORMANCE"),$("h1","","Analytics"),$("p","","Explore employee output, work trends, locations, operation types and organization performance. Charts are built from your organization’s actual operations and audit events."));
+const tags=$("div","ct-analytics3-tags");["Live organization records","Filterable reports","Multiple chart formats"].forEach(x=>tags.appendChild($("span","",x)));hero.appendChild(tags);page.appendChild(hero);
+const dates=()=>{const e=new Date(),s=new Date(e);s.setDate(s.getDate()-29);return{start:s.getFullYear()+"-"+String(s.getMonth()+1).padStart(2,"0")+"-"+String(s.getDate()).padStart(2,"0"),end:e.getFullYear()+"-"+String(e.getMonth()+1).padStart(2,"0")+"-"+String(e.getDate()).padStart(2,"0")};};
+const d=dates(),from=$("input","ct-analytics3-input"),to=$("input","ct-analytics3-input");from.type=to.type="date";from.value=d.start;to.value=d.end;
+const bucket=SEL("bucket",[["day","Day"],["week","Week"],["month","Month"],["quarter","Quarter"],["year","Year"]]);bucket.value="day";
+const team=SEL("team_ids",[],true),location=SEL("location_ids",[],true),zone=SEL("zone_ids",[],true),employee=SEL("employee_ids",[],true),type=SEL("task_type",[],false);
+const filterPanel=$("section","ct-analytics3-filter-panel");filterPanel.append($("h2","","Filters"),$("p","ct-analytics3-muted","Filters apply to the whole report. Leave multi-selects empty to include all available values."));
+const fg=$("div","ct-analytics3-filter-grid");fg.append(W("From",from),W("To",to),W("Trend interval",bucket),W("Teams",team,"Choose multiple teams to compare."),W("Locations",location),W("Zones",zone),W("Employees",employee),W("Operation type",type));
+const apply=B("Apply filters","ct-analytics3-button ct-analytics3-primary",load),reset=B("Reset filters","ct-analytics3-button ct-analytics3-secondary",()=>{const x=dates();from.value=x.start;to.value=x.end;bucket.value="day";[team,location,zone,employee].forEach(n=>Array.from(n.options).forEach(o=>o.selected=false));type.value="";load();});
+const fb=$("div","ct-analytics3-filter-actions");fb.append(apply,reset);filterPanel.append(fg,fb);page.appendChild(filterPanel);
+const status=$("p","ct-analytics3-status","Loading organization analytics…");status.setAttribute("role","status");status.setAttribute("aria-live","polite");page.appendChild(status);
+const kpiDefs=[["Tasks created","tasks_created_in_period","Creation cohort","n"],["Completed","completed_tasks","Current status of period work","n"],["Completion rate","completion_rate","Completed ÷ created","p"],["Approvals recorded","approval_events","Audit events in period","n"],["Rejections recorded","rejection_events","Audit events in period","n"],["Overdue open work","overdue_tasks","Currently overdue in cohort","n"],["On-time rate","on_time_rate","Completed with due dates","p"],["Average completion time","average_completion_hours","Elapsed hours","h"]];
+const kg=$("div","ct-analytics3-kpis"),kv={};kpiDefs.forEach(([label,key,note,kind])=>{const c=$("article","ct-analytics3-kpi"),v=$("strong","ct-analytics3-kpi-value","—");c.append($("span","ct-analytics3-kpi-label",label),v,$("small","",note));kv[key]={v,kind};kg.appendChild(c);});page.appendChild(kg);
+const panel=$("section","ct-analytics3-panel"),ph=$("div","ct-analytics3-panel-head"),pc=$("div");pc.append($("p","ct-analytics3-eyebrow","ANALYSIS BUILDER"),$("h2","","Build your view"),$("p","ct-analytics3-muted","Change the subject, measure and visualization while retaining your filters."));ph.appendChild(pc);
+const view=SEL("analysis_view",[["trends","Work trends"],["teams","Team comparisons"],["employees","Employee analytics"],["locations","Location analytics"],["operation_types","Operation-type analytics"],["statuses","Current status distribution"],["zones","Zone analytics"]]);
+const chart=SEL("chart_type",[["line","Line chart"],["area","Area chart"],["bar","Bar chart"],["stacked","Stacked bar chart"],["pie","Pie chart"],["donut","Donut chart"],["table","Data table"]]);chart.value="line";
+const metric=SEL("metric",TRENDS),download=B("Export current view (CSV)","ct-analytics3-button ct-analytics3-secondary",exportCsv);
+const builder=$("div","ct-analytics3-builder"),exportCell=$("div","ct-analytics3-builder-action");exportCell.appendChild(download);builder.append(W("Analysis",view),W("Visualization",chart),W("Measure",metric),exportCell);
+const title=$("h3","ct-analytics3-chart-title","Work trends"),legend=$("div","ct-analytics3-legend"),drawing=$("div","ct-analytics3-chart-wrap"),tableTitle=$("h3","ct-analytics3-chart-title","Data behind this view"),tableWrap=$("div","ct-analytics3-table-wrap"),note=$("p","ct-analytics3-muted");
+panel.append(ph,builder,title,legend,drawing,tableTitle,tableWrap,note);page.appendChild(panel);
+const ai=$("section","ct-analytics3-ai-panel"),aic=$("div");ai.append($("span","ct-analytics3-ai-icon","✦"));aic.append($("h2","","AI predictions"),$("p","","Under development. Predictions will appear only after a validated prediction model is connected. No predicted values are shown yet."));ai.append(aic,$("span","ct-analytics3-ai-badge","In development"));page.appendChild(ai);
+const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
+let report=null,current=null,sequence=0;
+function query(){const p=new URLSearchParams({start_date:from.value,end_date:to.value,bucket:bucket.value});if(PICK(team).length)p.set("team_ids",PICK(team).join(","));if(PICK(location).length)p.set("location_ids",PICK(location).join(","));if(PICK(zone).length)p.set("zone_ids",PICK(zone).join(","));if(PICK(employee).length)p.set("employee_ids",PICK(employee).join(","));if(type.value)p.set("task_type",type.value);return p;}
+function fillFilters(f){const t=PICK(team),l=PICK(location),z=PICK(zone),e=PICK(employee),ty=type.value;options(team,f.teams||[],t,"name","id");options(location,f.locations||[],l,"name","id");options(zone,f.zones||[],z,"name","id");options(employee,f.employees||[],e,"name","id");options(type,(f.operation_types||[]).map(n=>({name:n,value:n})),ty,"name","value");}
+function configureMetric(){const allowed=view.value==="trends"?TRENDS:view.value==="statuses"?[["statuses","Operations by current status"]]:METRICS,old=metric.value;metric.replaceChildren();allowed.forEach(([v,l])=>{const o=$("option","",l);o.value=v;metric.appendChild(o);});metric.value=allowed.some(a=>a[0]===old)?old:allowed[0][0];}
+function getData(){
+if(!report)return{labels:[],series:[],rows:[],title:"Analytics",metric:metric.value};
+if(view.value==="trends"){const rows=report.trends||[],defs=metric.value==="all"?TRENDS.slice(1):TRENDS.filter(x=>x[0]===metric.value);return{labels:rows.map(r=>r.label),series:defs.map(([key,name])=>({name,key,values:rows.map(r=>Number(r[key]||0))})),rows,title:"Work trends",metric:metric.value};}
+if(view.value==="statuses"){const rows=report.breakdowns?.statuses||[];return{labels:rows.map(r=>r.name),series:[{name:"Operations",key:"value",values:rows.map(r=>Number(r.value||0))}],rows,title:"Current status distribution",metric:"statuses"};}
+let rows=(report.breakdowns?.[view.value]||[]).slice();if(view.value==="teams"&&PICK(team).length)rows=rows.filter(r=>PICK(team).includes(String(r.id)));
+return{labels:rows.map(r=>r.name),series:[{name:NAMES[metric.value]||"Operations",key:metric.value,values:rows.map(r=>r[metric.value]===null||r[metric.value]===undefined?0:Number(r[metric.value]))}],rows,title:({teams:"Team comparisons",employees:"Employee analytics",locations:"Location analytics",operation_types:"Operation-type analytics",zones:"Zone analytics"})[view.value]||"Analytics",metric:metric.value};
+}
+function drawLegend(series){legend.replaceChildren();series.forEach((s,i)=>{const n=$("span","ct-analytics3-legend-item");n.append($("i","ct-analytics3-swatch swatch-"+i%6),$("span","",s.name));legend.appendChild(n);});legend.hidden=!series.length||["pie","donut","table"].includes(chart.value);}
+function sample(data,max){if(data.labels.length<=max)return data;const idx=[];for(let i=0;i<max;i++)idx.push(Math.round(i*(data.labels.length-1)/(max-1)));return{labels:idx.map(i=>data.labels[i]),series:data.series.map(s=>({...s,values:idx.map(i=>s.values[i])}))};}
+function axisChart(data,kind){
+const xdata=sample(data,64),labels=xdata.labels,series=xdata.series,w=1000,h=410,L=64,R=22,T=24,BOT=95,pw=w-L-R,phh=h-T-BOT,values=series.flatMap(s=>s.values),raw=Math.max(0,...values),max=raw?raw*1.15:1,root=S("svg",{viewBox:"0 0 "+w+" "+h,role:"img","aria-label":data.title+" chart"});
+for(let i=0;i<=4;i++){const y=T+phh*i/4;root.append(S("line",{x1:L,y1:y,x2:w-R,y2:y,class:"ct-analytics3-gridline"}),S("text",{x:L-12,y:y+4,"text-anchor":"end",class:"ct-analytics3-axis-label"},String(Math.round(max*(1-i/4)))));}
+if(!labels.length||!series.length||raw===0){root.appendChild(S("text",{x:w/2,y:h/2,"text-anchor":"middle",class:"ct-analytics3-empty-svg"},"No records match these filters."));drawing.appendChild(root);return;}
+const xpos=i=>L+(labels.length===1?pw/2:pw*i/(labels.length-1)),ypos=v=>T+phh-Math.max(0,Number(v)||0)/max*phh;
+if(kind==="bar"||kind==="stacked"){const slot=pw/labels.length,g=Math.max(2,Math.min(slot*.82,54));labels.forEach((label,i)=>{if(kind==="stacked"){let stack=0;series.forEach((s,j)=>{const v=Math.max(0,Number(s.values[i])||0),hh=v/max*phh;root.appendChild(S("rect",{x:L+slot*i+(slot-g)/2,y:ypos(stack+v),width:g,height:hh,class:"ct-analytics3-bar series-"+j%6,rx:2}));stack+=v;});}else{const sw=g/series.length;series.forEach((s,j)=>{const v=Math.max(0,Number(s.values[i])||0);root.appendChild(S("rect",{x:L+slot*i+(slot-g)/2+sw*j,y:ypos(v),width:Math.max(1,sw-2),height:v/max*phh,class:"ct-analytics3-bar series-"+j%6,rx:2}));});}});}
+else{series.forEach((s,j)=>{const pts=s.values.map((v,i)=>xpos(i)+","+ypos(v)).join(" ");if(kind==="area")root.appendChild(S("polygon",{points:L+","+(T+phh)+" "+pts+" "+(L+pw)+","+(T+phh),class:"ct-analytics3-area series-"+j%6}));root.appendChild(S("polyline",{points:pts,fill:"none",class:"ct-analytics3-line series-"+j%6}));if(labels.length<=24)s.values.forEach((v,i)=>root.appendChild(S("circle",{cx:xpos(i),cy:ypos(v),r:3.5,class:"ct-analytics3-point series-"+j%6})));});}
+const stride=Math.max(1,Math.ceil(labels.length/9));labels.forEach((label,i)=>{if(i%stride&&i!==labels.length-1)return;const xx=(kind==="bar"||kind==="stacked")?L+pw*(i+.5)/labels.length:xpos(i);root.appendChild(S("text",{x:xx,y:T+phh+25,transform:"rotate(-30 "+xx+" "+(T+phh+25)+")","text-anchor":"end",class:"ct-analytics3-axis-label"},label.length>16?label.slice(0,14)+"…":label));});drawing.appendChild(root);
+}
+function pieChart(data,donut){
+let labels=data.labels.slice(),values=data.series.length?data.series[0].values.map(v=>Math.max(0,Number(v)||0)):[];if(view.value==="trends"&&metric.value==="all"){labels=TRENDS.slice(1).map(x=>x[1]);values=TRENDS.slice(1).map(([k])=>(report.trends||[]).reduce((s,r)=>s+Number(r[k]||0),0));}
+const total=values.reduce((a,b)=>a+b,0),root=S("svg",{viewBox:"0 0 1000 390",role:"img","aria-label":data.title+" share chart"});if(!labels.length||total<=0){root.appendChild(S("text",{x:500,y:195,"text-anchor":"middle",class:"ct-analytics3-empty-svg"},"No values to chart for this selection."));drawing.appendChild(root);return;}
+const cx=310,cy=188,r=donut?135:145;let a=-Math.PI/2;values.forEach((v,i)=>{if(v<=0)return;const n=a+v/total*Math.PI*2,x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(n),y2=cy+r*Math.sin(n),large=n-a>Math.PI?1:0;const d=v/total>.99999?"M "+cx+" "+(cy-r)+" A "+r+" "+r+" 0 1 1 "+(cx-.01)+" "+(cy-r)+" Z":"M "+cx+" "+cy+" L "+x1+" "+y1+" A "+r+" "+r+" 0 "+large+" 1 "+x2+" "+y2+" Z";root.appendChild(S("path",{d,class:"ct-analytics3-slice series-"+i%6}));a=n;});
+if(donut){root.append(S("circle",{cx,cy,r:76,class:"ct-analytics3-donut-hole"}),S("text",{x:cx,y:cy-4,"text-anchor":"middle",class:"ct-analytics3-donut-total"},NUM(total)),S("text",{x:cx,y:cy+20,"text-anchor":"middle",class:"ct-analytics3-donut-caption"},"Total"));}
+labels.forEach((l,i)=>{const y=54+i*33;if(y>372)return;root.append(S("rect",{x:560,y:y-12,width:12,height:12,rx:3,class:"ct-analytics3-bar series-"+i%6}),S("text",{x:584,y,class:"ct-analytics3-pie-label"},l.length>27?l.slice(0,25)+"…":l),S("text",{x:960,y,"text-anchor":"end",class:"ct-analytics3-axis-label"},NUM(values[i])+" ("+(values[i]/total*100).toFixed(1)+"%)"));});drawing.appendChild(root);
+}
+function drawTable(data){
+tableWrap.replaceChildren();const table=$("table","ct-analytics3-table"),head=$("thead"),hr=$("tr");hr.appendChild($("th","","Name / Period"));
+if(view.value==="trends")data.series.forEach(s=>hr.appendChild($("th","",s.name)));else if(view.value==="statuses")hr.appendChild($("th","","Operations"));else["Tasks created","Completed","Completion rate","Open","Overdue","Overdue rate","On-time rate","Average completion (h)"].forEach(x=>hr.appendChild($("th","",x)));head.appendChild(hr);table.appendChild(head);const body=$("tbody");
+if(view.value==="trends")data.rows.forEach(r=>{const tr=$("tr");tr.appendChild($("th","",r.label));data.series.forEach(s=>tr.appendChild($("td","",NUM(r[s.key]))));body.appendChild(tr);});
+else if(view.value==="statuses")data.rows.forEach(r=>{const tr=$("tr");tr.append($("th","",r.name),$("td","",NUM(r.value)));body.appendChild(tr);});
+else data.rows.forEach(r=>{const tr=$("tr");tr.appendChild($("th","",r.name));[["total_tasks","n"],["completed_tasks","n"],["completion_rate","p"],["open_tasks","n"],["overdue_tasks","n"],["overdue_rate","p"],["on_time_rate","p"],["average_completion_hours","h"]].forEach(([k,t])=>tr.appendChild($("td","",t==="p"?PCT(r[k]):t==="h"?(r[k]===null||r[k]===undefined?"N/A":NUM(r[k])):NUM(r[k]))));body.appendChild(tr);});
+if(!body.children.length){const tr=$("tr"),td=$("td","ct-analytics3-empty-cell","No records match the selected filters.");td.colSpan=view.value==="trends"?data.series.length+1:view.value==="statuses"?2:9;tr.appendChild(td);body.appendChild(tr);}table.appendChild(body);tableWrap.appendChild(table);
+}
+function draw(){if(!report)return;configureMetric();const d=getData();current=d;title.textContent=d.title+" · "+chart.options[chart.selectedIndex].textContent;tableTitle.textContent="Data behind "+d.title.toLowerCase();drawing.replaceChildren();legend.replaceChildren();d.series.forEach((s,i)=>{const l=$("span","ct-analytics3-legend-item");l.append($("i","ct-analytics3-swatch swatch-"+i%6),$("span","",s.name));legend.appendChild(l);});legend.hidden=!d.series.length||["pie","donut","table"].includes(chart.value);
+if(chart.value==="table")drawing.appendChild($("p","ct-analytics3-muted","Table format selected; complete values are shown below."));else if(chart.value==="pie"||chart.value==="donut")pieChart(d,chart.value==="donut");else axisChart(d,chart.value);drawTable(d);note.textContent=view.value==="trends"?"For long daily periods, only the plotted line/bar points are sampled for readability; the table retains every bucket. Created tasks use creation timestamps; completion, approval, rejection and submission trends use recorded operation audit events.":"Group metrics describe operations created in the selected period and their currently recorded state. Existing teams and other organization dimensions remain visible even when their counts are zero.";
+}
+function csv(){if(!report||!current)return;const q=v=>'"'+String(v===null||v===undefined?"":v).replace(/"/g,'""')+'"',rows=[["Analytics view",current.title],["Period",report.period.start_date,report.period.end_date],["Interval",report.bucket]];
+if(view.value==="trends"){rows.push(["Period",...current.series.map(s=>s.name)]);current.rows.forEach(r=>rows.push([r.label,...current.series.map(s=>r[s.key]||0)]));}else if(view.value==="statuses"){rows.push(["Status","Operations"]);current.rows.forEach(r=>rows.push([r.name,r.value]));}else{rows.push(["Name","Tasks created","Completed","Completion rate","Open","Overdue","Overdue rate","On-time rate","Average completion hours"]);current.rows.forEach(r=>rows.push([r.name,r.total_tasks,r.completed_tasks,r.completion_rate,r.open_tasks,r.overdue_tasks,r.overdue_rate,r.on_time_rate,r.average_completion_hours]));}
+const blob=new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=$("a","");a.href=url;a.download="cleantrack-analytics-"+view.value+"-"+report.period.start_date+"-to-"+report.period.end_date+".csv";document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
+async function load(){
+if(!from.value||!to.value){status.textContent="Choose both start and end dates.";status.className="ct-analytics3-status is-error";return;}if(from.value>to.value){status.textContent="Start date must be on or before end date.";status.className="ct-analytics3-status is-error";return;}
+const n=++sequence;apply.disabled=true;status.textContent="Loading filtered organization records…";status.className="ct-analytics3-status";
+try{const r=await API.get("analytics/workspace?"+query().toString());if(n!==sequence)return;report=r;const pt=PICK(team),pl=PICK(location),pz=PICK(zone),pe=PICK(employee),py=type.value;options(team,r.filters?.teams||[],pt,"name","id");options(location,r.filters?.locations||[],pl,"name","id");options(zone,r.filters?.zones||[],pz,"name","id");options(employee,r.filters?.employees||[],pe,"name","id");options(type,(r.filters?.operation_types||[]).map(x=>({name:x,value:x})),py,"name","value");
+kpiDefs.forEach(([lab,key,note,kind])=>{const v=r.summary?.[key];kv[key].v.textContent=kind==="p"?PCT(v):kind==="h"?(v===null||v===undefined?"N/A":NUM(v)+" h"):NUM(v);});configureMetric();draw();
+mb.replaceChildren();[["Cohort",r.methodology?.cohort],["Trends",r.methodology?.trends],["Completion rate",r.methodology?.completion_rate],["On-time rate",r.methodology?.on_time_rate],["Average completion time",r.methodology?.average_completion_hours],["Filters",r.methodology?.filters]].forEach(([a,b])=>{if(!b)return;const p=$("p");p.append($("strong","",a+": "),$("span","",b));mb.appendChild(p);});
+status.textContent="Loaded organization records for "+r.period.start_date+" through "+r.period.end_date+". Trend approval and rejection counts use recorded audit events.";status.className="ct-analytics3-status is-success";
+}catch(e){if(n!==sequence)return;report=null;drawing.replaceChildren();tableWrap.replaceChildren();Object.values(kv).forEach(x=>x.v.textContent="—");status.textContent=e.message||"Could not load analytics.";status.className="ct-analytics3-status is-error";}
+finally{if(n===sequence)apply.disabled=false;}}
+view.addEventListener("change",()=>{configureMetric();draw();});chart.addEventListener("change",draw);metric.addEventListener("change",draw);
+load();
+}
+window.CleanTrackAnalytics=Object.freeze({render});
 })();
