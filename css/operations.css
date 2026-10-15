@@ -560,3 +560,12 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
 #page-content .ct-operations-page .ct-op-calendar-trigger-floating{position:fixed!important;z-index:10060;min-width:0;box-shadow:0 8px 26px rgb(0 0 0 / 30%);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;}
 #page-content .ct-operations-page .ct-op-calendar-trigger-floating.is-dragging{cursor:grabbing;transition:none;}
 #page-content .ct-operations-page .ct-op-calendar-trigger-floating:focus-visible{outline-offset:3px;}
+
+
+/* Floating calendar positioning controls. */
+#page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-toolbar{
+ cursor:grab;touch-action:none;user-select:none;
+}
+#page-content .ct-operations-page .ct-op-calendar-popover.is-dragging{
+ cursor:grabbing;user-select:none;-webkit-user-select:none;
+}
