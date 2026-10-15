@@ -553,3 +553,10 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
  #page-content .ct-operations-page .ct-op-calendar-popover{padding:9px}
  #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-controls .ct-op-button{padding:5px 6px}
 }
+
+
+/* Movable Operations Calendar launcher. The same click still toggles the calendar sheet. */
+#page-content .ct-operations-page .ct-op-calendar-trigger-draggable{touch-action:pan-y;cursor:grab;}
+#page-content .ct-operations-page .ct-op-calendar-trigger-floating{position:fixed!important;z-index:10060;min-width:0;box-shadow:0 8px 26px rgb(0 0 0 / 30%);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;}
+#page-content .ct-operations-page .ct-op-calendar-trigger-floating.is-dragging{cursor:grabbing;transition:none;}
+#page-content .ct-operations-page .ct-op-calendar-trigger-floating:focus-visible{outline-offset:3px;}
