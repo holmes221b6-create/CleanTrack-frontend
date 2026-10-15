@@ -698,3 +698,33 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-selec
   #page-content .ct-operations-page .ct-op-calendar-popover{padding:10px!important}
   #page-content .ct-operations-page .ct-op-calendar-popover .ct-op-calendar-date{height:32px!important;min-height:32px!important}
 }
+
+
+/* Match the main Operations calendar to the soft-grey custom calendar. */
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-panel {
+  background: #e8edf2 !important;
+  border-color: #d7dee8 !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-month-grid {
+  background: #e8edf2 !important;
+  border-color: #d7dee8 !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-weekday {
+  background: #dfe5ec !important;
+  border-color: #d1d9e3 !important;
+  color: #526174 !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-cell {
+  background: #edf1f5 !important;
+  border-color: #d1d9e3 !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-cell.is-outside {
+  background: #e3e8ee !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-event {
+  background: #e6ebf1 !important;
+  border-color: #d1d9e3 !important;
+}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-event:hover {
+  background: #dfe7f0 !important;
+}
