@@ -248,3 +248,27 @@
   .ct-analytics3-ai-panel { align-items: flex-start; flex-wrap: wrap; }
   .ct-analytics3-ai-badge { margin-left: 56px; }
 }
+
+
+/* Keep exported/printed reports readable without application chrome. */
+.ct-analytics3-builder-action { flex-wrap: wrap; align-items: center; gap: 8px; }
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  #app-header, #app-footer, .app-header, .app-footer, .sidebar-layout, .app-sidebar,
+  .ct-sidebar, .sidebar, nav[aria-label="Primary navigation"] { display: none !important; }
+  #main-content, #page-content { display: block !important; width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  #page-content .ct-analytics3-page { display: block !important; color: #111 !important; }
+  .ct-analytics3-filter-actions, .ct-analytics3-builder, .ct-analytics3-ai-panel,
+  .ct-analytics3-methodology, .ct-analytics3-status { display: none !important; }
+  .ct-analytics3-hero, .ct-analytics3-filter-panel, .ct-analytics3-panel, .ct-analytics3-kpi {
+    box-shadow: none !important; break-inside: avoid; border-color: #bbb !important; color: #111 !important; background: #fff !important;
+  }
+  .ct-analytics3-kpis { grid-template-columns: repeat(4,minmax(0,1fr)) !important; }
+  .ct-analytics3-chart-wrap { overflow: visible !important; }
+  .ct-analytics3-chart-wrap svg { min-width: 0 !important; width: 100% !important; max-height: none !important; }
+  .ct-analytics3-table-wrap { overflow: visible !important; }
+  .ct-analytics3-table { min-width: 0 !important; width: 100% !important; font-size: 7.5pt !important; }
+  .ct-analytics3-table th, .ct-analytics3-table td { white-space: normal !important; padding: 5px !important; color: #111 !important; background: #fff !important; }
+  .ct-analytics3-axis-label, .ct-analytics3-pie-label, .ct-analytics3-donut-total, .ct-analytics3-donut-caption { fill: #111 !important; }
+  .ct-analytics3-chart-title { color: #111 !important; }
+}
