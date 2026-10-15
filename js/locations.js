@@ -19,8 +19,8 @@
   async function load(){const r=await Promise.allSettled([API.get("locations"),API.get("teams"),API.get("zones"),API.get("operations")]);if(r[0].status==="rejected")throw r[0].reason;locations=rows(r[0].value,"locations");dataStatus={teams:r[1].status==="fulfilled",zones:r[2].status==="fulfilled",operations:r[3].status==="fulfilled"};teams=dataStatus.teams?rows(r[1].value,"teams"):[];zones=dataStatus.zones?rows(r[2].value,"zones"):[];operations=dataStatus.operations?rows(r[3].value,"operations"):[];}
   function renderMapPins(){
     if(!map||!layer||!window.L)return;layer.clearLayers();
-    locations.filter(coords).forEach(x=>{const s=String(x.status||"active").toLowerCase();const p=L.circleMarker([Number(x.latitude),Number(x.longitude)],{radius:String(selectedId)===String(x.id)?10:7,color:s==="archived"?"#93939d":s==="inactive"?"#dfa64f":"#42cfa4",fillColor:s==="archived"?"#73737d":s==="inactive"?"#dfa64f":"#42cfa4",fillOpacity:.9,weight:2}).addTo(layer);p.bindTooltip(x.name||"Location");p.on("click",()=>showDetails(x.id,true));});
-    if(candidate&&Number.isFinite(candidate.lat)&&Number.isFinite(candidate.lon)){const p=L.marker([candidate.lat,candidate.lon],{draggable:true}).addTo(layer);p.bindTooltip(candidate.label||"Selected pin");p.on("dragend",e=>{const g=e.target.getLatLng();setPin(g.lat,g.lng,candidate.label);});}
+    locations.filter(coords).forEach(x=>{const s=String(x.status||"active").toLowerCase();const p=L.circleMarker([Number(x.latitude),Number(x.longitude)],{radius:String(selectedId)===String(x.id)?10:7,color:s==="archived"?"#93939d":s==="inactive"?"#dfa64f":"#42cfa4",fillColor:s==="archived"?"#73737d":s==="inactive"?"#dfa64f":"#42cfa4",fillOpacity:.9,weight:2}).addTo(layer);p.bindTooltip(x.name||("Location "+x.id),{permanent:true,direction:"top",offset:[0,-9],opacity:.98,className:"ct-loc-pin-label"});p.on("click",()=>showDetails(x.id,true));});
+    if(candidate&&Number.isFinite(candidate.lat)&&Number.isFinite(candidate.lon)){const p=L.marker([candidate.lat,candidate.lon],{draggable:true}).addTo(layer);p.bindTooltip(candidate.label||"Selected pin",{permanent:true,direction:"top",offset:[0,-9],opacity:.98,className:"ct-loc-pin-label"});p.on("dragend",e=>{const g=e.target.getLatLng();setPin(g.lat,g.lng,candidate.label);});}
   }
   function initMap(){
     const box=root&&root.querySelector("#ct-location-map");
@@ -30,10 +30,11 @@
     // Always attach exactly one Leaflet map to the current page container.
     if(map){try{map.off();map.remove();}catch(_){}}
     map=null;layer=null;
-    map=L.map(box,{scrollWheelZoom:true,preferCanvas:true}).setView([20,0],2);
+    map=L.map(box,{scrollWheelZoom:true,preferCanvas:true,worldCopyJump:false}).setView([20,0],3);
     // Single free, no-key basemap. Avoid offering multiple map layers/providers.
     const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
       maxZoom:19,
+      noWrap:true,
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
     });
     tiles.on("tileerror",()=>mapMsg("Map tiles could not load. Check your connection. You can still use the saved location directory and place search.",true));
@@ -45,9 +46,11 @@
       notice("Pin placed. Confirm the address and save the location.","success");
     });
     renderMapPins();
-    // Frame actual saved location pins on first open rather than showing a
-    // world-scale map where an organization's points are almost invisible.
-    if(locations.some(coords))fitPins();
+    // Use real saved coordinates where available. Without mapped records,
+    // show one labelled world view and explain how to add real pins.
+    const mappedCount=locations.filter(coords).length;
+    if(mappedCount)fitPins();
+    else mapMsg("No saved locations have map coordinates yet. Search for a real place above, or add a location and save its coordinates. No sample pins are displayed.",false);
     setTimeout(()=>map&&map.invalidateSize(),100);
   }
   function toggleMapPanel(forceOpen){
@@ -131,7 +134,7 @@
   function addLocation(){editingId=null;formNode.hidden=false;buildForm();formNode.scrollIntoView({behavior:"smooth",block:"start"});if(candidate&&map)map.setView([candidate.lat,candidate.lon],Math.max(14,map.getZoom()));}
   function editLocation(id){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;selectedId=x.id;editingId=x.id;candidate=coords(x)?{lat:Number(x.latitude),lon:Number(x.longitude),label:x.name}:null;formNode.hidden=false;buildForm();renderMapPins();formNode.scrollIntoView({behavior:"smooth",block:"start"});}
   function cancelForm(){formNode.hidden=true;editingId=null;candidate=null;renderMapPins();}
-  function fitPins(){if(!map||!window.L)return;const pts=locations.filter(coords).map(x=>[Number(x.latitude),Number(x.longitude)]);if(pts.length===1)map.setView(pts[0],14);else if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:14});else map.setView([20,0],2);}
+  function fitPins(){if(!map||!window.L)return;const pts=locations.filter(coords).map(x=>[Number(x.latitude),Number(x.longitude)]);if(pts.length===1)map.setView(pts[0],14);else if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:14});else map.setView([20,0],3);}
   async function searchPlaces(value){if(!value)return;const button=root.querySelector(".ct-loc-map-search button");button.disabled=true;button.textContent="Searching…";searchResultsNode.replaceChildren(el("p","ct-loc-muted","Searching OpenStreetMap place names…"));try{const wait=Math.max(0,1100-(Date.now()-lastPlaceSearchAt));if(wait)await new Promise(resolve=>setTimeout(resolve,wait));lastPlaceSearchAt=Date.now();const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&limit=10&q="+encodeURIComponent(value);const response=await fetch(url,{headers:{"Accept":"application/json","Accept-Language":document.documentElement.lang||"en"}});if(!response.ok)throw new Error("Place search is unavailable right now (HTTP "+response.status+").");searchResultsNode.replaceChildren();const results=await response.json();if(!Array.isArray(results)||!results.length){searchResultsNode.append(el("p","ct-loc-muted","No results found. Try a more specific address or place a pin manually."));return;}results.forEach(place=>{
       const title=place.name||String(place.display_name||"").split(",")[0]||"Map result";
       const country=place.address?.country||"Country not identified";
