@@ -86,6 +86,15 @@ function positionCalendar(root){
  panel.style.top=edge+"px";
  const measured=panel.getBoundingClientRect();
  const height=Math.min(measured.height,viewportH-edge*2);
+ // If the user moved the popover, restore its saved viewport position.
+ let savedPosition=null;
+ try{savedPosition=JSON.parse(localStorage.getItem("cleantrack.operations-calendar-panel.position")||"null");}catch(_){}
+ if(savedPosition&&Number.isFinite(savedPosition.x)&&Number.isFinite(savedPosition.y)){
+  const x=Math.max(edge,Math.min(viewportW-width-edge,savedPosition.x));
+  const y=Math.max(edge,Math.min(viewportH-height-edge,savedPosition.y));
+  panel.dataset.userPositioned="true";panel.style.left=x+"px";panel.style.top=y+"px";
+  return;
+ }
  const spaceRight=viewportW-rect.right-edge-gap;
  const spaceLeft=rect.left-edge-gap;
  let left,top;
@@ -107,6 +116,54 @@ function positionCalendar(root){
  top=Math.max(edge,Math.min(viewportH-height-edge,top));
  panel.style.left=left+"px";
  panel.style.top=top+"px";
+}
+function makeCalendarPanelMovable(root,panel){
+ const handle=panel.querySelector(".ct-op-calendar-toolbar");
+ if(!handle)return;
+ const key="cleantrack.operations-calendar-panel.position",pad=8;
+ const clamp=(v,min,max)=>Math.max(min,Math.min(Math.max(min,max),v));
+ let drag=null,moved=false;
+ handle.style.cursor="grab";handle.style.touchAction="none";handle.style.userSelect="none";
+ handle.title="Drag this toolbar to move the calendar. Use Reset position to return it beside the launcher.";
+ handle.addEventListener("pointerdown",event=>{
+  if(event.button!==undefined&&event.button!==0)return;
+  if(event.target.closest("button,input,select,textarea,a,[role='button']"))return;
+  const rect=panel.getBoundingClientRect();
+  drag={id:event.pointerId,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top};
+  moved=false;
+  try{handle.setPointerCapture(event.pointerId);}catch(_){}
+  event.preventDefault();
+ });
+ handle.addEventListener("pointermove",event=>{
+  if(!drag||event.pointerId!==drag.id)return;
+  const dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;
+  if(!moved&&Math.hypot(dx,dy)<3)return;
+  moved=true;
+  const rect=panel.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
+  panel.style.left=clamp(drag.left+dx,pad,vw-rect.width-pad)+"px";
+  panel.style.top=clamp(drag.top+dy,pad,vh-rect.height-pad)+"px";
+  panel.classList.add("is-dragging");event.preventDefault();
+ });
+ const endDrag=event=>{
+  if(!drag||event.pointerId!==drag.id)return;
+  if(moved){
+   const rect=panel.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
+   const x=clamp(rect.left,pad,vw-rect.width-pad),y=clamp(rect.top,pad,vh-rect.height-pad);
+   panel.style.left=x+"px";panel.style.top=y+"px";panel.dataset.userPositioned="true";
+   try{localStorage.setItem(key,JSON.stringify({x,y}));}catch(_){}
+  }
+  panel.classList.remove("is-dragging");drag=null;moved=false;
+ };
+ handle.addEventListener("pointerup",endDrag);handle.addEventListener("pointercancel",endDrag);
+ window.addEventListener("resize",()=>{
+  if(panel.hidden)return;
+  const rect=panel.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
+  if(panel.dataset.userPositioned==="true"){
+   const x=clamp(rect.left,pad,vw-rect.width-pad),y=clamp(rect.top,pad,vh-rect.height-pad);
+   panel.style.left=x+"px";panel.style.top=y+"px";
+   try{localStorage.setItem(key,JSON.stringify({x,y}));}catch(_){}
+  }else positionCalendar(root);
+ });
 }
 function makeCalendarTriggerMovable(root,trigger){
  const key="cleantrack.operations-calendar-trigger.position";
@@ -190,6 +247,13 @@ function makeCalendarPanel(root){
  controls.append(button("Today","ct-op-button ct-op-button-secondary",()=>{
   calendarCursor=new Date();calendarSelectedDate=new Date();renderCalendar(root);
  }),prev,next);
+ const resetPosition=button("↔","ct-op-button ct-op-button-secondary",()=>{
+  try{localStorage.removeItem("cleantrack.operations-calendar-panel.position");}catch(_){}
+  delete panel.dataset.userPositioned;positionCalendar(root);
+ });
+ resetPosition.title="Reset calendar position";
+ resetPosition.setAttribute("aria-label","Reset calendar position");
+ controls.appendChild(resetPosition);
  const closeButton=button("×","ct-op-button ct-op-button-secondary ct-op-calendar-close",()=>{panel.hidden=true;});
  closeButton.setAttribute("aria-label","Close operations calendar");
  head.append(title,controls,closeButton);
@@ -200,6 +264,7 @@ function makeCalendarPanel(root){
   if(!panel.hidden&&!panel.contains(event.target)&&!trigger?.contains(event.target))panel.hidden=true;
  });
  panel.addEventListener("keydown",event=>{if(event.key==="Escape")panel.hidden=true;});
+ makeCalendarPanelMovable(root,panel);
  return panel;
 }
 function setView(root,view){
