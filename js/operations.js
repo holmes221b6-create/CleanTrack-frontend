@@ -155,14 +155,13 @@ function makeCalendarPanelMovable(root,panel){
   if(panel.dataset.userPositioned==="true"){
    const x=clamp(rect.left,pad,vw-rect.width-pad),y=clamp(rect.top,pad,vh-rect.height-pad);
    panel.style.left=x+"px";panel.style.top=y+"px";
-   try{localStorage.setItem(key,JSON.stringify({x,y}));}catch(_){}
-  }else positionCalendar(root);
+   }else positionCalendar(root);
  });
 }
 function makeCalendarTriggerMovable(root,trigger){
  const clamp=(value,min,max)=>Math.max(min,Math.min(Math.max(min,max),value));
  const bounds=()=>({w:trigger.getBoundingClientRect().width||156,h:trigger.getBoundingClientRect().height||40});
- const apply=(x,y,persist=false)=>{
+ const apply=(x,y)=>{
   const size=bounds(),pad=8;
   const left=clamp(Number(x)||0,pad,window.innerWidth-size.w-pad);
   const top=clamp(Number(y)||0,pad,window.innerHeight-size.h-pad);
@@ -204,7 +203,7 @@ function makeCalendarTriggerMovable(root,trigger){
  trigger.addEventListener("keydown",event=>{
   if(event.key==="Escape"&&trigger.classList.contains("ct-op-calendar-trigger-floating")){
    trigger.classList.remove("ct-op-calendar-trigger-floating");trigger.style.left="";trigger.style.top="";
-     }
+  }
  });
  window.addEventListener("resize",()=>{
   if(!trigger.classList.contains("ct-op-calendar-trigger-floating"))return;
