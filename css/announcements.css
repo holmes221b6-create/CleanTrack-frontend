@@ -199,3 +199,103 @@ html[data-theme="light"] .ct-ann-control[type="time"]{color-scheme:light}
 html[data-theme="light"] .ct-ann-control[type="date"]::-webkit-calendar-picker-indicator,
 html[data-theme="light"] .ct-ann-control[type="datetime-local"]::-webkit-calendar-picker-indicator,
 html[data-theme="light"] .ct-ann-control[type="time"]::-webkit-calendar-picker-indicator{filter:none}
+
+
+/* Final dark-mode alignment: match Home's charcoal surfaces and lavender accents.
+   Keep status colors semantic, but remove the blue/navy cast from this page. */
+html:not([data-theme="light"]) body #page-content .ct-ann-page {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-metric,
+html:not([data-theme="light"]) body #page-content .ct-ann-card,
+html:not([data-theme="light"]) body #page-content .ct-ann-compose-card,
+html:not([data-theme="light"]) body #page-content .ct-ann-empty,
+html:not([data-theme="light"]) body #page-content .ct-ann-team-groups,
+html:not([data-theme="light"]) body #page-content .ct-ann-team-group,
+html:not([data-theme="light"]) body #page-content .ct-ann-dialog {
+  color: #e9e7ef;
+  background: #10141c;
+  border-color: #292c36;
+  box-shadow: 0 5px 18px rgb(0 0 0 / 13%);
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-metric {
+  background: linear-gradient(145deg, #11141c, #0d1017);
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-control,
+html:not([data-theme="light"]) body #page-content .ct-ann-compose-options {
+  color: #e9e7ef;
+  background: #171620;
+  border-color: #373342;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-control:focus {
+  border-color: #7668a5;
+  box-shadow: 0 0 0 3px rgb(118 101 164 / 20%);
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button,
+html:not([data-theme="light"]) body #page-content .ct-ann-icon-button {
+  color: #dcd8e7;
+  background: #171720;
+  border-color: #393149;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button:hover,
+html:not([data-theme="light"]) body #page-content .ct-ann-icon-button:hover {
+  color: #f0ebfc;
+  background: #211d2c;
+  border-color: #655785;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button-primary {
+  color: #9fe0c8;
+  background: #16352d;
+  border-color: #3a705f;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button-primary:hover {
+  color: #cbf3e6;
+  background: #1b4337;
+  border-color: #4a967f;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-eyebrow,
+html:not([data-theme="light"]) body #page-content .ct-ann-attachment:hover {
+  color: #b4a7dc;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-view {
+  color: #aaa5ba;
+  background: #10141c;
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-view:hover {
+  color: #e9e7ef;
+  background: #171522;
+  border-color: #514566;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-view.is-active {
+  color: #f0ebfc;
+  background: #1b1926;
+  border-color: #514566;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-view-count {
+  color: #c4bfd2;
+  background: #191722;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-view.is-active .ct-ann-view-count {
+  color: #f0ebfc;
+  background: #7668a5;
+}
+/* Informational states use Home's lavender accent rather than blue. */
+html:not([data-theme="light"]) body #page-content .ct-ann-badge.status-scheduled,
+html:not([data-theme="light"]) body #page-content .ct-ann-read-state.state-read {
+  color: #b4a7dc;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-badge.status-scheduled {
+  border-color: #514566;
+  background: #1b1926;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-card.is-pinned {
+  border-left-color: #7668a5;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-page button:focus-visible,
+html:not([data-theme="light"]) body #page-content .ct-ann-page a:focus-visible,
+html:not([data-theme="light"]) body #page-content .ct-ann-page input:focus-visible,
+html:not([data-theme="light"]) body #page-content .ct-ann-page select:focus-visible,
+html:not([data-theme="light"]) body #page-content .ct-ann-page textarea:focus-visible {
+  outline-color: #8878bb;
+}
