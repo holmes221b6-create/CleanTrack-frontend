@@ -149,6 +149,71 @@
     wrap.append(play,audio);
     return wrap;
   }
+  const SPEECH_VOICE_KEY = "cleantrack.announcementVoice";
+  const SPEECH_RATE_KEY = "cleantrack.announcementRate";
+  function speechSupported() {
+    return typeof window.speechSynthesis !== "undefined" && typeof window.SpeechSynthesisUtterance !== "undefined";
+  }
+  function speechVoices() {
+    if (!speechSupported()) return [];
+    try { return window.speechSynthesis.getVoices() || []; } catch (_) { return []; }
+  }
+  function speechVoiceOptions(select) {
+    const selected = (() => { try { return window.localStorage.getItem(SPEECH_VOICE_KEY) || ""; } catch (_) { return ""; } })();
+    const voices = speechVoices();
+    select.replaceChildren();
+    const system = el("option", "", "System default voice"); system.value = ""; select.appendChild(system);
+    voices.forEach(v => { const o = el("option", "", v.name + (v.lang ? " · " + v.lang : "")); o.value = v.name; select.appendChild(o); });
+    select.value = voices.some(v => v.name === selected) ? selected : "";
+  }
+  function speechRate() {
+    try { const n = Number(window.localStorage.getItem(SPEECH_RATE_KEY) || 1); return Number.isFinite(n) ? Math.max(.7, Math.min(1.2,n)) : 1; }
+    catch (_) { return 1; }
+  }
+  function speakText(text, voiceName, rate, onDone) {
+    if (!speechSupported()) throw new Error("Voice-over is not supported in this browser. Try a recent Chrome, Edge or Safari.");
+    const utterance = new SpeechSynthesisUtterance(String(text || "").trim());
+    const voices = speechVoices();
+    const voice = voices.find(v => v.name === voiceName) || voices.find(v => v.default) || voices[0];
+    if (voice) utterance.voice = voice;
+    utterance.rate = Number(rate || 1);
+    utterance.onend = () => { if (onDone) onDone(""); };
+    utterance.onerror = e => { if (onDone) onDone(e.error || "Voice playback failed."); };
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  }
+  function showVoiceError(message) {
+    const page = document.querySelector(".ct-ann-page");
+    if (!page) { window.alert(message); return; }
+    let node = page.querySelector(".ct-ann-voice-status");
+    if (!node) { node = el("p","ct-ann-status ct-ann-voice-status is-error"); node.setAttribute("role","status"); page.insertBefore(node,page.children[1]||null); }
+    node.textContent = message;
+  }
+  function addReadAloudActions(host, text) {
+    if (!speechSupported()) return;
+    let playing = false;
+    const listen = button("🔊 Listen aloud","ct-ann-button ct-ann-button-secondary",() => {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume(); listen.textContent = "Ⅱ Pause voice-over"; return;
+      }
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause(); listen.textContent = "▶ Resume voice-over"; return;
+      }
+      try {
+        playing = true;
+        speakText(text, "", speechRate(), error => {
+          playing = false; listen.textContent = "🔊 Listen aloud";
+          if (error) showVoiceError(error);
+        });
+        listen.textContent = "Ⅱ Pause voice-over";
+      } catch (e) { showVoiceError(apiError(e)); }
+    });
+    const stop = button("■ Stop voice","ct-ann-button ct-ann-button-secondary",() => {
+      window.speechSynthesis.cancel(); playing = false; listen.textContent = "🔊 Listen aloud";
+    });
+    host.append(listen,stop);
+  }
+
   function announcementPayload(item, overrides) {
     return Object.assign({
       title:item.title, message:item.message, announcement_type:item.announcement_type,
@@ -395,6 +460,7 @@
         card.appendChild(attach);
       }
       const actions=el("div","ct-ann-card-actions");
+      addReadAloudActions(actions, item.title + ". " + item.message);
       if(item.can_mark_read && receipt.state!=="read" && receipt.state!=="acknowledged" && item.status==="published") {
         actions.appendChild(button("Mark as read","ct-ann-button ct-ann-button-secondary",async()=>{try{await API.post("announcements/"+item.id+"/read",{});await load();}catch(e){showNotice(apiError(e),true);}}));
       }
@@ -485,6 +551,91 @@
       const voice=el("input","ct-ann-control");voice.type="file";voice.accept="audio/*,.m4a,.mp3,.wav,.ogg,.webm";
       const currentFiles=el("div","ct-ann-current-files");
       if(item?.attachments?.length){item.attachments.forEach(a=>currentFiles.appendChild(attachmentLink(a)));}
+      let recordedVoiceBlob = null;
+      let recordedVoiceName = "";
+      let mediaRecorder = null;
+      let recordingStream = null;
+      let recordedVoiceUrl = "";
+      const recorderPanel = el("div","ct-ann-recorder");
+      const recorderStatus = el("p","ct-ann-muted","Record a voice message using your microphone, then attach it to this announcement.");
+      const startRecording = button("● Start recording","ct-ann-button ct-ann-button-secondary",async()=>{
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+          recorderStatus.textContent = "Audio recording is not supported here. Use a secure HTTPS page in a supported browser, or choose an audio file below.";
+          return;
+        }
+        try {
+          recordingStream = await navigator.mediaDevices.getUserMedia({audio:true});
+          const mime = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"].find(t=>MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+          mediaRecorder = mime ? new MediaRecorder(recordingStream,{mimeType:mime}) : new MediaRecorder(recordingStream);
+          const chunks = [];
+          mediaRecorder.addEventListener("dataavailable",e=>{if(e.data&&e.data.size)chunks.push(e.data);});
+          mediaRecorder.addEventListener("stop",()=>{
+            recordedVoiceBlob = new Blob(chunks,{type:mediaRecorder.mimeType||"audio/webm"});
+            const ext = recordedVoiceBlob.type.includes("mp4") ? "m4a" : recordedVoiceBlob.type.includes("ogg") ? "ogg" : "webm";
+            recordedVoiceName = "voice-announcement-" + new Date().toISOString().replace(/[:.]/g,"-") + "." + ext;
+            if(recordedVoiceUrl) URL.revokeObjectURL(recordedVoiceUrl);
+            recordedVoiceUrl = URL.createObjectURL(recordedVoiceBlob);
+            const player = el("audio","ct-ann-recorded-preview"); player.controls=true; player.src=recordedVoiceUrl;
+            recorderPanel.querySelectorAll("audio").forEach(n=>n.remove());
+            recorderPanel.appendChild(player);
+            recorderStatus.textContent = "Recording ready to attach (" + Math.max(1,Math.round(recordedVoiceBlob.size/1024)) + " KB).";
+            startRecording.disabled=false; stopRecording.disabled=true; clearRecording.disabled=false;
+            if(recordingStream) recordingStream.getTracks().forEach(t=>t.stop());
+            recordingStream=null;
+          },{once:true});
+          mediaRecorder.start();
+          recorderStatus.textContent = "Recording… speak clearly, then select Stop recording.";
+          startRecording.disabled=true; stopRecording.disabled=false; clearRecording.disabled=true;
+        } catch(e) {
+          recorderStatus.textContent = e && e.name==="NotAllowedError" ? "Microphone access was denied. Allow microphone access in your browser, or upload an audio file." : "Could not start recording. Check your microphone and browser permissions.";
+          if(recordingStream) recordingStream.getTracks().forEach(t=>t.stop());
+          recordingStream=null;
+        }
+      });
+      const stopRecording = button("■ Stop recording","ct-ann-button ct-ann-button-secondary",()=>{
+        if(mediaRecorder&&mediaRecorder.state!=="inactive") mediaRecorder.stop();
+      });
+      stopRecording.disabled=true;
+      const clearRecording = button("Remove recording","ct-ann-button ct-ann-button-secondary",()=>{
+        recordedVoiceBlob=null; recordedVoiceName="";
+        if(recordedVoiceUrl) URL.revokeObjectURL(recordedVoiceUrl);
+        recordedVoiceUrl="";
+        recorderPanel.querySelectorAll("audio").forEach(n=>n.remove());
+        recorderStatus.textContent="Recording removed. You can record again or choose an audio file.";
+        clearRecording.disabled=true;
+      });
+      clearRecording.disabled=true;
+      recorderPanel.append(recorderStatus,startRecording,stopRecording,clearRecording);
+      const voiceSettings = el("div","ct-ann-speech-settings");
+      const voiceSelect = optionSelect([], "", "System default voice");
+      voiceSelect.setAttribute("aria-label","Text-to-speech voice");
+      speechVoiceOptions(voiceSelect);
+      const speedSelect = optionSelect([[0.7,"Slow"],[0.85,"A little slow"],[1,"Normal"],[1.1,"A little fast"],[1.2,"Fast"]],speechRate());
+      speedSelect.setAttribute("aria-label","Voice-over speaking speed");
+      const voicePreviewStatus = el("p","ct-ann-muted","Choose a synthetic voice for reading the text aloud. Recorded audio is a separate option.");
+      const previewButton = button("▶ Preview chosen voice","ct-ann-button ct-ann-button-secondary",()=>{
+        try {
+          const selectedVoice=voiceSelect.value||"";
+          const selectedRate=Number(speedSelect.value||1);
+          try { window.localStorage.setItem(SPEECH_VOICE_KEY,selectedVoice); window.localStorage.setItem(SPEECH_RATE_KEY,String(selectedRate)); } catch(_){}
+          speakText((name.value.trim()||"Announcement title")+". "+(message.value.trim()||"Announcement message"),selectedVoice,selectedRate,error=>{
+            previewButton.textContent="▶ Preview chosen voice";
+            if(error) voicePreviewStatus.textContent="Voice preview error: "+error;
+          });
+          previewButton.textContent="Ⅱ Playing preview…";
+        } catch(e) { voicePreviewStatus.textContent=apiError(e); }
+      });
+      const stopPreviewButton=button("■ Stop preview","ct-ann-button ct-ann-button-secondary",()=>{
+        if(speechSupported()) window.speechSynthesis.cancel();
+        previewButton.textContent="▶ Preview chosen voice";
+      });
+      if(!speechSupported()){previewButton.disabled=true;voicePreviewStatus.textContent="Text-to-speech is unavailable in this browser; audio recording and upload may still work.";}
+      voiceSettings.append(field("Synthetic voice",voiceSelect),field("Speaking speed",speedSelect),previewButton,stopPreviewButton,voicePreviewStatus);
+      if(speechSupported()){
+        const refreshSpeechVoices=()=>speechVoiceOptions(voiceSelect);
+        if(window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged",refreshSpeechVoices,{once:true});
+        else window.speechSynthesis.onvoiceschanged=refreshSpeechVoices;
+      }
       const statusLine=statusNode("",false);statusLine.hidden=true;
       const submitRow=el("div","ct-ann-compose-actions");
       const save=el("button","ct-ann-button ct-ann-button-primary","Save");save.type="submit";
@@ -510,7 +661,9 @@
       escalationBox.append(escalates.wrap,field("Escalation threshold",escalationAfter,"High/Critical alerts escalate immediately when enabled; lower severities escalate after this interval if still open."));
       const attachmentField=field("Attachments (optional)",files,"Images or documents; up to 10 MB each and 20 MB per upload.");
       const voiceField=field("Voice note (optional)",voice,isAdmin?"Text is the primary format. Voice is optional and intended mainly for supervisor broadcasts.":"Add a short audio note for your team if needed.");
-      form.append(grid,optionsBox,escalationBox,attachmentField,voiceField,currentFiles,statusLine,submitRow);
+      const recordingField=field("Record a voice announcement",recorderPanel,"Recording requires microphone permission and a secure HTTPS connection.");
+      const voiceSettingsField=field("Read text aloud",voiceSettings,"Listeners can use Listen aloud on the published announcement. Voice availability depends on the recipient's browser and device.");
+      form.append(grid,optionsBox,escalationBox,attachmentField,voiceField,currentFiles,recordingField,voiceSettingsField,statusLine,submitRow);
       card.appendChild(form);composerHost.appendChild(card);
 
       function changeAudience() {
@@ -545,6 +698,7 @@
         if(status.value==="scheduled"&&!scheduled.value){statusLine.textContent="Choose a future date and time before scheduling.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
         if(status.value==="scheduled" && new Date(scheduled.value).getTime()<=Date.now()){statusLine.textContent="The scheduled time must be in the future.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
         if(audience.value==="team"&&!team.value){statusLine.textContent="Choose a target team.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
+        try { window.localStorage.setItem(SPEECH_VOICE_KEY,voiceSelect.value||""); window.localStorage.setItem(SPEECH_RATE_KEY,String(speedSelect.value||1)); } catch(_){}
         const payload={
           title:name.value.trim(),message:message.value.trim(),announcement_type:kind.value,
           audience_scope:audience.value,severity:kind.value==="alert"?sev.value:"info",
@@ -561,6 +715,7 @@
           const result=editing?await API.patch("announcements/"+item.id,payload):await API.post("announcements",payload);
           const saved=result.announcement;
           const allFiles=[...files.files,...voice.files];
+          if(recordedVoiceBlob) allFiles.push(new File([recordedVoiceBlob],recordedVoiceName,{type:recordedVoiceBlob.type||"audio/webm"}));
           if(allFiles.length) {
             const data=new FormData(); allFiles.forEach(file=>data.append("files",file));
             await API.post("announcements/"+saved.id+"/attachments",data);
