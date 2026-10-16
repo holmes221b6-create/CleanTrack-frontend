@@ -1,0 +1,336 @@
+/*
+ * CleanTrack Home theme — application-wide workspace palette.
+ * This stylesheet is loaded last so every module shares the same visual language.
+ * Home's own cards retain their purpose-built layouts; page modules inherit these
+ * tokens and the shared workspace chrome. The existing Light theme is preserved.
+ */
+html:not([data-theme="light"]) {
+  color-scheme: dark !important;
+  --bg: #0b0f14;
+  --bg-elevated: #10141c;
+  --surface: #10141c;
+  --surface-hover: #191722;
+  --surface-raised: #211d2c;
+  --border: #292c36;
+  --border-strong: #393149;
+  --text: #e9e7ef;
+  --text-secondary: #9290a0;
+  --text-muted: #777485;
+  --primary: #7668a5;
+  --primary-hover: #8878bb;
+  --primary-contrast: #f0ebfc;
+  --accent: #a69acb;
+  --success: #62b99a;
+  --warning: #d9b36b;
+  --danger: #df7d8b;
+  --info: #8d9ed7;
+  --ct-bg: #0b0f14;
+  --ct-page: #0f1219;
+  --ct-surface: #10141c;
+  --ct-panel: #10141c;
+  --ct-panel-raised: #191722;
+  --ct-border: #292c36;
+  --ct-text: #e9e7ef;
+  --ct-text-muted: #9290a0;
+  --ct-blue: #7668a5;
+  --ct-blue-hover: #8878bb;
+  --ct-focus: #8878bb;
+  --ct-green: #16352d;
+  --ct-green-light: #9fe0c8;
+  --ct-accent: #a69acb;
+  --focus-ring: 0 0 0 3px rgb(118 101 164 / 24%);
+  --shadow-sm: 0 5px 18px rgb(0 0 0 / 18%);
+  --shadow-md: 0 16px 40px rgb(0 0 0 / 28%);
+}
+
+html:not([data-theme="light"]),
+html:not([data-theme="light"]) body,
+html:not([data-theme="light"]) #app,
+html:not([data-theme="light"]) #main-content,
+html:not([data-theme="light"]) #workspace-view,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-shell,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-main,
+html:not([data-theme="light"]) #workspace-view #page-content,
+html:not([data-theme="light"]) #workspace-view .page-content,
+html:not([data-theme="light"]) #page-content {
+  color: #e9e7ef !important;
+  background-color: #0f1219 !important;
+  background-image: none !important;
+}
+html:not([data-theme="light"]) body {
+  background:
+    radial-gradient(ellipse at 84% 0%, rgb(118 101 164 / 10%), transparent 40%),
+    #0b0f14 !important;
+}
+
+/* Shared application header, workspace toolbar and sidebar */
+html:not([data-theme="light"]) body .app-header,
+html:not([data-theme="light"]) body #workspace-view .ct-workspace-toolbar,
+html:not([data-theme="light"]) body .profile-menu,
+html:not([data-theme="light"]) body .dropdown-menu,
+html:not([data-theme="light"]) body .popover,
+html:not([data-theme="light"]) body .tooltip {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+  box-shadow: 0 6px 22px rgb(0 0 0 / 16%) !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar,
+html:not([data-theme="light"]) body #workspace-view .sidebar,
+html:not([data-theme="light"]) body .sidebar {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+  box-shadow: 4px 0 18px rgb(0 0 0 / 12%) !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand {
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand-mark {
+  color: #d5cde8 !important;
+  background: #1b1926 !important;
+  border-color: #393149 !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand strong,
+html:not([data-theme="light"]) body #workspace-view .sidebar-brand-text,
+html:not([data-theme="light"]) body #workspace-view .brand-name,
+html:not([data-theme="light"]) body .app-header .brand-name {
+  color: #e9e7ef !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand small,
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-label,
+html:not([data-theme="light"]) body #workspace-view .workspace-identity,
+html:not([data-theme="light"]) body #workspace-view #workspace-organization,
+html:not([data-theme="light"]) body #workspace-view #workspace-role {
+  color: #858194 !important;
+}
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation button,
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation a {
+  color: #aaa5ba !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation button:hover,
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation a:hover {
+  color: #f0ebfc !important;
+  background: #191722 !important;
+  border-color: #383246 !important;
+}
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation .active,
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation [aria-current="page"],
+html:not([data-theme="light"]) body #workspace-view #workspace-navigation .ct-nav-active {
+  color: #f0ebfc !important;
+  background: linear-gradient(100deg, #211d2c, #15151f) !important;
+  border-color: #393149 !important;
+  box-shadow: inset 3px 0 #7668a5 !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-toggle {
+  color: #dcd8e7 !important;
+  background: #171720 !important;
+  border-color: #393149 !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-sidebar-toggle:hover {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #655785 !important;
+}
+html:not([data-theme="light"]) body #workspace-view .ct-hamburger > span {
+  background: #b4a7dc !important;
+}
+
+/* Consistent typography and form controls across each page/module */
+html:not([data-theme="light"]) body #page-content h1,
+html:not([data-theme="light"]) body #page-content h2,
+html:not([data-theme="light"]) body #page-content h3,
+html:not([data-theme="light"]) body #page-content h4,
+html:not([data-theme="light"]) body #page-content h5,
+html:not([data-theme="light"]) body #page-content h6,
+html:not([data-theme="light"]) body .app-modal h1,
+html:not([data-theme="light"]) body .app-modal h2,
+html:not([data-theme="light"]) body .app-modal h3 {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content p,
+html:not([data-theme="light"]) body #page-content label,
+html:not([data-theme="light"]) body #page-content small,
+html:not([data-theme="light"]) body #page-content .muted,
+html:not([data-theme="light"]) body #page-content .ct-muted {
+  color: #9290a0;
+}
+html:not([data-theme="light"]) body #page-content hr,
+html:not([data-theme="light"]) body #page-content .divider {
+  border-color: #292c36 !important;
+  background-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html:not([data-theme="light"]) body #page-content select,
+html:not([data-theme="light"]) body #page-content textarea {
+  color: #e9e7ef;
+  background-color: #171620;
+  border-color: #373342;
+}
+html:not([data-theme="light"]) body #page-content input::placeholder,
+html:not([data-theme="light"]) body #page-content textarea::placeholder {
+  color: #706c7f;
+}
+
+/* Legacy shared components that still had the old blue/teal palette hard-coded */
+html:not([data-theme="light"]) body #page-content .card,
+html:not([data-theme="light"]) body #page-content .panel,
+html:not([data-theme="light"]) body #page-content .modal-content,
+html:not([data-theme="light"]) body .app-modal {
+  color: #e9e7ef;
+  background-color: #10141c;
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .card-description,
+html:not([data-theme="light"]) body #page-content .text-muted,
+html:not([data-theme="light"]) body #page-content .muted {
+  color: #9290a0 !important;
+}
+html:not([data-theme="light"]) body #page-content .btn-primary,
+html:not([data-theme="light"]) body #page-content .ct-ann-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-op-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-audit-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-loc-btn-primary,
+html:not([data-theme="light"]) body #page-content .ct-inv-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-staff-button--primary,
+html:not([data-theme="light"]) body #page-content .ct-team-btn--primary,
+html:not([data-theme="light"]) body #page-content .ct-settings-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-org-button-primary,
+html:not([data-theme="light"]) body #page-content .ct-home-button--primary {
+  color: #9fe0c8 !important;
+  background: #16352d !important;
+  border-color: #3a705f !important;
+}
+html:not([data-theme="light"]) body #page-content .btn-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-ann-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-op-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-audit-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-loc-btn-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-inv-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-staff-button--primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-team-btn--primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-settings-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-org-button-primary:hover,
+html:not([data-theme="light"]) body #page-content .ct-home-button--primary:hover {
+  color: #cbf3e6 !important;
+  background: #1b4337 !important;
+  border-color: #4a967f !important;
+}
+html:not([data-theme="light"]) body #page-content a:not([class*="button"]):not([class*="btn"]) {
+  color: #b4a7dc;
+}
+html:not([data-theme="light"]) body #page-content a:not([class*="button"]):not([class*="btn"]):hover {
+  color: #f0ebfc;
+}
+
+/* Keep pages with purpose-built Home-style layouts consistent with its palette */
+html:not([data-theme="light"]) body #page-content .ct-ann-page,
+html:not([data-theme="light"]) body #page-content .ct-settings-page,
+html:not([data-theme="light"]) body #page-content .ct-org-settings-page,
+html:not([data-theme="light"]) body #page-content .ct-team-manager,
+html:not([data-theme="light"]) body #page-content .ct-staff-page,
+html:not([data-theme="light"]) body #page-content .ct-invitations-page,
+html:not([data-theme="light"]) body #page-content .ct-operations-page,
+html:not([data-theme="light"]) body #page-content .ct-analytics-page,
+html:not([data-theme="light"]) body #page-content .ct-locations-page,
+html:not([data-theme="light"]) body #page-content .ct-audit-page {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-card,
+html:not([data-theme="light"]) body #page-content .ct-ann-compose-card,
+html:not([data-theme="light"]) body #page-content .ct-ann-empty,
+html:not([data-theme="light"]) body #page-content .ct-ann-metric,
+html:not([data-theme="light"]) body #page-content .ct-ann-team-groups,
+html:not([data-theme="light"]) body #page-content .ct-ann-team-group,
+html:not([data-theme="light"]) body #page-content .ct-ann-dialog {
+  color: #e9e7ef;
+  background-color: #10141c;
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-control,
+html:not([data-theme="light"]) body #page-content .ct-ann-compose-options {
+  color: #e9e7ef;
+  background-color: #171620;
+  border-color: #373342;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button,
+html:not([data-theme="light"]) body #page-content .ct-ann-icon-button {
+  color: #dcd8e7;
+  background-color: #171720;
+  border-color: #393149;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-button:hover,
+html:not([data-theme="light"]) body #page-content .ct-ann-icon-button:hover {
+  color: #f0ebfc;
+  background-color: #211d2c;
+  border-color: #655785;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-eyebrow,
+html:not([data-theme="light"]) body #page-content .ct-ann-attachment:hover {
+  color: #b4a7dc;
+}
+
+/* Match the Home page's charcoal cards, violet details, and restrained green actions */
+html:not([data-theme="light"]) body #page-content .ct-op-card,
+html:not([data-theme="light"]) body #page-content .ct-op-stat,
+html:not([data-theme="light"]) body #page-content .ct-audit-card,
+html:not([data-theme="light"]) body #page-content .ct-inv-card,
+html:not([data-theme="light"]) body #page-content .ct-staff-card,
+html:not([data-theme="light"]) body #page-content .ct-staff-kpi,
+html:not([data-theme="light"]) body #page-content .ct-staff-sidebar,
+html:not([data-theme="light"]) body #page-content .ct-team-notice,
+html:not([data-theme="light"]) body #page-content .ct-team-recent-panel,
+html:not([data-theme="light"]) body #page-content .ct-team-list-panel,
+html:not([data-theme="light"]) body #page-content .ct-team-create-form,
+html:not([data-theme="light"]) body #page-content .ct-team-detail,
+html:not([data-theme="light"]) body #page-content .ct-team-action-panel {
+  color: #e9e7ef;
+  background-color: #10141c;
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-badge,
+html:not([data-theme="light"]) body #page-content .ct-ann-issued,
+html:not([data-theme="light"]) body #page-content .ct-ann-attachment {
+  background-color: #191722;
+  border-color: #383246;
+  color: #d5cde8;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-meta,
+html:not([data-theme="light"]) body #page-content .ct-ann-muted,
+html:not([data-theme="light"]) body #page-content .ct-ann-receipt-summary {
+  color: #9290a0;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-card-title,
+html:not([data-theme="light"]) body #page-content .ct-ann-compose-card h2 {
+  color: #e9e7ef;
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-card {
+  box-shadow: 0 5px 18px rgb(0 0 0 / 16%);
+}
+html:not([data-theme="light"]) body #page-content .ct-ann-card.is-pinned { border-left-color: #7668a5; }
+html:not([data-theme="light"]) body #page-content .ct-ann-card.is-alert { border-left-color: #df7d8b; }
+
+/* Tables, pagination, dialogs, popovers and small legacy widgets */
+html:not([data-theme="light"]) body #page-content table,
+html:not([data-theme="light"]) body #page-content th,
+html:not([data-theme="light"]) body #page-content td {
+  border-color: #292c36;
+}
+html:not([data-theme="light"]) body #page-content th {
+  color: #c9c3d8;
+  background-color: #15151f;
+}
+html:not([data-theme="light"]) body #page-content tr:hover td {
+  background-color: #191722;
+}
+html:not([data-theme="light"]) body .app-modal {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #393149 !important;
+}
+html:not([data-theme="light"]) body .app-modal .modal-header,
+html:not([data-theme="light"]) body .app-modal .modal-footer {
+  border-color: #292c36 !important;
+}
