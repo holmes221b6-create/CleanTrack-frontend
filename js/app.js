@@ -120,6 +120,7 @@
     if (menuElement) {
       navigation.renderMenu(menuElement);
     }
+    refreshAnnouncementBadge();
 
     const defaultPage = navigation.getDefaultPage(user.role);
 
@@ -647,9 +648,30 @@
       const count = Number(data.unread_count || 0);
       badge.textContent = count > 99 ? "99+" : String(count);
       badge.hidden = count <= 0;
+      const notificationButton = getElement("notifications-button");
+      if (notificationButton) {
+        notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
+        notificationButton.title = count ? count + " unread notification" + (count === 1 ? "" : "s") : "Notifications";
+      }
     } catch (_) {
       // The badge remains hidden if notification retrieval is unavailable.
     }
+  }
+
+  async function refreshAnnouncementBadge() {
+    if (!window.CleanTrackApi || !auth.isAuthenticated()) return;
+    try {
+      const data = await window.CleanTrackApi.get("announcements");
+      const rows = Array.isArray(data.announcements) ? data.announcements : [];
+      const user = auth.getCurrentUser() || {};
+      const count = rows.filter(function (item) {
+        const receipt = item.my_receipt || {};
+        const receiptState = receipt.state || (Number(item.created_by_id) === Number(user.id) ? "issued" : "unread");
+        return item.status === "published" && !item.archived_at &&
+          receiptState === "unread" && (item.can_mark_read || item.can_acknowledge);
+      }).length;
+      if (navigation && typeof navigation.setAnnouncementUnreadCount === "function") navigation.setAnnouncementUnreadCount(count);
+    } catch (_) {}
   }
 
   function bindNotificationsButton() {
@@ -1079,7 +1101,10 @@ function bindNavigation() {
     bindNotificationsButton();
     if (!state.notificationPollingStarted) {
       state.notificationPollingStarted = true;
-      window.setInterval(refreshNotificationBadge, 60000);
+      window.setInterval(function () {
+        refreshNotificationBadge();
+        refreshAnnouncementBadge();
+      }, 60000);
     }
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
