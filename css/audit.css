@@ -39,3 +39,13 @@
 html[dir="rtl"] .ct-audit-table th{text-align:right}
 html[dir="rtl"] .ct-audit-detail-block strong{text-align:right}
 @media(max-width:720px){.ct-audit-export-note{text-align:start}}
+
+/* Audit details render in a body-level modal, never inside the table layout. */
+.ct-audit-view-details{white-space:nowrap}
+.ct-audit-modal-backdrop{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgb(0 0 0 / 58%)}
+.ct-audit-modal{box-sizing:border-box;width:min(720px,100%);max-height:85vh;overflow:auto;padding:20px;border:1px solid var(--border-strong);border-radius:14px;background:var(--bg-elevated);color:var(--text);box-shadow:0 20px 60px rgb(0 0 0 / 35%)}
+.ct-audit-modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.ct-audit-modal-header h2{margin:0;font-size:1.1rem}
+.ct-audit-modal .ct-audit-detail-block{margin:12px 0;min-width:0}
+.ct-audit-modal .ct-audit-detail-block pre{max-width:100%;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){.ct-audit-modal-backdrop{padding:10px}.ct-audit-modal{padding:14px;max-height:90vh}}
