@@ -43,3 +43,15 @@
 .ct-settings-overview-item p { margin:0 0 12px; }
 .ct-settings-overview-item .ct-settings-button { justify-self:start; }
 @media(max-width:560px) { .ct-settings-overview-grid { grid-template-columns:1fr; } }
+
+
+/* Personal calendar and SMS sync settings. */
+.ct-settings-status{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:.88rem;line-height:1.5;overflow-wrap:anywhere}
+.ct-settings-status.is-success{border-color:var(--success);color:var(--success)}
+.ct-settings-status.is-error{border-color:var(--danger);color:var(--danger)}
+.ct-settings-check{display:flex;align-items:flex-start;gap:9px;margin:8px 0;color:var(--text)}
+.ct-settings-check input{margin-top:3px;accent-color:var(--primary)}
+.ct-settings-integration-list{display:grid;gap:10px}
+.ct-settings-integration-list .ct-settings-integration-row{padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
+.ct-settings-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.ct-settings-actions .ct-settings-button:disabled{opacity:.6;cursor:wait}
