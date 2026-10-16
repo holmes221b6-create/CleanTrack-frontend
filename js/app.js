@@ -472,6 +472,23 @@
       return;
     }
 
+    if (pageId === "reports") {
+      if (!["admin", "supervisor"].includes(String(user?.role || "").toLowerCase())) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Reports are not available to your role."
+        }));
+        return;
+      }
+      if (window.CleanTrackReports && typeof window.CleanTrackReports.render === "function") {
+        await window.CleanTrackReports.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Reports could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
     // Operations is the role-scoped work engine. Employee routes reuse the same
     // data-backed module but expose only operations assigned to the signed-in user.
     if (["operations", "my-tasks", "my-history"].includes(pageId)) {
