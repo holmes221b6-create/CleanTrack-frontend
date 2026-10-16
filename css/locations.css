@@ -174,3 +174,6 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 .ct-loc-map .leaflet-tooltip-top.ct-loc-landmark-label::before {
   border-top-color: #8da9df;
 }
+
+/* Shared private indoor floor plans for locations */
+.ct-loc-floor-plan{margin-top:18px}.ct-loc-floor-plan-preview{display:grid;place-items:center;min-height:90px;margin:12px 0;border:1px solid #303640;border-radius:12px;background:#12151a;overflow:hidden}.ct-loc-floor-plan-image{display:block;max-width:100%;max-height:620px;width:auto;height:auto;object-fit:contain}.ct-loc-floor-plan-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px}.ct-loc-floor-plan input[type=file]{max-width:100%;min-width:220px;flex:1}.ct-loc-floor-plan [hidden]{display:none!important}
