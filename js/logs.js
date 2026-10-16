@@ -127,8 +127,15 @@
       });
     }
     function executionDuration(row) {
-      const end = row.submitted_at;
-      return elapsed(row.started_at, end) !== "—" ? elapsed(row.started_at,end) : "—";
+      if (Number.isFinite(Number(row.time_taken_minutes)) && row.time_taken_minutes !== null) {
+        const mins = Math.max(0, Number(row.time_taken_minutes));
+        if (mins < 60) return mins + " min";
+        if (mins < 1440) return Math.floor(mins / 60) + "h " + (mins % 60) + "m";
+        return Math.floor(mins / 1440) + "d " + Math.floor((mins % 1440) / 60) + "h";
+      }
+      const end = row.execution_submitted_at || row.submitted_at;
+      const duration = elapsed(row.started_at, end);
+      return duration !== "—" ? duration : "—";
     }
     search.addEventListener("input",draw); filter.addEventListener("change",draw);
     draw();
@@ -217,9 +224,14 @@
           if(intent==="reject"&&!feedback){textarea.setCustomValidity("A rejection reason is required.");textarea.reportValidity();return;}
           textarea.setCustomValidity("");confirm.disabled=true;cancel.disabled=true;confirm.textContent="Saving…";
           try{
-            await API.post("operations/"+encodeURIComponent(detail.id)+"/review",{decision:intent,feedback});
+            const reviewResult = await API.post("operations/"+encodeURIComponent(detail.id)+"/review",{decision:intent,feedback});
             modal.remove();
             await render(root);
+            if (reviewResult?.email_delivery === "not_configured") {
+              const notice = create("div","ct-logs-message ct-logs-email-notice");
+              notice.textContent = "Review saved and the employee was notified in CleanTrack. Email delivery is not configured, so no email was sent.";
+              root.insertBefore(notice, root.firstChild);
+            }
           }catch(error){confirm.disabled=false;cancel.disabled=false;confirm.textContent=intent==="approve"?"Confirm approval":"Confirm rejection";let msg=review.querySelector(".ct-logs-error");if(!msg){msg=create("p","ct-logs-error");review.appendChild(msg);}msg.textContent=error?.message||"The review could not be saved.";}
         });
         actions.append(cancel,confirm);review.appendChild(actions);body.appendChild(review);
