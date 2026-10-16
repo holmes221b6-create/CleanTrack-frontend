@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   const API=window.CleanTrackApi, AUTH=window.CleanTrackAuth;
-  let root=null,map=null,layer=null,buildingLayer=null,buildingRefreshTimer=null,lastBuildingFetchAt=0,lastBuildingBounds="",locations=[],teams=[],zones=[],operations=[],selectedId=null,editingId=null,candidate=null,mapCardNode=null,mapToggleButton=null,searchBoxNode=null;
+  let root=null,map=null,layer=null,buildingLayer=null,landmarkLayer=null,buildingRefreshTimer=null,landmarkRefreshTimer=null,lastBuildingFetchAt=0,lastBuildingBounds="",lastLandmarkFetchAt=0,lastLandmarkBounds="",locations=[],teams=[],zones=[],operations=[],selectedId=null,editingId=null,candidate=null,mapCardNode=null,mapToggleButton=null,searchBoxNode=null;
   let query="",statusFilter="all",dataStatus={teams:true,zones:true,operations:true},lastPlaceSearchAt=0,noticeNode=null,mapNotice=null,formNode=null,detailNode=null,searchResultsNode=null,busy=false,importBusy=false;
   const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n;};
   const btn=(x,c,fn,type)=>{const n=el("button",c||"ct-loc-btn",x);n.type=type||"button";if(fn)n.addEventListener("click",fn);return n;};
@@ -42,18 +42,28 @@
     tiles.addTo(map);
     layer=L.layerGroup().addTo(map);
     buildingLayer=L.layerGroup();
+    landmarkLayer=L.layerGroup();
     L.control.layers(
       {"Street map":tiles},
-      {"Building footprints (OpenStreetMap)":buildingLayer},
+      {
+        "Landmarks & localities (OpenStreetMap)":landmarkLayer,
+        "Building footprints (OpenStreetMap)":buildingLayer
+      },
       {collapsed:true,position:"topright"}
     ).addTo(map);
     map.on("overlayadd",e=>{
       if(e.layer===buildingLayer) loadBuildingFootprints(true);
+      if(e.layer===landmarkLayer) loadLandmarks(true);
     });
     map.on("moveend",()=>{
-      if(!buildingLayer||!map.hasLayer(buildingLayer))return;
-      if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
-      buildingRefreshTimer=window.setTimeout(()=>loadBuildingFootprints(false),900);
+      if(buildingLayer&&map.hasLayer(buildingLayer)){
+        if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
+        buildingRefreshTimer=window.setTimeout(()=>loadBuildingFootprints(false),900);
+      }
+      if(landmarkLayer&&map.hasLayer(landmarkLayer)){
+        if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
+        landmarkRefreshTimer=window.setTimeout(()=>loadLandmarks(false),1000);
+      }
     });
     map.on("click",e=>{
       if(!formNode||formNode.hidden)return;
@@ -150,6 +160,111 @@
   function editLocation(id){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;selectedId=x.id;editingId=x.id;candidate=coords(x)?{lat:Number(x.latitude),lon:Number(x.longitude),label:x.name}:null;formNode.hidden=false;buildForm();renderMapPins();formNode.scrollIntoView({behavior:"smooth",block:"start"});}
   function cancelForm(){formNode.hidden=true;editingId=null;candidate=null;renderMapPins();}
   function fitPins(){if(!map||!window.L)return;const pts=locations.filter(coords).map(x=>[Number(x.latitude),Number(x.longitude)]);if(pts.length===1)map.setView(pts[0],17);else if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:17});else map.setView([20,0],3);}
+  async function loadLandmarks(force){
+    if(!map||!landmarkLayer||!map.hasLayer(landmarkLayer))return;
+    const bounds=map.getBounds(),zoom=map.getZoom();
+    if(zoom<11){
+      mapMsg("Zoom in to level 11 or closer to load named villages, neighbourhoods and landmarks. This works outside city boundaries too.",false);
+      landmarkLayer.clearLayers();lastLandmarkBounds="";
+      return;
+    }
+    const south=bounds.getSouth(),west=bounds.getWest(),north=bounds.getNorth(),east=bounds.getEast();
+    const spanLat=north-south,spanLon=east-west;
+    if(spanLat>0.55||spanLon>0.65||spanLat*spanLon>0.22){
+      mapMsg("Zoom in one level to search named places in this area. Smaller map queries include more useful local details and keep the map responsive.",false);
+      return;
+    }
+    const boundsKey=[south,west,north,east].map(v=>v.toFixed(5)).join(",");
+    if(!force&&boundsKey===lastLandmarkBounds)return;
+    const elapsed=Date.now()-lastLandmarkFetchAt;
+    if(!force&&elapsed<1400){
+      if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
+      landmarkRefreshTimer=window.setTimeout(()=>loadLandmarks(false),1400-elapsed);
+      return;
+    }
+    lastLandmarkFetchAt=Date.now();lastLandmarkBounds=boundsKey;
+    mapMsg("Loading named places, villages and landmarks for the visible area…",false);
+    const box="("+south+","+west+","+north+","+east+")";
+    const query='[out:json][timeout:22];('+
+      'nwr["name"]["place"~"^(city|town|village|hamlet|suburb|neighbourhood|quarter|locality|isolated_dwelling)$"]'+box+';'+
+      'nwr["name"]["tourism"~"^(attraction|museum|viewpoint|artwork|zoo|theme_park|picnic_site|information)$"]'+box+';'+
+      'nwr["name"]["historic"]'+box+';'+
+      'nwr["name"]["landmark"]'+box+';'+
+      'nwr["name"]["natural"~"^(peak|waterfall|spring|cave_entrance|beach|lake|hot_spring|wood|wetland)$"]'+box+';'+
+      'nwr["name"]["amenity"~"^(place_of_worship|hospital|school|college|university|community_centre|bus_station|library|marketplace|monastery)$"]'+box+';'+
+      'nwr["name"]["leisure"~"^(park|garden|nature_reserve|sports_centre|playground)$"]'+box+';'+
+      ');out center tags;';
+    const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+    let data=null,lastError=null;
+    for(const endpoint of endpoints){
+      const controller=new AbortController(),timeout=window.setTimeout(()=>controller.abort(),26000);
+      try{
+        const response=await fetch(endpoint,{
+          method:"POST",
+          headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},
+          body:new URLSearchParams({data:query}),
+          signal:controller.signal
+        });
+        if(!response.ok)throw new Error("Landmark data service returned HTTP "+response.status+".");
+        data=await response.json();break;
+      }catch(error){lastError=error;}
+      finally{window.clearTimeout(timeout);}
+    }
+    if(!data){
+      lastLandmarkBounds="";
+      mapMsg((lastError&&lastError.name==="AbortError"?"The landmark search timed out. Zoom closer or try again.":lastError&&lastError.message)||"Named place data is temporarily unavailable. The street map and saved locations are still available.",true);
+      return;
+    }
+    if(!map||!landmarkLayer||!map.hasLayer(landmarkLayer))return;
+    const now=map.getBounds();
+    if(map.getZoom()!==zoom||now.getSouthWest().distanceTo(bounds.getSouthWest())>350){
+      lastLandmarkBounds="";
+      if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
+      landmarkRefreshTimer=window.setTimeout(()=>loadLandmarks(false),500);
+      return;
+    }
+    landmarkLayer.clearLayers();
+    const elements=Array.isArray(data.elements)?data.elements:[];
+    const seen=new Set();let count=0;
+    elements.slice(0,400).forEach(item=>{
+      const tags=item.tags||{},name=String(tags.name||"").trim();
+      if(!name)return;
+      const lat=Number(item.lat??item.center?.lat),lon=Number(item.lon??item.center?.lon);
+      if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat>90||lon < -180||lon>180)return;
+      const key=name.toLocaleLowerCase()+"|"+lat.toFixed(4)+"|"+lon.toFixed(4);
+      if(seen.has(key))return;seen.add(key);
+      const category=tags.place?"Locality · "+String(tags.place).replaceAll("_"," "):
+        tags.tourism?"Tourism · "+String(tags.tourism).replaceAll("_"," "):
+        tags.historic?"Historic place · "+String(tags.historic).replaceAll("_"," "):
+        tags.landmark?"Landmark":
+        tags.natural?"Natural feature · "+String(tags.natural).replaceAll("_"," "):
+        tags.amenity?"Place · "+String(tags.amenity).replaceAll("_"," "):
+        tags.leisure?"Leisure · "+String(tags.leisure).replaceAll("_"," "):"Named place";
+      const isLocality=Boolean(tags.place);
+      const marker=L.circleMarker([lat,lon],{
+        radius:isLocality?6:5,
+        color:isLocality?"#265bd7":"#9a4bc8",
+        weight:2,
+        fillColor:isLocality?"#8bb5ff":"#e0a4ff",
+        fillOpacity:.95
+      }).addTo(landmarkLayer);
+      marker.bindTooltip(name,{permanent:true,direction:"top",offset:[0,-6],opacity:.98,className:"ct-loc-landmark-label"});
+      const popup=el("div","ct-loc-building-popup");
+      popup.append(el("strong","",name),el("span","",category));
+      const locality=[tags["addr:suburb"],tags["addr:neighbourhood"],tags["addr:town"],tags["addr:village"],tags["addr:city"],tags["addr:county"],tags["addr:state"],tags["addr:country"]].filter(Boolean);
+      if(locality.length)popup.append(el("span","",locality.filter((v,i,a)=>a.indexOf(v)===i).join(", ")));
+      popup.append(el("small","","OpenStreetMap named feature · map coverage varies by area."));
+      marker.bindPopup(popup);count++;
+    });
+    mapMsg(count
+      ?count+" named localities and landmarks loaded for the visible area, including mapped places outside cities. Select a label for details."
+      :"No named localities or landmarks are mapped in this view. Move slightly or zoom out/in and retry; OpenStreetMap coverage varies by area.",false);
+  }
+  function enableLandmarksForCurrentView(){
+    if(!map||!landmarkLayer)return;
+    if(!map.hasLayer(landmarkLayer))landmarkLayer.addTo(map);
+    else loadLandmarks(true);
+  }
   async function loadBuildingFootprints(force){
     if(!map||!buildingLayer||!map.hasLayer(buildingLayer))return;
     const bounds=map.getBounds(),zoom=map.getZoom();
@@ -212,6 +327,7 @@
     toggleMapPanel(true);
     if(!map)return;
     map.setView([Number(location.latitude),Number(location.longitude)],19);
+    enableLandmarksForCurrentView();
     if(buildingLayer&&!map.hasLayer(buildingLayer)){
       buildingLayer.addTo(map); // overlayadd triggers the first footprint query
     }else loadBuildingFootprints(true);
@@ -234,6 +350,7 @@
           if(Math.abs(north-south)>0.02||Math.abs(east-west)>0.02)map.fitBounds([[south,west],[north,east]],{padding:[24,24],maxZoom:14});
           else map.fitBounds([[south,west],[north,east]],{padding:[30,30],maxZoom:19});
         }else if(map){const kindLower=String(place.type||"").toLowerCase();const zoom=["country","state","region"].includes(kindLower)?6:["city","administrative","municipality"].includes(kindLower)?12:["suburb","neighbourhood","quarter","village"].includes(kindLower)?14:["house","building","residential","address","road"].includes(kindLower)?19:17;map.setView([lat,lon],zoom);}
+        enableLandmarksForCurrentView();
         if(!formNode.hidden){const n=formNode.querySelector('[name="name"]'),a=formNode.querySelector('[name="address"]');if(n&&!n.value)n.value=title;if(a&&!a.value)a.value=place.display_name||"";}
         searchResultsNode.replaceChildren(el("p","ct-loc-search-picked","Selected "+title+" · "+country+". This is a map reference only until you save it as a CleanTrack location."));
         notice("Map centered on "+title+", "+country+". Save it with Add Location only if you want it in your organization's directory.","info");
@@ -268,7 +385,9 @@
     // Without this, Leaflet can retain a detached container and the next visit
     // may produce a blank map or stale map UI.
     if(map){try{map.off();map.remove();}catch(_){}}
-    map=null;layer=null;buildingLayer=null;root=null;mapCardNode=null;mapToggleButton=null;searchBoxNode=null;mapNotice=null;noticeNode=null;formNode=null;detailNode=null;searchResultsNode=null;
+    if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
+    if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
+    map=null;layer=null;buildingLayer=null;landmarkLayer=null;buildingRefreshTimer=null;landmarkRefreshTimer=null;root=null;mapCardNode=null;mapToggleButton=null;searchBoxNode=null;mapNotice=null;noticeNode=null;formNode=null;detailNode=null;searchResultsNode=null;
     if(String(AUTH?.getCurrentUser?.()?.role||"").toLowerCase()!=="admin"){container.replaceChildren(el("p","ct-loc-notice error","Location administration is available to organization Admins only."));return;}
     root=container;container.replaceChildren(el("p","ct-loc-muted","Loading organization locations…"));try{await load();query="";statusFilter="all";selectedId=null;candidate=null;createPage(container);}catch(err){container.replaceChildren();const p=el("section","ct-locations-page");p.append(el("h1","","Locations"),el("p","ct-loc-notice error",err.message||"Locations could not load."),btn("Retry","ct-loc-btn ct-loc-btn-primary",()=>render(container)));container.append(p);}}
   window.CleanTrackLocations=Object.freeze({render,refresh:async()=>{await load();if(root){renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();}}});
