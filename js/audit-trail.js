@@ -52,14 +52,12 @@
   }
   function decodeAuditText(value) {
     if (typeof value !== "string" || !value) return value;
-    // Legacy audit payloads may have been HTML-escaped more than once.
-    // Decode a bounded number of layers, then keep the result as text (never HTML).
     let decoded = value;
-    for (let pass = 0; pass < 4; pass += 1) {
+    for (let pass = 0; pass < 6; pass += 1) {
       if (!/&(?:#x?[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/i.test(decoded)) break;
-      const decoder = document.createElement("textarea");
-      decoder.innerHTML = decoded;
-      const next = decoder.value
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = decoded;
+      const next = textarea.value
         .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
         .replace(/&#([0-9]+);/g, (_, num) => String.fromCodePoint(parseInt(num, 10)))
         .replace(/&quot;/gi, '"').replace(/&apos;/gi, "'")
@@ -68,8 +66,14 @@
       if (next === decoded) break;
       decoded = next;
     }
-    // Normalize common escaped line breaks left behind by older HTML serialization.
-    return decoded.replace(/<br\s*\/?\s*>/gi, "\n");
+    decoded = decoded.replace(/<br\s*\/?\s*>/gi, "\n");
+    // Some legacy values are serialized as a JSON object surrounded by table separators.
+    const firstBrace = decoded.indexOf("{");
+    const lastBrace = decoded.lastIndexOf("}");
+    if (firstBrace >= 0 && lastBrace > firstBrace && /^[\s|]*$/.test(decoded.slice(0, firstBrace)) && /^[\s|]*$/.test(decoded.slice(lastBrace + 1))) {
+      decoded = decoded.slice(firstBrace, lastBrace + 1);
+    }
+    return decoded;
   }
   function normalizeAuditValue(value, depth = 0) {
     if (depth > 8 || value === null || value === undefined) return value;
