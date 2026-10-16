@@ -592,3 +592,50 @@ html[data-theme="black"] body .app-modal,html[data-theme="black"] body .modal-co
 }
 html[data-theme="black"] body #page-content .ct-settings-theme-option {color:#ffffff !important;background:#0b0b0b !important;border-color:#333333 !important}
 html[data-theme="black"] body #page-content .ct-settings-theme-option.is-selected {border-color:#ffffff !important;background:#202020 !important}
+
+
+/* Strict black mode: no charcoal, colored, gradient, or tinted element backgrounds
+   anywhere in the application. Keep foreground text/icons white for contrast. */
+html[data-theme="black"],
+html[data-theme="black"] body,
+html[data-theme="black"] body *,
+html[data-theme="black"] body *::before,
+html[data-theme="black"] body *::after {
+  background-color: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+html[data-theme="black"] body *,
+html[data-theme="black"] body *::before,
+html[data-theme="black"] body *::after {
+  border-color: #242424 !important;
+  text-shadow: none !important;
+}
+html[data-theme="black"] body input,
+html[data-theme="black"] body select,
+html[data-theme="black"] body textarea,
+html[data-theme="black"] body option,
+html[data-theme="black"] body button,
+html[data-theme="black"] body [role="button"] {
+  background-color: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+html[data-theme="black"] body input::placeholder,
+html[data-theme="black"] body textarea::placeholder {
+  color: #c8c8c8 !important;
+}
+html[data-theme="black"] body input[type="checkbox"],
+html[data-theme="black"] body input[type="radio"],
+html[data-theme="black"] body progress,
+html[data-theme="black"] body meter {
+  accent-color: #ffffff !important;
+}
+html[data-theme="black"] body img,
+html[data-theme="black"] body video,
+html[data-theme="black"] body canvas,
+html[data-theme="black"] body iframe {
+  background-color: #000000 !important;
+}
