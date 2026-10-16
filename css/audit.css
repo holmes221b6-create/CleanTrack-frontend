@@ -24,20 +24,17 @@
 .ct-audit-actor strong{display:block}.ct-audit-action{display:inline-block;color:var(--text);font-size:.78rem;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);white-space:normal}
 .ct-audit-outcome{display:inline-flex;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:.76rem;font-weight:750;white-space:nowrap}
 .ct-audit-outcome.outcome-success,.ct-audit-outcome.outcome-approved{color:var(--success)}.ct-audit-outcome.outcome-rejected,.ct-audit-outcome.outcome-failed{color:var(--danger)}
-.ct-audit-details{position:relative;min-width:110px}.ct-audit-details summary{color:var(--primary);cursor:pointer;font-weight:650;white-space:nowrap}
-.ct-audit-detail-grid{display:none;position:absolute;z-index:1000;top:calc(100% + 6px);right:0;box-sizing:border-box;grid-template-columns:minmax(0,1fr);gap:10px;width:min(650px,calc(100vw - 40px));max-height:min(65vh,560px);overflow:auto;padding:14px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg-elevated);box-shadow:0 12px 32px rgb(0 0 0 / 24%)}
-.ct-audit-details[open] .ct-audit-detail-grid{display:grid}.ct-audit-detail-block{min-width:0}.ct-audit-detail-block strong{display:block;margin-bottom:4px;color:var(--text-secondary);font-size:.76rem}
+.ct-audit-detail-block{min-width:0}.ct-audit-detail-block strong{display:block;margin-bottom:4px;color:var(--text-secondary);font-size:.76rem}
 .ct-audit-detail-block pre{max-width:100%;max-height:240px;overflow:auto;margin:0;padding:9px;border-radius:7px;background:var(--surface);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
 .ct-audit-empty-row td{text-align:center;padding:32px;color:var(--text-secondary)}
 .ct-audit-pagination{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:16px}
 @media(max-width:1100px){.ct-audit-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.ct-audit-filter-grid .ct-audit-field:first-child{grid-column:span 3}}
-@media(max-width:720px){.ct-audit-detail-grid{position:fixed;top:auto;right:20px;left:20px;bottom:20px;width:auto;max-height:65vh}.ct-audit-card{padding:12px}.ct-audit-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-audit-filter-grid .ct-audit-field:first-child{grid-column:span 2}.ct-audit-export-group{justify-content:stretch}.ct-audit-export-group .ct-audit-input,.ct-audit-export-group .ct-audit-button{flex:1}.ct-audit-list-head{align-items:flex-start}.ct-audit-detail-grid{width:min(82vw,450px)}}
+@media(max-width:720px){.ct-audit-card{padding:12px}.ct-audit-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-audit-filter-grid .ct-audit-field:first-child{grid-column:span 2}.ct-audit-export-group{justify-content:stretch}.ct-audit-export-group .ct-audit-input,.ct-audit-export-group .ct-audit-button{flex:1}.ct-audit-list-head{align-items:flex-start}}
 @media(max-width:430px){.ct-audit-filter-grid{grid-template-columns:1fr}.ct-audit-filter-grid .ct-audit-field:first-child{grid-column:auto}.ct-audit-filter-actions .ct-audit-button{flex:1}.ct-audit-pagination{gap:7px}.ct-audit-pagination .ct-audit-button{padding:8px}}
 
 /* Audit Trail respects shared theme tokens and account language direction. */
 .ct-audit-export-note{flex-basis:100%;text-align:end;color:var(--text-secondary);font-size:.78rem}
 html[dir="rtl"] .ct-audit-table th{text-align:right}
-html[dir="rtl"] .ct-audit-detail-block strong{text-align:right}
 @media(max-width:720px){.ct-audit-export-note{text-align:start}}
 
 /* Audit details render in a body-level modal, never inside the table layout. */
