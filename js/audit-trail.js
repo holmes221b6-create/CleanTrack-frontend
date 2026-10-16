@@ -185,6 +185,38 @@
     function statusMessage(message, error=false) {
       status.textContent=message; status.hidden=!message; status.className="ct-audit-status"+(error?" is-error":"");
     }
+    function appendAuditDetailValue(group, value) {
+      const normalized = normalizeAuditValue(value);
+      if (normalized === null || normalized === undefined || normalized === "") {
+        group.appendChild(el("p", "ct-audit-detail-empty", "No data recorded."));
+        return;
+      }
+      if (typeof normalized === "object" && !Array.isArray(normalized)) {
+        const entries = Object.entries(normalized);
+        if (!entries.length) {
+          group.appendChild(el("p", "ct-audit-detail-empty", "No data recorded."));
+          return;
+        }
+        const list = el("dl", "ct-audit-detail-list");
+        entries.forEach(([key, item]) => {
+          const row = el("div", "ct-audit-detail-item");
+          row.appendChild(el("dt", "", key.replace(/[_-]+/g, " ").replace(/\\b\\w/g, letter => letter.toUpperCase())));
+          const display = item && typeof item === "object" ? JSON.stringify(item, null, 2) : String(item ?? "—");
+          row.appendChild(el("dd", "", display));
+          list.appendChild(row);
+        });
+        group.appendChild(list);
+        return;
+      }
+      if (Array.isArray(normalized)) {
+        const list = el("ul", "ct-audit-detail-array");
+        normalized.forEach(item => list.appendChild(el("li", "", item && typeof item === "object" ? JSON.stringify(item, null, 2) : String(item ?? "—"))));
+        group.appendChild(list);
+        return;
+      }
+      group.appendChild(el("p", "ct-audit-detail-value", String(normalized)));
+    }
+
     function openAuditDetails(entry) {
       const overlay = el("div", "ct-audit-modal-backdrop");
       overlay.setAttribute("role", "presentation");
@@ -199,8 +231,8 @@
       dialog.appendChild(header);
       [["Before",entry.before],["After",entry.after],["Additional context",entry.details]].forEach(([label,value]) => {
         const group = el("section", "ct-audit-detail-block");
-        group.appendChild(el("strong", "", label));
-        group.appendChild(el("pre", "", safeJson(value)));
+        group.appendChild(el("h3", "", label));
+        appendAuditDetailValue(group, value);
         dialog.appendChild(group);
       });
       overlay.appendChild(dialog);
