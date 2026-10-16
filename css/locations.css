@@ -156,3 +156,21 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 .ct-loc-building-popup small{color:#526175;}
 .ct-loc-map .leaflet-control-zoom a{width:34px;height:34px;line-height:34px;font-size:22px;}
 @media(max-width:560px){.ct-loc-map .leaflet-control-zoom a{width:38px;height:38px;line-height:38px;}}
+
+/* Named map landmarks/localities: permanent, readable labels for non-city areas too. */
+.ct-loc-map .ct-loc-landmark-label {
+  background: #fff;
+  border: 1px solid #8da9df;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 22%);
+  color: #17223a;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  padding: 3px 6px;
+  white-space: nowrap;
+  z-index: 700;
+}
+.ct-loc-map .leaflet-tooltip-top.ct-loc-landmark-label::before {
+  border-top-color: #8da9df;
+}
