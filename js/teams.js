@@ -153,7 +153,7 @@ function actionPanel(d,mode){
  }else if(mode==="zones"){
   const f=el("form","ct-team-form");f.append(el("p","ct-team-muted","A zone cannot be assigned here while its location belongs to another team. Reassign that location first."));
   const locs=new Map((d.available_locations||[]).map(x=>[String(x.id),x])),set=new Set(d.zones.map(x=>String(x.id))),list=el("div","ct-team-check-list");
-  (d.available_zones||[]).forEach(z=>{const loc=locs.get(String(z.location_id)),locked=Boolean(loc?.team_id&&String(loc.team_id)!==String(t.id));list.append(checkRow(z.name,"Location: "+(loc?.name||("Location #"+z.location_id))+(locked?" · assigned to another team":""),set.has(String(z.id)),locked,z.id))});
+  (d.available_zones||[]).forEach(z=>{const loc=locs.get(String(z.location_id)),isSelected=set.has(String(z.id)),inactive=String(z.status||"active")!=="active",locked=(inactive&&!isSelected)||Boolean(loc?.team_id&&String(loc.team_id)!==String(t.id));const suffix=inactive?" · "+String(z.status||"inactive")+" — restore before assigning":locked?" · assigned to another team":"";list.append(checkRow(z.name,"Location: "+(loc?.name||("Location #"+z.location_id))+suffix,isSelected,locked,z.id))});
   f.append(list,button("Save Zones","ct-team-btn ct-team-btn--primary",null,"submit"));f.addEventListener("submit",e=>{e.preventDefault();const ids=[...list.querySelectorAll("input:checked")].map(x=>Number(x.value));act("Saving zones…",async()=>{await API.put("teams/"+t.id+"/zones",{zone_ids:ids});await reloadTeam(t.id);notice("Zone assignments saved and audited.","success")})});p.append(f)
  }else if(mode==="create-task"){
   const f=el("form","ct-team-form"),t=d.team;
