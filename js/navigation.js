@@ -25,7 +25,7 @@
       { id: "locations", label: "Locations", icon: "⌖" },
       { id: "zones", label: "Zones", icon: "▦" },
       { id: "operations", label: "Operations Management", icon: "☷" },
-      { id: "reviews", label: "Logs and Reviews", icon: "✓" },
+      { id: "reviews", label: "Logs", icon: "✓" },
       { id: "analytics", label: "Analytics", icon: "▥" },
       { id: "reports", label: "Reports", icon: "▤" },
       { id: "announcements", label: "Announcements & Alerts", icon: "♢" },
