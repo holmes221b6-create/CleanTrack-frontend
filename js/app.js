@@ -551,6 +551,23 @@
       return;
     }
 
+    if (pageId === "zones") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Zone administration is available to organization Admins only."
+        }));
+        return;
+      }
+      if (window.CleanTrackZones && typeof window.CleanTrackZones.render === "function") {
+        await window.CleanTrackZones.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "The Zones module could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
     if (pageId === "staff") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
         pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Staff administration is available to organization Admins only." }));
