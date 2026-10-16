@@ -50,9 +50,48 @@
       return new Date(value).toLocaleString();
     } catch (_) { return new Date(value).toLocaleString(); }
   }
+  function decodeAuditText(value) {
+    if (typeof value !== "string" || !value) return value;
+    // Some older audit events contain HTML-escaped JSON (for example, &#xA; and &#x20;).
+    // Decode entities as text only; the result is still rendered via textContent, never as HTML.
+    const decoder = document.createElement("textarea");
+    decoder.innerHTML = value;
+    let decoded = decoder.value;
+    if (decoded === value && /&(?:#x?[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/i.test(value)) {
+      decoded = value
+        .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+        .replace(/&#([0-9]+);/g, (_, num) => String.fromCodePoint(parseInt(num, 10)))
+        .replace(/&quot;/gi, '"').replace(/&apos;/gi, "'")
+        .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
+        .replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&");
+    }
+    return decoded;
+  }
+  function normalizeAuditValue(value, depth = 0) {
+    if (depth > 8 || value === null || value === undefined) return value;
+    if (typeof value === "string") {
+      const decoded = decodeAuditText(value);
+      const trimmed = decoded.trim();
+      if ((trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+          (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+        try { return normalizeAuditValue(JSON.parse(trimmed), depth + 1); } catch (_) {}
+      }
+      return decoded;
+    }
+    if (Array.isArray(value)) return value.map(item => normalizeAuditValue(item, depth + 1));
+    if (typeof value === "object") {
+      return Object.fromEntries(Object.entries(value).map(([key, item]) => [
+        decodeAuditText(key), normalizeAuditValue(item, depth + 1)
+      ]));
+    }
+    return value;
+  }
   function safeJson(value) {
     if (value === null || value === undefined || value === "") return "—";
-    try { return JSON.stringify(value, null, 2); } catch (_) { return String(value); }
+    try {
+      const normalized = normalizeAuditValue(value);
+      return typeof normalized === "string" ? normalized : JSON.stringify(normalized, null, 2);
+    } catch (_) { return String(value); }
   }
 
   async function render(container) {
