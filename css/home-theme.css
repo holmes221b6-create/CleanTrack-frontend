@@ -379,3 +379,117 @@ html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-butt
   background: #15332f !important;
   border-color: #3a705f !important;
 }
+
+
+/* Audit Trail canvas and controls: align with the Announcements charcoal workspace.
+   Scoped to the Audit route so other tables and pages retain their own styling. */
+html:not([data-theme="light"]) body #workspace-view:has(#page-content .ct-audit-page),
+html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) .ct-workspace-shell,
+html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) .ct-workspace-main,
+html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) #page-content,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page),
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-page {
+  color: #e9e7ef !important;
+  background-color: #0f1219 !important;
+  background-image: none !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-page {
+  border-color: transparent !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-card,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table-wrap {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention-icon {
+  color: #b4a7dc !important;
+  background: #191722 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-eyebrow,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-details summary {
+  color: #b4a7dc !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-muted,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention p,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table small,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-detail-block strong {
+  color: #9290a0 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-input {
+  color: #e9e7ef !important;
+  background: #0b0f14 !important;
+  border-color: #302d3b !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-input:focus {
+  border-color: #7668a5 !important;
+  box-shadow: 0 0 0 3px rgb(180 167 220 / 14%) !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button {
+  color: #dcd8e7 !important;
+  background: #151720 !important;
+  border-color: #373142 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button:hover {
+  color: #f0ebfc !important;
+  background: #211d2c !important;
+  border-color: #655785 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button-primary {
+  color: #c6f5e4 !important;
+  background: #15332f !important;
+  border-color: #3a705f !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button-primary:hover {
+  background: #1b4337 !important;
+  border-color: #4a826f !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-list-head {
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-status {
+  color: #c9c3d8 !important;
+  background: #191722 !important;
+  border-color: #383246 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table th {
+  color: #c9c3d8 !important;
+  background: #15151f !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table td {
+  color: #e9e7ef !important;
+  border-color: #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover td {
+  background: #191722 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-action,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome {
+  color: #d5cde8 !important;
+  background: #191722 !important;
+  border-color: #383246 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-success,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-approved {
+  color: #84d6b5 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-rejected,
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-failed {
+  color: #df7d8b !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-detail-block pre {
+  color: #e9e7ef !important;
+  background: #0b0f14 !important;
+  border: 1px solid #292c36 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-empty-row td {
+  color: #9290a0 !important;
+}
