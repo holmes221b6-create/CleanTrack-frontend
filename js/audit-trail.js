@@ -52,20 +52,24 @@
   }
   function decodeAuditText(value) {
     if (typeof value !== "string" || !value) return value;
-    // Some older audit events contain HTML-escaped JSON (for example, &#xA; and &#x20;).
-    // Decode entities as text only; the result is still rendered via textContent, never as HTML.
-    const decoder = document.createElement("textarea");
-    decoder.innerHTML = value;
-    let decoded = decoder.value;
-    if (decoded === value && /&(?:#x?[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/i.test(value)) {
-      decoded = value
+    // Legacy audit payloads may have been HTML-escaped more than once.
+    // Decode a bounded number of layers, then keep the result as text (never HTML).
+    let decoded = value;
+    for (let pass = 0; pass < 4; pass += 1) {
+      if (!/&(?:#x?[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/i.test(decoded)) break;
+      const decoder = document.createElement("textarea");
+      decoder.innerHTML = decoded;
+      const next = decoder.value
         .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
         .replace(/&#([0-9]+);/g, (_, num) => String.fromCodePoint(parseInt(num, 10)))
         .replace(/&quot;/gi, '"').replace(/&apos;/gi, "'")
         .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
         .replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&");
+      if (next === decoded) break;
+      decoded = next;
     }
-    return decoded;
+    // Normalize common escaped line breaks left behind by older HTML serialization.
+    return decoded.replace(/<br\s*\/?\s*>/gi, "\n");
   }
   function normalizeAuditValue(value, depth = 0) {
     if (depth > 8 || value === null || value === undefined) return value;
