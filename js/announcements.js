@@ -673,7 +673,16 @@
         if(!teamNeeded)team.value="";
         escalationBox.hidden=kind.value!=="alert" || isAdmin;
         voiceField.hidden=isAdmin && audience.value!=="supervisors";
+        recordingField.hidden=isAdmin && audience.value!=="supervisors";
         if(voiceField.hidden) voice.value="";
+        if(recordingField.hidden && recordedVoiceBlob) {
+          recordedVoiceBlob=null; recordedVoiceName="";
+          if(recordedVoiceUrl) URL.revokeObjectURL(recordedVoiceUrl);
+          recordedVoiceUrl="";
+          recorderPanel.querySelectorAll("audio").forEach(n=>n.remove());
+          recorderStatus.textContent="Recording cleared because voice notes are only allowed for supervisor-targeted admin announcements.";
+          clearRecording.disabled=true;
+        }
         severityField.hidden=kind.value!=="alert";
         escalates.input.disabled=kind.value!=="alert";
         if(kind.value!=="alert"){escalates.input.checked=false;}
