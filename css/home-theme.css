@@ -4,7 +4,7 @@
  * Home's own cards retain their purpose-built layouts; page modules inherit these
  * tokens and the shared workspace chrome. The existing Light theme is preserved.
  */
-html:not([data-theme="light"]) {
+html[data-theme="default"] {
   color-scheme: dark !important;
   --bg: #0b0f14;
   --bg-elevated: #10141c;
@@ -43,338 +43,338 @@ html:not([data-theme="light"]) {
   --shadow-md: 0 16px 40px rgb(0 0 0 / 28%);
 }
 
-html:not([data-theme="light"]),
-html:not([data-theme="light"]) body,
-html:not([data-theme="light"]) #app,
-html:not([data-theme="light"]) #main-content,
-html:not([data-theme="light"]) #workspace-view,
-html:not([data-theme="light"]) #workspace-view .ct-workspace-shell,
-html:not([data-theme="light"]) #workspace-view .ct-workspace-main,
-html:not([data-theme="light"]) #workspace-view #page-content,
-html:not([data-theme="light"]) #workspace-view .page-content,
-html:not([data-theme="light"]) #page-content {
+html[data-theme="default"],
+html[data-theme="default"] body,
+html[data-theme="default"] #app,
+html[data-theme="default"] #main-content,
+html[data-theme="default"] #workspace-view,
+html[data-theme="default"] #workspace-view .ct-workspace-shell,
+html[data-theme="default"] #workspace-view .ct-workspace-main,
+html[data-theme="default"] #workspace-view #page-content,
+html[data-theme="default"] #workspace-view .page-content,
+html[data-theme="default"] #page-content {
   color: #e9e7ef !important;
   background-color: #0f1219 !important;
   background-image: none !important;
 }
-html:not([data-theme="light"]) body {
+html[data-theme="default"] body {
   background:
     radial-gradient(ellipse at 84% 0%, rgb(118 101 164 / 10%), transparent 40%),
     #0b0f14 !important;
 }
 
 /* Shared application header, workspace toolbar and sidebar */
-html:not([data-theme="light"]) body .app-header,
-html:not([data-theme="light"]) body #workspace-view .ct-workspace-toolbar,
-html:not([data-theme="light"]) body .profile-menu,
-html:not([data-theme="light"]) body .dropdown-menu,
-html:not([data-theme="light"]) body .popover,
-html:not([data-theme="light"]) body .tooltip {
+html[data-theme="default"] body .app-header,
+html[data-theme="default"] body #workspace-view .ct-workspace-toolbar,
+html[data-theme="default"] body .profile-menu,
+html[data-theme="default"] body .dropdown-menu,
+html[data-theme="default"] body .popover,
+html[data-theme="default"] body .tooltip {
   color: #e9e7ef !important;
   background: #10141c !important;
   border-color: #292c36 !important;
   box-shadow: 0 6px 22px rgb(0 0 0 / 16%) !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar,
-html:not([data-theme="light"]) body #workspace-view .sidebar,
-html:not([data-theme="light"]) body .sidebar {
+html[data-theme="default"] body #workspace-view .ct-sidebar,
+html[data-theme="default"] body #workspace-view .sidebar,
+html[data-theme="default"] body .sidebar {
   color: #e9e7ef !important;
   background: #10141c !important;
   border-color: #292c36 !important;
   box-shadow: 4px 0 18px rgb(0 0 0 / 12%) !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand {
+html[data-theme="default"] body #workspace-view .ct-sidebar-brand {
   border-color: #292c36 !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand-mark {
+html[data-theme="default"] body #workspace-view .ct-sidebar-brand-mark {
   color: #d5cde8 !important;
   background: #1b1926 !important;
   border-color: #393149 !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand strong,
-html:not([data-theme="light"]) body #workspace-view .sidebar-brand-text,
-html:not([data-theme="light"]) body #workspace-view .brand-name,
-html:not([data-theme="light"]) body .app-header .brand-name {
+html[data-theme="default"] body #workspace-view .ct-sidebar-brand strong,
+html[data-theme="default"] body #workspace-view .sidebar-brand-text,
+html[data-theme="default"] body #workspace-view .brand-name,
+html[data-theme="default"] body .app-header .brand-name {
   color: #e9e7ef !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-brand small,
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-label,
-html:not([data-theme="light"]) body #workspace-view .workspace-identity,
-html:not([data-theme="light"]) body #workspace-view #workspace-organization,
-html:not([data-theme="light"]) body #workspace-view #workspace-role {
+html[data-theme="default"] body #workspace-view .ct-sidebar-brand small,
+html[data-theme="default"] body #workspace-view .ct-sidebar-label,
+html[data-theme="default"] body #workspace-view .workspace-identity,
+html[data-theme="default"] body #workspace-view #workspace-organization,
+html[data-theme="default"] body #workspace-view #workspace-role {
   color: #858194 !important;
 }
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation button,
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation a {
+html[data-theme="default"] body #workspace-view #workspace-navigation button,
+html[data-theme="default"] body #workspace-view #workspace-navigation a {
   color: #aaa5ba !important;
   background: transparent !important;
   border-color: transparent !important;
 }
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation button:hover,
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation a:hover {
+html[data-theme="default"] body #workspace-view #workspace-navigation button:hover,
+html[data-theme="default"] body #workspace-view #workspace-navigation a:hover {
   color: #f0ebfc !important;
   background: #191722 !important;
   border-color: #383246 !important;
 }
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation .active,
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation [aria-current="page"],
-html:not([data-theme="light"]) body #workspace-view #workspace-navigation .ct-nav-active {
+html[data-theme="default"] body #workspace-view #workspace-navigation .active,
+html[data-theme="default"] body #workspace-view #workspace-navigation [aria-current="page"],
+html[data-theme="default"] body #workspace-view #workspace-navigation .ct-nav-active {
   color: #f0ebfc !important;
   background: linear-gradient(100deg, #211d2c, #15151f) !important;
   border-color: #393149 !important;
   box-shadow: inset 3px 0 #7668a5 !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-toggle {
+html[data-theme="default"] body #workspace-view .ct-sidebar-toggle {
   color: #dcd8e7 !important;
   background: #171720 !important;
   border-color: #393149 !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-sidebar-toggle:hover {
+html[data-theme="default"] body #workspace-view .ct-sidebar-toggle:hover {
   color: #f0ebfc !important;
   background: #211d2c !important;
   border-color: #655785 !important;
 }
-html:not([data-theme="light"]) body #workspace-view .ct-hamburger > span {
+html[data-theme="default"] body #workspace-view .ct-hamburger > span {
   background: #b4a7dc !important;
 }
 
 /* Consistent typography and form controls across each page/module */
-html:not([data-theme="light"]) body #page-content h1,
-html:not([data-theme="light"]) body #page-content h2,
-html:not([data-theme="light"]) body #page-content h3,
-html:not([data-theme="light"]) body #page-content h4,
-html:not([data-theme="light"]) body #page-content h5,
-html:not([data-theme="light"]) body #page-content h6,
-html:not([data-theme="light"]) body .app-modal h1,
-html:not([data-theme="light"]) body .app-modal h2,
-html:not([data-theme="light"]) body .app-modal h3 {
+html[data-theme="default"] body #page-content h1,
+html[data-theme="default"] body #page-content h2,
+html[data-theme="default"] body #page-content h3,
+html[data-theme="default"] body #page-content h4,
+html[data-theme="default"] body #page-content h5,
+html[data-theme="default"] body #page-content h6,
+html[data-theme="default"] body .app-modal h1,
+html[data-theme="default"] body .app-modal h2,
+html[data-theme="default"] body .app-modal h3 {
   color: #e9e7ef;
 }
-html:not([data-theme="light"]) body #page-content p,
-html:not([data-theme="light"]) body #page-content label,
-html:not([data-theme="light"]) body #page-content small,
-html:not([data-theme="light"]) body #page-content .muted,
-html:not([data-theme="light"]) body #page-content .ct-muted {
+html[data-theme="default"] body #page-content p,
+html[data-theme="default"] body #page-content label,
+html[data-theme="default"] body #page-content small,
+html[data-theme="default"] body #page-content .muted,
+html[data-theme="default"] body #page-content .ct-muted {
   color: #9290a0;
 }
-html:not([data-theme="light"]) body #page-content hr,
-html:not([data-theme="light"]) body #page-content .divider {
+html[data-theme="default"] body #page-content hr,
+html[data-theme="default"] body #page-content .divider {
   border-color: #292c36 !important;
   background-color: #292c36 !important;
 }
-html:not([data-theme="light"]) body #page-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-html:not([data-theme="light"]) body #page-content select,
-html:not([data-theme="light"]) body #page-content textarea {
+html[data-theme="default"] body #page-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html[data-theme="default"] body #page-content select,
+html[data-theme="default"] body #page-content textarea {
   color: #e9e7ef;
   background-color: #171620;
   border-color: #373342;
 }
-html:not([data-theme="light"]) body #page-content input::placeholder,
-html:not([data-theme="light"]) body #page-content textarea::placeholder {
+html[data-theme="default"] body #page-content input::placeholder,
+html[data-theme="default"] body #page-content textarea::placeholder {
   color: #706c7f;
 }
 
 /* Legacy shared components that still had the old blue/teal palette hard-coded */
-html:not([data-theme="light"]) body #page-content .card,
-html:not([data-theme="light"]) body #page-content .panel,
-html:not([data-theme="light"]) body #page-content .modal-content,
-html:not([data-theme="light"]) body .app-modal {
+html[data-theme="default"] body #page-content .card,
+html[data-theme="default"] body #page-content .panel,
+html[data-theme="default"] body #page-content .modal-content,
+html[data-theme="default"] body .app-modal {
   color: #e9e7ef;
   background-color: #10141c;
   border-color: #292c36;
 }
-html:not([data-theme="light"]) body #page-content .card-description,
-html:not([data-theme="light"]) body #page-content .text-muted,
-html:not([data-theme="light"]) body #page-content .muted {
+html[data-theme="default"] body #page-content .card-description,
+html[data-theme="default"] body #page-content .text-muted,
+html[data-theme="default"] body #page-content .muted {
   color: #9290a0 !important;
 }
-html:not([data-theme="light"]) body #page-content .btn-primary,
-html:not([data-theme="light"]) body #page-content .ct-ann-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-op-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-audit-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-loc-btn-primary,
-html:not([data-theme="light"]) body #page-content .ct-inv-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-staff-button--primary,
-html:not([data-theme="light"]) body #page-content .ct-team-btn--primary,
-html:not([data-theme="light"]) body #page-content .ct-settings-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-org-button-primary,
-html:not([data-theme="light"]) body #page-content .ct-home-button--primary {
+html[data-theme="default"] body #page-content .btn-primary,
+html[data-theme="default"] body #page-content .ct-ann-button-primary,
+html[data-theme="default"] body #page-content .ct-op-button-primary,
+html[data-theme="default"] body #page-content .ct-audit-button-primary,
+html[data-theme="default"] body #page-content .ct-loc-btn-primary,
+html[data-theme="default"] body #page-content .ct-inv-button-primary,
+html[data-theme="default"] body #page-content .ct-staff-button--primary,
+html[data-theme="default"] body #page-content .ct-team-btn--primary,
+html[data-theme="default"] body #page-content .ct-settings-button-primary,
+html[data-theme="default"] body #page-content .ct-org-button-primary,
+html[data-theme="default"] body #page-content .ct-home-button--primary {
   color: #9fe0c8 !important;
   background: #16352d !important;
   border-color: #3a705f !important;
 }
-html:not([data-theme="light"]) body #page-content .btn-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-ann-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-op-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-audit-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-loc-btn-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-inv-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-staff-button--primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-team-btn--primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-settings-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-org-button-primary:hover,
-html:not([data-theme="light"]) body #page-content .ct-home-button--primary:hover {
+html[data-theme="default"] body #page-content .btn-primary:hover,
+html[data-theme="default"] body #page-content .ct-ann-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-op-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-audit-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-loc-btn-primary:hover,
+html[data-theme="default"] body #page-content .ct-inv-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-staff-button--primary:hover,
+html[data-theme="default"] body #page-content .ct-team-btn--primary:hover,
+html[data-theme="default"] body #page-content .ct-settings-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-org-button-primary:hover,
+html[data-theme="default"] body #page-content .ct-home-button--primary:hover {
   color: #cbf3e6 !important;
   background: #1b4337 !important;
   border-color: #4a967f !important;
 }
-html:not([data-theme="light"]) body #page-content a:not([class*="button"]):not([class*="btn"]) {
+html[data-theme="default"] body #page-content a:not([class*="button"]):not([class*="btn"]) {
   color: #b4a7dc;
 }
-html:not([data-theme="light"]) body #page-content a:not([class*="button"]):not([class*="btn"]):hover {
+html[data-theme="default"] body #page-content a:not([class*="button"]):not([class*="btn"]):hover {
   color: #f0ebfc;
 }
 
 /* Keep pages with purpose-built Home-style layouts consistent with its palette */
-html:not([data-theme="light"]) body #page-content .ct-ann-page,
-html:not([data-theme="light"]) body #page-content .ct-settings-page,
-html:not([data-theme="light"]) body #page-content .ct-org-settings-page,
-html:not([data-theme="light"]) body #page-content .ct-team-manager,
-html:not([data-theme="light"]) body #page-content .ct-staff-page,
-html:not([data-theme="light"]) body #page-content .ct-invitations-page,
-html:not([data-theme="light"]) body #page-content .ct-operations-page,
-html:not([data-theme="light"]) body #page-content .ct-analytics-page,
-html:not([data-theme="light"]) body #page-content .ct-locations-page,
-html:not([data-theme="light"]) body #page-content .ct-audit-page {
+html[data-theme="default"] body #page-content .ct-ann-page,
+html[data-theme="default"] body #page-content .ct-settings-page,
+html[data-theme="default"] body #page-content .ct-org-settings-page,
+html[data-theme="default"] body #page-content .ct-team-manager,
+html[data-theme="default"] body #page-content .ct-staff-page,
+html[data-theme="default"] body #page-content .ct-invitations-page,
+html[data-theme="default"] body #page-content .ct-operations-page,
+html[data-theme="default"] body #page-content .ct-analytics-page,
+html[data-theme="default"] body #page-content .ct-locations-page,
+html[data-theme="default"] body #page-content .ct-audit-page {
   color: #e9e7ef;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-card,
-html:not([data-theme="light"]) body #page-content .ct-ann-compose-card,
-html:not([data-theme="light"]) body #page-content .ct-ann-empty,
-html:not([data-theme="light"]) body #page-content .ct-ann-metric,
-html:not([data-theme="light"]) body #page-content .ct-ann-team-groups,
-html:not([data-theme="light"]) body #page-content .ct-ann-team-group,
-html:not([data-theme="light"]) body #page-content .ct-ann-dialog {
+html[data-theme="default"] body #page-content .ct-ann-card,
+html[data-theme="default"] body #page-content .ct-ann-compose-card,
+html[data-theme="default"] body #page-content .ct-ann-empty,
+html[data-theme="default"] body #page-content .ct-ann-metric,
+html[data-theme="default"] body #page-content .ct-ann-team-groups,
+html[data-theme="default"] body #page-content .ct-ann-team-group,
+html[data-theme="default"] body #page-content .ct-ann-dialog {
   color: #e9e7ef;
   background-color: #10141c;
   border-color: #292c36;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-control,
-html:not([data-theme="light"]) body #page-content .ct-ann-compose-options {
+html[data-theme="default"] body #page-content .ct-ann-control,
+html[data-theme="default"] body #page-content .ct-ann-compose-options {
   color: #e9e7ef;
   background-color: #171620;
   border-color: #373342;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-button,
-html:not([data-theme="light"]) body #page-content .ct-ann-icon-button {
+html[data-theme="default"] body #page-content .ct-ann-button,
+html[data-theme="default"] body #page-content .ct-ann-icon-button {
   color: #dcd8e7;
   background-color: #171720;
   border-color: #393149;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-button:hover,
-html:not([data-theme="light"]) body #page-content .ct-ann-icon-button:hover {
+html[data-theme="default"] body #page-content .ct-ann-button:hover,
+html[data-theme="default"] body #page-content .ct-ann-icon-button:hover {
   color: #f0ebfc;
   background-color: #211d2c;
   border-color: #655785;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-eyebrow,
-html:not([data-theme="light"]) body #page-content .ct-ann-attachment:hover {
+html[data-theme="default"] body #page-content .ct-ann-eyebrow,
+html[data-theme="default"] body #page-content .ct-ann-attachment:hover {
   color: #b4a7dc;
 }
 
 /* Match the Home page's charcoal cards, violet details, and restrained green actions */
-html:not([data-theme="light"]) body #page-content .ct-op-card,
-html:not([data-theme="light"]) body #page-content .ct-op-stat,
-html:not([data-theme="light"]) body #page-content .ct-audit-card,
-html:not([data-theme="light"]) body #page-content .ct-inv-card,
-html:not([data-theme="light"]) body #page-content .ct-staff-card,
-html:not([data-theme="light"]) body #page-content .ct-staff-kpi,
-html:not([data-theme="light"]) body #page-content .ct-staff-sidebar,
-html:not([data-theme="light"]) body #page-content .ct-team-notice,
-html:not([data-theme="light"]) body #page-content .ct-team-recent-panel,
-html:not([data-theme="light"]) body #page-content .ct-team-list-panel,
-html:not([data-theme="light"]) body #page-content .ct-team-create-form,
-html:not([data-theme="light"]) body #page-content .ct-team-detail,
-html:not([data-theme="light"]) body #page-content .ct-team-action-panel {
+html[data-theme="default"] body #page-content .ct-op-card,
+html[data-theme="default"] body #page-content .ct-op-stat,
+html[data-theme="default"] body #page-content .ct-audit-card,
+html[data-theme="default"] body #page-content .ct-inv-card,
+html[data-theme="default"] body #page-content .ct-staff-card,
+html[data-theme="default"] body #page-content .ct-staff-kpi,
+html[data-theme="default"] body #page-content .ct-staff-sidebar,
+html[data-theme="default"] body #page-content .ct-team-notice,
+html[data-theme="default"] body #page-content .ct-team-recent-panel,
+html[data-theme="default"] body #page-content .ct-team-list-panel,
+html[data-theme="default"] body #page-content .ct-team-create-form,
+html[data-theme="default"] body #page-content .ct-team-detail,
+html[data-theme="default"] body #page-content .ct-team-action-panel {
   color: #e9e7ef;
   background-color: #10141c;
   border-color: #292c36;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-badge,
-html:not([data-theme="light"]) body #page-content .ct-ann-issued,
-html:not([data-theme="light"]) body #page-content .ct-ann-attachment {
+html[data-theme="default"] body #page-content .ct-ann-badge,
+html[data-theme="default"] body #page-content .ct-ann-issued,
+html[data-theme="default"] body #page-content .ct-ann-attachment {
   background-color: #191722;
   border-color: #383246;
   color: #d5cde8;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-meta,
-html:not([data-theme="light"]) body #page-content .ct-ann-muted,
-html:not([data-theme="light"]) body #page-content .ct-ann-receipt-summary {
+html[data-theme="default"] body #page-content .ct-ann-meta,
+html[data-theme="default"] body #page-content .ct-ann-muted,
+html[data-theme="default"] body #page-content .ct-ann-receipt-summary {
   color: #9290a0;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-card-title,
-html:not([data-theme="light"]) body #page-content .ct-ann-compose-card h2 {
+html[data-theme="default"] body #page-content .ct-ann-card-title,
+html[data-theme="default"] body #page-content .ct-ann-compose-card h2 {
   color: #e9e7ef;
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-card {
+html[data-theme="default"] body #page-content .ct-ann-card {
   box-shadow: 0 5px 18px rgb(0 0 0 / 16%);
 }
-html:not([data-theme="light"]) body #page-content .ct-ann-card.is-pinned { border-left-color: #7668a5; }
-html:not([data-theme="light"]) body #page-content .ct-ann-card.is-alert { border-left-color: #df7d8b; }
+html[data-theme="default"] body #page-content .ct-ann-card.is-pinned { border-left-color: #7668a5; }
+html[data-theme="default"] body #page-content .ct-ann-card.is-alert { border-left-color: #df7d8b; }
 
 /* Tables, pagination, dialogs, popovers and small legacy widgets */
-html:not([data-theme="light"]) body #page-content table,
-html:not([data-theme="light"]) body #page-content th,
-html:not([data-theme="light"]) body #page-content td {
+html[data-theme="default"] body #page-content table,
+html[data-theme="default"] body #page-content th,
+html[data-theme="default"] body #page-content td {
   border-color: #292c36;
 }
-html:not([data-theme="light"]) body #page-content th {
+html[data-theme="default"] body #page-content th {
   color: #c9c3d8;
   background-color: #15151f;
 }
-html:not([data-theme="light"]) body #page-content tr:hover td {
+html[data-theme="default"] body #page-content tr:hover td {
   background-color: #191722;
 }
-html:not([data-theme="light"]) body .app-modal {
+html[data-theme="default"] body .app-modal {
   color: #e9e7ef !important;
   background: #10141c !important;
   border-color: #393149 !important;
 }
-html:not([data-theme="light"]) body .app-modal .modal-header,
-html:not([data-theme="light"]) body .app-modal .modal-footer {
+html[data-theme="default"] body .app-modal .modal-header,
+html[data-theme="default"] body .app-modal .modal-footer {
   border-color: #292c36 !important;
 }
 
 
 /* Announcements page canvas: match Home's charcoal workspace, not the legacy navy canvas.
    Scoped to this route so the rest of the app keeps its own component layout. */
-html:not([data-theme="light"]) body #workspace-view:has(#page-content .ct-ann-page),
-html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) .ct-workspace-shell,
-html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) .ct-workspace-main,
-html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) #page-content,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page),
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-page {
+html[data-theme="default"] body #workspace-view:has(#page-content .ct-ann-page),
+html[data-theme="default"] body #workspace-view:has(.ct-ann-page) .ct-workspace-shell,
+html[data-theme="default"] body #workspace-view:has(.ct-ann-page) .ct-workspace-main,
+html[data-theme="default"] body #workspace-view:has(.ct-ann-page) #page-content,
+html[data-theme="default"] body #page-content:has(.ct-ann-page),
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-page {
   color: #e9e7ef !important;
   background-color: #0f1219 !important;
   background-image: none !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-page {
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-page {
   border-color: transparent !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-card,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-compose-card,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-empty,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-metric,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-team-groups,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-team-group {
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-card,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-compose-card,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-empty,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-metric,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-team-groups,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-team-group {
   color: #e9e7ef !important;
   background: #10141c !important;
   border-color: #292c36 !important;
   box-shadow: none !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-control,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-compose-options {
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-control,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-compose-options {
   color: #e9e7ef !important;
   background: #0b0f14 !important;
   border-color: #302d3b !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-button,
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-icon-button {
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-button,
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-icon-button {
   color: #dcd8e7 !important;
   background: #151720 !important;
   border-color: #373142 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-button-primary {
+html[data-theme="default"] body #page-content:has(.ct-ann-page) .ct-ann-button-primary {
   color: #c6f5e4 !important;
   background: #15332f !important;
   border-color: #3a705f !important;
@@ -383,113 +383,212 @@ html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-butt
 
 /* Audit Trail canvas and controls: align with the Announcements charcoal workspace.
    Scoped to the Audit route so other tables and pages retain their own styling. */
-html:not([data-theme="light"]) body #workspace-view:has(#page-content .ct-audit-page),
-html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) .ct-workspace-shell,
-html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) .ct-workspace-main,
-html:not([data-theme="light"]) body #workspace-view:has(.ct-audit-page) #page-content,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page),
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-page {
+html[data-theme="default"] body #workspace-view:has(#page-content .ct-audit-page),
+html[data-theme="default"] body #workspace-view:has(.ct-audit-page) .ct-workspace-shell,
+html[data-theme="default"] body #workspace-view:has(.ct-audit-page) .ct-workspace-main,
+html[data-theme="default"] body #workspace-view:has(.ct-audit-page) #page-content,
+html[data-theme="default"] body #page-content:has(.ct-audit-page),
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-page {
   color: #e9e7ef !important;
   background-color: #0f1219 !important;
   background-image: none !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-page {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-page {
   border-color: transparent !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-card,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table-wrap {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-card,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-retention,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table-wrap {
   color: #e9e7ef !important;
   background: #10141c !important;
   border-color: #292c36 !important;
   box-shadow: none !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention-icon {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-retention-icon {
   color: #b4a7dc !important;
   background: #191722 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-eyebrow,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-details summary {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-eyebrow,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-details summary {
   color: #b4a7dc !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-muted,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-retention p,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table small,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-detail-block strong {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-muted,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-retention p,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table small,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-detail-block strong {
   color: #9290a0 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-input {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-input {
   color: #e9e7ef !important;
   background: #0b0f14 !important;
   border-color: #302d3b !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-input:focus {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-input:focus {
   border-color: #7668a5 !important;
   box-shadow: 0 0 0 3px rgb(180 167 220 / 14%) !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-button {
   color: #dcd8e7 !important;
   background: #151720 !important;
   border-color: #373142 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button:hover {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-button:hover {
   color: #f0ebfc !important;
   background: #211d2c !important;
   border-color: #655785 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button-primary {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-button-primary {
   color: #c6f5e4 !important;
   background: #15332f !important;
   border-color: #3a705f !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-button-primary:hover {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-button-primary:hover {
   background: #1b4337 !important;
   border-color: #4a826f !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-list-head {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-list-head {
   border-color: #292c36 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-status {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-status {
   color: #c9c3d8 !important;
   background: #191722 !important;
   border-color: #383246 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table {
   color: #e9e7ef !important;
   background: #10141c !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table th {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table th {
   color: #c9c3d8 !important;
   background: #15151f !important;
   border-color: #292c36 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table td {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table td {
   color: #e9e7ef !important;
   border-color: #292c36 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover td {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-table tbody tr:hover td {
   background: #191722 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-action,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-action,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-outcome {
   color: #d5cde8 !important;
   background: #191722 !important;
   border-color: #383246 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-success,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-approved {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-success,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-approved {
   color: #84d6b5 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-rejected,
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-failed {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-rejected,
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-outcome.outcome-failed {
   color: #df7d8b !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-detail-block pre {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-detail-block pre {
   color: #e9e7ef !important;
   background: #0b0f14 !important;
   border: 1px solid #292c36 !important;
 }
-html:not([data-theme="light"]) body #page-content:has(.ct-audit-page) .ct-audit-empty-row td {
+html[data-theme="default"] body #page-content:has(.ct-audit-page) .ct-audit-empty-row td {
   color: #9290a0 !important;
 }
+
+
+/* Pure-black appearance: separate from CleanTrack's default charcoal theme. */
+html[data-theme="black"] {
+  color-scheme: dark !important;
+  --bg:#000000;--bg-elevated:#080808;--surface:#0b0b0b;--surface-hover:#171717;
+  --surface-raised:#202020;--border:#292929;--border-strong:#3a3a3a;
+  --text:#ffffff;--text-secondary:#d0d0d0;--text-muted:#aaaaaa;
+  --primary:#ffffff;--primary-hover:#e7e7e7;--primary-contrast:#000000;
+  --accent:#e0e0e0;--success:#86efac;--warning:#facc15;--danger:#fca5a5;--info:#93c5fd;
+  --ct-bg:#000000;--ct-page:#000000;--ct-surface:#080808;--ct-panel:#0b0b0b;
+  --ct-panel-raised:#171717;--ct-border:#292929;--ct-text:#ffffff;--ct-text-muted:#d0d0d0;
+  --ct-blue:#ffffff;--ct-blue-hover:#e7e7e7;--ct-focus:#ffffff;--ct-green:#171717;
+  --ct-green-light:#ffffff;--ct-accent:#e0e0e0;--focus-ring:0 0 0 3px rgb(255 255 255 / 22%);
+  --shadow-sm:0 5px 18px rgb(0 0 0 / 45%);--shadow-md:0 16px 40px rgb(0 0 0 / 60%);
+}
+html[data-theme="black"],html[data-theme="black"] body,html[data-theme="black"] #app,
+html[data-theme="black"] #main-content,html[data-theme="black"] #workspace-view,
+html[data-theme="black"] #workspace-view .ct-workspace-shell,
+html[data-theme="black"] #workspace-view .ct-workspace-main,
+html[data-theme="black"] #workspace-view #page-content,
+html[data-theme="black"] #workspace-view .page-content,html[data-theme="black"] #page-content {
+  color:#ffffff !important;background:#000000 !important;background-image:none !important;
+}
+html[data-theme="black"] body .app-header,html[data-theme="black"] body #workspace-view .ct-workspace-toolbar,
+html[data-theme="black"] body .profile-menu,html[data-theme="black"] body .dropdown-menu,
+html[data-theme="black"] body .popover,html[data-theme="black"] body .tooltip,
+html[data-theme="black"] body #workspace-view .ct-sidebar,html[data-theme="black"] body #workspace-view .sidebar,
+html[data-theme="black"] body .sidebar {
+  color:#ffffff !important;background:#080808 !important;border-color:#292929 !important;
+}
+html[data-theme="black"] body #workspace-view #workspace-navigation button,
+html[data-theme="black"] body #workspace-view #workspace-navigation a {color:#e5e5e5 !important;background:transparent !important;border-color:transparent !important}
+html[data-theme="black"] body #workspace-view #workspace-navigation button:hover,
+html[data-theme="black"] body #workspace-view #workspace-navigation a:hover,
+html[data-theme="black"] body #workspace-view #workspace-navigation .active,
+html[data-theme="black"] body #workspace-view #workspace-navigation [aria-current="page"],
+html[data-theme="black"] body #workspace-view #workspace-navigation .ct-nav-active {
+  color:#ffffff !important;background:#202020 !important;border-color:#444444 !important;box-shadow:inset 3px 0 #ffffff !important;
+}
+html[data-theme="black"] body #page-content h1,html[data-theme="black"] body #page-content h2,
+html[data-theme="black"] body #page-content h3,html[data-theme="black"] body #page-content h4,
+html[data-theme="black"] body #page-content h5,html[data-theme="black"] body #page-content h6,
+html[data-theme="black"] body #page-content p,html[data-theme="black"] body #page-content label,
+html[data-theme="black"] body #page-content small,html[data-theme="black"] body #page-content a,
+html[data-theme="black"] body #page-content li,html[data-theme="black"] body #page-content dt,
+html[data-theme="black"] body #page-content dd,html[data-theme="black"] body .ct-settings-muted,
+html[data-theme="black"] body #workspace-view .ct-sidebar-brand strong,
+html[data-theme="black"] body #workspace-view .ct-sidebar-brand small,
+html[data-theme="black"] body #workspace-view .ct-sidebar-label,
+html[data-theme="black"] body #workspace-view .workspace-identity,
+html[data-theme="black"] body #workspace-view #workspace-organization,
+html[data-theme="black"] body #workspace-view #workspace-role {color:#ffffff !important}
+html[data-theme="black"] body #page-content .card,html[data-theme="black"] body #page-content .panel,
+html[data-theme="black"] body #page-content .stat-card,html[data-theme="black"] body #page-content .metric-card,
+html[data-theme="black"] body #page-content .dashboard-card,html[data-theme="black"] body #page-content .form-card,
+html[data-theme="black"] body #page-content .table-wrap,html[data-theme="black"] body #page-content .table-container,
+html[data-theme="black"] body #page-content .content-card,html[data-theme="black"] body #page-content .ct-settings-card,
+html[data-theme="black"] body #page-content .ct-settings-nav,html[data-theme="black"] body #page-content .ct-settings-panel,
+html[data-theme="black"] body #page-content .ct-settings-overview-item,html[data-theme="black"] body #page-content .ct-team-card,
+html[data-theme="black"] body #page-content .ct-dash-panel,html[data-theme="black"] body #page-content .ct-dash-kpi,
+html[data-theme="black"] body #page-content .ct-dash-quick-action,html[data-theme="black"] body #page-content .ct-org-card {
+  color:#ffffff !important;background:#0b0b0b !important;border-color:#292929 !important;box-shadow:none !important;
+}
+html[data-theme="black"] body #page-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html[data-theme="black"] body #page-content select,html[data-theme="black"] body #page-content textarea,
+html[data-theme="black"] body input,html[data-theme="black"] body select,html[data-theme="black"] body textarea {
+  color:#ffffff !important;background:#111111 !important;border-color:#3a3a3a !important;
+}
+html[data-theme="black"] body input::placeholder,html[data-theme="black"] body textarea::placeholder {color:#bdbdbd !important}
+html[data-theme="black"] body #page-content button:not(.ct-settings-theme-option),
+html[data-theme="black"] body #page-content .ct-settings-button,
+html[data-theme="black"] body #page-content .ct-settings-nav-item {
+  color:#ffffff;border-color:#3a3a3a;
+}
+html[data-theme="black"] body #page-content .ct-settings-button-primary,
+html[data-theme="black"] body #page-content .btn-primary,
+html[data-theme="black"] body #page-content .ct-ann-button-primary,
+html[data-theme="black"] body #page-content .ct-op-button-primary,
+html[data-theme="black"] body #page-content .ct-audit-button-primary,
+html[data-theme="black"] body #page-content .ct-loc-btn-primary,
+html[data-theme="black"] body #page-content .ct-inv-button-primary,
+html[data-theme="black"] body #page-content .ct-staff-button--primary,
+html[data-theme="black"] body #page-content .ct-team-btn--primary,
+html[data-theme="black"] body #page-content .ct-org-button-primary,
+html[data-theme="black"] body #page-content .ct-home-button--primary {
+  color:#000000 !important;background:#ffffff !important;border-color:#ffffff !important;
+}
+html[data-theme="black"] body #page-content table,html[data-theme="black"] body #page-content th,
+html[data-theme="black"] body #page-content td {color:#ffffff !important;border-color:#292929 !important}
+html[data-theme="black"] body #page-content tr:nth-child(even) {background:#101010 !important}
+html[data-theme="black"] body #page-content hr,html[data-theme="black"] body #page-content .divider {
+  border-color:#292929 !important;background-color:#292929 !important;
+}
+html[data-theme="black"] body .app-modal,html[data-theme="black"] body .modal-content {
+  color:#ffffff !important;background:#080808 !important;border-color:#292929 !important;
+}
+html[data-theme="black"] body #page-content .ct-settings-theme-option {color:#ffffff !important;background:#0b0b0b !important;border-color:#333333 !important}
+html[data-theme="black"] body #page-content .ct-settings-theme-option.is-selected {border-color:#ffffff !important;background:#202020 !important}
