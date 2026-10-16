@@ -98,11 +98,11 @@ const smsTest=btn("Send test SMS to my saved number","ct-settings-button",async(
  finally{smsTest.disabled=false;smsStatus.hidden=false}
 });
 smsActions.append(smsSave,smsTest);smsCard.appendChild(smsActions);
-const info=card("Provider readiness","Configuration status only confirms that server environment variables are present. It does not mean your account is connected or that assignment notifications are running.","ⓘ");
+const syncInfo=card("Provider readiness","Configuration status only confirms that server environment variables are present. It does not mean your account is connected or that assignment notifications are running.","ⓘ");
 const providerList=el("div","ct-settings-integration-list");
 [[ "Google Calendar","OAuth connection and task event sync are not implemented yet." ],["Microsoft Outlook Calendar","OAuth connection and task event sync are not implemented yet."],["SMS via Twilio","A test SMS can be sent when backend credentials and your saved phone number are valid. Automatic assignment SMS is not implemented yet."]].forEach(([name,desc])=>{const row=el("div","ct-settings-integration-row"),body=el("div");body.append(el("strong","",name),el("p","ct-settings-muted",desc));row.appendChild(body);providerList.appendChild(row)});
-info.appendChild(providerList);
-p.integrations.append(providerCard,smsCard,info);
+syncInfo.appendChild(providerList);
+p.integrations.append(providerCard,smsCard,syncInfo);
 (async()=>{
  try{
   const result=await API.get("integrations/sync-settings"),settings=result.settings||{},providers=result.providers||{};
