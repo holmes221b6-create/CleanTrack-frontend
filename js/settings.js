@@ -62,8 +62,64 @@ p.appearance.appendChild(ac);
 const rv=pr.reports||{},fmt=sel([["csv","CSV"],["xlsx","Excel (.xlsx)"],["pdf","PDF"]],rv.exportFormat||"csv","exportFormat"),range=sel([["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["365","Last 12 months"]],rv.dateRange||"30","dateRange"),dateFormat=sel([["iso","ISO (YYYY-MM-DD)"],["day-first","Day first (DD/MM/YYYY)"],["month-first","Month first (MM/DD/YYYY)"]],rv.dateFormat||"iso","dateFormat"),arch=chk("Include archived records by default where permitted",rv.includeArchived,"includeArchived");
 p.data.appendChild(formcard("Data and report defaults","These choices set personal defaults; they do not generate or export reports by themselves.","▤",[fld("Default export format",fmt),fld("Report date range",range),fld("Export date format",dateFormat),arch.wrap],async()=>{PREF.update({reports:{exportFormat:fmt.value,dateRange:range.value,dateFormat:dateFormat.value,includeArchived:arch.input.checked}});try{await PREF.sync()}catch(e){throw Error("Report defaults changed locally, but the account save failed: "+e.message)}},"Save data preferences"));
 p.data.appendChild(card("Formatting","Shared helpers are available for localized date, time and currency. Individual pages must use these helpers to reflect selections in all output.","◷"));
-// INTEGRATIONS
-const integrations=card("Integrations","These are reserved for future configuration. No external provider is connected by these controls.","⌘");[["WhatsApp","Messages and alerts"],["Email service","Delivery provider"],["Maps","Location and mapping"],["Third-party tools","Future integrations"],["API access","Keys and webhooks"]].forEach(([x,y])=>{const r=el("div","ct-settings-integration-row"),t=el("div");t.append(el("strong","",x),el("p","ct-settings-muted",y));r.append(t,el("span","ct-settings-tag","Not connected"));integrations.appendChild(r)});p.integrations.appendChild(integrations);
+// INTEGRATIONS & PERSONAL SYNC
+const integrations=card("Sync & Integrations","Choose how CleanTrack can reach you. These settings are personal to your account; provider connections and delivery are shown separately.", "⌘");
+const statusLine=(text,kind)=>{const n=el("p","ct-settings-status"+(kind?" is-"+kind:""),text);n.setAttribute("role","status");return n};
+const providerCard=card("Calendar Sync","Prepare personal calendar preferences for Google Calendar or Microsoft Outlook. OAuth and automatic task-to-event synchronization still require provider connection work.", "▦");
+const calEnabled=chk("Enable calendar sync for my account",false,"calendarEnabled");
+const calProvider=sel([["google","Google Calendar"],["outlook","Microsoft Outlook Calendar"]],"google","calendarProvider");
+const calMode=sel([["confirm","Ask before adding each assignment"],["automatic","Automatically add eligible assignments"]],"confirm","calendarMode");
+const calReminder=sel([["0","No reminder"],["5","5 minutes before"],["10","10 minutes before"],["15","15 minutes before"],["30","30 minutes before"],["60","1 hour before"]],"15","calendarReminder");
+const calStatus=statusLine("Checking provider configuration…");
+providerCard.append(calEnabled.wrap,fld("Preferred calendar",calProvider),fld("When assigned a task",calMode),fld("Calendar reminder",calReminder),calStatus);
+const calSave=btn("Save calendar preferences","ct-settings-button ct-settings-button-primary",async()=>{
+ calSave.disabled=true;try{const result=await API.patch("integrations/sync-settings",{calendar:{enabled:calEnabled.input.checked,provider:calProvider.value,mode:calMode.value,reminderMinutes:Number(calReminder.value)}});calStatus.textContent="Preferences saved to your CleanTrack account. Calendar authorization and live event sync are not yet implemented.";calStatus.className="ct-settings-status is-success";calStatus.hidden=false;}catch(e){calStatus.textContent=e.message||"Unable to save calendar preferences.";calStatus.className="ct-settings-status is-error";calStatus.hidden=false;}finally{calSave.disabled=false}
+});
+providerCard.appendChild(calSave);
+const smsCard=card("SMS Sync","Send task notifications to the phone number saved in your CleanTrack Account settings. SMS delivery requires Twilio credentials on the backend.", "✉");
+const smsEnabled=chk("Enable SMS notification preference",false,"smsEnabled");
+const smsEvents=[
+ chk("When a task is assigned to me",true,"assigned"),
+ chk("When my task changes or is reassigned",true,"changed"),
+ chk("When a task becomes overdue",true,"overdue"),
+ chk("When a task is cancelled",false,"cancelled")
+];
+const smsEventList=el("div","ct-settings-check-list");smsEvents.forEach(x=>smsEventList.appendChild(x.wrap));
+const smsStatus=statusLine("Checking SMS provider configuration…");
+smsCard.append(smsEnabled.wrap,el("p","ct-settings-muted","Phone number is taken from Account settings. Test messages go only to your own registered number."),smsEventList,smsStatus);
+const smsActions=el("div","ct-settings-actions");
+const smsSave=btn("Save SMS preferences","ct-settings-button ct-settings-button-primary",async()=>{
+ smsSave.disabled=true;try{await API.patch("integrations/sync-settings",{sms:{enabled:smsEnabled.input.checked,events:Object.fromEntries(smsEvents.map(x=>[x.input.name,x.input.checked]))}});smsStatus.textContent="SMS preferences saved to your CleanTrack account. Assignment-triggered SMS delivery is not yet enabled.";smsStatus.className="ct-settings-status is-success";smsStatus.hidden=false;}catch(e){smsStatus.textContent=e.message||"Unable to save SMS preferences.";smsStatus.className="ct-settings-status is-error";smsStatus.hidden=false;}finally{smsSave.disabled=false}
+});
+const smsTest=btn("Send test SMS to my saved number","ct-settings-button",async()=>{
+ smsTest.disabled=true;smsStatus.textContent="Sending test message…";smsStatus.className="ct-settings-status";smsStatus.hidden=false;
+ try{const result=await API.post("integrations/sms/test",{});smsStatus.textContent=result.message||"Test SMS accepted by the provider.";smsStatus.className="ct-settings-status is-success";}
+ catch(e){smsStatus.textContent=e.message||"SMS test failed. Check provider configuration and your saved phone number.";smsStatus.className="ct-settings-status is-error";}
+ finally{smsTest.disabled=false;smsStatus.hidden=false}
+});
+smsActions.append(smsSave,smsTest);smsCard.appendChild(smsActions);
+const info=card("Provider readiness","Configuration status only confirms that server environment variables are present. It does not mean your account is connected or that assignment notifications are running.","ⓘ");
+const providerList=el("div","ct-settings-integration-list");
+[[ "Google Calendar","OAuth connection and task event sync are not implemented yet." ],["Microsoft Outlook Calendar","OAuth connection and task event sync are not implemented yet."],["SMS via Twilio","A test SMS can be sent when backend credentials and your saved phone number are valid. Automatic assignment SMS is not implemented yet."]].forEach(([name,desc])=>{const row=el("div","ct-settings-integration-row"),body=el("div");body.append(el("strong","",name),el("p","ct-settings-muted",desc));row.appendChild(body);providerList.appendChild(row)});
+info.appendChild(providerList);
+p.integrations.append(providerCard,smsCard,info);
+(async()=>{
+ try{
+  const result=await API.get("integrations/sync-settings"),settings=result.settings||{},providers=result.providers||{};
+  const cal=settings.calendar||{},sms=settings.sms||{};
+  calEnabled.input.checked=!!cal.enabled;calProvider.value=cal.provider==="outlook"?"outlook":"google";calMode.value=cal.mode==="automatic"?"automatic":"confirm";calReminder.value=String([0,5,10,15,30,60].includes(Number(cal.reminderMinutes))?Number(cal.reminderMinutes):15);
+  smsEnabled.input.checked=!!sms.enabled;
+  smsEvents.forEach(x=>{x.input.checked=!!((sms.events||{})[x.input.name])});
+  const gp=providers.googleCalendar||{},op=providers.outlookCalendar||{},tw=providers.sms||{};
+  calStatus.textContent="Google OAuth credentials: "+(gp.configured?"present":"missing")+"; Outlook OAuth credentials: "+(op.configured?"present":"missing")+". Calendar account authorization and event synchronization are still pending.";
+  smsStatus.textContent=tw.configured?"Twilio credentials are present. Test SMS is available; automatic assignment notifications are not yet wired up.":"Twilio is not configured on the backend. Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_FROM_NUMBER to enable test SMS.";
+  calStatus.className="ct-settings-status";smsStatus.className="ct-settings-status";calStatus.hidden=smsStatus.hidden=false;
+ }catch(e){
+  calStatus.textContent="Cannot load sync settings from backend: "+(e.message||"connection failed");calStatus.className="ct-settings-status is-error";calStatus.hidden=false;
+  smsStatus.textContent="Cannot load SMS status from backend: "+(e.message||"connection failed");smsStatus.className="ct-settings-status is-error";smsStatus.hidden=false;
+ }
+})();
+
 // BUILDING-LEVEL PLACE DIRECTORY
 if(window.CleanTrackBuildingPlaces)window.CleanTrackBuildingPlaces.render(p.places);
 // HELP
