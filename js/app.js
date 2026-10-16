@@ -359,6 +359,17 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
+    if (pageId === "reviews" && String(user?.role || "").toLowerCase() === "admin") {
+      if (window.CleanTrackLogs && typeof window.CleanTrackLogs.render === "function") {
+        await window.CleanTrackLogs.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Logs could not load. Refresh the page and try again."
+        }));
+      }
+      return;
+    }
+
     if (pageId === "audit") {
       if (window.CleanTrackAuditTrail && typeof window.CleanTrackAuditTrail.render === "function") {
         await window.CleanTrackAuditTrail.render(pageContent);
