@@ -43,7 +43,6 @@
       { id: "sites", label: "Sites and Zones", icon: "⌖" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
-      { id: "reports", label: "Reports", icon: "▤" },
       { id: "team-pulse", label: "Team Pulse", icon: "♡" },
       { id: "skills", label: "Skills and Eligibility", icon: "★" },
       { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" },
