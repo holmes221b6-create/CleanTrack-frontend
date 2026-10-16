@@ -334,3 +334,48 @@ html:not([data-theme="light"]) body .app-modal .modal-header,
 html:not([data-theme="light"]) body .app-modal .modal-footer {
   border-color: #292c36 !important;
 }
+
+
+/* Announcements page canvas: match Home's charcoal workspace, not the legacy navy canvas.
+   Scoped to this route so the rest of the app keeps its own component layout. */
+html:not([data-theme="light"]) body #workspace-view:has(#page-content .ct-ann-page),
+html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) .ct-workspace-shell,
+html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) .ct-workspace-main,
+html:not([data-theme="light"]) body #workspace-view:has(.ct-ann-page) #page-content,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page),
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-page {
+  color: #e9e7ef !important;
+  background-color: #0f1219 !important;
+  background-image: none !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-page {
+  border-color: transparent !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-card,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-compose-card,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-empty,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-metric,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-team-groups,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-team-group {
+  color: #e9e7ef !important;
+  background: #10141c !important;
+  border-color: #292c36 !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-control,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-compose-options {
+  color: #e9e7ef !important;
+  background: #0b0f14 !important;
+  border-color: #302d3b !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-button,
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-icon-button {
+  color: #dcd8e7 !important;
+  background: #151720 !important;
+  border-color: #373142 !important;
+}
+html:not([data-theme="light"]) body #page-content:has(.ct-ann-page) .ct-ann-button-primary {
+  color: #c6f5e4 !important;
+  background: #15332f !important;
+  border-color: #3a705f !important;
+}
