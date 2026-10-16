@@ -149,6 +149,14 @@
       label.textContent = item.label;
 
       button.append(icon, label);
+      if (item.id === "announcements") {
+        const badge = document.createElement("span");
+        badge.className = "nav-unread-count";
+        badge.dataset.unreadBadge = "announcements";
+        badge.hidden = true;
+        badge.setAttribute("aria-label", "Unread announcements");
+        button.appendChild(badge);
+      }
 
       button.addEventListener("click", function () {
         setActivePage(item.id);
@@ -184,6 +192,14 @@
     setActivePage: setActivePage,
     getActivePage: getActivePage,
     getDefaultPage: getDefaultPage,
-    renderMenu: renderMenu
+    renderMenu: renderMenu,
+    setAnnouncementUnreadCount: function (count) {
+      const value = Math.max(0, Number(count) || 0);
+      document.querySelectorAll('[data-unread-badge="announcements"]').forEach(function (badge) {
+        badge.textContent = value > 99 ? "99+" : String(value);
+        badge.hidden = value <= 0;
+        badge.setAttribute("aria-label", value + " unread announcements");
+      });
+    }
   });
 })();
