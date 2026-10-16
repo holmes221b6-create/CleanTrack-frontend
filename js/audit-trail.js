@@ -21,8 +21,15 @@
     return node;
   };
   function localYmd(date) {
-    const d = new Date(date);
-    return [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+    const timeZone = window.CleanTrackPreferences?.get()?.timeZone;
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+      const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+      return values.year + "-" + values.month + "-" + values.day;
+    } catch (_) {
+      const d = new Date(date);
+      return [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+    }
   }
   function addOptions(control, options, chosen) {
     options.forEach(([value, label]) => {
@@ -90,10 +97,11 @@
       toolbar.reset(); category.value = ""; outcome.value = ""; from.value = ""; to.value = ""; search.value = ""; state.offset = 0; load();
     });
     const exportFormat = el("select", "ct-audit-input");
-    addOptions(exportFormat, [["csv","Export CSV"],["json","Export JSON"]], "csv");
+    const preferredExport = window.CleanTrackPreferences?.get()?.reports?.exportFormat;
+    addOptions(exportFormat, [["csv","Export CSV"],["json","Export JSON"]], preferredExport === "json" ? "json" : "csv");
     const exportButton = button("Export filtered records", "ct-audit-button ct-audit-button-primary", exportRecords);
     const filterActions = el("div", "ct-audit-filter-actions"); filterActions.append(submit, clear);
-    const exportGroup = el("div", "ct-audit-export-group"); exportGroup.append(exportFormat, exportButton);
+    const exportGroup = el("div", "ct-audit-export-group"); exportGroup.append(exportFormat, exportButton, el("small", "ct-audit-export-note", "Audit exports support CSV and JSON. If your preferred format is not supported here, CSV is used."));
     toolbar.append(filtersTop, filterActions);
     const topLine = el("div", "ct-audit-list-head");
     const counter = el("p", "ct-audit-muted", "Loading records…");
@@ -171,14 +179,16 @@
         const actorOptions=[["","All actors"],...(Array.isArray(data.actors)?data.actors.map(item=>[String(item.id),item.label+(item.role?" · "+item.role:"")]):[])];
         actor.replaceChildren(); addOptions(actor,actorOptions,actorOptions.some(item=>item[0]===selectedActor)?selectedActor:"");
         renderRows(state.entries);
-        counter.textContent=state.total+" record"+(state.total===1?"":"s")+" in your permitted seven-day window";
+        const prefs = window.CleanTrackPreferences;
+        const translate = (value) => prefs ? prefs.translate(value) : value;
+        counter.textContent=state.total+" "+translate(state.total===1?"record":"records")+" "+translate("in your permitted seven-day window");
         const start=state.total?state.offset+1:0;const end=Math.min(state.offset+state.entries.length,state.total);
-        pageLabel.textContent=state.total?("Showing "+start+"–"+end+" of "+state.total):"No records";
+        pageLabel.textContent=state.total?(translate("Showing")+" "+start+"–"+end+" "+translate("of")+" "+state.total):translate("No records");
         prev.disabled=state.offset===0;next.disabled=state.offset+PAGE_SIZE>=state.total;
         exportButton.disabled=state.total===0;
       } catch(error) {
         state.entries=[];state.total=0;renderRows([]);
-        counter.textContent="Could not load audit records";statusMessage(error.message||"Audit Trail could not be loaded.",true);
+        counter.textContent=window.CleanTrackPreferences?.translate("Could not load audit records")||"Could not load audit records";statusMessage(error.message||"Audit Trail could not be loaded.",true);
         prev.disabled=true;next.disabled=true;exportButton.disabled=true;pageLabel.textContent="—";
       } finally {state.loading=false;submit.disabled=false;refresh.disabled=false;}
     }
