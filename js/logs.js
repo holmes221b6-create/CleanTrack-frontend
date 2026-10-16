@@ -20,8 +20,8 @@
     if (hours < 24) return hours + "h " + remain + "m";
     return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
   };
-  const statusKey = row => norm(row.status);
-  const statusLabel = row => ({submitted:"Awaiting review",completed:"Approved",approved:"Approved",rejected:"Rejected"}[statusKey(row)] || row.status || "Unknown");
+  const statusKey = row => { const raw = norm(row.status); return raw === "completed" && row.reviewed_at ? "approved" : raw; };
+  const statusLabel = row => ({submitted:"Awaiting review",completed:"Completed",approved:"Approved",rejected:"Rejected"}[statusKey(row)] || row.status || "Unknown");
   const isSubmitted = row => statusKey(row) === "submitted";
   const formatBytes = bytes => !bytes ? "" : bytes < 1024*1024 ? Math.ceil(bytes/1024)+" KB" : (bytes/1024/1024).toFixed(1)+" MB";
   const create = (tag, cls, text) => {
@@ -54,7 +54,7 @@
     searchWrap.append(searchIcon,search);
     const filter = create("select","ct-logs-status-filter");
     filter.setAttribute("aria-label","Filter logs by status");
-    [["all","All logs"],["submitted","Awaiting review"],["completed","Approved"],["rejected","Rejected"]].forEach(([value,label])=>filter.add(new Option(label,value)));
+    [["all","All logs"],["submitted","Awaiting review"],["completed","Completed"],["approved","Approved"],["rejected","Rejected"]].forEach(([value,label])=>filter.add(new Option(label,value)));
     toolbar.append(searchWrap,filter);
     root.appendChild(toolbar);
 
@@ -81,7 +81,7 @@
       const st = filter.value;
       const shown = records.filter(row => {
         const searchable = [row.title,row.created_by_name,row.assigned_to_name,row.status,row.task_type,row.review_feedback].map(norm).join(" ");
-        return (!q || searchable.includes(q)) && (st === "all" || statusKey(row) === st || (st === "completed" && statusKey(row) === "approved"));
+        return (!q || searchable.includes(q)) && (st === "all" || statusKey(row) === st);
       });
       resultLine.replaceChildren();
       const count = create("span","ct-logs-count",shown.length+" "+(shown.length===1?"log":"logs"));
