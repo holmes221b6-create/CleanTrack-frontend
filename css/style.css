@@ -1521,3 +1521,15 @@ display: none !important;
   .admin-dashboard-grid { grid-template-columns: minmax(0, 1fr); }
   .admin-dashboard-card { padding: 17px; }
 }
+
+
+/* Messaging-app style unread counter attached to the notification bell. */
+#notifications-button { position: relative; }
+#notifications-button .notification-count {
+  position: absolute; top: -5px; right: -5px; z-index: 2;
+  min-width: 19px; height: 19px; padding: 0 5px;
+  border: 2px solid var(--bg, #0b1020); border-radius: 999px;
+  background: #ef4444; color: #fff; font-size: 11px; font-weight: 800;
+  line-height: 15px; text-align: center; box-shadow: 0 1px 4px rgb(0 0 0 / 24%);
+}
+#notifications-button .notification-count[hidden] { display: none !important; }
