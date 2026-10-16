@@ -185,6 +185,33 @@
     function statusMessage(message, error=false) {
       status.textContent=message; status.hidden=!message; status.className="ct-audit-status"+(error?" is-error":"");
     }
+    function openAuditDetails(entry) {
+      const overlay = el("div", "ct-audit-modal-backdrop");
+      overlay.setAttribute("role", "presentation");
+      const dialog = el("section", "ct-audit-modal");
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "true");
+      dialog.setAttribute("aria-label", "Audit record details");
+      const header = el("div", "ct-audit-modal-header");
+      header.appendChild(el("h2", "", "Audit record details"));
+      const close = button("Close", "ct-audit-button", () => overlay.remove());
+      header.appendChild(close);
+      dialog.appendChild(header);
+      [["Before",entry.before],["After",entry.after],["Additional context",entry.details]].forEach(([label,value]) => {
+        const group = el("section", "ct-audit-detail-block");
+        group.appendChild(el("strong", "", label));
+        group.appendChild(el("pre", "", safeJson(value)));
+        dialog.appendChild(group);
+      });
+      overlay.appendChild(dialog);
+      overlay.addEventListener("click", event => { if (event.target === overlay) overlay.remove(); });
+      document.addEventListener("keydown", function onEscape(event) {
+        if (event.key === "Escape") { overlay.remove(); document.removeEventListener("keydown", onEscape); }
+      });
+      document.body.appendChild(overlay);
+      close.focus();
+    }
+
     function renderRows(entries) {
       tbody.replaceChildren();
       if (!entries.length) {
@@ -206,13 +233,9 @@
         tr.appendChild(resourceCell);
         const outcomeCell=el("td","");const outcomeBadge=el("span","ct-audit-outcome",entry.outcome||"Recorded");
         outcomeBadge.classList.add("outcome-"+String(entry.outcome||"recorded").toLowerCase().replace(/[^a-z0-9]+/g,"-"));outcomeCell.appendChild(outcomeBadge);tr.appendChild(outcomeCell);
-        const detailsCell=el("td","");const view=el("details","ct-audit-details");const summary=el("summary","","View details");
-        view.appendChild(summary);
-        const detailGrid=el("div","ct-audit-detail-grid");
-        [["Before",entry.before],["After",entry.after],["Additional context",entry.details]].forEach(([label,value])=>{
-          const group=el("section","ct-audit-detail-block");group.appendChild(el("strong","",label));group.appendChild(el("pre","",safeJson(value)));detailGrid.appendChild(group);
-        });
-        view.appendChild(detailGrid);detailsCell.appendChild(view);tr.appendChild(detailsCell);tbody.appendChild(tr);
+        const detailsCell=el("td","");
+        const view=button("View details","ct-audit-button ct-audit-view-details",()=>openAuditDetails(entry));
+        detailsCell.appendChild(view);tr.appendChild(detailsCell);tbody.appendChild(tr);
       });
     }
     async function load() {
