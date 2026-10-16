@@ -967,3 +967,8 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
     height: 27px !important;
   }
 }
+
+/* Clear, role-scoped execution controls in the operations queue. */
+.ct-op-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;min-width:0}
+.ct-op-row-actions .ct-op-button{white-space:nowrap}
+@media(max-width:740px){.ct-op-row-actions{grid-column:2;grid-row:1/4;align-items:stretch;flex-direction:column}.ct-op-row-actions .ct-op-button{width:100%}}
