@@ -299,3 +299,18 @@ html:not([data-theme="light"]) body #page-content .ct-ann-page select:focus-visi
 html:not([data-theme="light"]) body #page-content .ct-ann-page textarea:focus-visible {
   outline-color: #8878bb;
 }
+
+
+/* Voice-over and microphone recording controls */
+.ct-ann-recorder,.ct-ann-speech-settings{display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:13px;border:1px solid var(--border,#29374d);border-radius:12px;background:var(--surface,#141e31)}
+.ct-ann-recorder .ct-ann-muted,.ct-ann-speech-settings .ct-ann-muted{flex-basis:100%;margin:0}
+.ct-ann-recorder audio{flex-basis:100%;width:100%;max-width:520px}
+.ct-ann-speech-settings .ct-ann-field{flex:1 1 190px;min-width:0}
+.ct-ann-voice-player{display:inline-flex;align-items:center;flex-wrap:wrap;gap:8px}
+.ct-ann-voice-player audio{display:block;max-width:100%;width:260px}
+.ct-ann-voice-status{margin:12px 0}
+@media(max-width:640px){
+ .ct-ann-recorder,.ct-ann-speech-settings{align-items:stretch}
+ .ct-ann-recorder .ct-ann-button,.ct-ann-speech-settings .ct-ann-button{width:100%}
+ .ct-ann-voice-player audio{width:100%}
+}
