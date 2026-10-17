@@ -73,6 +73,38 @@
     }
   }
 
+  function applyOrganizationIdentity(organization) {
+    if (!organization || typeof organization !== "object") return;
+    const normalized = {
+      id: organization.id ?? null,
+      name: String(organization.name || "").trim(),
+      description: String(organization.description || ""),
+      avatar_url: String(organization.avatar_url || ""),
+      contact_email: String(organization.contact_email || ""),
+      status: String(organization.status || "active")
+    };
+    window.CleanTrackOrganization = Object.freeze(normalized);
+    const user = auth.getCurrentUser && auth.getCurrentUser();
+    if (user) {
+      user.organization_name = normalized.name;
+      user.organizationName = normalized.name;
+      user.organization = { ...(user.organization && typeof user.organization === "object" ? user.organization : {}), ...normalized };
+    }
+    const label = getElement("workspace-organization");
+    if (label && normalized.name) label.textContent = normalized.name;
+    document.dispatchEvent(new CustomEvent("cleantrack:organization-updated", { detail: normalized }));
+  }
+  async function loadOrganizationIdentity() {
+    if (!window.CleanTrackApi || !auth.getCurrentUser || !auth.getCurrentUser()) return;
+    try {
+      const response = await window.CleanTrackApi.get("organizations/my-profile");
+      if (response && response.organization) applyOrganizationIdentity(response.organization);
+    } catch (error) {
+      console.warn("Organization details could not be refreshed:", error.message || error);
+    }
+  }
+  window.CleanTrackOrganizationContext = Object.freeze({ apply: applyOrganizationIdentity, refresh: loadOrganizationIdentity });
+
   function showAuthenticatedLayout(user) {
     setVisible(getElement("auth-view"), false);
     setVisible(getElement("workspace-view"), true);
@@ -116,6 +148,7 @@
           ? organization.trim()
           : "Organization";
     }
+    loadOrganizationIdentity();
 
     if (menuElement) {
       navigation.renderMenu(menuElement);
