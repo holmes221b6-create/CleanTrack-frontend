@@ -639,3 +639,40 @@ html[data-theme="black"] body canvas,
 html[data-theme="black"] body iframe {
   background-color: #000000 !important;
 }
+
+
+/* Reports page: neutral charcoal surfaces. The previous default-theme-only selector
+   did not match all active theme attribute values, leaving the global blue page surface visible. */
+html:not([data-theme="black"]) body #page-content:has(.ct-reports),
+html:not([data-theme="black"]) body #workspace-view #page-content:has(.ct-reports) {
+  background: #191919 !important;
+  background-color: #191919 !important;
+  background-image: none !important;
+}
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-steps {
+  background: #191919 !important;
+  background-color: #191919 !important;
+  background-image: none !important;
+}
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-panel,
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-kpi,
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-table-wrap {
+  background: #202020 !important;
+  background-color: #202020 !important;
+  background-image: none !important;
+  border-color: #3b3b3b !important;
+}
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-step,
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-step b,
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-btn,
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-table th {
+  background: #292929 !important;
+  background-color: #292929 !important;
+  background-image: none !important;
+  border-color: #454545 !important;
+}
+html:not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-hero {
+  background: linear-gradient(135deg, #242424, #191919) !important;
+  background-color: #191919 !important;
+  border-color: #3b3b3b !important;
+}
