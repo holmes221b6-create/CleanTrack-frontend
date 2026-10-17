@@ -610,3 +610,10 @@ html[data-theme="light"] .ct-settings-check { color: #172536; }
   .ct-settings-integration-row { align-items: flex-start; flex-direction: column; }
   .ct-settings-nav-item { white-space: nowrap; }
 }
+
+/* Saved organization profile summary; editing is opt-in. */
+#page-content .ct-org-profile-summary { display:grid; justify-items:start; gap:10px; padding:16px; border:1px solid var(--ct-border, rgba(255,255,255,.12)); border-radius:12px; background:var(--ct-surface, rgba(255,255,255,.025)); }
+#page-content .ct-org-profile-summary h3, #page-content .ct-org-profile-summary p { margin:0; }
+#page-content .ct-org-profile-summary h3 { color:var(--ct-text, inherit); font-size:17px; }
+#page-content .ct-org-profile-summary[hidden], #page-content .ct-org-form[hidden] { display:none !important; }
+#page-content .ct-org-summary-logo { width:72px; height:72px; object-fit:contain; border-radius:12px; }
