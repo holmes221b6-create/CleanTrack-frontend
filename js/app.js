@@ -92,6 +92,23 @@
     }
     const label = getElement("workspace-organization");
     if (label && normalized.name) label.textContent = normalized.name;
+    const brand = document.querySelector("#workspace-view .brand-mark");
+    if (brand) {
+      const mark = brand.querySelector("svg");
+      if (normalized.avatar_url) {
+        brand.style.backgroundImage = 'url("' + normalized.avatar_url.replaceAll('"', "%22") + '")';
+        brand.style.backgroundSize = "cover";
+        brand.style.backgroundPosition = "center";
+        if (mark) mark.hidden = true;
+        brand.setAttribute("aria-label", normalized.name + " logo");
+      } else {
+        brand.style.backgroundImage = "";
+        brand.style.backgroundSize = "";
+        brand.style.backgroundPosition = "";
+        if (mark) mark.hidden = false;
+        brand.removeAttribute("aria-label");
+      }
+    }
     document.dispatchEvent(new CustomEvent("cleantrack:organization-updated", { detail: normalized }));
   }
   async function loadOrganizationIdentity() {
