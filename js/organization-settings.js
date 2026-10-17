@@ -123,7 +123,28 @@
   function makeProfileCard(content) {
     const card = el("section", "ct-org-card");
     card.appendChild(cardHeading("◇", "Organization profile", "Edit the organization identity shown across CleanTrack. Changes are saved to the database and added to the audit trail."));
+    const summary = el("div", "ct-org-profile-summary");
+    summary.append(el("h3", "", organization.name || "Organization"));
+    summary.append(el("p", "ct-org-muted", organization.description || "No organization description has been added."));
+    summary.append(el("p", "ct-org-muted", organization.contact_email || "No organization contact email is configured."));
+    if (organization.avatar_url) {
+      const logo = el("img", "ct-org-summary-logo");
+      logo.src = organization.avatar_url;
+      logo.alt = (organization.name || "Organization") + " logo";
+      logo.addEventListener("error", () => logo.remove(), { once: true });
+      summary.prepend(logo);
+    }
     const form = el("form", "ct-org-form");
+    form.hidden = true;
+    const editButton = button("Edit organization details", "ct-org-button ct-org-button-primary", () => {
+      summary.hidden = true;
+      form.hidden = false;
+      const nameField = form.querySelector('[name="name"]');
+      if (nameField) nameField.focus();
+    });
+    if (organization.status === "archived") editButton.disabled = true;
+    summary.appendChild(editButton);
+    card.appendChild(summary);
     const profileTop = el("div", "ct-org-profile-top");
     const avatarWrap = el("div", "ct-org-avatar-preview");
     const avatarUrl = String(organization.avatar_url || "").trim();
@@ -174,6 +195,7 @@
       try {
         const result = await API.patch("organizations/current", data);
         organization = result.organization || organization;
+        if (window.CleanTrackOrganizationContext) window.CleanTrackOrganizationContext.apply(organization);
         status(msg, result.message || "Organization profile saved.", false);
         render(root);
       } catch (error) {
