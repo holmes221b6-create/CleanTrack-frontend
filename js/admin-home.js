@@ -351,6 +351,7 @@
           description: desc.value.trim()
         });
         currentOrganization = result.organization || null;
+        if (currentOrganization && window.CleanTrackOrganizationContext) window.CleanTrackOrganizationContext.apply(currentOrganization);
         await render(root);
       } catch (error) {
         status.textContent = error.message || "Unable to create the organization. Please try again.";
