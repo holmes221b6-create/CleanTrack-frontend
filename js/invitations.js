@@ -241,28 +241,40 @@
         item.appendChild(details);
 
         if (request.status === "pending") {
+          const approvalBox = el("div", "ct-inv-approval-email");
+          approvalBox.append(
+            el("h4", "", "Approval email to the new member"),
+            el("p", "ct-inv-muted", "Edit the message sent to " + (applicant.email || "the applicant") + ". Personalization placeholders: {name}, {organization}, {role}, {email}.")
+          );
+          const emailBody = el("textarea", "ct-inv-input ct-inv-approval-email-body");
+          emailBody.rows = 6;
+          emailBody.maxLength = 10000;
+          emailBody.setAttribute("aria-label", "Editable membership approval email");
+          emailBody.value = "Hello {name},\n\nGood news! Your request to join {organization} on CleanTrack has been approved. Your account is now active, and you can sign in using {email}.\n\nApproved role: {role}\nOrganization: {organization}\n\nWelcome aboard!\n{organization} Admin team";
+          approvalBox.appendChild(emailBody);
           const actions = el("div", "ct-inv-actions");
           actions.append(
-            button("Approve request", "ct-inv-button ct-inv-button--primary", async () => {
-              if (!confirm("Approve " + (applicant.full_name || applicant.email || "this applicant") + " as " + request.requested_role + "? Their account will become active.")) return;
-              await reviewRequest(page, request.id, "approve", "");
+            button("Approve & send email", "ct-inv-button ct-inv-button--primary", async () => {
+              if (!confirm("Approve " + (applicant.full_name || applicant.email || "this applicant") + " and email the approval message?")) return;
+              await reviewRequest(page, request.id, "approve", "", emailBody.value);
             }),
             button("Reject request", "ct-inv-button ct-inv-button--danger", async () => {
               const reason = prompt("Optional rejection reason (recorded in the audit trail):", "");
               if (reason === null) return;
-              await reviewRequest(page, request.id, "reject", reason.trim());
+              await reviewRequest(page, request.id, "reject", reason.trim(), "");
             })
           );
-          item.appendChild(actions);
+          approvalBox.appendChild(actions);
+          item.appendChild(approvalBox);
         }
         requestList.appendChild(item);
       });
     }
 
-    async function reviewRequest(root, id, decision, reviewMessage) {
+    async function reviewRequest(root, id, decision, reviewMessage, approvalEmailMessage) {
       try {
-        const result = await API.post("membership/requests/" + id + "/review", { decision, review_message: reviewMessage });
-        showMessage(root, result.message || "Membership request updated.", "success");
+        const result = await API.post("membership/requests/" + id + "/review", { decision, review_message: reviewMessage, approval_email_message: approvalEmailMessage || "" });
+        showMessage(root, result.message || "Membership request updated.", result.email_sent === false ? "error" : "success");
         await load(root, false);
       } catch (error) {
         showMessage(root, error.message || "Could not review membership request.", "error");
