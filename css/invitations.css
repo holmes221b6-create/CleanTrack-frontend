@@ -64,3 +64,10 @@
 .ct-notification-item p{margin:0;color:var(--text-secondary,#a9b8cc);overflow-wrap:anywhere}
 .ct-notification-item small{color:var(--text-muted,#7e90aa)}
 .ct-notification-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+
+/* Editable approval email within each pending membership request */
+.ct-inv-approval-email{display:grid;gap:10px;margin-top:14px;padding:15px;border:1px solid var(--border,#3b3b3b);border-radius:12px;background:var(--surface,#202020)}
+.ct-inv-approval-email h4{margin:0;color:var(--text-primary,#f3f4f6);font-size:.98rem}
+.ct-inv-approval-email p{margin:0}
+.ct-inv-approval-email-body{width:100%;min-height:150px;resize:vertical;padding:12px;border:1px solid var(--border,#454545);border-radius:9px;background:var(--surface-raised,#141414);color:var(--text-primary,#f3f4f6);font:inherit;line-height:1.55;white-space:pre-wrap}
+.ct-inv-approval-email-body:focus{outline:2px solid var(--primary,#777);outline-offset:1px}
