@@ -121,7 +121,6 @@ p.integrations.append(providerCard,smsCard,syncInfo);
 })();
 
 // BUILDING-LEVEL PLACE DIRECTORY
-if(window.CleanTrackBuildingPlaces)window.CleanTrackBuildingPlaces.render(p.places);
 // HELP
 const help=card("Help and support","Available published help resources.","?");[["Help Center","center"],["User/Admin guide","guide"],["Contact support","contact"],["Report a problem","problem"],["Feedback","feedback"]].forEach(([label,id])=>help.appendChild(btn(label,"ct-settings-button",()=>{const target=document.querySelector('[data-help-action="'+id+'"]');if(target)target.click();else alert("No support destination is configured yet. No message was sent.")})));p.help.appendChild(help);
 // LEGAL
