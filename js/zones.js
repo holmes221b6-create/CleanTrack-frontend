@@ -27,7 +27,7 @@ if(!name)name="Zone "+(index+1);
 const base=name;
 let suffix=2;
 while(usedNames.has(name.toLocaleLowerCase())){
-const ending=" ("+suffix+++ ")";
+const ending=" ("+(suffix++)+")";
 name=base.slice(0,150-ending.length)+ending;
 }
 usedNames.add(name.toLocaleLowerCase());
