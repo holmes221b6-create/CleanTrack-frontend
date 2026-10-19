@@ -3,7 +3,7 @@
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
 const LANGS=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
 const CURS="USD EUR GBP INR CNY JPY KRW AED SAR QAR KWD BHD OMR JOD SGD AUD CAD CHF NZD HKD TWD THB IDR MYR PHP VND BDT PKR LKR NPR ZAR NGN KES EGP TRY BRL MXN ARS CLP COP PEN UYU DOP PLN CZK HUF RON SEK NOK DKK ISK RUB ILS UAH MAD GHS UGX TZS ETB KZT MUR".split(" ");
-const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["places","Location & Places","⌖"],["actions","Account actions","↗"]];
+const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
 function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n}
 function btn(x,c,fn){const n=el("button",c||"ct-settings-button",x);n.type="button";n.addEventListener("click",fn);return n}
 function fld(x,n,h){const w=el("label","ct-settings-field");w.append(el("span","",x),n);if(h)w.appendChild(el("small","ct-settings-muted",h));return w}
