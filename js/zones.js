@@ -35,7 +35,7 @@ async function handleZonePackageFile(event){
 const file=event.target.files?.[0];if(!file)return;
 try{
 const ext=file.name.toLowerCase().split(".").pop();
-if(["pdf","png","jpg","jpeg","webp"].includes(ext))throw Error("A PDF or image is a floor plan, not zone geometry. Open Locations, select the saved Location, and use “Upload / replace floor plan” there. No Location ID is needed.");
+if(["pdf","png","jpg","jpeg","webp"].includes(ext)){if(!locations.length)throw Error("Create a Location first. Then choose its floor plan file again.");const options=locations.map((x,i)=>(i+1)+". "+x.name+(x.address?" — "+x.address:"")).join("\n");const answer=prompt("Attach this floor plan to which saved Location? Enter its list number, not its ID:\n\n"+options);if(answer===null)throw Error("Floor-plan upload cancelled.");const n=Number(answer.trim());if(!Number.isInteger(n)||n<1||n>locations.length)throw Error("Enter a valid number from the Location list.");const target=locations[n-1];if(file.size<1||file.size>15*1024*1024)throw Error("Choose a non-empty floor plan no larger than 15 MB.");const form=new FormData();form.append("file",file);const result=await API.post("locations/"+encodeURIComponent(target.id)+"/floor-plan",form);notice((result.message||"Floor plan uploaded successfully.")+" Location: "+target.name,"success");return;}
 const pkg=await window.CleanTrackMapImport.parseFile(file,"zones");
 if(pkg.format!=="cleantrack-location-package")throw Error("This file does not contain a recognized zone dataset.");
 await importZonesPackage(pkg);
