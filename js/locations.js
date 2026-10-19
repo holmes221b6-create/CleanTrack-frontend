@@ -440,8 +440,8 @@
         const options=locations.map(x=>x.id+" — "+x.name).join("\n");
         const chosen=prompt("Enter the ID of the existing Location to receive these Zones:\n"+options);
         if(!chosen)throw new Error("Import cancelled. No records were saved.");
-        locationId=Number(chosen);
-        if(!Number.isInteger(locationId)||!locations.some(x=>Number(x.id)===locationId))throw new Error("That Location ID was not found in the current organization. No records were saved.");
+        locationId=String(chosen).trim();
+        if(!locations.some(x=>String(x.id)===locationId))throw new Error("That Location ID was not found in the current organization. No records were saved.");
         mode="existing_location";
       }
     }
