@@ -19,14 +19,14 @@ async function importZonesPackage(pkg){
 const preview=await API.post("locations/import-package/preview",pkg);
 const items=preview.zones||[];
 if(!items.length){notice("This package contains no Zones to import.","warning");return;}
-const options=locations.filter(x=>String(x.status||"active")==="active").map(x=>x.id+" — "+x.name).join("\\n");
+const options=locations.filter(x=>String(x.status||"active")==="active").map(x=>x.id+" — "+x.name).join("\n");
 if(!options)throw Error("Create or import a Location before importing Zones.");
-const raw=prompt("Package: "+(preview.location?.name||"Unnamed Location")+"\\nZones found: "+items.length+"\\n\\nEnter the ID of the existing Location that should contain these Zones:\\n"+options);
+const raw=prompt("Package: "+(preview.location?.name||"Unnamed Location")+"\nZones found: "+items.length+"\n\nEnter the ID of the existing Location that should contain these Zones:\n"+options);
 if(!raw)throw Error("Import cancelled. No records were saved.");
-const locationId=Number(raw);
-const target=locations.find(x=>Number(x.id)===locationId);
-if(!Number.isInteger(locationId)||!target)throw Error("That Location ID was not found in the current organization.");
-if(!confirm("Import "+items.length+" Zones into "+target.name+"?\\n\\nOnly names and boundaries present in the file will be imported. Existing duplicate Zone names will stop the whole import."))return;
+const locationId=String(raw).trim();
+const target=locations.find(x=>String(x.id)===locationId);
+if(!target)throw Error("That Location ID was not found in the current organization.");
+if(!confirm("Import "+items.length+" Zones into "+target.name+"?\n\nOnly names and boundaries present in the file will be imported. Existing duplicate Zone names will stop the whole import."))return;
 const result=await API.post("locations/import-package",{package:pkg,mode:"existing_location",location_id:locationId});
 notice(result.message||"Zones imported successfully.","success");
 await load();metrics();list();
