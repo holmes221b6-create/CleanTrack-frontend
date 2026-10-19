@@ -55,3 +55,7 @@
 .ct-settings-integration-list .ct-settings-integration-row{padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
 .ct-settings-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 .ct-settings-actions .ct-settings-button:disabled{opacity:.6;cursor:wait}
+
+/* Keep Location & Places out of the personal Settings interface. */
+.ct-settings-nav-item[data-settings-nav="places"],
+.ct-settings-panel[data-settings-panel="places"] { display: none !important; }
