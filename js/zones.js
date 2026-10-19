@@ -35,7 +35,7 @@ async function handleZonePackageFile(event){
 const file=event.target.files?.[0];if(!file)return;
 try{
 const ext=file.name.toLowerCase().split(".").pop();
-if(["pdf","png","jpg","jpeg","webp"].includes(ext)){if(!locations.length)throw Error("Create a Location before attaching its floor plan.");const options=locations.map(x=>String(x.id)+" — "+x.name).join("\n");const chosen=prompt("This is a floor-plan document/image, not zone geometry. Enter the ID of the Location to attach it to:\n\n"+options);if(!chosen)throw Error("Floor-plan upload cancelled.");const target=locations.find(x=>String(x.id)===String(chosen).trim());if(!target)throw Error("That Location ID was not found.");if(file.size<1||file.size>15*1024*1024)throw Error("Choose a non-empty floor plan no larger than 15 MB.");const form=new FormData();form.append("file",file);const result=await API.post("locations/"+encodeURIComponent(target.id)+"/floor-plan",form);notice((result.message||"Floor plan saved.")+" Location: "+target.name,"success");return;}
+if(["pdf","png","jpg","jpeg","webp"].includes(ext))throw Error("A PDF or image is a floor plan, not zone geometry. Open Locations, select the saved Location, and use “Upload / replace floor plan” there. No Location ID is needed.");
 const pkg=await window.CleanTrackMapImport.parseFile(file,"zones");
 if(pkg.format!=="cleantrack-location-package")throw Error("This file does not contain a recognized zone dataset.");
 await importZonesPackage(pkg);
