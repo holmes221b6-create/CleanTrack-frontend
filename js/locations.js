@@ -357,11 +357,45 @@
       }));
       searchResultsNode.append(row);
     });}catch(err){searchResultsNode.replaceChildren(el("p","ct-loc-notice error",err.message||"Address search failed. You can pin manually."));}finally{button.disabled=false;button.textContent="Browse location";}}
+  async function discoverAndDownloadZones(location){
+    if(!coords(location)){notice("This Location has no saved coordinates yet. Edit it and set its real latitude and longitude before discovering mapped indoor areas.","warning");return;}
+    const action=[...detailNode.querySelectorAll("button")].find(x=>x.textContent==="Discover & download zones");
+    if(action){action.disabled=true;action.textContent="Searching OpenStreetMap…";}
+    notice("Searching OpenStreetMap for explicitly mapped indoor areas near "+location.name+". Only mapped candidates will be included; no zones or boundaries will be invented.","info");
+    try{
+      const lat=Number(location.latitude),lon=Number(location.longitude);
+      const query='[out:json][timeout:25];(nwr(around:180,'+lat+','+lon+')["indoor"];nwr(around:180,'+lat+','+lon+')["room"];nwr(around:180,'+lat+','+lon+')["level"];);out tags geom;';
+      const response=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});
+      if(!response.ok)throw new Error("OpenStreetMap query failed (HTTP "+response.status+"). Please retry later.");
+      const data=await response.json(),seen=new Set(),zonesOut=[];
+      for(const item of (Array.isArray(data.elements)?data.elements:[])){
+        const tags=item.tags||{},indoor=tags.indoor||tags.room||tags.level;
+        if(!indoor)continue;
+        const name=String(tags.name||tags.ref||"").trim();
+        if(!name||seen.has(name.toLowerCase()))continue;
+        seen.add(name.toLowerCase());
+        let boundary=null;
+        if(item.type==="way"&&Array.isArray(item.geometry)&&item.geometry.length>=4){
+          const coordsOut=item.geometry.map(p=>[Number(p.lon),Number(p.lat)]);
+          const first=coordsOut[0],last=coordsOut[coordsOut.length-1];
+          if(first[0]===last[0]&&first[1]===last[1]&&coordsOut.every(p=>p.every(Number.isFinite)))boundary={type:"Polygon",coordinates:[coordsOut]};
+        }
+        zonesOut.push({name,floor:tags.level||null,floor_label:tags.level||null,type:tags.amenity||tags.room||tags.indoor||"other",description:"OpenStreetMap mapped indoor feature (OSM "+item.type+" "+item.id+").",boundary,source:{provider:"OpenStreetMap",element_type:item.type,element_id:item.id,tags}});
+      }
+      if(!zonesOut.length){notice("No named indoor zones were found in OpenStreetMap within 180 metres of this Location. This is not proof that the building has no zones. You can import a verified package or create zones manually; CleanTrack has not generated any fake records.","warning");return;}
+      const pkg={format:"cleantrack-location-package",version:1,source:{provider:"OpenStreetMap",url:"https://www.openstreetmap.org/copyright",retrieved_at:new Date().toISOString(),note:"Only named mapped indoor features returned by OpenStreetMap; coverage may be incomplete."},location:{name:location.name,address:location.address||"",description:location.description||"",latitude:lat,longitude:lon,team_id:location.team_id||null},zones:zonesOut};
+      const blob=new Blob([JSON.stringify(pkg,null,2)+"\n"],{type:"application/json;charset=utf-8"});
+      const url=URL.createObjectURL(blob),a=el("a");a.href=url;a.download=(String(location.name||"location").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"location")+"-zones-cleantrack-package.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      notice("Downloaded "+zonesOut.length+" mapped indoor candidate(s) for "+location.name+". "+zonesOut.filter(z=>z.boundary).length+" include closed mapped polygon boundaries. Review the source and preview the package before importing; OSM coverage can be incomplete.","success");
+    }catch(err){notice(err.message||"OpenStreetMap zone discovery failed. No records were imported or fabricated.","error");}
+    finally{if(action){action.disabled=false;action.textContent="Discover & download zones";}}
+  }
   async function showDetails(id,zoom){const x=locations.find(v=>String(v.id)===String(id));if(!x)return;if(locationFloorPlanUrl){URL.revokeObjectURL(locationFloorPlanUrl);locationFloorPlanUrl=null;}selectedId=x.id;if(zoom&&coords(x))toggleMapPanel(true);renderMapPins();renderDirectory();detailNode.hidden=false;detailNode.replaceChildren();if(zoom&&coords(x)&&map)map.setView([Number(x.latitude),Number(x.longitude)],Math.max(map.getZoom(),18));
     const head=el("div","ct-loc-section-head"),identity=el("div");identity.append(el("p","ct-loc-eyebrow","SAVED LOCATION"),el("h2","",x.name),el("p","ct-loc-muted",x.address||"Address not recorded"));const actions=el("div","ct-loc-detail-actions");
     if(coords(x))actions.append(btn("Building view","ct-loc-btn ct-loc-btn-primary",()=>focusBuilding(x)));
     if(coords(x))actions.append(btn("Satellite view","ct-loc-btn",()=>window.open("https://www.google.com/maps/@?api=1&map_action=map&center="+encodeURIComponent(x.latitude+","+x.longitude)+"&zoom=20&basemap=satellite","_blank","noopener")));
     if(coords(x))actions.append(btn("Directions","ct-loc-btn",()=>window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(x.latitude+","+x.longitude),"_blank","noopener")));
+    actions.append(btn("Discover & download zones","ct-loc-btn ct-loc-btn-primary",()=>discoverAndDownloadZones(x)));
     actions.append(btn("Edit","ct-loc-btn ct-loc-btn-primary",()=>editLocation(x.id)));
     if(x.status==="archived")actions.append(btn("Restore","ct-loc-btn",()=>changeStatus(x,"active")));else actions.append(btn("Archive","ct-loc-btn ct-loc-btn-danger",()=>archiveLocation(x)));
     head.append(identity,actions);detailNode.append(head);
