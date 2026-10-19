@@ -16,6 +16,24 @@ async function load(){const res=await Promise.allSettled([API.get("zones"),API.g
 function metrics(){const n=root.querySelector("[data-zone-metrics]");n.replaceChildren();const mapped=zones.filter(z=>z.boundary?.type==="Polygon"||z.has_indoor_boundary).length;[["All zones",zones.length,"Saved in this organization","⌖"],["Active",zones.filter(z=>st(z)==="active").length,"Available for new work","●"],["Inactive / archived",zones.filter(z=>st(z)==="inactive").length+" / "+zones.filter(z=>st(z)==="archived").length,"Status-based availability","◷"],["Mapped boundaries",mapped,"Saved polygon areas","⌗"]].forEach(([title,value,sub,ic])=>{const c=e("article","ct-zone-metric");c.append(e("span","ct-zone-metric-icon",ic),e("strong","",value),e("span","",title),e("small","",sub));n.append(c);});}
 async function render(container){if(mapCleanup){try{mapCleanup();}catch(_){}mapCleanup=null;}if(floorPlanUrl){URL.revokeObjectURL(floorPlanUrl);floorPlanUrl=null;}drawing=false;points=[];root=container;root.replaceChildren(e("p","ct-zone-muted","Loading zones from the organization database…"));q="";status="all";try{locFilter=sessionStorage.getItem("cleantrack.zoneLocationFilter")||"all";sessionStorage.removeItem("cleantrack.zoneLocationFilter");}catch(_){locFilter="all";}selected=null;try{await load();build();}catch(err){root.replaceChildren();const p=e("section","ct-zones-page");p.append(e("h1","","Zones"),e("p","ct-zone-notice error",err.message||"Zones could not load."),b("Retry","ct-zone-btn ct-zone-btn-primary",()=>render(container)));root.append(p);}}
 async function importZonesPackage(pkg){
+if(!Array.isArray(pkg?.zones))throw Error("This Zone Package must contain a zones array.");
+let shortenedNames=0;
+const usedNames=new Set();
+const safeZones=pkg.zones.map((zone,index)=>{
+const raw=String(zone?.name??"").replace(/\\s+/g," ").trim();
+let name=raw.slice(0,150);
+if(raw.length>150)shortenedNames++;
+if(!name)name="Zone "+(index+1);
+const base=name;
+let suffix=2;
+while(usedNames.has(name.toLocaleLowerCase())){
+const ending=" ("+suffix+++ ")";
+name=base.slice(0,150-ending.length)+ending;
+}
+usedNames.add(name.toLocaleLowerCase());
+return {...zone,name};
+});
+pkg={...pkg,zones:safeZones};
 const preview=await API.post("locations/import-package/preview",pkg);
 const items=preview.zones||[];
 if(!items.length){notice("This package contains no Zones to import.","warning");return;}
