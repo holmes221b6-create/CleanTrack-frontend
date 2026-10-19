@@ -20,7 +20,7 @@ if(!Array.isArray(pkg?.zones))throw Error("This Zone Package must contain a zone
 let shortenedNames=0;
 const usedNames=new Set();
 const safeZones=pkg.zones.map((zone,index)=>{
-const raw=String(zone?.name??"").replace(/\\s+/g," ").trim();
+const raw=String(zone?.name??"").replace(/\s+/g," ").trim();
 let name=raw.slice(0,150);
 if(raw.length>150)shortenedNames++;
 if(!name)name="Zone "+(index+1);
