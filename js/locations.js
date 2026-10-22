@@ -449,48 +449,47 @@
     }catch(err){status.textContent="Zone detection could not finish: "+(err.message||"unknown error");}finally{detecting=false;detectBtn.disabled=false;}}
     async function saveZones(){const pending=drafts.filter(z=>!z._savedId);if(!pending.length){status.textContent="All detected zones are already saved to CleanTrack.";return;}const invalid=pending.find(z=>!String(z.name||"").trim()||String(z.name).trim().length>150);if(invalid){status.textContent="Every zone needs a name between 1 and 150 characters. Correct the highlighted names before saving.";return;}saveBtn.disabled=true;const saved=[];const failed=[];try{for(const z of pending){try{const result=await API.post("zones",{location_id:location.id,name:String(z.name).trim(),description:String(z.description||"Detected from the imported floor plan; review the boundary before operational use.").slice(0,1000),floor_label:String(z.floor_label||"").slice(0,120),type:"other",boundary:{type:"IndoorPolygon",points:z.indoor_boundary.points}});z._savedId=result.id||result.zone?.id||true;saved.push(z.name);}catch(err){failed.push(z.name+": "+(err.message||"save failed"));}}if(saved.length){await load();renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();status.textContent="Saved "+saved.length+" zone(s) to the organization database with their editable indoor boundary"+(failed.length?". Some zones failed: "+failed.join("; "):".");notice("Saved "+saved.length+" zone(s) with their boundaries to CleanTrack.","success");}if(failed.length)status.textContent+=" Failed: "+failed.join("; ");refresh();paint();}finally{saveBtn.disabled=false;saveBtn.textContent="Save detected zones to CleanTrack";}}
     async function download(){
-      if(!drafts.length){status.textContent="Detect or draw at least one zone before downloading.";return;}
       if(!baseReady||!base.width||!base.height){status.textContent="The source floor plan is not ready to export.";return;}
       downloadBtn.disabled=true;
-      status.textContent="Creating the three requested editable zone deliverables…";
+      status.textContent="Reading the entire floor plan and tracing its full structure — no zone selection required…";
       try{
         const clean=String(location.name||"location").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"location";
-        const current=drafts.filter(z=>!z._page||z._page===pageNo);
         const csvCell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-        const namesRows=[["name","description","floor_label","location_name","location_id","source_page","boundary_type","boundary_points_normalized"].map(csvCell).join(","),
-          ...drafts.map(z=>[z.name,z.description||"",z.floor_label||"",location.name||"",location.id||"",z._page||pageNo,z.indoor_boundary?.type||"",JSON.stringify(z.indoor_boundary?.points||[])].map(csvCell).join(","))];
-        const namesBlob=new Blob(["\ufeff"+namesRows.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
         const svgEsc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
-        const colors=["#168a66","#d97706","#2563eb","#9333ea","#db2777","#0891b2"];
-        const buildVectorZones=(includeLabels)=>current.map((z,i)=>{
-          const ps=z.indoor_boundary?.points||[];
-          if(ps.length<3)return "";
-          const pts=ps.map(p=>(Number(p[0])*base.width).toFixed(2)+","+(Number(p[1])*base.height).toFixed(2)).join(" ");
-          const fallbackX=ps.reduce((a,p)=>a+Number(p[0])/ps.length,0)*base.width,fallbackY=ps.reduce((a,p)=>a+Number(p[1])/ps.length,0)*base.height,ocrLabel=detectedLabelBoxes.find(q=>String(q.name||"").trim().toLowerCase()===String(z.name||"").trim().toLowerCase()),cx=ocrLabel?ocrLabel.x:fallbackX,cy=ocrLabel?ocrLabel.y:fallbackY;
-          const color=colors[i%colors.length],id="zone-"+(i+1),sw=Math.max(2,base.width/700);
-          const shape='<polygon id="'+id+'-boundary" data-zone-id="'+svgEsc(z._savedId||"draft-"+(i+1))+'" points="'+pts+'" fill="'+color+'" fill-opacity="0.12" stroke="'+color+'" stroke-width="'+sw+'" vector-effect="non-scaling-stroke"/>';
-          const label='<text id="'+id+'-name" x="'+cx.toFixed(2)+'" y="'+cy.toFixed(2)+'" font-family="Arial,sans-serif" font-size="'+Math.max(12,base.width/70)+'" font-weight="bold" fill="'+color+'">'+svgEsc(z.name)+'</text>';
-          const desc=z.description?'<text id="'+id+'-description" x="'+cx.toFixed(2)+'" y="'+(cy+Math.max(15,base.width/55)).toFixed(2)+'" font-family="Arial,sans-serif" font-size="'+Math.max(9,base.width/115)+'" fill="'+color+'">'+svgEsc(z.description)+'</text>':"";
-          return '<g id="'+id+'" data-zone-name="'+svgEsc(z.name)+'" data-zone-description="'+svgEsc(z.description||"")+'">'+shape+(includeLabels?label+desc:"")+'</g>';
-        }).join("\n");
-        const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
-        const pathSvg=()=>detectedStructurePaths.filter(q=>!detectedLabelBoxes.some(l=>l.left<q.x+q.width&&l.right>q.x&&l.top<q.y+q.height&&l.bottom>q.y)).map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
-        const sourceLabelsSvg=detectedLabelBoxes.map((q,i)=>{const fs=Math.max(8,Math.min(48,(q.bottom-q.top)*.82));return '<text id="source-label-'+i+'" x="'+q.x+'" y="'+(q.y+fs*.35)+'" font-family="Arial,sans-serif" font-size="'+fs+'" fill="#171717" text-anchor="middle" data-source-label="true">'+svgEsc(q.name)+'</text>';}).join("");
-        const metadata='<metadata>'+svgEsc(JSON.stringify({location:{id:location.id,name:location.name},floor_label:floor.value.trim()||(pdf?"PDF page "+pageNo:""),zones:drafts.map(z=>({name:z.name,description:z.description||"",floor_label:z.floor_label||"",boundary:z.indoor_boundary||null}))}))+'</metadata>';
+        if(!detectedLabelBoxes.length){
+          if(!window.Tesseract||typeof window.Tesseract.recognize!=="function")throw Error("The text reader did not load. Refresh and retry.");
+          status.textContent="Reading labels across the entire floor plan…";
+          const ocr=await window.Tesseract.recognize(base,"eng",{logger:m=>{if(m.status==="recognizing text")status.textContent="Reading the whole drawing: "+Math.round((m.progress||0)*100)+"%";},workerPath:"https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/worker.min.js",corePath:"https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0/tesseract-core.wasm.js",langPath:"https://tessdata.projectnaptha.com/4.0.0"});
+          const lines=new Map();
+          for(const w of (ocr.data.words||[])){const text=String(w.text||"").trim();if(!text||Number(w.confidence||0)<30)continue;const k=[w.block_num,w.par_num,w.line_num].join(":");if(!lines.has(k))lines.set(k,{text:[],left:w.bbox.x0,top:w.bbox.y0,right:w.bbox.x1,bottom:w.bbox.y1,confidence:0,count:0});const q=lines.get(k);q.text.push(text);q.left=Math.min(q.left,w.bbox.x0);q.top=Math.min(q.top,w.bbox.y0);q.right=Math.max(q.right,w.bbox.x1);q.bottom=Math.max(q.bottom,w.bbox.y1);q.confidence+=Number(w.confidence||0);q.count++;}
+          detectedLabelBoxes=[...lines.values()].map(q=>({name:q.text.join(" ").replace(/\\s+/g," ").trim(),x:(q.left+q.right)/2,y:(q.top+q.bottom)/2,left:q.left,top:q.top,right:q.right,bottom:q.bottom,confidence:q.confidence/Math.max(1,q.count)})).filter(q=>q.name.length>1&&!/^[|._\\-]+$/.test(q.name));
+        }
+        if(!detectedStructurePaths.length){
+          status.textContent="Tracing the entire floor-plan drawing into editable vector paths…";
+          const analysis=await findContoursInWorker();
+          detectedStructurePaths=analysis.structurePaths||[];
+        }
+        const labels=detectedLabelBoxes;
+        const csvRows=[["name","description","floor_label","location_name","location_id","source_page","boundary_type","boundary_points_normalized"].map(csvCell).join(","),
+          ...labels.map(q=>[q.name,"",floor.value.trim()||(pdf?"PDF page "+pageNo:""),location.name||"",location.id||"",pageNo,"",""].map(csvCell).join(","))];
+        const namesBlob=new Blob(["\\ufeff"+csvRows.join("\\r\\n")+"\\r\\n"],{type:"text/csv;charset=utf-8"});
+        const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\\n<svg xmlns="http://www.w3.org/2000/svg" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
+        const allPaths=detectedStructurePaths.map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
+        const noLabelPaths=detectedStructurePaths.filter(q=>!labels.some(l=>l.left<q.x+q.width&&l.right>q.x&&l.top<q.y+q.height&&l.bottom>q.y)).map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
+        const editableLabels=labels.map((q,i)=>{const fs=Math.max(8,Math.min(48,(q.bottom-q.top)*.82));return '<text id="source-label-'+i+'" x="'+q.x+'" y="'+(q.y+fs*.35)+'" font-family="Arial,sans-serif" font-size="'+fs+'" fill="#171717" text-anchor="middle">'+svgEsc(q.name)+'</text>';}).join("");
+        const metadata='<metadata>'+svgEsc(JSON.stringify({location:{id:location.id,name:location.name},floor_label:floor.value.trim()||(pdf?"PDF page "+pageNo:""),detected_text_labels:labels.map(q=>({name:q.name,x:q.x,y:q.y}))}))+'</metadata>';
         const close='</svg>';
-        // File 2 is a label-free, editable vector layout made from the zone polygons.
-        // File 3 preserves the supplied drawing and overlays editable vector boundaries, names and descriptions.
-        const structureSvg=svgOpen+'<title>'+svgEsc(location.name)+' — full editable floor-plan structure without zone labels</title><desc>Full-page architectural linework traced into editable vector paths; recognized text is omitted from this unlabelled version. All detected zone outlines are separate editable polygons. No source image is embedded.</desc>'+pathSvg()+buildVectorZones(false)+close;
-        const labelledSvg=svgOpen+'<title>'+svgEsc(location.name)+' — full editable labelled floor plan</title><desc>Full-page architectural linework traced into editable vector paths, with recognized original labels converted to editable text and separate editable zone outlines, names and descriptions. No source image is embedded.</desc>'+pathSvg()+sourceLabelsSvg+metadata+buildVectorZones(true)+close;
+        const structureSvg=svgOpen+'<title>'+svgEsc(location.name)+' — entire floor plan structure without text labels</title><desc>Whole-page architectural linework traced into editable vector paths. No zones are selected or added.</desc>'+noLabelPaths+close;
+        const labelledSvg=svgOpen+'<title>'+svgEsc(location.name)+' — entire floor plan with editable labels</title><desc>Whole-page architectural linework traced into editable vector paths, with all OCR-recognized original drawing labels recreated as editable text. No zones are selected or added.</desc>'+allPaths+editableLabels+metadata+close;
         const structureBlob=new Blob([structureSvg],{type:"image/svg+xml;charset=utf-8"});
         const labelledBlob=new Blob([labelledSvg],{type:"image/svg+xml;charset=utf-8"});
         const save=(fileBlob,filename)=>{const url=URL.createObjectURL(fileBlob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);};
-        save(namesBlob,clean+"-zone-names-descriptions-and-boundaries.csv");
-        save(structureBlob,clean+"-editable-floor-plan-structure-no-labels.svg");
-        save(labelledBlob,clean+"-editable-floor-plan-with-zone-labels.svg");
-        status.textContent="Downloaded exactly 3 files: zone names/descriptions/boundaries CSV; label-free editable vector zone structure SVG; and the uploaded drawing with editable zone outlines, names and descriptions SVG.";
-        notice("Downloaded the three requested files only.","success");
-      }catch(err){status.textContent="Could not create the three zone files: "+(err.message||"unknown error");}
+        save(namesBlob,clean+"-floor-plan-text-labels.csv");
+        save(structureBlob,clean+"-entire-floor-plan-structure-no-labels.svg");
+        save(labelledBlob,clean+"-entire-floor-plan-structure-and-labels.svg");
+        status.textContent="Downloaded 3 whole-floor-plan files. No zone selection or zone detection was used. Text extraction and vector tracing may need review for faint or complex drawings.";
+        notice("Downloaded the three whole-floor-plan files.","success");
+      }catch(err){status.textContent="Could not create the whole-floor-plan files: "+(err.message||"unknown error");}
       finally{downloadBtn.disabled=false;}
     }
     const detectBtn=btn("Detect Zones automatically","ct-loc-btn ct-loc-btn-primary",detect),redetect=btn("Re-detect current page","ct-loc-btn",detect),manualBtn=btn("Draw zone manually","ct-loc-btn",beginManual),saveBtn=btn("Save zones to CleanTrack","ct-loc-btn ct-loc-btn-primary",saveZones),downloadBtn=btn("Download 3 editable zone files","ct-loc-btn ct-loc-btn-primary",download),close=btn("Close","ct-loc-btn",()=>{manualMode=false;manualPoints=[];panel.hidden=true;});
