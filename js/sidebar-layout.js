@@ -661,16 +661,16 @@ if (identity) {
         }
         function liveDataIntent(question) {
           const q = normalized(question);
-          const asksLive = /\\b(show|list|find|check|count|how many|current|latest|recent|today|yesterday|right now|my |why|not showing|missing|empty|status|overview|summary|what .* have|do we have|are there)\\b/.test(q);
+          const asksLive = /\b(show|list|find|check|count|how many|current|latest|recent|today|yesterday|right now|my |why|not showing|missing|empty|status|overview|summary|what .* have|do we have|are there)\b/.test(q);
           if (!asksLive) return null;
-          if (/\\b(logs?|cleaning logs|audit|activity history)\\b/.test(q)) return "logs";
-          if (/\\b(tasks?|operations?|work orders?|overdue)\\b/.test(q)) return "tasks";
-          if (/\\b(zones?|floors?|rooms?)\\b/.test(q)) return "zones";
-          if (/\\b(locations?|sites?|buildings?|facilities)\\b/.test(q)) return "locations";
-          if (/\\b(staff|employees?|people|members|personnel)\\b/.test(q)) return "staff";
-          if (/\\b(teams?)\\b/.test(q)) return "teams";
-          if (/\\b(alerts?|announcements?|notifications?)\\b/.test(q)) return "alerts";
-          if (/\\b(organisation|organization|workspace|dashboard|overview|overall|summary|kpis?)\\b/.test(q)) return "overview";
+          if (/\b(logs?|cleaning logs|audit|activity history)\b/.test(q)) return "logs";
+          if (/\b(tasks?|operations?|work orders?|overdue)\b/.test(q)) return "tasks";
+          if (/\b(zones?|floors?|rooms?)\b/.test(q)) return "zones";
+          if (/\b(locations?|sites?|buildings?|facilities)\b/.test(q)) return "locations";
+          if (/\b(staff|employees?|people|members|personnel)\b/.test(q)) return "staff";
+          if (/\b(teams?)\b/.test(q)) return "teams";
+          if (/\b(alerts?|announcements?|notifications?)\b/.test(q)) return "alerts";
+          if (/\b(organisation|organization|workspace|dashboard|overview|overall|summary|kpis?)\b/.test(q)) return "overview";
           return null;
         }
 
@@ -727,7 +727,7 @@ if (identity) {
             if (!taskRows && !logRows && !locationRows && !zoneRows && !dash) return explainLiveFailure(failures, role);
             if (failures.length) parts.push("Some sources weren't available for your role or at this moment: " + failures.map(r => r.key).join(", ") + ". Counts above include only sources that responded successfully.");
             parts.push("These are records visible through your account's API permissions, not organisation-wide totals unless your role permits that scope.");
-            return parts.join("\\n");
+            return parts.join("\n");
           }
           if (intent === "logs") {
             const logs = rowsFor("logs", labels.logs[1]);
@@ -747,7 +747,7 @@ if (identity) {
             } else parts.push("Tasks could not be cross-checked, so I can't explain the reason from task status.");
             const failed = results.filter(r => !r.ok);
             if (failed.length) parts.push("Unavailable sources: " + failed.map(r => r.key).join(", ") + ". I have not treated a failed request as zero records.");
-            return parts.join("\\n");
+            return parts.join("\n");
           }
           const spec = labels[intent];
           const rows = spec ? rowsFor(intent, spec[1]) : null;
@@ -763,11 +763,11 @@ if (identity) {
             const extra = [row.status, row.location_name, row.zone_name, row.staff_name || row.assigned_to_name].filter(Boolean).join(" · ");
             return "• " + name + (extra ? " — " + extra : "");
           });
-          if (candidates.length) parts.push("Recent records:\\n" + candidates.join("\\n"));
+          if (candidates.length) parts.push("Recent records:\n" + candidates.join("\n"));
           if (!rows.length) parts.push("The request succeeded and returned no records in the data scope your account can access. That is different from an API error.");
           if (intent === "staff" && role === "supervisor") parts.push("The staff directory endpoint only exposes staff data to authorised Admin/Supervisor roles; results are still subject to backend access rules.");
           if (byKey[intent] && byKey[intent].ok && !responseRows(byKey[intent].value, spec[1])) parts.push("The endpoint responded, but its data shape was not recognised; I won't invent a count.");
-          return parts.join("\\n");
+          return parts.join("\n");
         }
 
         function explainLiveFailure(failures, role, intent) {
