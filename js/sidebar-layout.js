@@ -548,7 +548,14 @@ if (identity) {
         avatarInput.tabIndex = -1;
         avatarInput.style.display = "none";
         avatarLabel.style.display = "none";
-        avatarControls.append(avatarLabel, avatarInput);
+        const cameraButton = document.createElement("button");
+        cameraButton.type = "button";
+        cameraButton.className = "ct-profile-avatar-camera";
+        cameraButton.setAttribute("aria-label", "Change profile picture");
+        cameraButton.title = "Change profile picture";
+        cameraButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h-4l-2 3H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>';
+        cameraButton.addEventListener("click", openAvatarPicker);
+        avatarControls.append(avatarLabel, avatarInput, cameraButton);
         const openAvatarPicker = () => avatarInput.click();
         avatar.addEventListener("click", openAvatarPicker);
         avatar.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openAvatarPicker(); } });
