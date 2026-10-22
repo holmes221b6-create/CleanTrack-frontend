@@ -49,6 +49,27 @@ if (identity) {
     toolbar.className = "ct-workspace-toolbar";
     toolbar.setAttribute("aria-label", "Workspace tools");
 
+    const backButton = document.createElement("button");
+    backButton.type = "button";
+    backButton.className = "ct-workspace-back";
+    backButton.setAttribute("aria-label", "Go back one page");
+    backButton.title = "Back to previous page (Escape)";
+    backButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Back</span>';
+    backButton.disabled = true;
+    backButton.addEventListener("click", function () {
+      const navApi = window.CleanTrackNavigation;
+      if (navApi && navApi.goBack) navApi.goBack();
+      updateBackButton();
+    });
+
+    function updateBackButton() {
+      const navApi = window.CleanTrackNavigation;
+      backButton.disabled = !(navApi && navApi.canGoBack && navApi.canGoBack());
+    }
+    window.addEventListener("cleantrack:navigate", updateBackButton);
+    window.addEventListener("cleantrack:session-restored", updateBackButton);
+    window.addEventListener("cleantrack:logout", updateBackButton);
+
     const toolbarSpacer = document.createElement("span");
     toolbarSpacer.className = "ct-toolbar-leading-space";
     toolbarSpacer.setAttribute("aria-hidden", "true");
@@ -88,7 +109,7 @@ if (identity) {
     profileButton.title = "Profile and account";
     profileButton.innerHTML = '<span class="ct-profile-avatar" aria-hidden="true">U</span><span class="ct-profile-trigger-name">Account</span><svg class="ct-profile-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>';
 
-    toolbar.append(toolbarSpacer, searchWrap, actions);
+    toolbar.append(backButton, toolbarSpacer, searchWrap, actions);
     actions.append(toggle, notificationsButton, assistantButton, profileButton);
 
     function getUser() {
@@ -293,6 +314,30 @@ if (identity) {
     document.addEventListener("click", function (event) {
       if (!searchWrap.contains(event.target)) closeSearch();
     });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !event.defaultPrevented) {
+        const dialog = document.getElementById("app-modal");
+        const active = document.activeElement;
+        const isEditing = active && (
+          active.matches("input, textarea, select, [contenteditable='true']") ||
+          active.isContentEditable
+        );
+        const results = searchWrap.querySelector("#ct-global-search-results");
+        const searchIsOpen = results && !results.hidden;
+        if (searchIsOpen) {
+          closeSearch();
+          return;
+        }
+        if (isEditing || (dialog && (dialog.open || dialog.hasAttribute("open")))) return;
+        const navApi = window.CleanTrackNavigation;
+        if (navApi && navApi.canGoBack && navApi.canGoBack()) {
+          event.preventDefault();
+          navApi.goBack();
+          updateBackButton();
+        }
+      }
+    });
+
     document.addEventListener("keydown", function (event) {
       if ((event.ctrlKey || event.metaKey) && String(event.key).toLowerCase() === "k") {
         event.preventDefault();
