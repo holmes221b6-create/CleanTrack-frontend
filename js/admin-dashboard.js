@@ -173,9 +173,11 @@
 
   function completionDate(task) {
     if (!isCompleted(task)) return null;
+    // Only use explicit work-submission/completion/review timestamps.
+    // updated_at can change for unrelated edits and created_at is not a completion date.
     return safeDate(task.execution_submitted_at) || safeDate(task.submitted_at) ||
-      safeDate(task.reviewed_at) || safeDate(task.verified_at) ||
-      safeDate(task.updated_at) || safeDate(task.created_at);
+      safeDate(task.completed_at) || safeDate(task.completed_on) ||
+      safeDate(task.reviewed_at) || safeDate(task.verified_at);
   }
 
   function locationFor(task) {
@@ -503,7 +505,8 @@
       ["Pending", counts.pending, "Open tasks not currently in progress"],
       ["Overdue", counts.overdue, "Open tasks past their due date or explicitly marked overdue"],
       ["Approved tasks", counts.approved, "Tasks with approved status"],
-      ["Submitted or completed in trend period", completed, "Counted using the dashboard completion/submission timestamps"],
+      ["Submitted or completed in trend period", completed, "Only tasks with a recorded submission, completion, or review timestamp are counted"],
+      ["Completed tasks missing a completion timestamp", operations.filter(task => isCompleted(task) && !completionDate(task)).length, "Excluded from the dated trend because no reliable completion/submission timestamp is recorded"],
       ["Locations", locations.length, "Locations currently loaded in the dashboard"],
       [],
       ["Completion trend"],
@@ -619,39 +622,169 @@
       return;
     }
     if (format === "pdf") {
-      const popup = window.open("", "_blank");
-      if (!popup) {
-        window.alert("Your browser blocked the PDF report window. Allow pop-ups for CleanTrack and try again.");
-        return;
+      // Build a real PDF document in-browser so this option downloads a .pdf
+      // directly instead of opening a print preview and relying on the user to save it.
+      const PAGE_W = 842, PAGE_H = 595, MARGIN = 32;
+      const BG = [0.043, 0.071, 0.125], PANEL = [0.067, 0.110, 0.180],
+        ALT = [0.082, 0.133, 0.216], BORDER = [0.16, 0.22, 0.30],
+        TEXT = [0.93, 0.95, 0.98], MUTED = [0.58, 0.65, 0.75],
+        GREEN = [0.39, 0.85, 0.69], GREEN_DARK = [0.08, 0.20, 0.18];
+      const pdfSafe = value => String(value == null ? "" : value)
+        .replace(/[’‘]/g, "'").replace(/[“”]/g, '"')
+        .replace(/[–—]/g, "-").replace(/·/g, " | ")
+        .replace(/[✓]/g, "CleanTrack").replace(/[^\x20-\x7E]/g, "?");
+      const pdfEscape = value => pdfSafe(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+      const color = (rgb, stroke) => rgb.map(n => n.toFixed(3)).join(" ") + (stroke ? " RG" : " rg");
+      const pages = [];
+      let ops = [], y = 0, pageNo = 0;
+      const rect = (x, bottom, w, h, fill) => { ops.push(color(fill, false)); ops.push(x.toFixed(2)+" "+bottom.toFixed(2)+" "+w.toFixed(2)+" "+h.toFixed(2)+" re f"); };
+      const line = (x1, y1, x2, y2, stroke) => { ops.push(color(stroke, true)); ops.push("0.6 w"); ops.push(x1.toFixed(2)+" "+y1.toFixed(2)+" m "+x2.toFixed(2)+" "+y2.toFixed(2)+" l S"); };
+      const text = (x, baseline, value, size, fill, font) => {
+        ops.push(color(fill, false));
+        ops.push("BT /"+(font || "F1")+" "+size+" Tf "+x.toFixed(2)+" "+baseline.toFixed(2)+" Td ("+pdfEscape(value)+") Tj ET");
+      };
+      const wrap = (value, maxChars) => {
+        const words = pdfSafe(value).split(/\s+/);
+        const lines = [];
+        let currentLine = "";
+        words.forEach(word => {
+          while (word.length > maxChars) {
+            if (currentLine) { lines.push(currentLine); currentLine = ""; }
+            lines.push(word.slice(0, maxChars));
+            word = word.slice(maxChars);
+          }
+          if (!word) return;
+          if (!currentLine) currentLine = word;
+          else if ((currentLine + " " + word).length <= maxChars) currentLine += " " + word;
+          else { lines.push(currentLine); currentLine = word; }
+        });
+        if (currentLine) lines.push(currentLine);
+        return lines.length ? lines : [""];
+      };
+      const finishPage = () => {
+        line(MARGIN, 25, PAGE_W-MARGIN, 25, BORDER);
+        text(MARGIN, 13, "CleanTrack | Organization dashboard report", 7, MUTED);
+        text(PAGE_W-MARGIN-62, 13, "Page "+pageNo, 7, MUTED);
+        pages.push(ops.join("\n"));
+      };
+      const newPage = () => {
+        if (pageNo) finishPage();
+        pageNo += 1;
+        ops = [];
+        rect(0,0,PAGE_W,PAGE_H,BG);
+        rect(0,PAGE_H-7,PAGE_W,7,GREEN);
+        text(MARGIN,PAGE_H-38,"CleanTrack",19,TEXT,"F2");
+        text(MARGIN+105,PAGE_H-38,"DASHBOARD REPORT",8,GREEN,"F2");
+        text(MARGIN,PAGE_H-56,"Operations | Accountability | Quality",8,MUTED);
+        text(PAGE_W-220,PAGE_H-35,"Generated "+pdfSafe(generatedAt.toLocaleString()),8,MUTED);
+        line(MARGIN,PAGE_H-68,PAGE_W-MARGIN,PAGE_H-68,BORDER);
+        y=PAGE_H-88;
+      };
+      const sectionHeading = label => {
+        if (y < 78) newPage();
+        rect(MARGIN,y-5,PAGE_W-MARGIN*2,22,GREEN_DARK);
+        text(MARGIN+9,y+3,label.toUpperCase(),9,GREEN,"F2");
+        y -= 25;
+      };
+      const drawTableHeader = headers => {
+        const usable = PAGE_W-MARGIN*2;
+        const count = Math.max(1,headers.length);
+        const widths = Array.from({length:count},(_,i)=>usable/count);
+        // Wider columns for descriptive text in common dashboard sections.
+        if (count===3 && String(headers[0]).toLowerCase()==="measure") { widths[0]=150; widths[1]=65; widths[2]=usable-215; }
+        else if (count===6) { widths[0]=usable*.25; widths[1]=usable*.15; widths[2]=usable*.15; widths[3]=usable*.19; widths[4]=usable*.13; widths[5]=usable-widths.slice(0,5).reduce((a,b)=>a+b,0); }
+        else if (count===5) { widths[0]=usable*.30; widths[1]=usable*.16; widths[2]=usable*.18; widths[3]=usable*.16; widths[4]=usable-widths.slice(0,4).reduce((a,b)=>a+b,0); }
+        else if (count===4) { widths[0]=usable*.23; widths[1]=usable*.22; widths[2]=usable*.18; widths[3]=usable-widths.slice(0,3).reduce((a,b)=>a+b,0); }
+        rect(MARGIN,y-20,usable,20,GREEN_DARK);
+        let x=MARGIN;
+        headers.forEach((header,i)=>{
+          text(x+6,y-12,wrap(header,Math.max(8,Math.floor((widths[i]-12)/4.5)))[0],7,GREEN,"F2");
+          x+=widths[i];
+          if(i<headers.length-1) line(x,y-20,x,y,BORDER);
+        });
+        y-=20;
+        return widths;
+      };
+      const drawTableRow = (values,widths,rowIndex,headers) => {
+        const maxLines = Math.max(1,...values.map((value,i)=>wrap(value,Math.max(8,Math.floor((widths[i]-12)/4.3))).length));
+        const rowHeight = Math.max(21,Math.min(58,maxLines*9+9));
+        if(y-rowHeight<42) {
+          newPage();
+          // Reintroduce the section header and column headings after a page break.
+          sectionHeading(currentSection || "Report details");
+          drawTableHeader(headers);
+        }
+        rect(MARGIN,y-rowHeight,PAGE_W-MARGIN*2,rowHeight,rowIndex%2===0?PANEL:ALT);
+        line(MARGIN,y-rowHeight,PAGE_W-MARGIN,y-rowHeight,BORDER);
+        let x=MARGIN;
+        values.forEach((value,i)=>{
+          const lines=wrap(value,Math.max(8,Math.floor((widths[i]-12)/4.3))).slice(0,6);
+          lines.forEach((part,j)=>text(x+6,y-12-j*9,part,7.5,(i===1 && /^\d+(\.\d+)?%?$/.test(String(value)))?GREEN:TEXT));
+          x+=widths[i];
+          if(i<values.length-1) line(x,y-rowHeight,x,y,BORDER);
+        });
+        y-=rowHeight;
+      };
+      let currentSection = "";
+      newPage();
+      // Show the reporting period clearly near the top of the first page.
+      text(MARGIN,y,"Reporting period: "+pdfSafe(range==="custom"?(customFrom+" to "+customTo):humanize(range)),9,TEXT,"F2");
+      y-=20;
+      text(MARGIN,y,"Live dashboard snapshot | "+operations.length+" tasks | "+locations.length+" locations",8,MUTED);
+      y-=24;
+      let i=0, rowIndex=0;
+      while(i<data.length) {
+        const kind=rowKind(data[i]);
+        if(kind==="title" || kind==="meta" || kind==="blank") { i++; continue; }
+        if(kind==="section") {
+          currentSection=String(data[i][0]||"Report details");
+          sectionHeading(currentSection);
+          i++;
+          if(i<data.length && rowKind(data[i])==="columns") {
+            const headers=data[i];
+            const widths=drawTableHeader(headers);
+            i++;
+            rowIndex=0;
+            while(i<data.length) {
+              const nextKind=rowKind(data[i]);
+              if(nextKind==="section") break;
+              if(nextKind==="blank" || nextKind==="columns" || nextKind==="title" || nextKind==="meta") { i++; continue; }
+              drawTableRow(data[i].map(value=>pdfSafe(value)),widths,rowIndex++,headers);
+              i++;
+            }
+          }
+          y-=12;
+          continue;
+        }
+        i++;
       }
-      let bodyIndex = 0;
-      const body = data.map(row => {
-        const kind = rowKind(row);
-        if (kind === "blank") return '<tr class="spacer"><td colspan="6"></td></tr>';
-        if (kind === "section") return '<tr class="section"><th colspan="6">' + escapeHtml(row[0]) + "</th></tr>";
-        if (kind === "title") return '<tr class="report-title"><th colspan="6">' + escapeHtml(row[0]) + "</th></tr>";
-        if (kind === "columns") return '<tr class="columns">' + row.map(value => "<th>" + escapeHtml(value) + "</th>").join("") + "</tr>";
-        if (kind === "body") bodyIndex += 1;
-        const classes = kind === "body" ? (bodyIndex % 2 === 0 ? ' class="alt"' : "") : "";
-        return "<tr" + classes + ">" + row.map((value, index) => {
-          const metric = kind === "body" && index === 1 && typeof value === "number" ? ' class="metric"' : "";
-          return "<td" + metric + ">" + escapeHtml(value) + "</td>";
-        }).join("") + "</tr>";
-      }).join("");
-      const generatedLabel = generatedAt.toLocaleString();
-      popup.document.open();
-      popup.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CleanTrack Dashboard Report</title><style>' +
-        ':root{color-scheme:dark;--bg:#0b1220;--panel:#111c2e;--panel2:#152238;--border:#29374d;--text:#edf3fc;--muted:#93a4bb;--green:#64d8b0;--green-bg:#15332f}' +
-        '*{box-sizing:border-box}body{margin:0;padding:28px;background:var(--bg);color:var(--text);font:12px/1.5 Inter,Segoe UI,Arial,sans-serif}' +
-        '.masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:0 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px}' +
-        '.brand{display:flex;align-items:center;gap:11px}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#18332f;color:var(--green);font-size:20px;font-weight:800;border:1px solid #31524f}.wordmark{font-size:19px;font-weight:800;letter-spacing:-.04em}.accent{color:var(--green)}' +
-        '.eyebrow{margin:0 0 6px;color:var(--green);font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.subtitle{margin:7px 0 0;color:var(--muted);font-size:11px}.meta{text-align:right;color:var(--muted);font-size:10px}.meta strong{display:block;color:var(--text);font-size:11px;margin-bottom:4px}' +
-        '.report-title th{padding:18px 14px;background:#142137;border:1px solid var(--border);text-align:left;font-size:20px;letter-spacing:-.03em}' +
-        'table{width:100%;border-collapse:separate;border-spacing:0;margin:0 0 10px;table-layout:auto}td,th{padding:8px 9px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}td:first-child,th:first-child{border-left:1px solid var(--border)}.columns th{background:var(--green-bg);color:#a5f3d8;font-size:9px;letter-spacing:.04em;text-transform:uppercase;border-top:1px solid #355b58}.section th{padding:13px 10px 8px;border:0;background:var(--bg);color:var(--green);font-size:11px;letter-spacing:.1em;text-transform:uppercase}.alt td{background:var(--panel2)}td{background:var(--panel)}.metric{color:var(--green);font-weight:800}.spacer td{height:8px;padding:0;border:0;background:var(--bg)}' +
-        '.foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--border);color:var(--muted);font-size:9px}' +
-        '@page{size:A4 landscape;margin:10mm}@media print{body{padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.masthead{break-after:avoid}tr{break-inside:avoid}table{break-inside:auto}.section{break-after:avoid}thead{display:table-header-group}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}' +
-        '</style></head><body><header class="masthead"><div><div class="brand"><span class="mark">✓</span><span class="wordmark">Clean<span class="accent">Track</span></span></div><p class="eyebrow">Operations · Accountability · Quality</p><p class="subtitle">Organization-wide operations report · ' + escapeHtml(range.charAt(0).toUpperCase() + range.slice(1)) + ' trend view</p></div><div class="meta"><strong>ADMIN DASHBOARD REPORT</strong>Generated ' + escapeHtml(generatedLabel) + '<br>Current organization</div></header><table><tbody>' + body + '</tbody></table><footer class="foot">Confidential organization report · Generated from the current CleanTrack dashboard data. For best results, enable “Background graphics” in the print dialog, then choose “Save as PDF”.</footer><script>window.addEventListener("load",function(){window.print();});<\\/script></body></html>');
-      popup.document.close();
+      finishPage();
+      const objects=[];
+      const addObject=body=>{objects.push(body);return objects.length;};
+      const catalogId=addObject("");
+      const pagesId=addObject("");
+      const fontRegularId=addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+      const fontBoldId=addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+      const pageIds=[];
+      pages.forEach(stream=>{
+        const streamId=addObject("<< /Length "+stream.length+" >>\nstream\n"+stream+"\nendstream");
+        const pageId=addObject("<< /Type /Page /Parent "+pagesId+" 0 R /MediaBox [0 0 "+PAGE_W+" "+PAGE_H+"] /Resources << /Font << /F1 "+fontRegularId+" 0 R /F2 "+fontBoldId+" 0 R >> >> /Contents "+streamId+" 0 R >>");
+        pageIds.push(pageId);
+      });
+      objects[catalogId-1]="<< /Type /Catalog /Pages "+pagesId+" 0 R >>";
+      objects[pagesId-1]="<< /Type /Pages /Kids ["+pageIds.map(id=>id+" 0 R").join(" ")+"] /Count "+pageIds.length+" >>";
+      let pdf="%PDF-1.4\n%CleanTrack\n";
+      const offsets=[0];
+      objects.forEach((obj,index)=>{
+        offsets.push(pdf.length);
+        pdf+=(index+1)+" 0 obj\n"+obj+"\nendobj\n";
+      });
+      const xrefOffset=pdf.length;
+      pdf+="xref\n0 "+(objects.length+1)+"\n0000000000 65535 f \n";
+      offsets.slice(1).forEach(offset=>{pdf+=String(offset).padStart(10,"0")+" 00000 n \n";});
+      pdf+="trailer\n<< /Size "+(objects.length+1)+" /Root "+catalogId+" 0 R >>\nstartxref\n"+xrefOffset+"\n%%EOF";
+      downloadBlob(new Blob([pdf],{type:"application/pdf"}),filename+".pdf");
+      return;
     }
   }
 
