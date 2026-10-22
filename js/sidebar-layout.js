@@ -125,11 +125,19 @@ if (identity) {
       return (initials || "U").toUpperCase();
     }
 
+    function readAccountAvatar(id) { try { return localStorage.getItem("cleantrack.avatar." + id) || ""; } catch (_) { return ""; } }
     function updateProfileTrigger() {
       const user = getUser();
       const avatar = profileButton.querySelector(".ct-profile-avatar");
       const name = profileButton.querySelector(".ct-profile-trigger-name");
-      if (avatar) avatar.textContent = userInitials(user);
+      const savedAvatar = user && user.id != null ? readAccountAvatar(user.id) : "";
+      if (avatar) {
+        avatar.textContent = savedAvatar ? "" : userInitials(user);
+        avatar.style.backgroundImage = savedAvatar ? "url('" + savedAvatar + "')" : "";
+        avatar.style.backgroundSize = savedAvatar ? "cover" : "";
+        avatar.style.backgroundPosition = savedAvatar ? "center" : "";
+        avatar.style.color = savedAvatar ? "transparent" : "";
+      }
       if (name) name.textContent = user && (user.name || user.email) || "Account";
       profileButton.title = user ? (user.name || user.email || "Profile and account") : "Profile and account";
     }
@@ -507,7 +515,9 @@ if (identity) {
         const wrap = appendText(content, "div", "", "ct-help-dialog ct-profile-dialog ct-profile-dialog-v2");
         const summary = document.createElement("section");
         summary.className = "ct-profile-hero";
-        const avatar = appendText(summary, "div", userInitials(user), "ct-profile-avatar ct-profile-avatar-large ct-profile-hero-avatar");
+        const savedAvatar = user && user.id != null ? readAccountAvatar(user.id) : "";
+        const avatar = appendText(summary, "div", savedAvatar ? "" : userInitials(user), "ct-profile-avatar ct-profile-avatar-large ct-profile-hero-avatar");
+        if (savedAvatar) { avatar.style.backgroundImage = "url('" + savedAvatar + "')"; avatar.style.backgroundSize = "cover"; avatar.style.backgroundPosition = "center"; avatar.style.color = "transparent"; }
         avatar.setAttribute("aria-hidden", "true");
         const identity = document.createElement("div");
         identity.className = "ct-profile-identity";
@@ -518,6 +528,42 @@ if (identity) {
         appendText(identity, "span", roleLabel, "ct-profile-role-pill");
         summary.appendChild(identity);
         wrap.appendChild(summary);
+        const avatarControls = document.createElement("div");
+        avatarControls.className = "ct-profile-avatar-controls";
+        const avatarInput = document.createElement("input");
+        avatarInput.type = "file";
+        avatarInput.accept = "image/png,image/jpeg,image/webp,image/gif";
+        avatarInput.className = "ct-profile-avatar-file";
+        avatarInput.id = "ct-account-avatar-file";
+        const avatarLabel = document.createElement("label");
+        avatarLabel.htmlFor = avatarInput.id;
+        avatarLabel.className = "ct-profile-avatar-select";
+        avatarLabel.textContent = "Choose profile picture";
+        const avatarHint = appendText(avatarControls, "p", "PNG, JPG, WEBP or GIF · up to 2 MB. Saved on this browser and used in the toolbar and settings.", "ct-profile-avatar-hint");
+        avatarControls.append(avatarLabel, avatarInput);
+        avatarInput.addEventListener("change", () => {
+          const file = avatarInput.files && avatarInput.files[0];
+          if (!file || !user || user.id == null) return;
+          if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type || "")) { avatarHint.textContent = "Choose a PNG, JPG, WEBP, or GIF image."; return; }
+          if (file.size > 2 * 1024 * 1024) { avatarHint.textContent = "Choose an image smaller than 2 MB."; return; }
+          const reader = new FileReader();
+          reader.onload = () => {
+            const data = String(reader.result || "");
+            try { localStorage.setItem("cleantrack.avatar." + user.id, data); }
+            catch (_) { avatarHint.textContent = "Unable to save the image in this browser. Try a smaller picture."; return; }
+            avatar.textContent = "";
+            avatar.style.backgroundImage = "url('" + data + "')";
+            avatar.style.backgroundSize = "cover";
+            avatar.style.backgroundPosition = "center";
+            avatar.style.color = "transparent";
+            updateProfileTrigger();
+            window.dispatchEvent(new CustomEvent("cleantrack:avatar-updated", { detail: { userId: user.id } }));
+            avatarHint.textContent = "Profile picture updated.";
+          };
+          reader.onerror = () => { avatarHint.textContent = "Unable to read this image."; };
+          reader.readAsDataURL(file);
+        });
+        wrap.appendChild(avatarControls);
 
         const section = document.createElement("section");
         section.className = "ct-profile-section";
@@ -534,6 +580,7 @@ if (identity) {
         const accountStatus = user && (user.account_status || user.status || user.membership_status);
         const emailVerified = user && (user.emailVerified === true || user.email_verified === true || user.is_email_verified === true);
         const fields = [
+          ["Account ID", user && user.id != null ? String(user.id) : "Not available"],
           ["Email address", user && user.email || "Not provided"],
           ["Organization", organization && typeof organization === "string" ? organization : organization && (organization.name || organization.organization_name) || "Not assigned"],
           ["Account role", roleLabel],
