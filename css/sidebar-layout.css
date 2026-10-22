@@ -427,3 +427,62 @@ color: #ffffff !important;
   }
   #workspace-view .ct-workspace-back span { display: none; }
 }
+
+
+/* Keep the global toolbar on one row after adding the Back control. */
+#workspace-view .ct-workspace-toolbar {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 94px !important;
+  max-width: 118px !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  white-space: nowrap;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-leading-space {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 8px;
+}
+#workspace-view .ct-workspace-toolbar > .ct-global-search {
+  flex: 0 1 280px;
+  min-width: 120px;
+  max-width: 280px;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: max-content;
+  margin-left: auto;
+}
+#workspace-view .ct-workspace-toolbar .ct-toolbar-actions > button {
+  flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+  #workspace-view .ct-workspace-toolbar { gap: 7px; padding-inline: 10px; }
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+    min-width: 38px !important;
+    width: 38px !important;
+    padding: 0 !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back span { display: none; }
+  #workspace-view .ct-workspace-toolbar > .ct-global-search {
+    flex: 1 1 100px;
+    min-width: 72px;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-toolbar-actions { gap: 6px; }
+}
+@media (max-width: 420px) {
+  #workspace-view .ct-workspace-toolbar > .ct-global-search { display: none; }
+}
