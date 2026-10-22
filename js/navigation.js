@@ -63,6 +63,7 @@
   };
 
   let activePage = null;
+  const pageHistory = [];
 
   function getMenu(role) {
     const normalizedRole = String(role || "").toLowerCase();
@@ -71,7 +72,7 @@
     });
   }
 
-  function setActivePage(pageId) {
+  function setActivePage(pageId, options) {
     const user = auth.getCurrentUser();
 
     if (!user) {
@@ -88,6 +89,10 @@
       return false;
     }
 
+    if (activePage && activePage !== pageId && !(options && options.fromHistory)) {
+      pageHistory.push(activePage);
+      if (pageHistory.length > 100) pageHistory.shift();
+    }
     activePage = pageId;
 
     window.dispatchEvent(
@@ -104,6 +109,20 @@
 
   function getActivePage() {
     return activePage;
+  }
+
+  function canGoBack() {
+    return pageHistory.length > 0;
+  }
+
+  function goBack() {
+    while (pageHistory.length) {
+      const previousPage = pageHistory.pop();
+      if (previousPage && previousPage !== activePage) {
+        return setActivePage(previousPage, { fromHistory: true });
+      }
+    }
+    return false;
   }
 
   function getDefaultPage(role) {
@@ -190,6 +209,8 @@
     getMenu: getMenu,
     setActivePage: setActivePage,
     getActivePage: getActivePage,
+    canGoBack: canGoBack,
+    goBack: goBack,
     getDefaultPage: getDefaultPage,
     renderMenu: renderMenu,
     setAnnouncementUnreadCount: function (count) {
