@@ -439,6 +439,19 @@
       return;
     }
 
+    if (pageId === "billing") {
+      if (String(user?.role || "").toLowerCase() !== "admin") {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Billing is available to organization Admins only." }));
+        return;
+      }
+      if (window.CleanTrackBilling && typeof window.CleanTrackBilling.render === "function") {
+        await window.CleanTrackBilling.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Billing could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     if (pageId === "announcements" || pageId === "team-channel") {
       const role = String(user?.role || "").toLowerCase();
       const pageAllowed = pageId === "announcements"
