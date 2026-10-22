@@ -162,6 +162,15 @@
     return safeDate(task.due_at) || safeDate(task.created_at);
   }
 
+  function isCompleted(task) {
+    return ["completed", "complete", "approved", "verified", "done", "closed"].includes(status(task));
+  }
+
+  function completionDate(task) {
+    if (!isCompleted(task)) return null;
+    return safeDate(task.reviewed_at) || safeDate(task.submitted_at) || safeDate(task.execution_submitted_at) || safeDate(task.updated_at) || safeDate(task.created_at);
+  }
+
   function locationFor(task) {
     return locations.find(item => String(item.id) === String(task.location_id));
   }
@@ -193,64 +202,51 @@
 
   function drawComplianceChart(container, rows, unit) {
     container.replaceChildren();
-    const width = 760;
-    const height = 284;
-    const left = 48;
-    const right = 16;
-    const top = 18;
-    const bottom = 42;
-    const plotW = width - left - right;
-    const plotH = height - top - bottom;
-    const graph = svg("svg", {
-      viewBox: "0 0 " + width + " " + height,
-      role: "img",
-      "aria-label": "Approved task compliance trend"
-    });
-
-    [0, 25, 50, 75, 100].forEach(value => {
-      const y = top + plotH * (1 - value / 100);
+    const completedTotal = rows.reduce((sum, row) => sum + row.completed, 0);
+    if (!completedTotal) {
+      container.appendChild(el("div", "ct-dash-empty", "No completed tasks in this period yet. Once tasks are completed, the trend will appear here."));
+      return;
+    }
+    const width = 760, height = 284, left = 48, right = 16, top = 18, bottom = 42;
+    const plotW = width - left - right, plotH = height - top - bottom;
+    const maxValue = Math.max(1, ...rows.map(row => row.completed));
+    const axisMax = maxValue <= 4 ? 4 : Math.ceil(maxValue / 4) * 4;
+    const tickStep = axisMax / 4;
+    const graph = svg("svg", { viewBox: "0 0 " + width + " " + height, role: "img", "aria-label": "Task completion trend, completed tasks per period" });
+    for (let tick = 0; tick <= 4; tick++) {
+      const value = Math.round(tick * tickStep), y = top + plotH * (1 - value / axisMax);
       graph.append(svg("line", { x1: left, y1: y, x2: width - right, y2: y, stroke: COLORS.grid, "stroke-width": 1 }));
       const label = svg("text", { x: left - 9, y: y + 4, fill: COLORS.muted, "font-size": 11, "text-anchor": "end" });
-      label.textContent = value + "%";
+      label.textContent = String(value);
       graph.appendChild(label);
-    });
-
-    const points = rows.map((row, index) => ({
-      x: rows.length === 1 ? left + plotW / 2 : left + index / (rows.length - 1) * plotW,
-      y: top + plotH * (1 - Math.max(0, Math.min(100, row.rate)) / 100),
-      row
-    }));
-
+    }
+    const points = rows.map((row, index) => ({ x: rows.length === 1 ? left + plotW / 2 : left + index / (rows.length - 1) * plotW, y: top + plotH * (1 - row.completed / axisMax), row }));
     if (points.length > 1) {
       const line = points.map((point, index) => (index ? "L" : "M") + point.x.toFixed(1) + " " + point.y.toFixed(1)).join(" ");
       graph.append(svg("path", { d: line, fill: "none", stroke: COLORS.green, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }));
       const area = line + " L" + points[points.length - 1].x + " " + (top + plotH) + " L" + points[0].x + " " + (top + plotH) + " Z";
       graph.append(svg("path", { d: area, fill: "rgba(100,216,176,0.08)", stroke: "none" }));
-      graph.lastChild && graph.insertBefore(graph.lastChild, graph.children[graph.children.length - 2]);
+      graph.insertBefore(graph.lastChild, graph.children[graph.children.length - 2]);
     }
-
     const tooltip = el("div", "ct-dash-chart-tooltip");
     tooltip.hidden = true;
     tooltip.setAttribute("role", "status");
     tooltip.setAttribute("aria-live", "polite");
     container.appendChild(graph);
     container.appendChild(tooltip);
-
     function showPointTooltip(point, dot) {
-      tooltip.textContent = point.row.label + " · " + point.row.rate + "% approved · " + point.row.approved + " of " + point.row.total + " tasks";
+      tooltip.textContent = point.row.label + " · " + point.row.completed + " task" + (point.row.completed === 1 ? "" : "s") + " completed";
       tooltip.style.left = (point.x / width * 100) + "%";
       tooltip.style.top = (point.y / height * 100) + "%";
       tooltip.hidden = false;
       graph.querySelectorAll(".ct-dash-point--active").forEach(node => node.classList.remove("ct-dash-point--active"));
       if (dot) dot.classList.add("ct-dash-point--active");
     }
-
     points.forEach((point, index) => {
-      // A wider transparent hit target makes the data point easier to tap on touch screens.
-      const hit = svg("circle", { cx: point.x, cy: point.y, r: 13, fill: "transparent", stroke: "transparent", "stroke-width": 1, tabindex: 0, role: "button", "aria-label": point.row.label + ": " + point.row.rate + "% approved, " + point.row.approved + " of " + point.row.total + " tasks" });
+      const hit = svg("circle", { cx: point.x, cy: point.y, r: 13, fill: "transparent", stroke: "transparent", "stroke-width": 1, tabindex: 0, role: "button", "aria-label": point.row.label + ": " + point.row.completed + " tasks completed" });
       const dot = svg("circle", { cx: point.x, cy: point.y, r: 4, fill: "#101827", stroke: COLORS.green, "stroke-width": 2, "pointer-events": "none" });
       const tip = svg("title", {});
-      tip.textContent = point.row.label + ": " + point.row.rate + "% (" + point.row.approved + "/" + point.row.total + " approved)";
+      tip.textContent = point.row.label + ": " + point.row.completed + " tasks completed";
       hit.appendChild(tip);
       hit.addEventListener("pointerenter", () => showPointTooltip(point, dot));
       hit.addEventListener("focus", () => showPointTooltip(point, dot));
@@ -263,7 +259,6 @@
       });
       graph.appendChild(hit);
       graph.appendChild(dot);
-
       const show = points.length <= 8 || index === 0 || index === points.length - 1 || index % Math.ceil(points.length / 6) === 0;
       if (show) {
         const label = svg("text", { x: point.x, y: height - 14, fill: COLORS.muted, "font-size": 10, "text-anchor": "middle" });
@@ -271,17 +266,14 @@
         graph.appendChild(label);
       }
     });
-
     graph.addEventListener("pointerleave", event => {
       if (event.pointerType === "mouse" && !graph.contains(document.activeElement)) {
         tooltip.hidden = true;
         graph.querySelectorAll(".ct-dash-point--active").forEach(node => node.classList.remove("ct-dash-point--active"));
       }
     });
-    graph.addEventListener("click", event => {
-      if (event.target === graph) tooltip.hidden = true;
-    });
-    container.append(el("p", "ct-dash-note", "Compliance = approved tasks divided by tasks due in the selected period. Tap or focus a data point to see its date, approval rate, and task count. Unscheduled tasks use their creation date."));
+    graph.addEventListener("click", event => { if (event.target === graph) tooltip.hidden = true; });
+    container.append(el("p", "ct-dash-note", "Shows tasks completed in each time bucket using the recorded completion, submission, or review date. Tap or focus a point to see its completed count."));
   }
 
   function complianceRows() {
@@ -289,17 +281,29 @@
     const rows = config.buckets.map(date => ({ date, label: bucketLabel(date, config.unit), total: 0, approved: 0 }));
     const lookup = new Map(rows.map((row, index) => [localKey(row.date), index]));
     const rangeEndExclusive = add(dayStart(config.end), "day", 1);
-
     operations.forEach(task => {
       const date = taskDate(task);
       if (!date || date < config.start || date >= rangeEndExclusive) return;
       const index = lookup.get(localKey(bucketFor(date, config.unit)));
       if (index === undefined) return;
       rows[index].total += 1;
-      if (status(task) === "approved") rows[index].approved += 1;
+      if (isCompleted(task)) rows[index].approved += 1;
     });
-
     return rows.map(row => ({ ...row, rate: row.total ? Math.round(row.approved / row.total * 100) : 0 }));
+  }
+
+  function completionRows() {
+    const config = currentRange();
+    const rows = config.buckets.map(date => ({ date, label: bucketLabel(date, config.unit), completed: 0 }));
+    const lookup = new Map(rows.map((row, index) => [localKey(row.date), index]));
+    const rangeEndExclusive = add(dayStart(config.end), "day", 1);
+    operations.forEach(task => {
+      const date = completionDate(task);
+      if (!date || date < config.start || date >= rangeEndExclusive) return;
+      const index = lookup.get(localKey(bucketFor(date, config.unit)));
+      if (index !== undefined) rows[index].completed += 1;
+    });
+    return rows;
   }
 
   function renderDonut(container, counts) {
@@ -493,9 +497,9 @@
     intro.append(el("h1", "ct-dash-title", "Admin Dashboard"));
     intro.append(el("p", "ct-dash-description", "What's happening right now across your organization."));
     const headerActions = el("div", "ct-dash-header-actions");
-    const rangeLabel = el("label", "ct-dash-control-label", "Compliance range");
+    const rangeLabel = el("label", "ct-dash-control-label", "Trend range");
     const rangeSelect = el("select", "ct-dash-select");
-    rangeSelect.setAttribute("aria-label", "Compliance trend range");
+    rangeSelect.setAttribute("aria-label", "Task completion trend range");
     [
       ["daily", "Daily · last 7 days"],
       ["weekly", "Weekly · last 8 weeks"],
@@ -554,10 +558,10 @@
     const compliance = el("section", "ct-dash-panel ct-dash-compliance");
     const complianceHead = el("div", "ct-dash-panel-head");
     const complianceTitle = el("div");
-    complianceTitle.append(el("p", "ct-dash-panel-kicker", "VERIFIED WORK"));
-    complianceTitle.append(el("h2", "ct-dash-panel-title", "Task compliance trend"));
+    complianceTitle.append(el("p", "ct-dash-panel-kicker", "COMPLETED WORK"));
+    complianceTitle.append(el("h2", "ct-dash-panel-title", "Task completion trend"));
     const rateWrap = el("div", "ct-dash-current-rate");
-    rateWrap.append(el("strong", "", "—"), el("span", "", "Selected period"));
+    rateWrap.append(el("strong", "", "—"), el("span", "", "Tasks completed"));
     rateWrap.firstChild.dataset.complianceRate = "true";
     complianceHead.append(complianceTitle, rateWrap);
     const chart = el("div", "ct-dash-chart");
@@ -655,11 +659,10 @@
     renderLocations(root.querySelector("[data-locations]"), now);
     renderActivity(root.querySelector("[data-activity]"));
 
-    const rows = complianceRows();
-    const due = rows.reduce((sum, row) => sum + row.total, 0);
-    const approved = rows.reduce((sum, row) => sum + row.approved, 0);
+    const rows = completionRows();
+    const completed = rows.reduce((sum, row) => sum + row.completed, 0);
     const rate = root.querySelector("[data-compliance-rate]");
-    if (rate) rate.textContent = due ? Math.round(approved / due * 100) + "%" : "—";
+    if (rate) rate.textContent = String(completed);
     drawComplianceChart(root.querySelector("[data-compliance-chart]"), rows, currentRange().unit);
   }
 
