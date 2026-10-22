@@ -1982,3 +1982,51 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
   }
   #workspace-view .ct-workspace-toolbar > .ct-workspace-back span { display: none !important; }
 }
+
+
+/* Professional, spacious account/profile dialog. */
+#workspace-view .ct-profile-dialog-v2 { display: grid; gap: 18px; }
+#workspace-view .ct-profile-hero {
+  display: flex; align-items: center; gap: 16px; padding: 20px;
+  border: 1px solid var(--border, #29374d); border-radius: 16px;
+  background: linear-gradient(135deg, rgba(100,216,176,.10), rgba(20,30,49,.76));
+}
+#workspace-view .ct-profile-hero-avatar {
+  display: grid; place-items: center; flex: 0 0 64px; width: 64px; height: 64px;
+  border: 1px solid rgba(100,216,176,.38); border-radius: 20px;
+  background: #182b29; color: #a5f3d8; font-size: 22px; font-weight: 750;
+}
+#workspace-view .ct-profile-identity { min-width: 0; display: grid; gap: 5px; }
+#workspace-view .ct-profile-eyebrow { margin: 0; color: #64d8b0; font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+#workspace-view .ct-profile-dialog-v2 .ct-profile-name { margin: 0; color: var(--text, #e5edf7); font-size: 21px; line-height: 1.25; overflow-wrap: anywhere; }
+#workspace-view .ct-profile-dialog-v2 .ct-profile-email { margin: 0; color: var(--muted, #aab7ca); font-size: 13px; overflow-wrap: anywhere; }
+#workspace-view .ct-profile-role-pill {
+  justify-self: start; margin-top: 3px; padding: 4px 9px; border-radius: 999px;
+  border: 1px solid rgba(100,216,176,.28); background: rgba(100,216,176,.09);
+  color: #a5f3d8; font-size: 11px; font-weight: 650;
+}
+#workspace-view .ct-profile-section { padding: 17px; border: 1px solid var(--border, #29374d); border-radius: 14px; background: var(--surface, #111a2a); }
+#workspace-view .ct-profile-section-heading { margin-bottom: 13px; }
+#workspace-view .ct-profile-section-heading h4 { margin: 0; color: var(--text, #e5edf7); font-size: 14px; font-weight: 700; }
+#workspace-view .ct-profile-section-heading p { margin: 5px 0 0; color: var(--muted, #aab7ca); font-size: 12px; }
+#workspace-view .ct-profile-data-v2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 18px; margin: 0; }
+#workspace-view .ct-profile-data-item { min-width: 0; padding: 12px 0; border-top: 1px solid var(--border, #29374d); }
+#workspace-view .ct-profile-data-item dt { margin: 0 0 5px; color: var(--muted, #9aa9bd); font-size: 11px; }
+#workspace-view .ct-profile-data-item dd { margin: 0; color: var(--text, #e5edf7); font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+#workspace-view .ct-profile-security-note {
+  display: flex; align-items: flex-start; gap: 11px; padding: 13px 15px;
+  border: 1px solid var(--border, #29374d); border-radius: 12px; background: rgba(20,30,49,.55);
+}
+#workspace-view .ct-profile-security-icon {
+  display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px;
+  border-radius: 8px; background: rgba(100,216,176,.12); color: #a5f3d8; font-weight: 800;
+}
+#workspace-view .ct-profile-security-note strong { display: block; margin: 1px 0 4px; color: var(--text, #e5edf7); font-size: 12px; }
+#workspace-view .ct-profile-security-note p { margin: 0; color: var(--muted, #aab7ca); font-size: 11px; line-height: 1.6; }
+#workspace-view .ct-profile-actions-v2 { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 2px; }
+#workspace-view .ct-profile-actions-v2 button { min-height: 38px; border-radius: 10px; }
+@media (max-width: 560px) {
+  #workspace-view .ct-profile-hero { align-items: flex-start; padding: 15px; }
+  #workspace-view .ct-profile-hero-avatar { flex-basis: 52px; width: 52px; height: 52px; border-radius: 16px; }
+  #workspace-view .ct-profile-data-v2 { grid-template-columns: minmax(0,1fr); }
+}
