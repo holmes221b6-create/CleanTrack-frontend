@@ -464,46 +464,188 @@ if (identity) {
     }
 
     function openAssistant() {
+      const user = getUser();
+      const menu = window.CleanTrackNavigation && window.CleanTrackNavigation.getMenu
+        ? window.CleanTrackNavigation.getMenu(user && user.role)
+        : [];
+      const pageAliases = [
+        { keys: ["dashboard", "overview", "home", "today", "summary"], page: "dashboard" },
+        { keys: ["task", "tasks", "operation", "operations", "work order", "assignment", "checklist", "overdue"], page: "operations" },
+        { keys: ["my work", "my desk", "my task", "assigned to me"], page: "my-desk" },
+        { keys: ["staff", "employee", "employees", "people", "member", "personnel"], page: "staff" },
+        { keys: ["team", "teams", "group"], page: "teams" },
+        { keys: ["location", "locations", "site", "sites", "building", "facility"], page: "locations" },
+        { keys: ["zone", "zones", "room", "area", "floor"], page: "zones" },
+        { keys: ["review", "reviews", "approve", "approval", "reject", "evidence"], page: "reviews" },
+        { keys: ["log", "logs", "audit", "history", "activity"], page: "audit" },
+        { keys: ["report", "reports", "export", "csv", "pdf"], page: "reports" },
+        { keys: ["analytics", "performance", "ranking", "trend", "metrics"], page: "analytics" },
+        { keys: ["announcement", "announcements", "alert", "alerts", "notice"], page: "announcements" },
+        { keys: ["message", "messages", "channel", "chat"], page: "team-channel" },
+        { keys: ["setting", "settings", "preference"], page: "settings" },
+        { keys: ["profile", "account", "avatar", "password", "email"], page: "profile" },
+        { keys: ["invite", "invitation", "join request"], page: "invitations" },
+        { keys: ["skill", "skills", "training", "qualification"], page: "skills" },
+        { keys: ["coverage", "delegation", "handover", "shift"], page: "coverage" }
+      ];
+
+      function findPage(id) {
+        return menu.find(item => item.id === id);
+      }
+      function matchPages(question) {
+        const q = normalized(question);
+        const matchedIds = [];
+        pageAliases.forEach(entry => {
+          if (entry.keys.some(key => q.includes(normalized(key))) && findPage(entry.page) && !matchedIds.includes(entry.page)) {
+            matchedIds.push(entry.page);
+          }
+        });
+        if (!matchedIds.length) {
+          buildSearchResults(question).filter(item => item.kind === "page").slice(0, 3).forEach(item => {
+            if (!matchedIds.includes(item.id)) matchedIds.push(item.id);
+          });
+        }
+        return matchedIds.slice(0, 4).map(findPage).filter(Boolean);
+      }
+
+      function answerQuestion(question) {
+        const q = normalized(question);
+        const has = (...terms) => terms.some(term => q.includes(normalized(term)));
+        if (has("hello", "hi", "hey", "good morning", "good afternoon")) {
+          return { text: "Hi! I can help you use CleanTrack, understand its workflows, and find the right workspace pages. What are you trying to do?", pages: [] };
+        }
+        if (has("what can you do", "help me", "help", "capabilities")) {
+          return { text: "I can explain CleanTrack workflows, help you find tasks and operations, guide you through locations and zones, explain reviews and logs, and point you to reports, staff, teams, and settings. I only answer about CleanTrack and won't invent live figures or claim an action was completed.", pages: [] };
+        }
+        if (has("location", "locations", "site", "building", "facility", "zone", "zones", "floor plan", "map")) {
+          return { text: "Locations represent the real-world sites or buildings your organisation works in. Zones are operational areas inside a location, such as a floor, lobby, room, or department. Start with Locations to add or review a site; then use Zones to manage the areas linked to that site. Zones should be based on the location's actual information, not randomly generated.", pages: matchPages(question) };
+        }
+        if (has("create operation", "create task", "assign task", "assign work", "schedule", "overdue", "task", "tasks", "operation", "operations", "checklist", "work order")) {
+          return { text: "For operational work, open Operations to review or manage work items and assignments. Check the task's status, assignee, due date, and required checklist or evidence. A planned operation is not the same as a completion log: the work should be marked complete through the available work flow before it is treated as finished.", pages: matchPages(question) };
+        }
+        if (has("approve", "approval", "reject", "review", "reviews", "before photo", "after photo", "evidence")) {
+          return { text: "Use Reviews to inspect submitted work and its evidence. Check the operation, completion details, and any before/after photos available. Approve only when the submission meets your organisation's requirements; reject it when it needs correction and provide a clear reason if the page supports one.", pages: matchPages(question) };
+        }
+        if (has("log", "logs", "audit", "history", "who changed", "activity")) {
+          return { text: "Logs and audit history are for what actually happened: actions, status changes, and completed or reviewed work. Operations describe intended work; logs record events and outcomes. Open the relevant logs/history page to inspect the records your role is allowed to see.", pages: matchPages(question) };
+        }
+        if (has("report", "reports", "export", "download", "csv", "pdf", "excel", "xlsx")) {
+          return { text: "Open Reports to prepare an export. A useful flow is select the data, apply filters, preview the result, generate it, then download or share it if those options are available. Use Analytics for comparisons and performance trends rather than as a replacement for a report export.", pages: matchPages(question) };
+        }
+        if (has("staff", "employee", "employees", "people", "member", "personnel", "team", "teams", "invite")) {
+          return { text: "Use Staff or Personnel to manage people and Teams to organise members into working groups. Invitations and join requests may need Admin approval. The options shown depend on your CleanTrack role, so I will only suggest pages available in your current navigation.", pages: matchPages(question) };
+        }
+        if (has("announcement", "announcements", "alert", "alerts", "notification", "notifications")) {
+          return { text: "Announcements and Alerts is the place to review or manage organisation notices. Before publishing, confirm the audience and message so the right people receive the update.", pages: matchPages(question) };
+        }
+        if (has("setting", "settings", "profile", "account", "avatar", "appearance", "theme")) {
+          return { text: "Use Profile for account details and Settings for preferences that are available to your role. Organisation-wide settings may be restricted to Admins. If a setting is not visible, I won't assume your account has permission to change it.", pages: matchPages(question) };
+        }
+        if (has("live data", "how many", "count", "status right now", "current number", "show me data")) {
+          return { text: "I won't guess live counts or statuses. This version of the assistant doesn't yet query operational records for conversational answers. Open the relevant CleanTrack page to see its current data; live, permission-checked data answers can be added through the backend without introducing a paid AI API.", pages: matchPages(question) };
+        }
+        const pages = matchPages(question);
+        if (pages.length) {
+          return { text: "I can help with that within CleanTrack. These are the closest pages available to your role. If you tell me the outcome you want—for example, create a task, review completed work, or export a report—I can give more specific guidance.", pages };
+        }
+        return { text: "I don't have a reliable CleanTrack-specific answer for that yet, and I won't make one up. Try asking how to manage operations, locations and zones, reviews, logs, reports, staff, teams, announcements, or settings.", pages: [] };
+      }
+
       openWorkspaceDialog("CleanTrack Assistant", content => {
-        const wrap = appendText(content, "div", "", "ct-help-dialog");
-        appendText(wrap, "p", "What would you like help finding?", "ct-help-lead");
-        appendText(wrap, "p", "Search your available CleanTrack sections, or ask a quick question about where to start.", "ct-help-note");
+        const wrap = appendText(content, "div", "", "ct-help-dialog ct-assistant-chat");
+        appendText(wrap, "p", "Your CleanTrack workspace helper", "ct-help-lead");
+        appendText(wrap, "p", "Free built-in guidance. No paid AI API and no external web search.", "ct-help-note");
+
+        const transcript = document.createElement("div");
+        transcript.className = "ct-assistant-transcript";
+        transcript.setAttribute("role", "log");
+        transcript.setAttribute("aria-live", "polite");
+        transcript.style.cssText = "display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto;padding:12px;margin:10px 0;border:1px solid var(--border-color,rgba(255,255,255,.12));border-radius:12px;background:var(--surface-secondary,rgba(0,0,0,.12));";
+        wrap.appendChild(transcript);
+
+        function addMessage(role, text) {
+          const bubble = document.createElement("div");
+          bubble.className = "ct-assistant-message ct-assistant-message-" + role;
+          bubble.style.cssText = "align-self:" + (role === "user" ? "flex-end" : "flex-start") + ";max-width:92%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;" +
+            (role === "user"
+              ? "background:var(--accent-color,#6d63a8);color:#fff;"
+              : "background:var(--surface-color,rgba(255,255,255,.06));border:1px solid var(--border-color,rgba(255,255,255,.10));");
+          bubble.textContent = text;
+          transcript.appendChild(bubble);
+          transcript.scrollTop = transcript.scrollHeight;
+          return bubble;
+        }
+
+        function addPageLinks(parent, pages) {
+          if (!pages.length) return;
+          const group = document.createElement("div");
+          group.className = "ct-assistant-matches";
+          group.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px;";
+          pages.forEach(page => addDialogButton(group, "Open " + page.label, () => {
+            const modal = document.getElementById("app-modal");
+            if (modal && modal.open) modal.close();
+            if (window.CleanTrackNavigation && window.CleanTrackNavigation.setActivePage) {
+              window.CleanTrackNavigation.setActivePage(page.id);
+            }
+          }, "ct-help-secondary-button"));
+          parent.appendChild(group);
+        }
+
+        const initial = document.createElement("div");
+        initial.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:8px;";
+        transcript.appendChild(initial);
+        addMessage("assistant", "Hello! I'm CleanTrack Assistant. I can guide you through your workspace and explain how CleanTrack features fit together. Ask me about operations, locations and zones, reviews, logs, reports, staff, or settings.");
+        const starterRow = document.createElement("div");
+        starterRow.style.cssText = "display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;";
+        [
+          "How do I manage operations?",
+          "How are locations and zones linked?",
+          "How do reviews and logs differ?",
+          "How do I generate a report?"
+        ].forEach(prompt => addDialogButton(starterRow, prompt, () => submitQuestion(prompt), "ct-help-secondary-button"));
+        wrap.appendChild(starterRow);
+
         const form = document.createElement("form");
         form.className = "ct-assistant-form";
+        form.style.cssText = "display:flex;gap:8px;align-items:stretch;";
         const input = document.createElement("input");
         input.type = "text";
         input.name = "question";
-        input.placeholder = "Try “find overdue tasks” or “manage staff”…";
+        input.autocomplete = "off";
+        input.placeholder = "Ask about CleanTrack…";
         input.setAttribute("aria-label", "Ask CleanTrack Assistant");
-        const output = appendText(wrap, "div", "Suggested pages will appear here.", "ct-assistant-output");
+        input.style.flex = "1";
         const go = document.createElement("button");
         go.type = "submit";
         go.className = "ct-help-action-button";
-        go.textContent = "Find guidance";
+        go.textContent = "Send";
         form.append(input, go);
         form.addEventListener("submit", event => {
           event.preventDefault();
-          const q = input.value.trim();
-          if (!q) {
-            output.textContent = "Enter a question or keyword to get started.";
-            return;
-          }
-          const matches = buildSearchResults(q).filter(item => item.kind === "page").slice(0, 4);
-          output.replaceChildren();
-          if (!matches.length) {
-            appendText(output, "p", "I couldn't match that to a page available to your role. Try words like tasks, staff, locations, reports, reviews, or settings.");
-            return;
-          }
-          appendText(output, "p", "Here are the most relevant sections:", "ct-help-lead");
-          const list = document.createElement("div");
-          list.className = "ct-assistant-matches";
-          matches.forEach(result => addDialogButton(list, result.label, () => {
-            document.getElementById("app-modal").close();
-            window.CleanTrackNavigation.setActivePage(result.id);
-          }, "ct-help-secondary-button"));
-          output.appendChild(list);
+          submitQuestion(input.value);
         });
         wrap.appendChild(form);
+
+        function submitQuestion(rawQuestion) {
+          const question = String(rawQuestion || "").trim();
+          if (!question) {
+            input.focus();
+            return;
+          }
+          addMessage("user", question);
+          input.value = "";
+          const answer = answerQuestion(question);
+          addMessage("assistant", answer.text);
+          if (answer.pages.length) {
+            const linkRow = document.createElement("div");
+            linkRow.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-left:4px;";
+            addPageLinks(linkRow, answer.pages);
+            transcript.appendChild(linkRow);
+            transcript.scrollTop = transcript.scrollHeight;
+          }
+          input.focus();
+        }
+        input.focus();
       });
     }
 
