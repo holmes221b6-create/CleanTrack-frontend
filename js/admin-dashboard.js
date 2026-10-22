@@ -728,7 +728,7 @@
       let currentSection = "";
       newPage();
       // Show the reporting period clearly near the top of the first page.
-      text(MARGIN,y,"Reporting period: "+pdfSafe(range==="custom"?(customFrom+" to "+customTo):humanize(range)),9,TEXT,"F2");
+      text(MARGIN,y,"Reporting period: "+pdfSafe(range==="custom"?(customFrom+" to "+customTo):String(range).replace(/[_-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase())),9,TEXT,"F2");
       y-=20;
       text(MARGIN,y,"Live dashboard snapshot | "+operations.length+" tasks | "+locations.length+" locations",8,MUTED);
       y-=24;
