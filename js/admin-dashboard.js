@@ -229,11 +229,39 @@
       graph.lastChild && graph.insertBefore(graph.lastChild, graph.children[graph.children.length - 2]);
     }
 
+    const tooltip = el("div", "ct-dash-chart-tooltip");
+    tooltip.hidden = true;
+    tooltip.setAttribute("role", "status");
+    tooltip.setAttribute("aria-live", "polite");
+    container.appendChild(graph);
+    container.appendChild(tooltip);
+
+    function showPointTooltip(point, dot) {
+      tooltip.textContent = point.row.label + " · " + point.row.rate + "% approved · " + point.row.approved + " of " + point.row.total + " tasks";
+      tooltip.style.left = (point.x / width * 100) + "%";
+      tooltip.style.top = (point.y / height * 100) + "%";
+      tooltip.hidden = false;
+      graph.querySelectorAll(".ct-dash-point--active").forEach(node => node.classList.remove("ct-dash-point--active"));
+      if (dot) dot.classList.add("ct-dash-point--active");
+    }
+
     points.forEach((point, index) => {
-      const dot = svg("circle", { cx: point.x, cy: point.y, r: 4, fill: "#101827", stroke: COLORS.green, "stroke-width": 2 });
+      // A wider transparent hit target makes the data point easier to tap on touch screens.
+      const hit = svg("circle", { cx: point.x, cy: point.y, r: 13, fill: "transparent", stroke: "transparent", "stroke-width": 1, tabindex: 0, role: "button", "aria-label": point.row.label + ": " + point.row.rate + "% approved, " + point.row.approved + " of " + point.row.total + " tasks" });
+      const dot = svg("circle", { cx: point.x, cy: point.y, r: 4, fill: "#101827", stroke: COLORS.green, "stroke-width": 2, "pointer-events": "none" });
       const tip = svg("title", {});
       tip.textContent = point.row.label + ": " + point.row.rate + "% (" + point.row.approved + "/" + point.row.total + " approved)";
-      dot.appendChild(tip);
+      hit.appendChild(tip);
+      hit.addEventListener("pointerenter", () => showPointTooltip(point, dot));
+      hit.addEventListener("focus", () => showPointTooltip(point, dot));
+      hit.addEventListener("click", event => {
+        event.stopPropagation();
+        if (!tooltip.hidden && dot.classList.contains("ct-dash-point--active")) {
+          tooltip.hidden = true;
+          dot.classList.remove("ct-dash-point--active");
+        } else showPointTooltip(point, dot);
+      });
+      graph.appendChild(hit);
       graph.appendChild(dot);
 
       const show = points.length <= 8 || index === 0 || index === points.length - 1 || index % Math.ceil(points.length / 6) === 0;
@@ -244,8 +272,16 @@
       }
     });
 
-    container.appendChild(graph);
-    container.append(el("p", "ct-dash-note", "Compliance = approved tasks divided by tasks due in the selected period. Unscheduled tasks use their creation date."));
+    graph.addEventListener("pointerleave", event => {
+      if (event.pointerType === "mouse" && !graph.contains(document.activeElement)) {
+        tooltip.hidden = true;
+        graph.querySelectorAll(".ct-dash-point--active").forEach(node => node.classList.remove("ct-dash-point--active"));
+      }
+    });
+    graph.addEventListener("click", event => {
+      if (event.target === graph) tooltip.hidden = true;
+    });
+    container.append(el("p", "ct-dash-note", "Compliance = approved tasks divided by tasks due in the selected period. Tap or focus a data point to see its date, approval rate, and task count. Unscheduled tasks use their creation date."));
   }
 
   function complianceRows() {
