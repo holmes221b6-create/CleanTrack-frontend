@@ -641,7 +641,7 @@ if (identity) {
 
         function isLogDiagnosisQuestion(question) {
           const q = normalized(question);
-          return /\\blogs?\\b/.test(q) && /\\b(why|not showing|missing|empty|no logs|test|diagnos|check|problem|issue|troubleshoot|where are)\\b/.test(q);
+          return /\blogs?\b/.test(q) && /\b(why|not showing|missing|empty|no logs|test|diagnos|check|problem|issue|troubleshoot|where are)\b/.test(q);
         }
 
         function responseRows(value, keys) {
@@ -717,7 +717,12 @@ if (identity) {
           input.value = "";
           if (isLogDiagnosisQuestion(question)) {
             const pending = addMessage("assistant", "Checking your current account, tasks, and logs…");
-            const answer = await diagnoseLiveLogs();
+            let answer;
+            try {
+              answer = await diagnoseLiveLogs();
+            } catch (error) {
+              answer = "The live Logs check failed unexpectedly. No records were changed. Please retry; if it continues, check the browser console and backend response.";
+            }
             pending.textContent = answer;
             history.push({ role: "assistant", text: answer, at: new Date().toISOString() });
             history = history.slice(-80);
