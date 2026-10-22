@@ -107,7 +107,7 @@ if (identity) {
     profileButton.className = "ct-profile-trigger";
     profileButton.setAttribute("aria-label", "Open profile and account data");
     profileButton.title = "Profile and account";
-    profileButton.innerHTML = '<span class="ct-profile-avatar" aria-hidden="true">U</span><span class="ct-profile-trigger-name">Account</span><svg class="ct-profile-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>';
+    profileButton.innerHTML = '<span class="ct-profile-avatar" aria-hidden="true">U</span>';
 
     toolbar.append(backButton, toolbarSpacer, searchWrap, actions);
     actions.append(toggle, notificationsButton, assistantButton, profileButton);
@@ -522,7 +522,7 @@ if (identity) {
         avatar.setAttribute("tabindex", "0");
         avatar.setAttribute("aria-label", "Change profile picture");
         avatar.title = "Change profile picture";
-        avatar.setAttribute("aria-description", "Click the round avatar or camera icon to choose a profile picture.");
+        avatar.setAttribute("aria-description", "Click the round avatar to choose a profile picture.");
         const identity = document.createElement("div");
         identity.className = "ct-profile-identity";
         appendText(identity, "p", "ACCOUNT", "ct-profile-eyebrow");
@@ -548,15 +548,7 @@ if (identity) {
         avatarInput.tabIndex = -1;
         avatarInput.style.display = "none";
         avatarLabel.style.display = "none";
-        const cameraButton = document.createElement("button");
-        cameraButton.type = "button";
-        cameraButton.className = "ct-profile-avatar-camera";
-        cameraButton.setAttribute("aria-label", "Change profile picture");
-        cameraButton.title = "Change profile picture";
-        cameraButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h-4l-2 3H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>';
         const openAvatarPicker = () => avatarInput.click();
-        cameraButton.addEventListener("click", event => { event.stopPropagation(); openAvatarPicker(); });
-        summary.appendChild(cameraButton);
         avatarControls.append(avatarLabel, avatarInput);
         avatar.addEventListener("click", openAvatarPicker);
         avatar.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openAvatarPicker(); } });
