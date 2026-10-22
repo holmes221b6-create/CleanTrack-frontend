@@ -374,3 +374,56 @@ color: #ffffff !important;
   font-weight: 800; line-height: 1; box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
 }
 .nav-unread-count[hidden] { display: none !important; }
+
+
+/* Global one-step Back control — match CleanTrack's charcoal and mint theme. */
+#workspace-view .ct-workspace-back {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  margin-right: 10px;
+  padding: 0 12px;
+  border: 1px solid #29374d;
+  border-radius: 10px;
+  background: #141e31;
+  color: #dbe6f5;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+#workspace-view .ct-workspace-back svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#workspace-view .ct-workspace-back:hover:not(:disabled) {
+  background: #182b29;
+  border-color: #64d8b0;
+  color: #a5f3d8;
+}
+#workspace-view .ct-workspace-back:focus-visible {
+  outline: 2px solid #64d8b0;
+  outline-offset: 2px;
+}
+#workspace-view .ct-workspace-back:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+@media (max-width: 520px) {
+  #workspace-view .ct-workspace-back {
+    gap: 0;
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+  }
+  #workspace-view .ct-workspace-back span { display: none; }
+}
