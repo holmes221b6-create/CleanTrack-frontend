@@ -517,6 +517,15 @@ if (identity) {
         if (has("what can you do", "help me", "help", "capabilities")) {
           return { text: "I can explain CleanTrack workflows, help you find tasks and operations, guide you through locations and zones, explain reviews and logs, and point you to reports, staff, teams, and settings. I only answer about CleanTrack and won't invent live figures or claim an action was completed.", pages: [] };
         }
+        if (has("what features", "features does cleantrack", "features of cleantrack", "feature list", "what does cleantrack do", "what can cleantrack do", "product features")) {
+          return { text: "CleanTrack is an organisation-focused cleaning and operations workspace. Its implemented areas include: organisation and member access; staff and team management; locations and linked zones; task/operation scheduling and assignment; staff work completion and cleaning logs; supervisor/Admin review and approval; announcements and alerts; analytics and report exports; profile and app settings. Available actions depend on your role, and a feature's presence in the navigation doesn't mean every integration or billing capability is enabled. Ask about any one feature and I can explain its workflow.", pages: matchPages(question) };
+        }
+        if (has("billing", "bill", "subscription", "subscriptions", "pricing", "upgrade", "plan", "payment", "invoice", "renewal")) {
+          return { text: "Billing and plan upgrades: I can't confirm an active self-service billing or subscription workflow from the CleanTrack features wired into this assistant. I won't invent prices, plan limits, payment steps, or claim an upgrade is available. Check whether your Admin navigation has an Organisation/Plan or Billing option. If no such option exists, billing isn't currently exposed in this app version and an organisation owner will need the intended plan-management process from the CleanTrack provider.", pages: matchPages(question) };
+        }
+        if (has("how does cleantrack work", "how does this app work", "how does the app work", "getting started", "start using cleantrack", "cleantrack workflow", "main workflow")) {
+          return { text: "CleanTrack's core workflow is: an Admin sets up the organisation and people; locations represent real sites; zones define working areas within locations; operations/tasks are assigned to staff; staff carry out the work and submit cleaning logs; submitted work can await supervisor/Admin review; reports and analytics summarise available records. Logs are evidence of work/events, while tasks describe planned work. Exact options depend on role and deployment.", pages: matchPages(question) };
+        }
         if (has("location", "locations", "site", "building", "facility", "zone", "zones", "floor plan", "map")) {
           return { text: "Locations represent the real-world sites or buildings your organisation works in. Zones are operational areas inside a location, such as a floor, lobby, room, or department. Start with Locations to add or review a site; then use Zones to manage the areas linked to that site. Zones should be based on the location's actual information, not randomly generated.", pages: matchPages(question) };
         }
@@ -544,10 +553,6 @@ if (identity) {
         if (has("setting", "settings", "profile", "account", "avatar", "appearance", "theme")) {
           return { text: "Use Profile for account details and Settings for preferences that are available to your role. Organisation-wide settings may be restricted to Admins. If a setting is not visible, I won't assume your account has permission to change it.", pages: matchPages(question) };
         }
-        const pages = matchPages(question);
-        if (pages.length) {
-          return { text: "I can help with that within CleanTrack. These are the closest pages available to your role. If you tell me the outcome you want—for example, create a task, review completed work, or export a report—I can give more specific guidance.", pages };
-        }
         if (has("cleantrack", "how does this app work", "how does the app work", "workflow", "work flow", "getting started", "start using")) {
           return { text: "CleanTrack connects organisation setup, locations, operational zones, teams and assigned tasks. Staff carry out assigned work and submit a cleaning log with the required details/evidence. Submitted work can move to pending approval for a supervisor or admin to review. Reports summarise records for export; audit logs record actions that happened. What you can see and do depends on your role and assigned location. I can check live records when you ask for current tasks, logs, locations or zones.", pages: matchPages(question) };
         }
@@ -556,6 +561,10 @@ if (identity) {
         }
         if (has("password", "sign in", "login", "log in", "session", "permission", "access denied", "forbidden")) {
           return { text: "For a sign-in or access problem, refresh the app and sign in again. If a page still fails, note which page and action failed; an empty result and an access/API error are different problems. CleanTrack limits records by role and assigned location, so ask an Admin to check your role or assignment if access still looks wrong.", pages: matchPages(question) };
+        }
+        const pages = matchPages(question);
+        if (pages.length) {
+          return { text: "I found these related CleanTrack pages. Tell me the outcome you want and I can guide you through the workflow.", pages };
         }
         return { text: "I can explain CleanTrack's workflows and check live records exposed to your signed-in role. I couldn't confidently match that wording to a specific feature, so I won't invent an answer. Try asking in terms of the outcome you want—for example, 'show my current tasks', 'check why Logs is empty', 'how do I submit work for review?', or 'how do I import a location and create zones?'.", pages: matchPages(question) };
       }
@@ -620,10 +629,10 @@ if (identity) {
         const starterRow = document.createElement("div");
         starterRow.style.cssText = "display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;";
         [
-          "How do I manage operations?",
+          "What features does CleanTrack have?",
+          "Why are my logs empty?",
           "How are locations and zones linked?",
-          "How do reviews and logs differ?",
-          "How do I generate a report?"
+          "How does billing or upgrading work?"
         ].forEach(prompt => addDialogButton(starterRow, prompt, () => submitQuestion(prompt), "ct-help-secondary-button"));
         wrap.appendChild(starterRow);
 
