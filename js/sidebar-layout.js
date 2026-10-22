@@ -511,7 +511,7 @@ if (identity) {
       function answerQuestion(question) {
         const q = normalized(question);
         const has = (...terms) => terms.some(term => q.includes(normalized(term)));
-        if (has("hello", "hi", "hey", "good morning", "good afternoon")) {
+        if (/^(hi|hello|hey|good morning|good afternoon)\b/.test(q)) {
           return { text: "Hi! I can help you use CleanTrack, understand its workflows, and find the right workspace pages. What are you trying to do?", pages: [] };
         }
         if (has("what can you do", "help me", "help", "capabilities")) {
@@ -519,6 +519,9 @@ if (identity) {
         }
         if (has("location", "locations", "site", "building", "facility", "zone", "zones", "floor plan", "map")) {
           return { text: "Locations represent the real-world sites or buildings your organisation works in. Zones are operational areas inside a location, such as a floor, lobby, room, or department. Start with Locations to add or review a site; then use Zones to manage the areas linked to that site. Zones should be based on the location's actual information, not randomly generated.", pages: matchPages(question) };
+        }
+        if (has("live data", "how many", "count", "status right now", "current number", "show me data")) {
+          return { text: "I won't guess live counts or statuses. This version of the assistant doesn't yet query operational records for conversational answers. Open the relevant CleanTrack page to see its current data; live, permission-checked data answers can be added through the backend without introducing a paid AI API.", pages: matchPages(question) };
         }
         if (has("create operation", "create task", "assign task", "assign work", "schedule", "overdue", "task", "tasks", "operation", "operations", "checklist", "work order")) {
           return { text: "For operational work, open Operations to review or manage work items and assignments. Check the task's status, assignee, due date, and required checklist or evidence. A planned operation is not the same as a completion log: the work should be marked complete through the available work flow before it is treated as finished.", pages: matchPages(question) };
@@ -540,9 +543,6 @@ if (identity) {
         }
         if (has("setting", "settings", "profile", "account", "avatar", "appearance", "theme")) {
           return { text: "Use Profile for account details and Settings for preferences that are available to your role. Organisation-wide settings may be restricted to Admins. If a setting is not visible, I won't assume your account has permission to change it.", pages: matchPages(question) };
-        }
-        if (has("live data", "how many", "count", "status right now", "current number", "show me data")) {
-          return { text: "I won't guess live counts or statuses. This version of the assistant doesn't yet query operational records for conversational answers. Open the relevant CleanTrack page to see its current data; live, permission-checked data answers can be added through the backend without introducing a paid AI API.", pages: matchPages(question) };
         }
         const pages = matchPages(question);
         if (pages.length) {
