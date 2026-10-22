@@ -280,6 +280,12 @@
   font:inherit; font-size:12px;
 }
 #page-content .ct-home-member-search::placeholder { color:#706c7f !important; }
+#page-content .ct-home-member-search-button { flex:0 0 auto; min-height:32px; padding:7px 13px; white-space:nowrap; }
+@media (max-width:520px) {
+  #page-content .ct-home-member-search-wrap { flex-wrap:wrap; padding:8px 10px; }
+  #page-content .ct-home-member-search { flex:1 1 calc(100% - 36px); }
+  #page-content .ct-home-member-search-button { flex:1 1 100%; }
+}
 #page-content .ct-home-member-count { margin:9px 0 0; color:#777485; font-size:10px; }
 #page-content .ct-home-member-results {
   display:grid;
