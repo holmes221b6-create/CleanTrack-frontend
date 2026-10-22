@@ -439,45 +439,106 @@
     const counts = {
       progress: operations.filter(task => workBucket(task, now) === "progress").length,
       pending: operations.filter(task => !isClosed(task) && workBucket(task, now) === "pending").length,
-      overdue: operations.filter(task => workBucket(task, now) === "overdue").length
+      overdue: operations.filter(task => workBucket(task, now) === "overdue").length,
+      approved: operations.filter(task => status(task) === "approved").length
     };
     const trend = completionRows();
     const completed = trend.reduce((sum, row) => sum + row.completed, 0);
+    const formatDateTime = value => {
+      const date = safeDate(value);
+      return date ? new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(date) : "Not recorded";
+    };
+    const formatDate = value => {
+      const date = safeDate(value);
+      return date ? new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date) : "Not set";
+    };
+    const humanize = value => {
+      const text = String(value == null ? "" : value).trim();
+      if (!text) return "Not specified";
+      return text.replace(/[_-]+/g, " ").replace(/\s+/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
+    };
+    const displayStatus = task => {
+      const raw = status(task);
+      if (!raw) return "Not set";
+      const known = {
+        "in progress": "In progress", "pending": "Pending", "submitted": "Submitted for review",
+        "completed": "Completed", "complete": "Completed", "approved": "Approved",
+        "verified": "Verified", "done": "Completed", "closed": "Closed",
+        "cancelled": "Cancelled", "overdue": "Overdue", "awaiting review": "Awaiting review",
+        "rejected": "Rejected", "rework": "Needs rework"
+      };
+      return known[raw] || humanize(raw);
+    };
+    const activitySummary = details => {
+      if (!details) return "No additional details recorded";
+      let value = details;
+      if (typeof value === "string") {
+        try { value = JSON.parse(value); } catch (_) { return value.slice(0, 240); }
+      }
+      if (typeof value !== "object") return String(value).slice(0, 240);
+      const entries = Object.entries(value).filter(([key, item]) =>
+        item !== null && item !== undefined && item !== "" &&
+        !/password|token|secret|authorization/i.test(key)
+      );
+      if (!entries.length) return "No additional details recorded";
+      return entries.slice(0, 4).map(([key, item]) => {
+        let shown = item;
+        if (typeof item === "object") {
+          if (Array.isArray(item)) shown = item.join(", ");
+          else shown = Object.entries(item).slice(0, 3).map(([nestedKey, nestedValue]) => humanize(nestedKey) + ": " + String(nestedValue)).join("; ");
+        }
+        return humanize(key) + ": " + String(shown).slice(0, 90);
+      }).join(" · ").slice(0, 300);
+    };
     const data = [
-      ["CleanTrack Admin Dashboard Report"],
-      ["Exported at", new Date().toISOString()],
-      ["Dashboard scope", "Current organization only"],
-      ["Selected trend range", range],
+      ["CleanTrack Dashboard Report"],
+      ["Generated", formatDateTime(now)],
+      ["Scope", "Current organization dashboard data"],
+      ["Trend period", humanize(range) + (range === "custom" ? " (" + customFrom + " to " + customTo + ")" : "")],
       [],
-      ["Task overview", "Count"],
-      ["Total tasks", operations.length],
-      ["In progress", counts.progress],
-      ["Pending", counts.pending],
-      ["Overdue", counts.overdue],
-      ["Approved / verified", operations.filter(task => status(task) === "approved").length],
-      ["Submitted / completed in selected trend range", completed],
-      ["Locations", locations.length],
+      ["Summary"],
+      ["Measure", "Value", "What it means"],
+      ["All tasks", operations.length, "Every task currently loaded in the dashboard"],
+      ["In progress", counts.progress, "Tasks currently marked in progress"],
+      ["Pending", counts.pending, "Open tasks not currently in progress"],
+      ["Overdue", counts.overdue, "Open tasks past their due date or explicitly marked overdue"],
+      ["Approved tasks", counts.approved, "Tasks with approved status"],
+      ["Submitted or completed in trend period", completed, "Counted using the dashboard completion/submission timestamps"],
+      ["Locations", locations.length, "Locations currently loaded in the dashboard"],
       [],
-      ["Task completion trend", "Tasks submitted/completed"],
-      ["Period", "Count"],
+      ["Completion trend"],
+      ["Period", "Tasks submitted or completed"],
       ...trend.map(row => [row.label, row.completed]),
       [],
-      ["Tasks"],
-      ["ID", "Title", "Status", "Task type", "Location", "Due at", "Created at", "Assigned user ID"]
+      ["Task register"],
+      ["Task name", "Current status", "Task type", "Location", "Due date", "Created date"],
+      ...operations.map(task => [
+        task.title || task.name || "Untitled task",
+        displayStatus(task),
+        humanize(task.task_type || task.operation_type || task.type),
+        (locationFor(task) || {}).name || (task.location_id ? "Location not found in loaded data" : "No location assigned"),
+        formatDate(task.due_at),
+        formatDate(task.created_at)
+      ]),
+      [],
+      ["Location performance"],
+      ["Location", "Total tasks", "Approved tasks", "Overdue tasks", "Approval rate"],
+      ...locations.map(location => {
+        const tasks = operations.filter(task => String(task.location_id) === String(location.id));
+        const approved = tasks.filter(task => status(task) === "approved").length;
+        const late = tasks.filter(task => overdue(task, now)).length;
+        return [location.name || "Unnamed location", tasks.length, approved, late, tasks.length ? Math.round(approved / tasks.length * 100) + "%" : "No tasks"];
+      }),
+      [],
+      ["Recent activity"],
+      ["Date and time", "Action", "Item type", "Summary"],
+      ...activity.map(log => [
+        formatDateTime(log.created_at || log.timestamp),
+        humanize(log.action || log.event_type || log.event),
+        humanize(log.resource_type || log.entity_type),
+        activitySummary(log.details || log.metadata || log.context)
+      ])
     ];
-    operations.forEach(task => data.push([
-      task.id, task.title, task.status, task.task_type,
-      (locationFor(task) || {}).name || "", task.due_at || "", task.created_at || "", task.assigned_to_id || ""
-    ]));
-    data.push([], ["Location performance"], ["Name", "Task count", "Approved", "Overdue", "Approved percentage"]);
-    locations.forEach(location => {
-      const tasks = operations.filter(task => String(task.location_id) === String(location.id));
-      const approved = tasks.filter(task => status(task) === "approved").length;
-      const late = tasks.filter(task => overdue(task, now)).length;
-      data.push([location.name, tasks.length, approved, late, tasks.length ? Math.round(approved / tasks.length * 100) + "%" : ""]);
-    });
-    data.push([], ["Recent activity"], ["Timestamp", "Action", "Resource type", "Resource ID", "Details"]);
-    activity.forEach(log => data.push([log.created_at, log.action, log.resource_type, log.resource_id, log.details ? JSON.stringify(log.details) : ""]));
     return data;
   }
 
@@ -506,14 +567,16 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     const rowKind = row => {
       const first = String(row[0] || "").trim().toLowerCase();
+      const second = String(row[1] || "").trim().toLowerCase();
       if (!first && row.every(value => value === "" || value === null || value === undefined)) return "blank";
-      if (first === "cleantrack admin dashboard report") return "title";
-      if (["task overview", "task completion trend", "tasks", "location performance", "recent activity"].includes(first)) return "section";
-      if ((first === "period" && String(row[1] || "").toLowerCase() === "count") ||
-          (first === "id" && String(row[1] || "").toLowerCase() === "title") ||
-          (first === "name" && String(row[1] || "").toLowerCase() === "task count") ||
-          (first === "timestamp" && String(row[1] || "").toLowerCase() === "action")) return "columns";
-      if (first === "exported at" || first === "dashboard scope" || first === "selected trend range") return "meta";
+      if (first === "cleantrack dashboard report") return "title";
+      if (["summary", "completion trend", "task register", "location performance", "recent activity"].includes(first)) return "section";
+      if ((first === "measure" && second === "value") ||
+          (first === "period" && second === "tasks submitted or completed") ||
+          (first === "task name" && second === "current status") ||
+          (first === "location" && second === "total tasks") ||
+          (first === "date and time" && second === "action")) return "columns";
+      if (["generated", "scope", "trend period"].includes(first)) return "meta";
       return "body";
     };
     if (format === "csv") {
@@ -730,15 +793,16 @@
     const exportAction = makeButton("", "ct-dash-quick-action", () => showExportOptions(root));
     exportAction.append(el("span", "ct-dash-quick-icon", "⇩"));
     const exportCopy = el("span", "ct-dash-quick-copy");
-    exportCopy.append(el("strong", "", "Export report"), el("small", "", "Choose CSV, Excel or PDF"));
+    exportCopy.append(el("strong", "", "Export report"), el("small", "", "Download a clear summary or detailed report"));
     exportAction.append(exportCopy, el("span", "ct-dash-quick-arrow", "→"));
     quickGrid.appendChild(exportAction);
     const exportOptions = el("div", "ct-dash-export-options");
     exportOptions.dataset.exportOptions = "true";
     exportOptions.hidden = true;
-    exportOptions.append(el("p", "ct-dash-panel-kicker", "DOWNLOAD FORMAT"));
+    exportOptions.append(el("p", "ct-dash-panel-kicker", "DOWNLOAD REPORT"));
+    exportOptions.append(el("p", "ct-dash-export-description", "Choose a format. Summary, task details, location performance and activity use clear labels."));
     const exportButtons = el("div", "ct-dash-export-buttons");
-    [["csv", "CSV", "Comma-separated values"], ["excel", "Excel", "Excel workbook-compatible file"], ["pdf", "PDF", "Print or save as PDF"]].forEach(([format, label, hint]) => {
+    [["csv", "CSV", "Open in a spreadsheet"], ["excel", "Excel", "Formatted workbook-compatible file"], ["pdf", "PDF", "Print or save as PDF"]].forEach(([format, label, hint]) => {
       const button = makeButton("", "ct-dash-export-option", () => exportReport(format));
       button.append(el("strong", "", label), el("small", "", hint));
       exportButtons.appendChild(button);
