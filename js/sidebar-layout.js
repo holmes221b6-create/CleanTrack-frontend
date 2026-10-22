@@ -659,6 +659,125 @@ if (identity) {
           for (const key of keys) if (value && Array.isArray(value[key])) return value[key];
           return null;
         }
+        function liveDataIntent(question) {
+          const q = normalized(question);
+          const asksLive = /\\b(show|list|find|check|count|how many|current|latest|recent|today|yesterday|right now|my |why|not showing|missing|empty|status|overview|summary|what .* have|do we have|are there)\\b/.test(q);
+          if (!asksLive) return null;
+          if (/\\b(logs?|cleaning logs|audit|activity history)\\b/.test(q)) return "logs";
+          if (/\\b(tasks?|operations?|work orders?|overdue)\\b/.test(q)) return "tasks";
+          if (/\\b(zones?|floors?|rooms?)\\b/.test(q)) return "zones";
+          if (/\\b(locations?|sites?|buildings?|facilities)\\b/.test(q)) return "locations";
+          if (/\\b(staff|employees?|people|members|personnel)\\b/.test(q)) return "staff";
+          if (/\\b(teams?)\\b/.test(q)) return "teams";
+          if (/\\b(alerts?|announcements?|notifications?)\\b/.test(q)) return "alerts";
+          if (/\\b(organisation|organization|workspace|dashboard|overview|overall|summary|kpis?)\\b/.test(q)) return "overview";
+          return null;
+        }
+
+        function shortValue(value, fallback) {
+          return value === null || value === undefined || value === "" ? fallback : String(value);
+        }
+
+        async function answerLiveQuestion(question, intent) {
+          const api = window.CleanTrackApi;
+          if (!api || typeof api.get !== "function") return "I can't reach CleanTrack's API client on this page. Refresh the app and retry; I won't guess live figures.";
+          const endpoints = {
+            me: "/auth/me", logs: "/logs", tasks: "/tasks", zones: "/zones",
+            locations: "/locations", staff: "/users", teams: "/teams",
+            alerts: "/alerts", overview: "/analytics/dashboard"
+          };
+          const requests = intent === "logs" ? ["me", "tasks", "logs"] :
+            intent === "overview" ? ["me", "tasks", "logs", "locations", "zones", "overview"] :
+            ["me", intent];
+          const results = await Promise.all(requests.map(async key => {
+            try { return { key, ok: true, value: await api.get(endpoints[key]) }; }
+            catch (error) { return { key, ok: false, error }; }
+          }));
+          const byKey = Object.fromEntries(results.map(result => [result.key, result]));
+          const meResult = byKey.me;
+          const account = meResult && meResult.ok ? (meResult.value.user || meResult.value) : null;
+          const role = String(account && account.role || "").toLowerCase();
+          const roleLabel = role ? role.replace(/[_-]+/g, " ") : "";
+          const rowsFor = (key, keys) => {
+            const result = byKey[key];
+            return result && result.ok ? responseRows(result.value, keys) : null;
+          };
+          const labels = {
+            logs: ["logs", ["logs", "items", "results"]],
+            tasks: ["tasks", ["tasks", "items", "results"]],
+            zones: ["zones", ["zones", "items", "results"]],
+            locations: ["locations", ["locations", "items", "results"]],
+            staff: ["staff members", ["users", "staff", "members", "items", "results"]],
+            teams: ["teams", ["teams", "items", "results"]],
+            alerts: ["alerts", ["alerts", "items", "results"]]
+          };
+          if (intent === "overview") {
+            const taskRows = rowsFor("tasks", labels.tasks[1]);
+            const logRows = rowsFor("logs", labels.logs[1]);
+            const locationRows = rowsFor("locations", labels.locations[1]);
+            const zoneRows = rowsFor("zones", labels.zones[1]);
+            const dash = byKey.overview && byKey.overview.ok ? byKey.overview.value : null;
+            const parts = ["Live CleanTrack overview" + (account ? " for your " + (roleLabel || "account") + " view" : "") + ":"];
+            if (taskRows) parts.push("Tasks visible: " + taskRows.length + ".");
+            if (logRows) parts.push("Logs visible: " + logRows.length + ".");
+            if (locationRows) parts.push("Locations visible: " + locationRows.length + ".");
+            if (zoneRows) parts.push("Zones visible: " + zoneRows.length + ".");
+            if (dash) parts.push("Dashboard summary is available from the live analytics endpoint.");
+            const failures = results.filter(r => !r.ok);
+            if (!taskRows && !logRows && !locationRows && !zoneRows && !dash) return explainLiveFailure(failures, role);
+            if (failures.length) parts.push("Some sources weren't available for your role or at this moment: " + failures.map(r => r.key).join(", ") + ". Counts above include only sources that responded successfully.");
+            parts.push("These are records visible through your account's API permissions, not organisation-wide totals unless your role permits that scope.");
+            return parts.join("\\n");
+          }
+          if (intent === "logs") {
+            const logs = rowsFor("logs", labels.logs[1]);
+            const tasks = rowsFor("tasks", labels.tasks[1]);
+            if (logs === null) return explainLiveFailure(results.filter(r => !r.ok), role);
+            const parts = ["Live Logs check" + (account ? " (" + roleLabel + " view)" : "") + ":", "Logs visible to this account: " + logs.length + "."];
+            if (tasks !== null) {
+              const counts = {};
+              tasks.forEach(t => { const status = String(t.status || "unknown").toLowerCase(); counts[status] = (counts[status] || 0) + 1; });
+              parts.push("Tasks visible: " + tasks.length + (Object.keys(counts).length ? " (" + Object.entries(counts).map(([k,v]) => k + ": " + v).join(", ") + ")" : "") + ".");
+              const inProgress = tasks.filter(t => String(t.status || "").toLowerCase() === "in-progress");
+              const pending = tasks.filter(t => String(t.status || "").toLowerCase() === "pending-approval");
+              if (!logs.length && inProgress.length) parts.push("There are " + inProgress.length + " in-progress task(s) but no visible logs. The API accepts a cleaning log only for an in-progress task and its matching zone; check the task assignment/zone and submit the log from the task workflow.");
+              else if (!logs.length && pending.length) parts.push(pending.length + " task(s) are pending approval, but this Logs query returned none. That is a mismatch worth checking in the live backend or page filter; it isn't safe to assume no log exists.");
+              else if (!logs.length) parts.push("No logs are returned for your permitted view. This can mean no logs have been submitted in that scope, or the role/location scope differs from what you expected.");
+              else parts.push("The API returned log records, so if the Logs page looks empty, refresh it and clear page filters. If it remains empty, the page may be failing to render or using a different filter.");
+            } else parts.push("Tasks could not be cross-checked, so I can't explain the reason from task status.");
+            const failed = results.filter(r => !r.ok);
+            if (failed.length) parts.push("Unavailable sources: " + failed.map(r => r.key).join(", ") + ". I have not treated a failed request as zero records.");
+            return parts.join("\\n");
+          }
+          const spec = labels[intent];
+          const rows = spec ? rowsFor(intent, spec[1]) : null;
+          if (!spec) return "I couldn't match that to a live CleanTrack data source.";
+          if (rows === null) return explainLiveFailure(results.filter(r => !r.ok), role, intent);
+          const q = normalized(question);
+          const statusCounts = {};
+          rows.forEach(row => { const status = String(row.status || "unknown").toLowerCase(); statusCounts[status] = (statusCounts[status] || 0) + 1; });
+          const parts = ["Live " + spec[0] + " visible to your account: " + rows.length + "."];
+          if (Object.keys(statusCounts).length && intent !== "locations" && intent !== "zones") parts.push("Status breakdown: " + Object.entries(statusCounts).map(([k,v]) => k + ": " + v).join(", ") + ".");
+          const candidates = rows.slice(0, 8).map(row => {
+            const name = shortValue(row.name || row.title || row.task_name || row.operation_name || row.location_name || row.zone_name || row.subject, "(unnamed record)");
+            const extra = [row.status, row.location_name, row.zone_name, row.staff_name || row.assigned_to_name].filter(Boolean).join(" · ");
+            return "• " + name + (extra ? " — " + extra : "");
+          });
+          if (candidates.length) parts.push("Recent records:\\n" + candidates.join("\\n"));
+          if (!rows.length) parts.push("The request succeeded and returned no records in the data scope your account can access. That is different from an API error.");
+          if (intent === "staff" && role === "supervisor") parts.push("The staff directory endpoint only exposes staff data to authorised Admin/Supervisor roles; results are still subject to backend access rules.");
+          if (byKey[intent] && byKey[intent].ok && !responseRows(byKey[intent].value, spec[1])) parts.push("The endpoint responded, but its data shape was not recognised; I won't invent a count.");
+          return parts.join("\\n");
+        }
+
+        function explainLiveFailure(failures, role, intent) {
+          const first = failures && failures[0];
+          const status = first && first.error && first.error.status;
+          if (status === 401 || status === 403) return "I couldn't read " + (intent || "the requested records") + " with this session. Your session may have expired or your role may not have access to that endpoint. Please sign in again; if it persists, ask an Admin to check the role/location assignment. This is not evidence that the data is empty.";
+          if (status === 404) return "CleanTrack's configured backend did not find the requested endpoint. This may indicate that the frontend is connected to a different or outdated backend version. I haven't treated that as zero records.";
+          return "I couldn't retrieve the live CleanTrack data just now. The backend may be unavailable, waking up, or the request may have failed. Refresh and retry; I won't invent a count or treat this as an empty result.";
+        }
+
 
         async function diagnoseLiveLogs() {
           const api = window.CleanTrackApi;
@@ -725,14 +844,12 @@ if (identity) {
           }
           addMessage("user", question);
           input.value = "";
-          if (isLogDiagnosisQuestion(question)) {
-            const pending = addMessage("assistant", "Checking your current account, tasks, and logs…");
+          const liveIntent = liveDataIntent(question);
+          if (liveIntent) {
+            const pending = addMessage("assistant", "Checking live CleanTrack records…");
             let answer;
-            try {
-              answer = await diagnoseLiveLogs();
-            } catch (error) {
-              answer = "The live Logs check failed unexpectedly. No records were changed. Please retry; if it continues, check the browser console and backend response.";
-            }
+            try { answer = await answerLiveQuestion(question, liveIntent); }
+            catch (_) { answer = "The live CleanTrack check failed unexpectedly. No records were changed. Please retry; I won't guess the data."; }
             pending.textContent = answer;
             history.push({ role: "assistant", text: answer, at: new Date().toISOString() });
             history = history.slice(-80);
