@@ -388,15 +388,70 @@ if (identity) {
 
     function openNotifications() {
       const user = getUser();
-      openWorkspaceDialog("Notifications", content => {
-        const wrap = appendText(content, "div", "", "ct-help-dialog");
-        appendText(wrap, "p", "You’re all caught up.", "ct-help-lead");
-        appendText(wrap, "p", "New announcements and updates for your role will appear here when the notification service is connected.", "ct-help-note");
-        const menu = window.CleanTrackNavigation.getMenu(user && user.role);
-        const announcements = menu.find(item => item.id === "announcements");
-        if (announcements) {
-          appendDialogActions(wrap, [{ label: "Open announcements and alerts", action: () => { document.getElementById("app-modal").close(); window.CleanTrackNavigation.setActivePage("announcements"); } }]);
+      openWorkspaceDialog("Organization activity", content => {
+        const wrap = appendText(content, "div", "", "ct-notification-feed");
+        appendText(wrap, "p", "Recent organization activity", "ct-help-lead");
+        appendText(wrap, "p", "Activities from the last 7 days only. Announcements and targeted alerts are managed separately.", "ct-help-note");
+        const status = appendText(wrap, "p", "Loading recent activity…", "ct-notification-status");
+        const list = document.createElement("div");
+        list.className = "ct-notification-list";
+        wrap.appendChild(list);
+        const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const now = new Date();
+        const params = new URLSearchParams({
+          from: cutoff.getFullYear()+"-"+String(cutoff.getMonth()+1).padStart(2,"0")+"-"+String(cutoff.getDate()).padStart(2,"0"),
+          to: now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0"),
+          limit: "100",
+          offset: "0"
+        });
+        const api = window.CleanTrackApi;
+        if (!api || typeof api.get !== "function") {
+          status.textContent = "The activity service is unavailable. No sample notifications are shown.";
+          return;
         }
+        api.get("audit-trail?" + params.toString()).then(result => {
+          const entries = Array.isArray(result && result.entries) ? result.entries : Array.isArray(result && result.records) ? result.records : [];
+          const recent = entries.filter(entry => {
+            const raw = entry.created_at || entry.timestamp || entry.occurred_at;
+            const date = raw ? new Date(raw) : null;
+            return date && !Number.isNaN(date.getTime()) && date >= cutoff && date <= now;
+          }).sort((a,b) => new Date(b.created_at || b.timestamp || b.occurred_at) - new Date(a.created_at || a.timestamp || a.occurred_at));
+          list.replaceChildren();
+          if (!recent.length) {
+            status.textContent = "No activity records were returned for the last 7 days.";
+            return;
+          }
+          status.textContent = "Showing " + recent.length + " activity records from the last 7 days.";
+          recent.forEach(entry => {
+            const item = document.createElement("article");
+            item.className = "ct-notification-item";
+            const top = document.createElement("div");
+            top.className = "ct-notification-item-top";
+            const title = document.createElement("strong");
+            title.textContent = String(entry.action_label || entry.action || entry.event_type || entry.event || "Organization activity").replace(/[._-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase());
+            const time = document.createElement("time");
+            const dateValue = entry.created_at || entry.timestamp || entry.occurred_at;
+            time.dateTime = dateValue;
+            time.textContent = new Date(dateValue).toLocaleString();
+            top.append(title,time);
+            item.appendChild(top);
+            const detail = document.createElement("p");
+            const actor = entry.actor_name || entry.user_name || entry.actor || "An organization member";
+            const record = entry.record_name || entry.target_name || entry.resource_name || entry.entity_name || "";
+            const action = String(entry.action_label || entry.action || entry.event_type || entry.event || "performed an activity").replace(/[._-]+/g," ");
+            detail.textContent = actor + " — " + action + (record ? ": " + record : "");
+            item.appendChild(detail);
+            if (entry.outcome) {
+              const outcome = document.createElement("span");
+              outcome.className = "ct-notification-outcome";
+              outcome.textContent = String(entry.outcome).replace(/[._-]+/g," ");
+              item.appendChild(outcome);
+            }
+            list.appendChild(item);
+          });
+        }).catch(error => {
+          status.textContent = "Could not load organization activity. " + String(error && error.message || "Please try again later.");
+        });
       });
     }
 
