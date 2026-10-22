@@ -163,12 +163,19 @@
   }
 
   function isCompleted(task) {
-    return ["completed", "complete", "approved", "verified", "done", "closed"].includes(status(task));
+    const operationStatus = status(task);
+    const executionStatus = String(task.execution_status || "").trim().toLowerCase();
+    // "Submitted" means the employee has finished the work and sent it for review.
+    return ["submitted", "completed", "complete", "approved", "verified", "done", "closed"].includes(operationStatus) ||
+      ["submitted", "completed", "complete", "approved", "verified", "done", "closed"].includes(executionStatus) ||
+      Boolean(task.execution_submitted_at || task.submitted_at || task.reviewed_at);
   }
 
   function completionDate(task) {
     if (!isCompleted(task)) return null;
-    return safeDate(task.reviewed_at) || safeDate(task.submitted_at) || safeDate(task.execution_submitted_at) || safeDate(task.updated_at) || safeDate(task.created_at);
+    return safeDate(task.execution_submitted_at) || safeDate(task.submitted_at) ||
+      safeDate(task.reviewed_at) || safeDate(task.verified_at) ||
+      safeDate(task.updated_at) || safeDate(task.created_at);
   }
 
   function locationFor(task) {
@@ -203,10 +210,6 @@
   function drawComplianceChart(container, rows, unit) {
     container.replaceChildren();
     const completedTotal = rows.reduce((sum, row) => sum + row.completed, 0);
-    if (!completedTotal) {
-      container.appendChild(el("div", "ct-dash-empty", "No completed tasks in this period yet. Once tasks are completed, the trend will appear here."));
-      return;
-    }
     const width = 760, height = 284, left = 48, right = 16, top = 18, bottom = 42;
     const plotW = width - left - right, plotH = height - top - bottom;
     const maxValue = Math.max(1, ...rows.map(row => row.completed));
@@ -273,7 +276,8 @@
       }
     });
     graph.addEventListener("click", event => { if (event.target === graph) tooltip.hidden = true; });
-    container.append(el("p", "ct-dash-note", "Shows tasks completed in each time bucket using the recorded completion, submission, or review date. Tap or focus a point to see its completed count."));
+    if (!completedTotal) container.append(el("p", "ct-dash-empty", "No tasks were submitted or completed in this selected range. Try a wider range, or check that the work has been submitted/completed in Operations."));
+    container.append(el("p", "ct-dash-note", "Counts work when it is submitted for review or marked completed, using its actual submission/review timestamp where available. Tap or focus a point to see the count."));
   }
 
   function complianceRows() {
