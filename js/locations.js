@@ -458,7 +458,7 @@
         const csvCell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
         const namesRows=[["name","description","floor_label","location_name","source_page","boundary"].map(csvCell).join(","),
           ...drafts.map(z=>[z.name,z.description||"",z.floor_label||"",location.name||"",z._page||pageNo,JSON.stringify(z.indoor_boundary||null)].map(csvCell).join(","))];
-        const namesBlob=new Blob(["\\ufeff"+namesRows.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
+        const namesBlob=new Blob(["\ufeff"+namesRows.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
         const sourceExt=blob.type==="application/pdf"?"pdf":blob.type==="image/png"?"png":blob.type==="image/webp"?"webp":"jpg";
         const svgEsc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
         const sourceData=base.toDataURL("image/png");
