@@ -493,25 +493,65 @@
   }
 
   function exportReport(format) {
-    const data = reportData(new Date());
-    const filename = "cleantrack-dashboard-" + localKey(new Date());
+    const generatedAt = new Date();
+    const data = reportData(generatedAt);
+    const filename = "cleantrack-dashboard-" + localKey(generatedAt);
     const safe = value => {
       let text = value === null || value === undefined ? "" : String(value);
       if (/^[=+\-@]/.test(text)) text = "'" + text;
       return text;
     };
+    const escapeHtml = value => safe(value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const rowKind = row => {
+      const first = String(row[0] || "").trim().toLowerCase();
+      if (!first && row.every(value => value === "" || value === null || value === undefined)) return "blank";
+      if (first === "cleantrack admin dashboard report") return "title";
+      if (["task overview", "task completion trend", "tasks", "location performance", "recent activity"].includes(first)) return "section";
+      if ((first === "period" && String(row[1] || "").toLowerCase() === "count") ||
+          (first === "id" && String(row[1] || "").toLowerCase() === "title") ||
+          (first === "name" && String(row[1] || "").toLowerCase() === "task count") ||
+          (first === "timestamp" && String(row[1] || "").toLowerCase() === "action")) return "columns";
+      if (first === "exported at" || first === "dashboard scope" || first === "selected trend range") return "meta";
+      return "body";
+    };
     if (format === "csv") {
+      // CSV itself cannot carry colors, fonts, or layout. Keep section labels and
+      // column labels as explicit rows so the exported data remains easy to scan.
       const cell = value => '"' + safe(value).replace(/"/g, '""') + '"';
-      downloadBlob(new Blob(["\uFEFF" + data.map(row => row.map(cell).join(",")).join("\r\n")], { type: "text/csv;charset=utf-8;" }), filename + ".csv");
+      const csv = data.map(row => row.map(cell).join(",")).join("\r\n");
+      downloadBlob(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }), filename + ".csv");
       return;
     }
     if (format === "excel") {
-      const xml = value => safe(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-      const rows = data.map(row => "<Row>" + row.map(value => {
-        const numeric = typeof value === "number" && Number.isFinite(value);
-        return '<Cell><Data ss:Type="' + (numeric ? "Number" : "String") + '">' + xml(value) + "</Data></Cell>";
-      }).join("") + "</Row>").join("");
-      const workbook = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="CleanTrack Report"><Table>' + rows + "</Table></Worksheet></Workbook>";
+      const xml = value => escapeHtml(value).replace(/'/g, "&apos;");
+      const styles = [
+        '<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#29374D"/></Borders><Font ss:FontName="Aptos" ss:Size="10" ss:Color="#EDF3FC"/><Interior ss:Color="#111C2E" ss:Pattern="Solid"/></Style>',
+        '<Style ss:ID="Title"><Font ss:FontName="Aptos Display" ss:Size="20" ss:Bold="1" ss:Color="#EDF3FC"/><Interior ss:Color="#0B1220" ss:Pattern="Solid"/><Alignment ss:Vertical="Center"/></Style>',
+        '<Style ss:ID="Meta"><Font ss:FontName="Aptos" ss:Size="10" ss:Color="#93A4BB"/><Interior ss:Color="#0B1220" ss:Pattern="Solid"/></Style>',
+        '<Style ss:ID="Section"><Font ss:FontName="Aptos" ss:Size="11" ss:Bold="1" ss:Color="#64D8B0"/><Interior ss:Color="#172A3C" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#355B58"/></Borders></Style>',
+        '<Style ss:ID="Columns"><Font ss:FontName="Aptos" ss:Size="10" ss:Bold="1" ss:Color="#A5F3D8"/><Interior ss:Color="#15332F" ss:Pattern="Solid"/><Alignment ss:Vertical="Center" ss:WrapText="1"/></Style>',
+        '<Style ss:ID="Body"><Font ss:FontName="Aptos" ss:Size="10" ss:Color="#EDF3FC"/><Interior ss:Color="#111C2E" ss:Pattern="Solid"/><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>',
+        '<Style ss:ID="Alt"><Font ss:FontName="Aptos" ss:Size="10" ss:Color="#EDF3FC"/><Interior ss:Color="#152238" ss:Pattern="Solid"/><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>',
+        '<Style ss:ID="Metric"><Font ss:FontName="Aptos" ss:Size="11" ss:Bold="1" ss:Color="#64D8B0"/><Interior ss:Color="#111C2E" ss:Pattern="Solid"/></Style>'
+      ].join("");
+      let bodyIndex = 0;
+      const rows = data.map(row => {
+        const kind = rowKind(row);
+        if (kind === "blank") return "<Row ss:Height=\"8\"></Row>";
+        const style = kind === "title" ? "Title" : kind === "section" ? "Section" :
+          kind === "columns" ? "Columns" : kind === "meta" ? "Meta" : "Body";
+        if (kind === "body") bodyIndex += 1;
+        const actualStyle = kind === "body" && bodyIndex % 2 === 0 ? "Alt" : style;
+        const cells = row.map((value, index) => {
+          const numeric = typeof value === "number" && Number.isFinite(value);
+          const cellStyle = kind === "body" && index === 1 && numeric ? "Metric" : actualStyle;
+          return '<Cell ss:StyleID="' + cellStyle + '"><Data ss:Type="' + (numeric ? "Number" : "String") + '">' + xml(value) + "</Data></Cell>";
+        }).join("");
+        return "<Row>" + cells + "</Row>";
+      }).join("");
+      const workbook = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles>' + styles + '</Styles><Worksheet ss:Name="CleanTrack Report"><Table>' + rows + '</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal><TopRowBottomPane>1</TopRowBottomPane><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet></Workbook>';
       downloadBlob(new Blob([workbook], { type: "application/vnd.ms-excel;charset=utf-8;" }), filename + ".xls");
       return;
     }
@@ -521,10 +561,33 @@
         window.alert("Your browser blocked the PDF report window. Allow pop-ups for CleanTrack and try again.");
         return;
       }
-      const escapeHtml = value => safe(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-      const body = data.map(row => "<tr>" + row.map(value => "<td>" + escapeHtml(value) + "</td>").join("") + "</tr>").join("");
+      let bodyIndex = 0;
+      const body = data.map(row => {
+        const kind = rowKind(row);
+        if (kind === "blank") return '<tr class="spacer"><td colspan="12"></td></tr>';
+        if (kind === "section") return '<tr class="section"><th colspan="' + Math.max(row.length, 1) + '">' + escapeHtml(row[0]) + "</th></tr>";
+        if (kind === "title") return '<tr class="report-title"><th colspan="' + Math.max(row.length, 1) + '">' + escapeHtml(row[0]) + "</th></tr>";
+        if (kind === "columns") return '<tr class="columns">' + row.map(value => "<th>" + escapeHtml(value) + "</th>").join("") + "</tr>";
+        if (kind === "body") bodyIndex += 1;
+        const classes = kind === "body" ? (bodyIndex % 2 === 0 ? ' class="alt"' : "") : "";
+        return "<tr" + classes + ">" + row.map((value, index) => {
+          const metric = kind === "body" && index === 1 && typeof value === "number" ? ' class="metric"' : "";
+          return "<td" + metric + ">" + escapeHtml(value) + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      const generatedLabel = generatedAt.toLocaleString();
       popup.document.open();
-      popup.document.write('<!doctype html><html><head><meta charset="utf-8"><title>CleanTrack Dashboard Report</title><style>body{font:12px Arial,sans-serif;color:#18202b;padding:24px}h1{font-size:20px}p{color:#555}table{border-collapse:collapse;width:100%;table-layout:fixed}td{border:1px solid #d7dce3;padding:5px;vertical-align:top;overflow-wrap:anywhere}@page{size:A4 landscape;margin:12mm}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body><h1>CleanTrack Admin Dashboard Report</h1><p>Generated ' + escapeHtml(new Date().toLocaleString()) + ' · Current organization</p><table><tbody>' + body + '</tbody></table><script>window.addEventListener("load",function(){window.print();});<\/script></body></html>');
+      popup.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CleanTrack Dashboard Report</title><style>' +
+        ':root{color-scheme:dark;--bg:#0b1220;--panel:#111c2e;--panel2:#152238;--border:#29374d;--text:#edf3fc;--muted:#93a4bb;--green:#64d8b0;--green-bg:#15332f}' +
+        '*{box-sizing:border-box}body{margin:0;padding:28px;background:var(--bg);color:var(--text);font:12px/1.5 Inter,Segoe UI,Arial,sans-serif}' +
+        '.masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:0 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px}' +
+        '.brand{display:flex;align-items:center;gap:11px}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#18332f;color:var(--green);font-size:20px;font-weight:800;border:1px solid #31524f}.wordmark{font-size:19px;font-weight:800;letter-spacing:-.04em}.accent{color:var(--green)}' +
+        '.eyebrow{margin:0 0 6px;color:var(--green);font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.subtitle{margin:7px 0 0;color:var(--muted);font-size:11px}.meta{text-align:right;color:var(--muted);font-size:10px}.meta strong{display:block;color:var(--text);font-size:11px;margin-bottom:4px}' +
+        '.report-title th{padding:18px 14px;background:#142137;border:1px solid var(--border);text-align:left;font-size:20px;letter-spacing:-.03em}' +
+        'table{width:100%;border-collapse:separate;border-spacing:0;margin:0 0 10px;table-layout:auto}td,th{padding:8px 9px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}td:first-child,th:first-child{border-left:1px solid var(--border)}.columns th{background:var(--green-bg);color:#a5f3d8;font-size:9px;letter-spacing:.04em;text-transform:uppercase;border-top:1px solid #355b58}.section th{padding:13px 10px 8px;border:0;background:var(--bg);color:var(--green);font-size:11px;letter-spacing:.1em;text-transform:uppercase}.alt td{background:var(--panel2)}td{background:var(--panel)}.metric{color:var(--green);font-weight:800}.spacer td{height:8px;padding:0;border:0;background:var(--bg)}' +
+        '.foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--border);color:var(--muted);font-size:9px}' +
+        '@page{size:A4 landscape;margin:10mm}@media print{body{padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.masthead{break-after:avoid}tr{break-inside:avoid}table{break-inside:auto}.section{break-after:avoid}thead{display:table-header-group}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}' +
+        '</style></head><body><header class="masthead"><div><div class="brand"><span class="mark">✓</span><span class="wordmark">Clean<span class="accent">Track</span></span></div><p class="eyebrow">Operations · Accountability · Quality</p><p class="subtitle">Organization-wide operations report · ' + escapeHtml(range.charAt(0).toUpperCase() + range.slice(1)) + ' trend view</p></div><div class="meta"><strong>ADMIN DASHBOARD REPORT</strong>Generated ' + escapeHtml(generatedLabel) + '<br>Current organization</div></header><table><tbody>' + body + '</tbody></table><footer class="foot">Confidential organization report · Generated from the current CleanTrack dashboard data. For best results, enable “Background graphics” in the print dialog, then choose “Save as PDF”.</footer><script>window.addEventListener("load",function(){window.print();});<\\/script></body></html>');
       popup.document.close();
     }
   }
