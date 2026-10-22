@@ -162,6 +162,18 @@
 .ct-dash-current-rate span { color: var(--dash-muted); font-size: 10px; white-space: nowrap; }
 .ct-dash-chart { min-width: 0; margin-top: 12px; }
 .ct-dash-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ct-dash-chart { position: relative; }
+.ct-dash-chart-tooltip {
+  position: absolute; z-index: 3; transform: translate(-50%, calc(-100% - 12px));
+  max-width: min(240px, 75%); padding: 9px 11px; border: 1px solid #3a4658;
+  border-radius: 9px; background: #111923; color: #f0f5fb; font-size: 12px;
+  line-height: 1.45; font-weight: 600; text-align: center; white-space: normal;
+  pointer-events: none; box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+}
+.ct-dash-chart-tooltip[hidden] { display: none; }
+.ct-dash-chart svg circle[role="button"] { cursor: pointer; outline: none; }
+.ct-dash-chart svg circle[role="button"]:focus-visible { stroke: #d9e9ff; stroke-width: 2; }
+.ct-dash-chart svg .ct-dash-point--active { stroke: #d9e9ff; stroke-width: 4; }
 .ct-dash-note { margin: 10px 0 0; color: #788ba4; font-size: 10px; line-height: 1.55; }
 .ct-dash-donut-area { display: grid; justify-items: center; gap: 22px; padding: 6px 0 0; }
 .ct-dash-donut {
