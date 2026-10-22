@@ -627,9 +627,9 @@
       let bodyIndex = 0;
       const body = data.map(row => {
         const kind = rowKind(row);
-        if (kind === "blank") return '<tr class="spacer"><td colspan="12"></td></tr>';
-        if (kind === "section") return '<tr class="section"><th colspan="' + Math.max(row.length, 1) + '">' + escapeHtml(row[0]) + "</th></tr>";
-        if (kind === "title") return '<tr class="report-title"><th colspan="' + Math.max(row.length, 1) + '">' + escapeHtml(row[0]) + "</th></tr>";
+        if (kind === "blank") return '<tr class="spacer"><td colspan="6"></td></tr>';
+        if (kind === "section") return '<tr class="section"><th colspan="6">' + escapeHtml(row[0]) + "</th></tr>";
+        if (kind === "title") return '<tr class="report-title"><th colspan="6">' + escapeHtml(row[0]) + "</th></tr>";
         if (kind === "columns") return '<tr class="columns">' + row.map(value => "<th>" + escapeHtml(value) + "</th>").join("") + "</tr>";
         if (kind === "body") bodyIndex += 1;
         const classes = kind === "body" ? (bodyIndex % 2 === 0 ? ' class="alt"' : "") : "";
