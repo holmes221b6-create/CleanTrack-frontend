@@ -664,7 +664,8 @@
     refreshOptions(locationControl,available("location_names"),"locations");
     refreshOptions(zoneControl,available("zone_names"),"zones");
     renderStats();renderSidebar();renderDirectory();
-    if(!supervisors.some(function(m){return String(m.id)===String(selectedId);})) selectedId=(supervisors.find(function(m){return m.account_status==="active";})||supervisors[0]||{}).id||null;
+    // Keep the details panel empty until an Admin explicitly selects a supervisor.
+    if(!supervisors.some(function(m){return String(m.id)===String(selectedId);})) selectedId=null;
     renderSidebar();renderDirectory();renderProfile();
     if(initial) notice(pageRoot,"Supervisor directory and summary counts loaded from CleanTrack records.","success");
   }
