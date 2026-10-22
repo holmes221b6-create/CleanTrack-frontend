@@ -57,7 +57,6 @@
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "skills", label: "My Skills", icon: "★" },
-      { id: "billing", label: "Billing", icon: "$" },
       { id: "settings", label: "Settings", icon: "⚙" },
       { id: "audit", label: "My Activity", icon: "◷" }
     ]
