@@ -524,7 +524,7 @@ if (identity) {
         avatar.title = "Change profile picture";
         const identity = document.createElement("div");
         identity.className = "ct-profile-identity";
-        appendText(identity, "p", "YOUR ACCOUNT", "ct-profile-eyebrow");
+        appendText(identity, "p", "ACCOUNT", "ct-profile-eyebrow");
         appendText(identity, "h3", user && (user.name || "CleanTrack user") || "CleanTrack user", "ct-profile-name");
         appendText(identity, "p", user && user.email || "Email not available", "ct-profile-email");
         const roleLabel = user && user.role ? String(user.role).replace(/[_-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase()) : "Member";
@@ -542,7 +542,7 @@ if (identity) {
         avatarLabel.htmlFor = avatarInput.id;
         avatarLabel.className = "ct-profile-avatar-select";
         avatarLabel.textContent = "Choose profile picture";
-        const avatarHint = appendText(avatarControls, "p", "Click your circular photo to change it. PNG, JPG, WEBP or GIF · up to 2 MB.", "ct-profile-avatar-hint");
+        const avatarHint = appendText(avatarControls, "p", "", "ct-profile-avatar-hint");
         avatarInput.setAttribute("aria-label", "Choose profile picture");
         avatarInput.tabIndex = -1;
         avatarInput.style.display = "none";
@@ -580,7 +580,7 @@ if (identity) {
         const sectionHeading = document.createElement("div");
         sectionHeading.className = "ct-profile-section-heading";
         appendText(sectionHeading, "h4", "Account details");
-        appendText(sectionHeading, "p", "Your identity and organization information");
+        appendText(sectionHeading, "p", "");
         section.appendChild(sectionHeading);
         const data = document.createElement("dl");
         data.className = "ct-profile-data ct-profile-data-v2";
@@ -609,30 +609,19 @@ if (identity) {
         section.appendChild(data);
         wrap.appendChild(section);
 
-        const accountNote = document.createElement("div");
-        accountNote.className = "ct-profile-security-note";
-        const securityIcon = document.createElement("span");
-        securityIcon.className = "ct-profile-security-icon";
-        securityIcon.setAttribute("aria-hidden","true");
-        securityIcon.textContent = "✓";
-        const noteCopy = document.createElement("div");
-        appendText(noteCopy,"strong","Account session");
-        appendText(noteCopy,"p","Your account details and available actions are shown here. For information that isn't available from your current session, open My Profile or Settings.");
-        accountNote.append(securityIcon,noteCopy);
-        wrap.appendChild(accountNote);
 
         const actionsRow = document.createElement("div");
         actionsRow.className = "ct-help-dialog-actions ct-profile-actions ct-profile-actions-v2";
         const profilePage = menu.find(item => item.id === "profile");
         const settingsPage = menu.find(item => item.id === "settings");
         if (profilePage) {
-          addDialogButton(actionsRow, "Open My Profile", () => {
+          addDialogButton(actionsRow, "View profile", () => {
             if (modal && modal.open) modal.close();
             window.CleanTrackNavigation.setActivePage("profile");
           }, "ct-profile-settings-button");
         }
         if (settingsPage) {
-          addDialogButton(actionsRow, "Account settings", () => {
+          addDialogButton(actionsRow, "Settings", () => {
             if (modal && modal.open) modal.close();
             window.CleanTrackNavigation.setActivePage("settings");
           }, "ct-profile-settings-button");
@@ -654,9 +643,6 @@ if (identity) {
             window.location.reload();
           }
         }, "ct-profile-logout-button");
-        addDialogButton(actionsRow, "Close", () => {
-          if (modal && modal.open) modal.close();
-        }, "ct-profile-close-button");
         wrap.appendChild(actionsRow);
       });
     }
