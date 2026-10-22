@@ -502,49 +502,85 @@ if (identity) {
     function openProfile() {
       const user = getUser();
       const menu = window.CleanTrackNavigation.getMenu(user && user.role);
-      openWorkspaceDialog("Profile and account", content => {
-        const wrap = appendText(content, "div", "", "ct-help-dialog ct-profile-dialog");
-        const top = document.createElement("div");
-        top.className = "ct-profile-summary";
-        appendText(top, "div", userInitials(user), "ct-profile-avatar ct-profile-avatar-large");
-        const info = document.createElement("div");
-        appendText(info, "h3", user && (user.name || "CleanTrack user"), "ct-profile-name");
-        appendText(info, "p", user && user.email || "Email not available", "ct-profile-email");
-        top.appendChild(info);
-        wrap.appendChild(top);
+      const modal = document.getElementById("app-modal");
+      openWorkspaceDialog("Account", content => {
+        const wrap = appendText(content, "div", "", "ct-help-dialog ct-profile-dialog ct-profile-dialog-v2");
+        const summary = document.createElement("section");
+        summary.className = "ct-profile-hero";
+        const avatar = appendText(summary, "div", userInitials(user), "ct-profile-avatar ct-profile-avatar-large ct-profile-hero-avatar");
+        avatar.setAttribute("aria-hidden", "true");
+        const identity = document.createElement("div");
+        identity.className = "ct-profile-identity";
+        appendText(identity, "p", "YOUR ACCOUNT", "ct-profile-eyebrow");
+        appendText(identity, "h3", user && (user.name || "CleanTrack user") || "CleanTrack user", "ct-profile-name");
+        appendText(identity, "p", user && user.email || "Email not available", "ct-profile-email");
+        const roleLabel = user && user.role ? String(user.role).replace(/[_-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase()) : "Member";
+        appendText(identity, "span", roleLabel, "ct-profile-role-pill");
+        summary.appendChild(identity);
+        wrap.appendChild(summary);
+
+        const section = document.createElement("section");
+        section.className = "ct-profile-section";
+        const sectionHeading = document.createElement("div");
+        sectionHeading.className = "ct-profile-section-heading";
+        appendText(sectionHeading, "h4", "Account details");
+        appendText(sectionHeading, "p", "Your identity and organization information");
+        section.appendChild(sectionHeading);
         const data = document.createElement("dl");
-        data.className = "ct-profile-data";
+        data.className = "ct-profile-data ct-profile-data-v2";
+        const organization = user && (user.organization_name || user.organisation_name || user.organization || user.org_name);
+        const phone = user && (user.phone || user.phone_number || user.mobile);
+        const createdAt = user && (user.created_at || user.createdAt || user.joined_at || user.member_since);
+        const accountStatus = user && (user.account_status || user.status || user.membership_status);
+        const emailVerified = user && (user.emailVerified === true || user.email_verified === true || user.is_email_verified === true);
         const fields = [
-          ["Role", user && user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Not available"],
-          ["Organization", user && user.organization_name || "Not available"],
-          ["Account ID", user && user.id != null ? String(user.id) : "Not available"],
-          ["Email verified", user && user.emailVerified ? "Yes" : "Not confirmed"]
+          ["Email address", user && user.email || "Not provided"],
+          ["Organization", organization && typeof organization === "string" ? organization : organization && (organization.name || organization.organization_name) || "Not assigned"],
+          ["Account role", roleLabel],
+          ["Account status", accountStatus ? String(accountStatus).replace(/[_-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase()) : "Active session"],
+          ["Email verification", emailVerified ? "Verified" : "Not confirmed"],
+          ["Phone", phone || "Not provided"],
+          ["Member since", createdAt && !Number.isNaN(new Date(createdAt).getTime()) ? new Date(createdAt).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}) : "Not available"]
         ];
-        fields.forEach(([label, value]) => {
-          appendText(data, "dt", label);
-          appendText(data, "dd", value);
+        fields.forEach(([label,value]) => {
+          const item = document.createElement("div");
+          item.className = "ct-profile-data-item";
+          appendText(item,"dt",label);
+          appendText(item,"dd",String(value));
+          data.appendChild(item);
         });
-        wrap.appendChild(data);
+        section.appendChild(data);
+        wrap.appendChild(section);
+
+        const accountNote = document.createElement("div");
+        accountNote.className = "ct-profile-security-note";
+        const securityIcon = document.createElement("span");
+        securityIcon.className = "ct-profile-security-icon";
+        securityIcon.setAttribute("aria-hidden","true");
+        securityIcon.textContent = "✓";
+        const noteCopy = document.createElement("div");
+        appendText(noteCopy,"strong","Account session");
+        appendText(noteCopy,"p","Your account details and available actions are shown here. For information that isn't available from your current session, open My Profile or Settings.");
+        accountNote.append(securityIcon,noteCopy);
+        wrap.appendChild(accountNote);
+
         const actionsRow = document.createElement("div");
-        actionsRow.className = "ct-help-dialog-actions ct-profile-actions";
+        actionsRow.className = "ct-help-dialog-actions ct-profile-actions ct-profile-actions-v2";
         const profilePage = menu.find(item => item.id === "profile");
         const settingsPage = menu.find(item => item.id === "settings");
-
         if (profilePage) {
           addDialogButton(actionsRow, "Open My Profile", () => {
-            document.getElementById("app-modal").close();
+            if (modal && modal.open) modal.close();
             window.CleanTrackNavigation.setActivePage("profile");
           }, "ct-profile-settings-button");
         }
         if (settingsPage) {
-          addDialogButton(actionsRow, "Settings", () => {
-            document.getElementById("app-modal").close();
+          addDialogButton(actionsRow, "Account settings", () => {
+            if (modal && modal.open) modal.close();
             window.CleanTrackNavigation.setActivePage("settings");
           }, "ct-profile-settings-button");
         }
-
         addDialogButton(actionsRow, "Log out", async () => {
-          const modal = document.getElementById("app-modal");
           const logoutButton = modal && modal.querySelector(".ct-profile-logout-button");
           if (logoutButton) {
             logoutButton.disabled = true;
@@ -561,14 +597,12 @@ if (identity) {
             window.location.reload();
           }
         }, "ct-profile-logout-button");
-
         addDialogButton(actionsRow, "Close", () => {
-          document.getElementById("app-modal").close();
+          if (modal && modal.open) modal.close();
         }, "ct-profile-close-button");
         wrap.appendChild(actionsRow);
       });
     }
-
     notificationsButton.addEventListener("click", openNotifications);
     assistantButton.addEventListener("click", openAssistant);
     profileButton.addEventListener("click", openProfile);
