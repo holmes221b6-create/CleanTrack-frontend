@@ -518,7 +518,10 @@ if (identity) {
         const savedAvatar = user && user.id != null ? readAccountAvatar(user.id) : "";
         const avatar = appendText(summary, "div", savedAvatar ? "" : userInitials(user), "ct-profile-avatar ct-profile-avatar-large ct-profile-hero-avatar");
         if (savedAvatar) { avatar.style.backgroundImage = "url('" + savedAvatar + "')"; avatar.style.backgroundSize = "cover"; avatar.style.backgroundPosition = "center"; avatar.style.color = "transparent"; }
-        avatar.setAttribute("aria-hidden", "true");
+        avatar.setAttribute("role", "button");
+        avatar.setAttribute("tabindex", "0");
+        avatar.setAttribute("aria-label", "Change profile picture");
+        avatar.title = "Change profile picture";
         const identity = document.createElement("div");
         identity.className = "ct-profile-identity";
         appendText(identity, "p", "YOUR ACCOUNT", "ct-profile-eyebrow");
@@ -539,8 +542,15 @@ if (identity) {
         avatarLabel.htmlFor = avatarInput.id;
         avatarLabel.className = "ct-profile-avatar-select";
         avatarLabel.textContent = "Choose profile picture";
-        const avatarHint = appendText(avatarControls, "p", "PNG, JPG, WEBP or GIF · up to 2 MB. Saved on this browser and used in the toolbar and settings.", "ct-profile-avatar-hint");
+        const avatarHint = appendText(avatarControls, "p", "Click your circular photo to change it. PNG, JPG, WEBP or GIF · up to 2 MB.", "ct-profile-avatar-hint");
+        avatarInput.setAttribute("aria-label", "Choose profile picture");
+        avatarInput.tabIndex = -1;
+        avatarInput.style.display = "none";
+        avatarLabel.style.display = "none";
         avatarControls.append(avatarLabel, avatarInput);
+        const openAvatarPicker = () => avatarInput.click();
+        avatar.addEventListener("click", openAvatarPicker);
+        avatar.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openAvatarPicker(); } });
         avatarInput.addEventListener("change", () => {
           const file = avatarInput.files && avatarInput.files[0];
           if (!file || !user || user.id == null) return;
