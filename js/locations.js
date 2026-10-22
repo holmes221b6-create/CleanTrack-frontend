@@ -30,7 +30,16 @@
     // Always attach exactly one Leaflet map to the current page container.
     if(map){try{map.off();map.remove();}catch(_){}}
     map=null;layer=null;
-    map=L.map(box,{scrollWheelZoom:true,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20}).setView([20,0],3);
+    map=L.map(box,{scrollWheelZoom:false,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20}).setView([20,0],3);
+    // Normal wheel scrolling must not zoom the map; Ctrl + wheel explicitly zooms it.
+    box.addEventListener("wheel",e=>{
+      if(!e.ctrlKey||!map)return;
+      e.preventDefault();
+      if(!e.deltaY)return;
+      const current=map.getZoom();
+      const next=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),current+(e.deltaY<0?1:-1)));
+      if(next!==current)map.setZoomAround(map.mouseEventToLatLng(e),next,{animate:false});
+    },{passive:false});
     // Single free, no-key basemap. Avoid offering multiple map layers/providers.
     const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
       maxZoom:20,
