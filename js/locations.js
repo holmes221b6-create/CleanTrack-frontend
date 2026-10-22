@@ -473,7 +473,7 @@
         const csvRows=[["name","description","floor_label","location_name","location_id","source_page","boundary_type","boundary_points_normalized"].map(csvCell).join(","),
           ...labels.map(q=>[q.name,"",floor.value.trim()||(pdf?"PDF page "+pageNo:""),location.name||"",location.id||"",pageNo,"",""].map(csvCell).join(","))];
         const namesBlob=new Blob(["\\ufeff"+csvRows.join("\\r\\n")+"\\r\\n"],{type:"text/csv;charset=utf-8"});
-        const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\\n<svg xmlns="http://www.w3.org/2000/svg" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
+        const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
         const allPaths=detectedStructurePaths.map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
         const noLabelPaths=detectedStructurePaths.filter(q=>!labels.some(l=>l.left<q.x+q.width&&l.right>q.x&&l.top<q.y+q.height&&l.bottom>q.y)).map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
         const editableLabels=labels.map((q,i)=>{const fs=Math.max(8,Math.min(48,(q.bottom-q.top)*.82));return '<text id="source-label-'+i+'" x="'+q.x+'" y="'+(q.y+fs*.35)+'" font-family="Arial,sans-serif" font-size="'+fs+'" fill="#171717" text-anchor="middle">'+svgEsc(q.name)+'</text>';}).join("");
