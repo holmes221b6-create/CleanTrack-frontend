@@ -158,23 +158,40 @@
     if (!speechSupported()) return [];
     try { return window.speechSynthesis.getVoices() || []; } catch (_) { return []; }
   }
-  function speechVoiceOptions(select) {
+  const SPEECH_LANGUAGE_KEY = "cleantrack.announcementLanguage";
+  const SPEECH_LANGUAGES = [
+    ["en-US", "English"], ["hi-IN", "Hindi"], ["ur-PK", "Urdu"],
+    ["ja-JP", "Japanese"], ["de-DE", "German"], ["es-ES", "Spanish"], ["ar-SA", "Arabic"]
+  ];
+  function speechLanguage() {
+    try { return window.localStorage.getItem(SPEECH_LANGUAGE_KEY) || "en-US"; }
+    catch (_) { return "en-US"; }
+  }
+  function speechVoiceOptions(select, languageCode) {
     const selected = (() => { try { return window.localStorage.getItem(SPEECH_VOICE_KEY) || ""; } catch (_) { return ""; } })();
     const voices = speechVoices();
+    const prefix = String(languageCode || "en-US").split("-")[0].toLowerCase();
+    const matching = voices.filter(v => String(v.lang || "").split("-")[0].toLowerCase() === prefix);
     select.replaceChildren();
-    const system = el("option", "", "System default voice"); system.value = ""; select.appendChild(system);
-    voices.forEach(v => { const o = el("option", "", v.name + (v.lang ? " · " + v.lang : "")); o.value = v.name; select.appendChild(o); });
-    select.value = voices.some(v => v.name === selected) ? selected : "";
+    const system = el("option", "", matching.length ? "Automatic language voice" : "Browser fallback (no matching installed voice detected");
+    system.value = ""; select.appendChild(system);
+    matching.forEach(v => { const o = el("option", "", v.name + (v.lang ? " · " + v.lang : "")); o.value = v.name; select.appendChild(o); });
+    select.value = matching.some(v => v.name === selected) ? selected : "";
   }
   function speechRate() {
     try { const n = Number(window.localStorage.getItem(SPEECH_RATE_KEY) || 1); return Number.isFinite(n) ? Math.max(.7, Math.min(1.2,n)) : 1; }
     catch (_) { return 1; }
   }
-  function speakText(text, voiceName, rate, onDone) {
+  function speakText(text, voiceName, rate, languageCode, onDone) {
     if (!speechSupported()) throw new Error("Voice-over is not supported in this browser. Try a recent Chrome, Edge or Safari.");
+    const lang = languageCode || speechLanguage();
     const utterance = new SpeechSynthesisUtterance(String(text || "").trim());
+    utterance.lang = lang;
     const voices = speechVoices();
-    const voice = voices.find(v => v.name === voiceName) || voices.find(v => v.default) || voices[0];
+    const prefix = String(lang).split("-")[0].toLowerCase();
+    const voice = voices.find(v => v.name === voiceName && String(v.lang || "").split("-")[0].toLowerCase() === prefix)
+      || voices.find(v => String(v.lang || "").split("-")[0].toLowerCase() === prefix)
+      || voices.find(v => v.default) || voices[0];
     if (voice) utterance.voice = voice;
     utterance.rate = Number(rate || 1);
     utterance.onend = () => { if (onDone) onDone(""); };
@@ -201,7 +218,7 @@
       }
       try {
         playing = true;
-        speakText(text, "", speechRate(), error => {
+        speakText(text, "", speechRate(), speechLanguage(), error => {
           playing = false; listen.textContent = "🔊 Listen aloud";
           if (error) showVoiceError(error);
         });
@@ -607,18 +624,21 @@
       clearRecording.disabled=true;
       recorderPanel.append(recorderStatus,startRecording,stopRecording,clearRecording);
       const voiceSettings = el("div","ct-ann-speech-settings");
-      const voiceSelect = optionSelect([], "", "System default voice");
+      const languageSelect = optionSelect(SPEECH_LANGUAGES, speechLanguage());
+      languageSelect.setAttribute("aria-label","Announcement voice language");
+      const voiceSelect = optionSelect([], "", "Automatic language voice");
       voiceSelect.setAttribute("aria-label","Text-to-speech voice");
-      speechVoiceOptions(voiceSelect);
+      speechVoiceOptions(voiceSelect, languageSelect.value);
       const speedSelect = optionSelect([[0.7,"Slow"],[0.85,"A little slow"],[1,"Normal"],[1.1,"A little fast"],[1.2,"Fast"]],speechRate());
       speedSelect.setAttribute("aria-label","Voice-over speaking speed");
-      const voicePreviewStatus = el("p","ct-ann-muted","Choose a synthetic voice for reading the text aloud. Recorded audio is a separate option.");
+      const voicePreviewStatus = el("p","ct-ann-muted","Choose a language first. Available voices depend on the voices installed in the browser or device; if no matching voice is installed, playback may use the browser's fallback voice.");
       const previewButton = button("▶ Preview chosen voice","ct-ann-button ct-ann-button-secondary",()=>{
         try {
           const selectedVoice=voiceSelect.value||"";
           const selectedRate=Number(speedSelect.value||1);
-          try { window.localStorage.setItem(SPEECH_VOICE_KEY,selectedVoice); window.localStorage.setItem(SPEECH_RATE_KEY,String(selectedRate)); } catch(_){}
-          speakText((name.value.trim()||"Announcement title")+". "+(message.value.trim()||"Announcement message"),selectedVoice,selectedRate,error=>{
+          const selectedLanguage=languageSelect.value||"en-US";
+          try { window.localStorage.setItem(SPEECH_LANGUAGE_KEY,selectedLanguage); window.localStorage.setItem(SPEECH_VOICE_KEY,selectedVoice); window.localStorage.setItem(SPEECH_RATE_KEY,String(selectedRate)); } catch(_){}
+          speakText((name.value.trim()||"Announcement title")+". "+(message.value.trim()||"Announcement message"),selectedVoice,selectedRate,selectedLanguage,error=>{
             previewButton.textContent="▶ Preview chosen voice";
             if(error) voicePreviewStatus.textContent="Voice preview error: "+error;
           });
@@ -630,9 +650,15 @@
         previewButton.textContent="▶ Preview chosen voice";
       });
       if(!speechSupported()){previewButton.disabled=true;voicePreviewStatus.textContent="Text-to-speech is unavailable in this browser; audio recording and upload may still work.";}
-      voiceSettings.append(field("Synthetic voice",voiceSelect),field("Speaking speed",speedSelect),previewButton,stopPreviewButton,voicePreviewStatus);
+      voiceSettings.append(field("Voice language",languageSelect),field("Synthetic voice",voiceSelect),field("Speaking speed",speedSelect),previewButton,stopPreviewButton,voicePreviewStatus);
+      languageSelect.addEventListener("change",()=>{
+        try { window.localStorage.setItem(SPEECH_LANGUAGE_KEY,languageSelect.value); window.localStorage.removeItem(SPEECH_VOICE_KEY); } catch(_){}
+        speechVoiceOptions(voiceSelect,languageSelect.value);
+        const langName=SPEECH_LANGUAGES.find(x=>x[0]===languageSelect.value)?.[1]||languageSelect.value;
+        voicePreviewStatus.textContent="Selected "+langName+". Available voices depend on the browser/device; if none is installed, the browser may use a fallback voice.";
+      });
       if(speechSupported()){
-        const refreshSpeechVoices=()=>speechVoiceOptions(voiceSelect);
+        const refreshSpeechVoices=()=>speechVoiceOptions(voiceSelect,languageSelect.value);
         if(window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged",refreshSpeechVoices,{once:true});
         else window.speechSynthesis.onvoiceschanged=refreshSpeechVoices;
       }
@@ -707,7 +733,7 @@
         if(status.value==="scheduled"&&!scheduled.value){statusLine.textContent="Choose a future date and time before scheduling.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
         if(status.value==="scheduled" && new Date(scheduled.value).getTime()<=Date.now()){statusLine.textContent="The scheduled time must be in the future.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
         if(audience.value==="team"&&!team.value){statusLine.textContent="Choose a target team.";statusLine.className="ct-ann-status is-error";statusLine.hidden=false;return;}
-        try { window.localStorage.setItem(SPEECH_VOICE_KEY,voiceSelect.value||""); window.localStorage.setItem(SPEECH_RATE_KEY,String(speedSelect.value||1)); } catch(_){}
+        try { window.localStorage.setItem(SPEECH_LANGUAGE_KEY,languageSelect.value||"en-US"); window.localStorage.setItem(SPEECH_VOICE_KEY,voiceSelect.value||""); window.localStorage.setItem(SPEECH_RATE_KEY,String(speedSelect.value||1)); } catch(_){}
         const payload={
           title:name.value.trim(),message:message.value.trim(),announcement_type:kind.value,
           audience_scope:audience.value,severity:kind.value==="alert"?sev.value:"info",
