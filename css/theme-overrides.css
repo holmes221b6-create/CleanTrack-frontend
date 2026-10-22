@@ -1892,3 +1892,93 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
   background: #17664f !important;
   border-color: #17664f !important;
 }
+
+
+/* Final toolbar layout override: this stylesheet loads after sidebar-layout.css. */
+#workspace-view .ct-workspace-toolbar {
+  display: grid !important;
+  grid-template-columns: max-content minmax(0, 1fr) max-content !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  white-space: nowrap !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-leading-space {
+  display: none !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-global-search {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 360px !important;
+  justify-self: end !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-actions {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  justify-self: end !important;
+  gap: 10px !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  margin: 0 0 0 auto !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-actions > button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+#workspace-view .ct-workspace-toolbar > .ct-toolbar-actions > .ct-sidebar-toggle {
+  display: inline-grid !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+}
+@media (max-width: 900px) {
+  #workspace-view .ct-workspace-toolbar {
+    grid-template-columns: max-content minmax(0, 1fr) max-content !important;
+    column-gap: 8px !important;
+    padding-inline: 10px !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-global-search {
+    display: none !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+    width: 84px !important;
+    min-width: 84px !important;
+    max-width: 84px !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-toolbar-actions { gap: 6px !important; }
+}
+@media (max-width: 480px) {
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    padding: 0 !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back span { display: none !important; }
+}
