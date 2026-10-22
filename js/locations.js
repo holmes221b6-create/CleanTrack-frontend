@@ -143,7 +143,7 @@
       box.append(empty);return;
     }
     const wrap=el("div","ct-loc-table-wrap"),table=el("table","ct-loc-table"),thead=el("thead"),hr=el("tr");["Location","Assigned team","Zones","Operations","Coordinates","Status","Actions"].forEach(v=>hr.append(el("th","",v)));thead.append(hr);const tb=el("tbody");
-    filtered.forEach(x=>{const tr=el("tr"),td=el("td","ct-loc-name-cell");td.append(btn(x.name,"ct-loc-text-button",()=>showDetails(x.id,true)),el("small","",x.address||"Address not recorded"));const countZones=x.zone_count??zonesAt(x).length,countOps=x.operation_count??opsAt(x).length,coord=coords(x)?Number(x.latitude).toFixed(5)+", "+Number(x.longitude).toFixed(5):"Not pinned";const st=el("td"),pill=el("span","ct-loc-status status-"+String(x.status||"active").toLowerCase(),txt(x.status,"active"));st.append(pill);const acts=el("td","ct-loc-row-actions");acts.append(btn("Details","ct-loc-btn ct-loc-btn-small",()=>showDetails(x.id,true)),btn("Edit","ct-loc-btn ct-loc-btn-small",()=>editLocation(x.id)));tr.append(td,el("td","",teamName(x.team_id)),el("td","",String(countZones)),el("td","",String(countOps)),el("td","",coord),st,acts);tb.append(tr);});
+    filtered.forEach(x=>{const tr=el("tr"),td=el("td","ct-loc-name-cell");td.append(btn(x.name,"ct-loc-text-button",()=>showDetails(x.id,true)),el("small","",x.address||"Address not recorded"));const countZones=x.zone_count??zonesAt(x).length,countOps=x.operation_count??opsAt(x).length,coord=coords(x)?Number(x.latitude).toFixed(5)+", "+Number(x.longitude).toFixed(5):"Not pinned";const st=el("td"),pill=el("span","ct-loc-status status-"+String(x.status||"active").toLowerCase(),txt(x.status,"active"));st.append(pill);const acts=el("td","ct-loc-row-actions");acts.append(btn("Details","ct-loc-btn ct-loc-btn-small",()=>showDetails(x.id,true)),btn("Edit","ct-loc-btn ct-loc-btn-small",()=>editLocation(x.id)),btn("Delete","ct-loc-btn ct-loc-btn-small ct-loc-delete-btn",()=>deleteLocation(x)));tr.append(td,el("td","",teamName(x.team_id)),el("td","",String(countZones)),el("td","",String(countOps)),el("td","",coord),st,acts);tb.append(tr);});
     table.append(thead,tb);wrap.append(table);box.append(wrap,el("p","ct-loc-table-foot",filtered.length+" of "+locations.length+" records · Loaded from CleanTrack database."));}
   function buildForm(){
     if(!formNode)return;formNode.replaceChildren();const editing=editingId!==null,old=editing?locations.find(x=>String(x.id)===String(editingId)):null;
@@ -405,7 +405,7 @@
     if(coords(x))actions.append(btn("Satellite view","ct-loc-btn",()=>window.open("https://www.google.com/maps/@?api=1&map_action=map&center="+encodeURIComponent(x.latitude+","+x.longitude)+"&zoom=20&basemap=satellite","_blank","noopener")));
     if(coords(x))actions.append(btn("Directions","ct-loc-btn",()=>window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(x.latitude+","+x.longitude),"_blank","noopener")));
     actions.append(btn("Find mapped indoor areas (OpenStreetMap)","ct-loc-btn",()=>discoverAndDownloadZones(x)));
-    actions.append(btn("Edit","ct-loc-btn ct-loc-btn-primary",()=>editLocation(x.id)));
+    actions.append(btn("Edit","ct-loc-btn ct-loc-btn-primary",()=>editLocation(x.id)),btn("Delete location","ct-loc-btn ct-loc-btn-danger",()=>deleteLocation(x)));
     if(x.status==="archived")actions.append(btn("Restore","ct-loc-btn",()=>changeStatus(x,"active")));else actions.append(btn("Archive","ct-loc-btn ct-loc-btn-danger",()=>archiveLocation(x)));
     head.append(identity,actions);detailNode.append(head);
     const metrics=el("div","ct-loc-detail-metrics");[[teamName(x.team_id),"Assigned team"],[zonesAt(x).length,"Zones"],[opsAt(x).length,"Operations"],[coords(x)?Number(x.latitude).toFixed(6)+", "+Number(x.longitude).toFixed(6):"Not pinned","Coordinates"]].forEach(([v,l])=>{const c=el("div","ct-loc-detail-stat");c.append(el("small","",l),el("strong","",String(v)));metrics.append(c);});detailNode.append(metrics);
@@ -515,6 +515,26 @@
   }
   async function changeStatus(x,status){try{const res=await API.patch("locations/"+x.id,{status});notice(res.message||"Location status updated.","success");await load();renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();await showDetails(x.id,false);}catch(err){notice(err.message||"Location status could not be changed.","error");}}
   async function archiveLocation(x){const open=Number(x.active_operation_count??opsAt(x).filter(o=>!["completed","complete","approved","done","closed","cancelled","canceled"].includes(String(o.status||"").toLowerCase())).length);if(!confirm("Archive “"+x.name+"”?\n\nLinked operations: "+opsAt(x).length+"\nOpen operations / scheduled work: "+open+"\nZones: "+zonesAt(x).length+"\n\nNothing will be deleted or moved. The server will reject archiving while open operations remain."))return;await changeStatus(x,"archived");}
+  async function deleteLocation(x){
+    const linkedZones=Number(x.zone_count??zonesAt(x).length),linkedOps=Number(x.operation_count??opsAt(x).length);
+    if(linkedZones||linkedOps){
+      notice('“'+x.name+'” has '+linkedZones+' linked zone(s) and '+linkedOps+' operation(s). Move or remove those records first, or archive this location to preserve history. Nothing was deleted.',"warning");
+      return;
+    }
+    if(!confirm('Permanently delete location “'+x.name+'”?\\n\\nThis cannot be undone. The location has no linked zones or operations.'))return;
+    try{
+      const response=await API.delete("locations/"+encodeURIComponent(x.id));
+      if(String(selectedId)===String(x.id))selectedId=null;
+      if(String(editingId)===String(x.id)){editingId=null;formNode.hidden=true;}
+      detailNode.hidden=true;
+      notice(response.message||'Location deleted successfully.',"success");
+      await load();renderMetrics(root.querySelector(".ct-loc-metrics"));renderDirectory();renderMapPins();
+    }catch(err){
+      const msg=err.message||"Location could not be deleted.";
+      notice(msg,"error");
+      if(err.status===409)notice(msg+" Archive the location if you need to preserve linked history.","warning");
+    }
+  }
   function parseCSV(text){text=text.replace(/^\uFEFF/,"");const all=[];let row=[],cell="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(c===","&&!quoted){row.push(cell);cell="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&text[i+1]==="\n")i++;row.push(cell);if(row.some(v=>v.trim()))all.push(row);row=[];cell="";}else cell+=c;}row.push(cell);if(row.some(v=>v.trim()))all.push(row);if(all.length<2)return [];const headers=all.shift().map(v=>v.trim().toLowerCase().replace(/\s+/g,"_"));return all.map(vals=>Object.fromEntries(headers.map((h,i)=>[h,String(vals[i]??"").trim()])));}
   async function importLocationPackage(pkg){
     const preview=await API.post("locations/import-package/preview",pkg);
