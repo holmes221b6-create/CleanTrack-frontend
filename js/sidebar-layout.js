@@ -576,6 +576,11 @@ if (identity) {
               : "background:var(--surface-color,rgba(255,255,255,.06));border:1px solid var(--border-color,rgba(255,255,255,.10));");
           bubble.textContent = text;
           transcript.appendChild(bubble);
+          if (persist) {
+            history.push({ role: role, text: String(text), at: new Date().toISOString() });
+            history = history.slice(-80);
+            saveHistory();
+          }
           transcript.scrollTop = transcript.scrollHeight;
           return bubble;
         }
@@ -598,7 +603,11 @@ if (identity) {
         const initial = document.createElement("div");
         initial.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:8px;";
         transcript.appendChild(initial);
-        addMessage("assistant", "Hello! I'm CleanTrack Assistant. I can guide you through your workspace and explain how CleanTrack features fit together. Ask me about operations, locations and zones, reviews, logs, reports, staff, or settings.");
+        if (history.length) {
+          history.forEach(item => addMessage(item.role, item.text, false));
+        } else {
+          addMessage("assistant", "Hello! I'm CleanTrack Assistant. I can guide you through your workspace and explain how CleanTrack features fit together. Ask me about operations, locations and zones, reviews, logs, reports, staff, or settings.");
+        }
         const starterRow = document.createElement("div");
         starterRow.style.cssText = "display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;";
         [
@@ -630,7 +639,75 @@ if (identity) {
         });
         wrap.appendChild(form);
 
-        function submitQuestion(rawQuestion) {
+        function isLogDiagnosisQuestion(question) {
+          const q = normalized(question);
+          return /\\blogs?\\b/.test(q) && /\\b(why|not showing|missing|empty|no logs|test|diagnos|check|problem|issue|troubleshoot|where are)\\b/.test(q);
+        }
+
+        function responseRows(value, keys) {
+          if (Array.isArray(value)) return value;
+          for (const key of keys) if (value && Array.isArray(value[key])) return value[key];
+          return null;
+        }
+
+        async function diagnoseLiveLogs() {
+          const api = window.CleanTrackApi;
+          if (!api || typeof api.get !== "function") {
+            return "I couldn't check live Logs because the CleanTrack API client isn't available on this page. Refresh CleanTrack and try again.";
+          }
+          const results = await Promise.allSettled([
+            api.get("/auth/me"),
+            api.get("/tasks"),
+            api.get("/logs")
+          ]);
+          const failed = results.map((r, i) => ({ result: r, label: ["account/session", "tasks", "logs"][i] })).filter(x => x.result.status === "rejected");
+          if (failed.length === 3) {
+            const err = failed[0].result.reason;
+            const status = err && err.status;
+            if (status === 401 || status === 403) return "I couldn't inspect live Logs because this session isn't authorised (HTTP " + status + "). Sign in again and make sure your account has access to the workspace.";
+            return "I couldn't inspect live Logs because the account, tasks, and logs requests all failed. This is an API/session/connectivity problem, not proof that there are zero logs. Check your sign-in and backend connection, then retry.";
+          }
+          const account = results[0].status === "fulfilled" ? (results[0].value.user || results[0].value) : null;
+          const tasks = results[1].status === "fulfilled" ? responseRows(results[1].value, ["tasks", "items", "results"]) : null;
+          const logs = results[2].status === "fulfilled" ? responseRows(results[2].value, ["logs", "items", "results"]) : null;
+          const lines = ["I checked the live CleanTrack endpoints available to your signed-in account."];
+          if (account) {
+            const role = account.role ? String(account.role).replace(/[_-]+/g, " ") : "account";
+            lines.push("Account role: " + role + (account.organization_name ? "; organisation: " + account.organization_name : "") + ".");
+          } else {
+            lines.push("The account endpoint failed, so I couldn't confirm your role.");
+          }
+          if (tasks === null) {
+            const e = results[1].reason;
+            lines.push("Tasks could not be read" + (e && e.status ? " (HTTP " + e.status + ")" : "") + ". I can't use task data to explain the Logs state.");
+          } else {
+            const statusCounts = {};
+            tasks.forEach(t => { const st = String(t.status || "unknown").toLowerCase(); statusCounts[st] = (statusCounts[st] || 0) + 1; });
+            lines.push("Tasks visible to this account: " + tasks.length + (Object.keys(statusCounts).length ? " (" + Object.entries(statusCounts).map(([k,v]) => k + ": " + v).join(", ") + ")" : "") + ".");
+          }
+          if (logs === null) {
+            const e = results[2].reason;
+            lines.push("Logs could not be read" + (e && e.status ? " (HTTP " + e.status + ")" : "") + ". This is an endpoint/access failure, so I won't report the log count as zero.");
+          } else {
+            lines.push("Logs visible to this account: " + logs.length + ".");
+            if (logs.length === 0 && tasks && tasks.length === 0) {
+              lines.push("Finding: both endpoints returned no visible records. This account currently has no tasks or logs in its permitted view, or the backend is filtering them by role/location/organisation.");
+            } else if (logs.length === 0 && tasks) {
+              const active = tasks.filter(t => String(t.status || "").toLowerCase() === "in-progress");
+              const awaiting = tasks.filter(t => String(t.status || "").toLowerCase() === "pending-approval");
+              if (active.length) lines.push("Finding: " + active.length + " task(s) are in progress but no logs are visible. Logs are created when a cleaning log is submitted for an in-progress task with its matching zone; open one of those tasks, confirm its zone, then submit the work log.");
+              else if (awaiting.length) lines.push("Finding: " + awaiting.length + " task(s) are awaiting approval but the Logs endpoint returned none. That mismatch needs checking in the backend data/API or role/location scope; I can't safely conclude that no logs exist.");
+              else lines.push("Finding: there are no visible in-progress tasks to submit logs against. Check task assignment and status in Operations, then start an eligible task before submitting a log.");
+            } else if (logs.length > 0) {
+              lines.push("Finding: logs do exist in the current account's permitted view. If the Logs page looks empty, refresh it and check that page's filters; if it remains empty, the page may be failing to load or applying a different scope.");
+            }
+          }
+          if (failed.length && failed.length < 3) lines.push("Some live requests failed (" + failed.map(x => x.label).join(", ") + "); conclusions above are limited to endpoints that responded.");
+          lines.push("I only read data; I did not change tasks or logs.");
+          return lines.join("\n");
+        }
+
+        async function submitQuestion(rawQuestion) {
           const question = String(rawQuestion || "").trim();
           if (!question) {
             input.focus();
@@ -638,14 +715,23 @@ if (identity) {
           }
           addMessage("user", question);
           input.value = "";
-          const answer = answerQuestion(question);
-          addMessage("assistant", answer.text);
-          if (answer.pages.length) {
-            const linkRow = document.createElement("div");
-            linkRow.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-left:4px;";
-            addPageLinks(linkRow, answer.pages);
-            transcript.appendChild(linkRow);
-            transcript.scrollTop = transcript.scrollHeight;
+          if (isLogDiagnosisQuestion(question)) {
+            const pending = addMessage("assistant", "Checking your current account, tasks, and logs…");
+            const answer = await diagnoseLiveLogs();
+            pending.textContent = answer;
+            history.push({ role: "assistant", text: answer, at: new Date().toISOString() });
+            history = history.slice(-80);
+            saveHistory();
+          } else {
+            const answer = answerQuestion(question);
+            addMessage("assistant", answer.text);
+            if (answer.pages.length) {
+              const linkRow = document.createElement("div");
+              linkRow.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-left:4px;";
+              addPageLinks(linkRow, answer.pages);
+              transcript.appendChild(linkRow);
+              transcript.scrollTop = transcript.scrollHeight;
+            }
           }
           input.focus();
         }
