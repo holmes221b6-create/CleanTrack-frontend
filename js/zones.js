@@ -43,12 +43,29 @@ const result=await API.post("locations/import-package",{package:pkg,mode:"existi
 notice(result.message||"Zones imported successfully.","success");
 await load();locFilter=String(locationId);metrics();syncLocFilter();renderLocationShortcuts();list();
 }
+function parseZoneCsvText(text){
+const rows=[];let row=[],field="",quoted=false;
+for(let i=0;i<text.length;i++){const ch=text[i];if(quoted){if(ch==='"'&&text[i+1]==='"'){field+='"';i++;}else if(ch==='"')quoted=false;else field+=ch;}else if(ch==='"')quoted=true;else if(ch===","){row.push(field);field="";}else if(ch==="\\r"||ch==="\\n"){if(ch==="\\r"&&text[i+1]==="\\n")i++;row.push(field);field="";if(row.some(v=>String(v).length))rows.push(row);row=[];}else field+=ch;}
+if(field.length||row.length){row.push(field);rows.push(row);}
+if(!rows.length)throw Error("The zone CSV is empty.");
+const headers=rows.shift().map((x,i)=>String(x||"").replace(/^\\ufeff/,"").trim().toLowerCase());
+const idx=name=>headers.indexOf(name);
+if(idx("name")<0||idx("location_name")<0)throw Error("This CSV must contain zone name and location_name columns. Download the three zone files from Locations.");
+const zones=rows.filter(r=>String(r[idx("name")]||"").trim()).map((r,i)=>{
+const val=k=>idx(k)<0?"":String(r[idx(k)]??"").trim();
+let boundary=null;const raw=val("boundary_points_normalized");
+if(raw){try{const points=JSON.parse(raw);if(Array.isArray(points)&&points.length>=3)boundary={type:"IndoorPolygon",points};}catch(_){}}
+return {name:val("name"),description:val("description"),floor_label:val("floor_label"),floor:val("floor_label"),type:"other",boundary};
+});
+if(!zones.length)throw Error("No named zones were found in this CSV.");
+return {format:"cleantrack-location-package",version:1,location:{name:String(rows.map(r=>r[idx("location_name")]).find(Boolean)||"").trim()},zones};
+}
 async function handleZonePackageFile(event){
 const file=event.target.files?.[0];if(!file)return;
 try{
 const ext=file.name.toLowerCase().split(".").pop();
-if(["pdf","png","jpg","jpeg","webp"].includes(ext))throw Error("Upload the PDF/image from Locations first. Open that saved Location, choose Build Zones from this floor plan, then import the downloaded Zone Package here.");
-const pkg=await window.CleanTrackMapImport.parseFile(file,"zones");
+if(["pdf","png","jpg","jpeg","webp"].includes(ext))throw Error("Upload the PDF/image from Locations first. Then import the downloaded zone names CSV here, or import a supported zone package.");
+const pkg=file.name.toLowerCase().endsWith(".csv")?parseZoneCsvText(await file.text()):await window.CleanTrackMapImport.parseFile(file,"zones");
 if(pkg.format!=="cleantrack-location-package")throw Error("This file does not contain a recognized zone dataset.");
 await importZonesPackage(pkg);
 }catch(ex){notice(ex.message||"The map file could not be imported.","error");}
