@@ -462,7 +462,7 @@
           const ocr=await window.Tesseract.recognize(base,"eng",{logger:m=>{if(m.status==="recognizing text")status.textContent="Reading the whole drawing: "+Math.round((m.progress||0)*100)+"%";},workerPath:"https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/worker.min.js",corePath:"https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0/tesseract-core.wasm.js",langPath:"https://tessdata.projectnaptha.com/4.0.0"});
           const lines=new Map();
           for(const w of (ocr.data.words||[])){const text=String(w.text||"").trim();if(!text||Number(w.confidence||0)<30)continue;const k=[w.block_num,w.par_num,w.line_num].join(":");if(!lines.has(k))lines.set(k,{text:[],left:w.bbox.x0,top:w.bbox.y0,right:w.bbox.x1,bottom:w.bbox.y1,confidence:0,count:0});const q=lines.get(k);q.text.push(text);q.left=Math.min(q.left,w.bbox.x0);q.top=Math.min(q.top,w.bbox.y0);q.right=Math.max(q.right,w.bbox.x1);q.bottom=Math.max(q.bottom,w.bbox.y1);q.confidence+=Number(w.confidence||0);q.count++;}
-          detectedLabelBoxes=[...lines.values()].map(q=>({name:q.text.join(" ").replace(/\\s+/g," ").trim(),x:(q.left+q.right)/2,y:(q.top+q.bottom)/2,left:q.left,top:q.top,right:q.right,bottom:q.bottom,confidence:q.confidence/Math.max(1,q.count)})).filter(q=>q.name.length>1&&!/^[|._\\-]+$/.test(q.name));
+          detectedLabelBoxes=[...lines.values()].map(q=>({name:q.text.join(" ").replace(/\s+/g," ").trim(),x:(q.left+q.right)/2,y:(q.top+q.bottom)/2,left:q.left,top:q.top,right:q.right,bottom:q.bottom,confidence:q.confidence/Math.max(1,q.count)})).filter(q=>q.name.length>1&&!/^[|._\-]+$/.test(q.name));
         }
         if(!detectedStructurePaths.length){
           status.textContent="Tracing the entire floor-plan drawing into editable vector paths…";
@@ -472,10 +472,10 @@
         const labels=detectedLabelBoxes;
         const csvRows=[["name","description","floor_label","location_name","location_id","source_page","boundary_type","boundary_points_normalized"].map(csvCell).join(","),
           ...labels.map(q=>[q.name,"",floor.value.trim()||(pdf?"PDF page "+pageNo:""),location.name||"",location.id||"",pageNo,"",""].map(csvCell).join(","))];
-        const namesBlob=new Blob(["\\ufeff"+csvRows.join("\\r\\n")+"\\r\\n"],{type:"text/csv;charset=utf-8"});
+        const namesBlob=new Blob(["\ufeff"+csvRows.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
         const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
         const allPaths=detectedStructurePaths.map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
-        const noLabelPaths=detectedStructurePaths.filter(q=>!labels.some(l=>l.left<q.x+q.width&&l.right>q.x&&l.top<q.y+q.height&&l.bottom>q.y)).map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
+        const noLabelPaths=detectedStructurePaths.filter(q=>q.area>Math.max(6,base.width*base.height*.000002)&&!labels.some(l=>l.left<q.x+q.width&&l.right>q.x&&l.top<q.y+q.height&&l.bottom>q.y&&q.width<Math.max(120,(l.right-l.left)*2.2)&&q.height<Math.max(70,(l.bottom-l.top)*2.2))).map((q,i)=>'<path id="drawing-line-'+i+'" d="M '+q.points.map(p=>p[0]+','+p[1]).join(' L ')+' Z" fill="none" stroke="#171717" stroke-width="1" vector-effect="non-scaling-stroke"/>').join("");
         const editableLabels=labels.map((q,i)=>{const fs=Math.max(8,Math.min(48,(q.bottom-q.top)*.82));return '<text id="source-label-'+i+'" x="'+q.x+'" y="'+(q.y+fs*.35)+'" font-family="Arial,sans-serif" font-size="'+fs+'" fill="#171717" text-anchor="middle">'+svgEsc(q.name)+'</text>';}).join("");
         const metadata='<metadata>'+svgEsc(JSON.stringify({location:{id:location.id,name:location.name},floor_label:floor.value.trim()||(pdf?"PDF page "+pageNo:""),detected_text_labels:labels.map(q=>({name:q.name,x:q.x,y:q.y}))}))+'</metadata>';
         const close='</svg>';
