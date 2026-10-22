@@ -13,3 +13,8 @@
 /* Shared PDF floor-plan preview */
 .ct-zone-floor-plan-pdf{display:block;width:100%;height:min(72vh,780px);min-height:380px;border:0;border-radius:10px;background:#fff}
 @media(max-width:560px){.ct-zone-floor-plan-pdf{height:62vh;min-height:320px}}
+
+
+/* Clickable parent-location shortcuts in the Zones directory */
+.ct-zone-location-shortcuts{margin:18px 0;padding:16px;border:1px solid var(--zb);border-radius:14px;background:var(--panel,rgba(128,128,128,.04))}.ct-zone-location-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.ct-zone-location-card{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:12px 14px;border:1px solid var(--zb);border-radius:10px;background:var(--card,rgba(128,128,128,.06));color:var(--text,inherit);text-align:left;font:inherit;font-weight:650;cursor:pointer}.ct-zone-location-card:hover,.ct-zone-location-card.is-selected{border-color:var(--accent,#4bd6a2);box-shadow:0 0 0 1px var(--accent,#4bd6a2) inset}.ct-zone-location-count{flex-shrink:0;font-size:.82rem;font-weight:500;color:var(--muted,#9ca3af)}
+@media(max-width:560px){.ct-zone-location-shortcuts{padding:12px}.ct-zone-location-grid{grid-template-columns:1fr}}
