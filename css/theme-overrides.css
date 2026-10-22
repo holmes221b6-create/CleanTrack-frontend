@@ -2030,3 +2030,12 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
   #workspace-view .ct-profile-hero-avatar { flex-basis: 52px; width: 52px; height: 52px; border-radius: 16px; }
   #workspace-view .ct-profile-data-v2 { grid-template-columns: minmax(0,1fr); }
 }
+
+
+/* Profile picture selector and restored account ID layout. */
+#workspace-view .ct-profile-avatar-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; padding:0 2px; }
+#workspace-view .ct-profile-avatar-file { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+#workspace-view .ct-profile-avatar-select { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:0 12px; border:1px solid var(--border,#29374d); border-radius:10px; background:var(--surface,#111a2a); color:var(--text,#e5edf7); font-size:12px; font-weight:650; cursor:pointer; }
+#workspace-view .ct-profile-avatar-select:hover { border-color:#64d8b0; color:#a5f3d8; }
+#workspace-view .ct-profile-avatar-file:focus-visible + .ct-profile-avatar-hint { outline:2px solid #64d8b0; }
+#workspace-view .ct-profile-avatar-hint { flex-basis:100%; margin:0; color:var(--muted,#9aa9bd); font-size:11px; line-height:1.5; }
