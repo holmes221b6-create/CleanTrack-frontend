@@ -486,3 +486,21 @@ color: #ffffff !important;
 @media (max-width: 420px) {
   #workspace-view .ct-workspace-toolbar > .ct-global-search { display: none; }
 }
+
+
+/* Organization activity feed in the toolbar notification dialog. */
+.ct-notification-feed { display: grid; gap: 10px; }
+.ct-notification-status { color: var(--muted, #9aa9bd); font-size: 12px; margin: 0; }
+.ct-notification-list { display: grid; gap: 8px; max-height: min(58vh, 560px); overflow: auto; }
+.ct-notification-item {
+  padding: 12px 14px;
+  border: 1px solid var(--border, #29374d);
+  border-radius: 12px;
+  background: var(--surface, #111a2a);
+}
+.ct-notification-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ct-notification-item-top strong { color: var(--text, #e5edf7); font-size: 13px; }
+.ct-notification-item-top time { color: var(--muted, #9aa9bd); font-size: 11px; white-space: nowrap; }
+.ct-notification-item p { margin: 7px 0 0; color: var(--muted, #b4c0d0); font-size: 12px; line-height: 1.5; }
+.ct-notification-outcome { display: inline-block; margin-top: 8px; padding: 3px 7px; border-radius: 6px; background: rgba(100,216,176,.1); color: #a5f3d8; font-size: 10px; text-transform: capitalize; }
+@media (max-width: 520px) { .ct-notification-item-top { flex-direction: column; gap: 4px; } }
