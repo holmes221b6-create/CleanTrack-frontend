@@ -741,7 +741,13 @@ if (identity) {
           if (intent === "logs") {
             const logs = rowsFor("logs", labels.logs[1]);
             const tasks = rowsFor("tasks", labels.tasks[1]);
-            if (logs === null) return explainLiveFailure(results.filter(r => !r.ok), role);
+            if (logs === null) {
+              const logResult = byKey.logs;
+              const logStatus = logResult && logResult.error && logResult.error.status;
+              const failedKeys = results.filter(r => !r.ok).map(r => r.key);
+              if (logStatus === 404) return "I couldn't check live Logs because the configured CleanTrack backend returned 404 for the Logs endpoint. A 404 means this backend doesn't recognise that route; it does not mean the Logs table is empty. The current configured API is " + String((window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl) || "the configured backend") + ". Check that Render is running the backend version containing GET /api/logs and that the frontend's API base URL points to that service. Failed checks: " + failedKeys.join(", ") + ".";
+              return explainLiveFailure(results.filter(r => !r.ok), role);
+            }
             const parts = ["Live Logs check" + (account ? " (" + roleLabel + " view)" : "") + ":", "Logs visible to this account: " + logs.length + "."];
             if (tasks !== null) {
               const counts = {};
