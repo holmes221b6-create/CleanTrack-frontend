@@ -548,7 +548,16 @@ if (identity) {
         if (pages.length) {
           return { text: "I can help with that within CleanTrack. These are the closest pages available to your role. If you tell me the outcome you want—for example, create a task, review completed work, or export a report—I can give more specific guidance.", pages };
         }
-        return { text: "I don't have a reliable CleanTrack-specific answer for that yet, and I won't make one up. Try asking how to manage operations, locations and zones, reviews, logs, reports, staff, teams, announcements, or settings.", pages: [] };
+        if (has("cleantrack", "how does this app work", "how does the app work", "workflow", "work flow", "getting started", "start using")) {
+          return { text: "CleanTrack connects organisation setup, locations, operational zones, teams and assigned tasks. Staff carry out assigned work and submit a cleaning log with the required details/evidence. Submitted work can move to pending approval for a supervisor or admin to review. Reports summarise records for export; audit logs record actions that happened. What you can see and do depends on your role and assigned location. I can check live records when you ask for current tasks, logs, locations or zones.", pages: matchPages(question) };
+        }
+        if (has("status", "pending", "in progress", "pending approval", "approved", "rejected", "overdue", "completed", "complete")) {
+          return { text: "In CleanTrack, task status tells you where planned work is in its workflow. A task generally needs to be assigned and started before a cleaning log can be submitted; submitted work can then await review. A status label alone doesn't prove that a log exists, so for a current case I should check the live task and Logs records instead of guessing. Ask me to check your current tasks or logs.", pages: matchPages(question) };
+        }
+        if (has("password", "sign in", "login", "log in", "session", "permission", "access denied", "forbidden")) {
+          return { text: "For a sign-in or access problem, refresh the app and sign in again. If a page still fails, note which page and action failed; an empty result and an access/API error are different problems. CleanTrack limits records by role and assigned location, so ask an Admin to check your role or assignment if access still looks wrong.", pages: matchPages(question) };
+        }
+        return { text: "I can explain CleanTrack's workflows and check live records exposed to your signed-in role. I couldn't confidently match that wording to a specific feature, so I won't invent an answer. Try asking in terms of the outcome you want—for example, 'show my current tasks', 'check why Logs is empty', 'how do I submit work for review?', or 'how do I import a location and create zones?'.", pages: matchPages(question) };
       }
 
       openWorkspaceDialog("CleanTrack Assistant", content => {
@@ -641,7 +650,8 @@ if (identity) {
 
         function isLogDiagnosisQuestion(question) {
           const q = normalized(question);
-          return /\blogs?\b/.test(q) && /\b(why|not showing|missing|empty|no logs|test|diagnos|check|problem|issue|troubleshoot|where are)\b/.test(q);
+          const asksForLiveState = /\b(why|not showing|missing|empty|no logs|test|diagnos|check|problem|issue|troubleshoot|where are|how many|show|list|current|latest|recent|my logs|any logs|logs today|logs yesterday|status)\b/.test(q);
+          return /\blogs?\b/.test(q) && asksForLiveState && !/\b(how do logs work|what are logs|difference between logs and operations|explain logs)\b/.test(q);
         }
 
         function responseRows(value, keys) {
@@ -664,8 +674,8 @@ if (identity) {
           if (failed.length === 3) {
             const err = failed[0].result.reason;
             const status = err && err.status;
-            if (status === 401 || status === 403) return "I couldn't inspect live Logs because this session isn't authorised (HTTP " + status + "). Sign in again and make sure your account has access to the workspace.";
-            return "I couldn't inspect live Logs because the account, tasks, and logs requests all failed. This is an API/session/connectivity problem, not proof that there are zero logs. Check your sign-in and backend connection, then retry.";
+            if (status === 401 || status === 403) return "I couldn't access your live CleanTrack records because your session may have expired or your account doesn't have permission. Please sign in again and retry. I have not treated this as an empty Logs page.";
+            return "I couldn't reach the live CleanTrack records just now. This can happen if the backend is waking up, unavailable, or the session needs refreshing. Please refresh CleanTrack and retry in a moment. I have not assumed that you have zero logs.";
           }
           const account = results[0].status === "fulfilled" ? (results[0].value.user || results[0].value) : null;
           const tasks = results[1].status === "fulfilled" ? responseRows(results[1].value, ["tasks", "items", "results"]) : null;
@@ -679,7 +689,7 @@ if (identity) {
           }
           if (tasks === null) {
             const e = results[1].reason;
-            lines.push("Tasks could not be read" + (e && e.status ? " (HTTP " + e.status + ")" : "") + ". I can't use task data to explain the Logs state.");
+            lines.push("I couldn't load the tasks needed to cross-check the Logs state. " + (e && (e.status === 401 || e.status === 403) ? "Your session or permissions may need attention." : "The live service may be temporarily unavailable.") + " I won't guess the task count.");
           } else {
             const statusCounts = {};
             tasks.forEach(t => { const st = String(t.status || "unknown").toLowerCase(); statusCounts[st] = (statusCounts[st] || 0) + 1; });
@@ -687,7 +697,7 @@ if (identity) {
           }
           if (logs === null) {
             const e = results[2].reason;
-            lines.push("Logs could not be read" + (e && e.status ? " (HTTP " + e.status + ")" : "") + ". This is an endpoint/access failure, so I won't report the log count as zero.");
+            lines.push("I couldn't load the live Logs records. " + (e && (e.status === 401 || e.status === 403) ? "Your session or permissions may need attention." : "The service may be temporarily unavailable.") + " This does not mean there are no logs.");
           } else {
             lines.push("Logs visible to this account: " + logs.length + ".");
             if (logs.length === 0 && tasks && tasks.length === 0) {
