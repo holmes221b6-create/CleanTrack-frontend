@@ -478,7 +478,7 @@
         const close='</svg>';
         // File 2 is a label-free, editable vector layout made from the zone polygons.
         // File 3 preserves the supplied drawing and overlays editable vector boundaries, names and descriptions.
-        const structureSvg=svgOpen+'<title>'+svgEsc(location.name)+' — editable zone structure without labels</title><desc>Editable zone block polygons only; no embedded source image, names, or descriptions.</desc>'+buildVectorZones(false)+close;
+        const structureSvg=svgOpen+'<title>'+svgEsc(location.name)+' — editable floor-plan structure without zone labels</title><desc>The supplied architectural drawing is used as the base, with separately editable zone block polygons over it. No CleanTrack zone names or descriptions are added to this version.</desc>'+background+buildVectorZones(false)+close;
         const labelledSvg=svgOpen+'<title>'+svgEsc(location.name)+' — labelled editable floor plan</title><desc>Uploaded architectural drawing with separately editable zone polygons, names and descriptions. The source drawing is embedded as an image; edit the vector zone shapes and text independently.</desc>'+background+metadata+buildVectorZones(true)+close;
         const structureBlob=new Blob([structureSvg],{type:"image/svg+xml;charset=utf-8"});
         const labelledBlob=new Blob([labelledSvg],{type:"image/svg+xml;charset=utf-8"});
