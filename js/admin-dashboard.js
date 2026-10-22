@@ -435,61 +435,103 @@
     );
   }
 
-  function renderReport(container, rows, now) {
-    const total = operations.length;
+  function reportData(now) {
     const counts = {
       progress: operations.filter(task => workBucket(task, now) === "progress").length,
       pending: operations.filter(task => !isClosed(task) && workBucket(task, now) === "pending").length,
       overdue: operations.filter(task => workBucket(task, now) === "overdue").length
     };
-    const due = rows.reduce((sum, row) => sum + row.total, 0);
-    const approved = rows.reduce((sum, row) => sum + row.approved, 0);
-    const csvRows = [
+    const trend = completionRows();
+    const completed = trend.reduce((sum, row) => sum + row.completed, 0);
+    const data = [
       ["CleanTrack Admin Dashboard Report"],
       ["Exported at", new Date().toISOString()],
       ["Dashboard scope", "Current organization only"],
+      ["Selected trend range", range],
       [],
       ["Task overview", "Count"],
-      ["Total tasks", total],
+      ["Total tasks", operations.length],
       ["In progress", counts.progress],
       ["Pending", counts.pending],
       ["Overdue", counts.overdue],
       ["Approved / verified", operations.filter(task => status(task) === "approved").length],
+      ["Submitted / completed in selected trend range", completed],
       ["Locations", locations.length],
-      ["Compliance for selected period", due ? Math.round(approved / due * 100) + "%" : "No tasks due"],
+      [],
+      ["Task completion trend", "Tasks submitted/completed"],
+      ["Period", "Count"],
+      ...trend.map(row => [row.label, row.completed]),
       [],
       ["Tasks"],
       ["ID", "Title", "Status", "Task type", "Location", "Due at", "Created at", "Assigned user ID"]
     ];
-    operations.forEach(task => csvRows.push([
+    operations.forEach(task => data.push([
       task.id, task.title, task.status, task.task_type,
       (locationFor(task) || {}).name || "", task.due_at || "", task.created_at || "", task.assigned_to_id || ""
     ]));
-    csvRows.push([], ["Locations"], ["Name", "Task count", "Approved", "Overdue", "Approved percentage"]);
+    data.push([], ["Location performance"], ["Name", "Task count", "Approved", "Overdue", "Approved percentage"]);
     locations.forEach(location => {
       const tasks = operations.filter(task => String(task.location_id) === String(location.id));
-      const approvedTasks = tasks.filter(task => status(task) === "approved").length;
+      const approved = tasks.filter(task => status(task) === "approved").length;
       const late = tasks.filter(task => overdue(task, now)).length;
-      csvRows.push([location.name, tasks.length, approvedTasks, late, tasks.length ? Math.round(approvedTasks / tasks.length * 100) + "%" : ""]);
+      data.push([location.name, tasks.length, approved, late, tasks.length ? Math.round(approved / tasks.length * 100) + "%" : ""]);
     });
-    csvRows.push([], ["Recent activity"], ["Timestamp", "Action", "Resource type", "Resource ID", "Details"]);
-    activity.forEach(log => csvRows.push([log.created_at, log.action, log.resource_type, log.resource_id, log.details ? JSON.stringify(log.details) : ""]));
+    data.push([], ["Recent activity"], ["Timestamp", "Action", "Resource type", "Resource ID", "Details"]);
+    activity.forEach(log => data.push([log.created_at, log.action, log.resource_type, log.resource_id, log.details ? JSON.stringify(log.details) : ""]));
+    return data;
+  }
 
-    function cell(value) {
-      let text = value === null || value === undefined ? "" : String(value);
-      if (/^[=+\-@]/.test(text)) text = "'" + text;
-      return '"' + text.replace(/"/g, '""') + '"';
-    }
-    const csv = "\uFEFF" + csvRows.map(row => row.map(cell).join(",")).join("\r\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  function downloadBlob(blob, filename) {
     const href = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = href;
-    link.download = "cleantrack-dashboard-" + localKey(new Date()) + ".csv";
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(href);
+    window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+  }
+
+  function exportReport(format) {
+    const data = reportData(new Date());
+    const filename = "cleantrack-dashboard-" + localKey(new Date());
+    const safe = value => {
+      let text = value === null || value === undefined ? "" : String(value);
+      if (/^[=+\-@]/.test(text)) text = "'" + text;
+      return text;
+    };
+    if (format === "csv") {
+      const cell = value => '"' + safe(value).replace(/"/g, '""') + '"';
+      downloadBlob(new Blob(["\uFEFF" + data.map(row => row.map(cell).join(",")).join("\r\n")], { type: "text/csv;charset=utf-8;" }), filename + ".csv");
+      return;
+    }
+    if (format === "excel") {
+      const xml = value => safe(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      const rows = data.map(row => "<Row>" + row.map(value => {
+        const numeric = typeof value === "number" && Number.isFinite(value);
+        return '<Cell><Data ss:Type="' + (numeric ? "Number" : "String") + '">' + xml(value) + "</Data></Cell>";
+      }).join("") + "</Row>").join("");
+      const workbook = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="CleanTrack Report"><Table>' + rows + "</Table></Worksheet></Workbook>";
+      downloadBlob(new Blob([workbook], { type: "application/vnd.ms-excel;charset=utf-8;" }), filename + ".xls");
+      return;
+    }
+    if (format === "pdf") {
+      const popup = window.open("", "_blank");
+      if (!popup) {
+        window.alert("Your browser blocked the PDF report window. Allow pop-ups for CleanTrack and try again.");
+        return;
+      }
+      const escapeHtml = value => safe(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      const body = data.map(row => "<tr>" + row.map(value => "<td>" + escapeHtml(value) + "</td>").join("") + "</tr>").join("");
+      popup.document.open();
+      popup.document.write('<!doctype html><html><head><meta charset="utf-8"><title>CleanTrack Dashboard Report</title><style>body{font:12px Arial,sans-serif;color:#18202b;padding:24px}h1{font-size:20px}p{color:#555}table{border-collapse:collapse;width:100%;table-layout:fixed}td{border:1px solid #d7dce3;padding:5px;vertical-align:top;overflow-wrap:anywhere}@page{size:A4 landscape;margin:12mm}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body><h1>CleanTrack Admin Dashboard Report</h1><p>Generated ' + escapeHtml(new Date().toLocaleString()) + ' · Current organization</p><table><tbody>' + body + '</tbody></table><script>window.addEventListener("load",function(){window.print();});<\/script></body></html>');
+      popup.document.close();
+    }
+  }
+
+  function showExportOptions(root) {
+    const panel = root.querySelector("[data-export-options]");
+    if (panel) panel.hidden = !panel.hidden;
   }
 
   function build(container) {
@@ -622,13 +664,24 @@
       action.append(copy, el("span", "ct-dash-quick-arrow", "→"));
       quickGrid.appendChild(action);
     });
-    const exportAction = makeButton("", "ct-dash-quick-action", () => renderReport(container, complianceRows(), new Date()));
+    const exportAction = makeButton("", "ct-dash-quick-action", () => showExportOptions(root));
     exportAction.append(el("span", "ct-dash-quick-icon", "⇩"));
     const exportCopy = el("span", "ct-dash-quick-copy");
-    exportCopy.append(el("strong", "", "Export report"), el("small", "", "Download this dashboard as CSV"));
+    exportCopy.append(el("strong", "", "Export report"), el("small", "", "Choose CSV, Excel or PDF"));
     exportAction.append(exportCopy, el("span", "ct-dash-quick-arrow", "→"));
     quickGrid.appendChild(exportAction);
-    quick.appendChild(quickGrid);
+    const exportOptions = el("div", "ct-dash-export-options");
+    exportOptions.dataset.exportOptions = "true";
+    exportOptions.hidden = true;
+    exportOptions.append(el("p", "ct-dash-panel-kicker", "DOWNLOAD FORMAT"));
+    const exportButtons = el("div", "ct-dash-export-buttons");
+    [["csv", "CSV", "Comma-separated values"], ["excel", "Excel", "Excel workbook-compatible file"], ["pdf", "PDF", "Print or save as PDF"]].forEach(([format, label, hint]) => {
+      const button = makeButton("", "ct-dash-export-option", () => exportReport(format));
+      button.append(el("strong", "", label), el("small", "", hint));
+      exportButtons.appendChild(button);
+    });
+    exportOptions.appendChild(exportButtons);
+    quick.append(quickGrid, exportOptions);
     root.appendChild(quick);
 
     container.appendChild(root);
