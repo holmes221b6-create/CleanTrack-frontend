@@ -563,7 +563,11 @@ if (identity) {
         transcript.style.cssText = "display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto;padding:12px;margin:10px 0;border:1px solid var(--border-color,rgba(255,255,255,.12));border-radius:12px;background:var(--surface-secondary,rgba(0,0,0,.12));";
         wrap.appendChild(transcript);
 
-        function addMessage(role, text) {
+        const historyKey = "cleantrack_assistant_history_v1";
+        let history = [];
+        try { const saved = JSON.parse(window.localStorage.getItem(historyKey) || "[]"); if (Array.isArray(saved)) history = saved.filter(item => item && (item.role === "user" || item.role === "assistant") && typeof item.text === "string").slice(-80); } catch (_) { history = []; }
+        function saveHistory() { try { window.localStorage.setItem(historyKey, JSON.stringify(history.slice(-80))); } catch (_) {} }
+        function addMessage(role, text, persist = true) {
           const bubble = document.createElement("div");
           bubble.className = "ct-assistant-message ct-assistant-message-" + role;
           bubble.style.cssText = "align-self:" + (role === "user" ? "flex-end" : "flex-start") + ";max-width:92%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;" +
