@@ -522,6 +522,7 @@ if (identity) {
         avatar.setAttribute("tabindex", "0");
         avatar.setAttribute("aria-label", "Change profile picture");
         avatar.title = "Change profile picture";
+        avatar.setAttribute("aria-description", "Click the round avatar or camera icon to choose a profile picture.");
         const identity = document.createElement("div");
         identity.className = "ct-profile-identity";
         appendText(identity, "p", "ACCOUNT", "ct-profile-eyebrow");
