@@ -2247,3 +2247,15 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
 #app-modal .ct-profile-hero-avatar {
   cursor: pointer !important;
 }
+
+
+/* Keep fallback initials perfectly centered inside the toolbar avatar. */
+#workspace-view .ct-profile-avatar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
