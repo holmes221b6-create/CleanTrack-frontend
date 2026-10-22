@@ -2039,3 +2039,21 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
 #workspace-view .ct-profile-avatar-select:hover { border-color:#64d8b0; color:#a5f3d8; }
 #workspace-view .ct-profile-avatar-file:focus-visible + .ct-profile-avatar-hint { outline:2px solid #64d8b0; }
 #workspace-view .ct-profile-avatar-hint { flex-basis:100%; margin:0; color:var(--muted,#9aa9bd); font-size:11px; line-height:1.5; }
+
+
+/* Circular click-to-change avatar, inspired by familiar account menus. */
+#workspace-view .ct-profile-hero-avatar { border-radius:50% !important; flex:0 0 76px; width:76px; height:76px; cursor:pointer; position:relative; overflow:hidden; }
+#workspace-view .ct-profile-hero-avatar:hover { outline:3px solid rgba(100,216,176,.35); outline-offset:2px; }
+#workspace-view .ct-profile-hero-avatar:focus-visible { outline:3px solid #64d8b0; outline-offset:3px; }
+#workspace-view .ct-profile-avatar-controls { padding:0 2px; }
+#workspace-view .ct-profile-avatar-select { display:none !important; }
+#workspace-view .ct-settings-avatar-picker { display:flex; align-items:center; gap:14px; padding:8px 0 14px; }
+#workspace-view .ct-settings-avatar-circle {
+  display:grid; place-items:center; width:68px; height:68px; flex:0 0 68px;
+  border:2px solid var(--border,#29374d); border-radius:50%; cursor:pointer;
+  background-color:var(--surface,#111a2a); background-position:center; background-size:cover;
+  color:#a5f3d8; font-size:27px; transition:outline .15s,border-color .15s;
+}
+#workspace-view .ct-settings-avatar-circle:hover { border-color:#64d8b0; outline:3px solid rgba(100,216,176,.18); }
+#workspace-view .ct-settings-avatar-circle:focus-visible { outline:3px solid #64d8b0; outline-offset:3px; }
+#workspace-view .ct-settings-avatar-picker-text { color:var(--muted,#aab7ca); font-size:12px; }
