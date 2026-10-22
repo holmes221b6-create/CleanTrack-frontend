@@ -451,38 +451,47 @@
       if(!drafts.length){status.textContent="Detect or draw at least one zone before downloading.";return;}
       if(!baseReady||!base.width||!base.height){status.textContent="The source floor plan is not ready to export.";return;}
       downloadBtn.disabled=true;
-      status.textContent="Preparing your three files: zone list, clean floor plan, and editable labelled floor plan…";
+      status.textContent="Creating the three requested editable zone deliverables…";
       try{
         const clean=String(location.name||"location").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"location";
         const current=drafts.filter(z=>!z._page||z._page===pageNo);
         const csvCell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-        const namesRows=[["name","description","floor_label","location_name","source_page","boundary"].map(csvCell).join(","),
-          ...drafts.map(z=>[z.name,z.description||"",z.floor_label||"",location.name||"",z._page||pageNo,JSON.stringify(z.indoor_boundary||null)].map(csvCell).join(","))];
+        const namesRows=[["name","description","floor_label","location_name","location_id","source_page","boundary_type","boundary_points_normalized"].map(csvCell).join(","),
+          ...drafts.map(z=>[z.name,z.description||"",z.floor_label||"",location.name||"",location.id||"",z._page||pageNo,z.indoor_boundary?.type||"",JSON.stringify(z.indoor_boundary?.points||[])].map(csvCell).join(","))];
         const namesBlob=new Blob(["\ufeff"+namesRows.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
-        const sourceExt=blob.type==="application/pdf"?"pdf":blob.type==="image/png"?"png":blob.type==="image/webp"?"webp":"jpg";
         const svgEsc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
-        const sourceData=base.toDataURL("image/png");
         const colors=["#168a66","#d97706","#2563eb","#9333ea","#db2777","#0891b2"];
-        const shapes=current.map((z,i)=>{
-          const ps=z.indoor_boundary?.points||[];if(ps.length<3)return "";
+        const buildVectorZones=(includeLabels)=>current.map((z,i)=>{
+          const ps=z.indoor_boundary?.points||[];
+          if(ps.length<3)return "";
           const pts=ps.map(p=>(Number(p[0])*base.width).toFixed(2)+","+(Number(p[1])*base.height).toFixed(2)).join(" ");
           const cx=ps.reduce((a,p)=>a+Number(p[0])/ps.length,0)*base.width,cy=ps.reduce((a,p)=>a+Number(p[1])/ps.length,0)*base.height;
-          const color=colors[i%colors.length],id="zone-"+(i+1);
-          return '<g id="'+id+'" data-zone-name="'+svgEsc(z.name)+'"><polygon id="'+id+'-boundary" points="'+pts+'" fill="'+color+'" fill-opacity="0.22" stroke="'+color+'" stroke-width="'+Math.max(2,base.width/700)+'" vector-effect="non-scaling-stroke"/><text id="'+id+'-label" x="'+cx.toFixed(2)+'" y="'+cy.toFixed(2)+'" font-family="Arial,sans-serif" font-size="'+Math.max(12,base.width/70)+'" font-weight="bold" fill="'+color+'">'+svgEsc(z.name)+'</text></g>';
+          const color=colors[i%colors.length],id="zone-"+(i+1),sw=Math.max(2,base.width/700);
+          const shape='<polygon id="'+id+'-boundary" data-zone-id="'+svgEsc(z._savedId||"draft-"+(i+1))+'" points="'+pts+'" fill="'+color+'" fill-opacity="0.12" stroke="'+color+'" stroke-width="'+sw+'" vector-effect="non-scaling-stroke"/>';
+          const label='<text id="'+id+'-name" x="'+cx.toFixed(2)+'" y="'+cy.toFixed(2)+'" font-family="Arial,sans-serif" font-size="'+Math.max(12,base.width/70)+'" font-weight="bold" fill="'+color+'">'+svgEsc(z.name)+'</text>';
+          const desc=z.description?'<text id="'+id+'-description" x="'+cx.toFixed(2)+'" y="'+(cy+Math.max(15,base.width/55)).toFixed(2)+'" font-family="Arial,sans-serif" font-size="'+Math.max(9,base.width/115)+'" fill="'+color+'">'+svgEsc(z.description)+'</text>':"";
+          return '<g id="'+id+'" data-zone-name="'+svgEsc(z.name)+'" data-zone-description="'+svgEsc(z.description||"")+'">'+shape+(includeLabels?label+desc:"")+'</g>';
         }).join("\n");
-        const svg='<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'"><title>'+svgEsc(location.name)+' — editable zones</title><desc>Editable vector zone boundaries and labels over the selected source floor-plan page. Each zone polygon and label is a separate SVG object. Open in Inkscape, Illustrator, or another SVG editor to edit.</desc><image id="source-floor-plan" x="0" y="0" width="'+base.width+'" height="'+base.height+'" href="'+sourceData+'" xlink:href="'+sourceData+'"/>\n'+shapes+'\n</svg>';
-        const svgBlob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"});
+        const svgOpen='<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+base.width+'" height="'+base.height+'" viewBox="0 0 '+base.width+' '+base.height+'">';
+        const background='<image id="source-architectural-drawing" x="0" y="0" width="'+base.width+'" height="'+base.height+'" href="'+base.toDataURL("image/png")+'" xlink:href="'+base.toDataURL("image/png")+'"/>';
+        const metadata='<metadata>'+svgEsc(JSON.stringify({location:{id:location.id,name:location.name},floor_label:floor.value.trim()||(pdf?"PDF page "+pageNo:""),zones:drafts.map(z=>({name:z.name,description:z.description||"",floor_label:z.floor_label||"",boundary:z.indoor_boundary||null}))}))+'</metadata>';
+        const close='</svg>';
+        // File 2 is a label-free, editable vector layout made from the zone polygons.
+        // File 3 preserves the supplied drawing and overlays editable vector boundaries, names and descriptions.
+        const structureSvg=svgOpen+'<title>'+svgEsc(location.name)+' — editable zone structure without labels</title><desc>Editable zone block polygons only; no embedded source image, names, or descriptions.</desc>'+buildVectorZones(false)+close;
+        const labelledSvg=svgOpen+'<title>'+svgEsc(location.name)+' — labelled editable floor plan</title><desc>Uploaded architectural drawing with separately editable zone polygons, names and descriptions. The source drawing is embedded as an image; edit the vector zone shapes and text independently.</desc>'+background+metadata+buildVectorZones(true)+close;
+        const structureBlob=new Blob([structureSvg],{type:"image/svg+xml;charset=utf-8"});
+        const labelledBlob=new Blob([labelledSvg],{type:"image/svg+xml;charset=utf-8"});
         const save=(fileBlob,filename)=>{const url=URL.createObjectURL(fileBlob),a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);};
-        // Exactly three deliverables: importable zone list, unchanged source plan, editable labelled plan.
-        save(namesBlob,clean+"-zones.csv");
-        save(blob,clean+"-floor-plan-original."+sourceExt);
-        save(svgBlob,clean+"-editable-floor-plan-with-zones.svg");
-        status.textContent="Downloaded exactly 3 files: zone names + boundary data (CSV), the original floor plan without labels, and an editable SVG with separate zone shapes and names. Import the CSV in the Zones page and choose the same Location.";
-        notice("Downloaded the 3 requested zone files. No ZIP or extra files.", "success");
+        save(namesBlob,clean+"-zone-names-descriptions-and-boundaries.csv");
+        save(structureBlob,clean+"-editable-floor-plan-structure-no-labels.svg");
+        save(labelledBlob,clean+"-editable-floor-plan-with-zone-labels.svg");
+        status.textContent="Downloaded exactly 3 files: zone names/descriptions/boundaries CSV; label-free editable vector zone structure SVG; and the uploaded drawing with editable zone outlines, names and descriptions SVG.";
+        notice("Downloaded the three requested files only.","success");
       }catch(err){status.textContent="Could not create the three zone files: "+(err.message||"unknown error");}
       finally{downloadBtn.disabled=false;}
     }
-    const detectBtn=btn("Detect Zones automatically","ct-loc-btn ct-loc-btn-primary",detect),redetect=btn("Re-detect current page","ct-loc-btn",detect),manualBtn=btn("Draw zone manually","ct-loc-btn",beginManual),saveBtn=btn("Save zones to CleanTrack","ct-loc-btn ct-loc-btn-primary",saveZones),downloadBtn=btn("Download 3 zone files","ct-loc-btn ct-loc-btn-primary",download),close=btn("Close","ct-loc-btn",()=>{manualMode=false;manualPoints=[];panel.hidden=true;});
+    const detectBtn=btn("Detect Zones automatically","ct-loc-btn ct-loc-btn-primary",detect),redetect=btn("Re-detect current page","ct-loc-btn",detect),manualBtn=btn("Draw zone manually","ct-loc-btn",beginManual),saveBtn=btn("Save zones to CleanTrack","ct-loc-btn ct-loc-btn-primary",saveZones),downloadBtn=btn("Download 3 editable zone files","ct-loc-btn ct-loc-btn-primary",download),close=btn("Close","ct-loc-btn",()=>{manualMode=false;manualPoints=[];panel.hidden=true;});
     actions.append(detectBtn,redetect,manualBtn,saveBtn,downloadBtn,close);panel.append(fields,pageRow,canvas,status,list,actions);host.append(panel);
     async function draw(){try{if(task){try{task.cancel();}catch(_){}}const p=await pdf.getPage(pageNo),v=p.getViewport({scale:Math.min(1.6,1500/p.getViewport({scale:1}).width)});base.width=Math.round(v.width);base.height=Math.round(v.height);task=p.render({canvasContext:base.getContext("2d"),viewport:v});await task.promise;task=null;baseReady=true;canvas.width=base.width;canvas.height=base.height;paint();status.textContent="PDF page "+pageNo+" of "+pdf.numPages+". Choose Detect Zones automatically.";}catch(err){if(err.name!=="RenderingCancelledException")status.textContent="Could not render PDF page: "+(err.message||"unknown error");}}
     if(blob.type==="application/pdf"){pageRow.hidden=false;if(!window.pdfjsLib){status.textContent="PDF renderer did not load. Refresh CleanTrack or use a PNG/JPG plan.";return panel;}window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";blob.arrayBuffer().then(buffer=>window.pdfjsLib.getDocument({data:buffer}).promise).then(doc=>{pdf=doc;pageSelect.replaceChildren();for(let n=1;n<=doc.numPages;n++)pageSelect.append(new Option("Page "+n,String(n)));pageSelect.value="1";pageSelect.addEventListener("change",()=>{pageNo=Number(pageSelect.value)||1;draw();});draw();}).catch(err=>{status.textContent="Could not open PDF: "+(err.message||"invalid PDF");});}
