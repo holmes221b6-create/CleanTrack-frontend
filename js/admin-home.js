@@ -253,9 +253,12 @@
     });
 
     results.hidden = false;
-    const limit = 100;
-    if (count) count.textContent = matched.length + " matching " + (matched.length === 1 ? "member" : "members")
-      + (matched.length > limit ? " · showing first " + limit : "");
+    const limit = q ? 100 : 5;
+    if (count) {
+      count.textContent = q
+        ? matched.length + " matching " + (matched.length === 1 ? "member" : "members") + (matched.length > limit ? " · showing first " + limit : "")
+        : (matched.length ? "Recommended members · showing " + Math.min(matched.length, limit) + " of " + matched.length : "Recommended members");
+    }
     if (!matched.length) {
       results.appendChild(el("div", "ct-home-member-empty",
         members.length ? "No members match these search terms and filters." : "No active approved members are available in this organization yet."));
@@ -526,7 +529,12 @@
     search.autocomplete = "off";
     search.setAttribute("aria-controls", "ct-home-member-results");
     search.dataset.ctMemberSearch = "true";
-    searchWrap.append(searchIcon, search);
+    const searchButton = button("Search", "ct-home-button ct-home-button--primary ct-home-member-search-button", () => {
+      renderMemberResults(root, search.value);
+      search.focus();
+    });
+    searchButton.setAttribute("aria-label", "Search organization members");
+    searchWrap.append(searchIcon, search, searchButton);
     directory.appendChild(searchWrap);
 
     const filterGrid = el("div", "ct-home-member-filters");
@@ -572,8 +580,10 @@
         const next = event.key === "ArrowDown" ? (active + 1) % items.length : (active <= 0 ? items.length - 1 : active - 1);
         items.forEach((item, index) => item.setAttribute("aria-selected", String(index === next)));
       } else if (event.key === "Enter") {
+        event.preventDefault();
+        renderMemberResults(root, search.value);
         const selected = items.find(item => item.getAttribute("aria-selected") === "true") || items[0];
-        if (selected) { event.preventDefault(); selected.click(); }
+        if (selected) selected.click();
       } else if (event.key === "Escape") {
         results.hidden = true;
       }
