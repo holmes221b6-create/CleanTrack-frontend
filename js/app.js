@@ -214,6 +214,7 @@
     draw();
   }
   function maybeShowFirstSetup(user){try{if(user&&localStorage.getItem(setupKey(user,"pending"))==="1"&&localStorage.getItem(setupKey(user,"completed"))!=="1")window.setTimeout(function(){showSetupGuide(user)},80)}catch(_){}}
+  window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) showSetupGuide(user); } });
   function showUnauthenticatedLayout() {
     setVisible(getElement("workspace-view"), false);
     setVisible(getElement("auth-view"), true);
