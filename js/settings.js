@@ -3,7 +3,7 @@
 const API=window.CleanTrackApi,AUTH=window.CleanTrackAuth,PREF=window.CleanTrackPreferences;
 const LANGS=[["en","English"],["es","Spanish"],["ar","Arabic"],["hi","Hindi"],["ur","Urdu"],["zh","Chinese"]];
 const CURS="USD EUR GBP INR CNY JPY KRW AED SAR QAR KWD BHD OMR JOD SGD AUD CAD CHF NZD HKD TWD THB IDR MYR PHP VND BDT PKR LKR NPR ZAR NGN KES EGP TRY BRL MXN ARS CLP COP PEN UYU DOP PLN CZK HUF RON SEK NOK DKK ISK RUB ILS UAH MAD GHS UGX TZS ETB KZT MUR".split(" ");
-const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
+const SECS=[["account","Account","♙"],["preferences","Preferences","⚙"],["privacy","Privacy and Security","◈"],["sessions","Sessions and Devices","⌁"],["notifications","Notifications","♧"],["appearance","Appearance","◐"],["data","Data and Reports","▤"],["integrations","Integrations","⌘"],["setup","Setup Guide","✧"],["help","Help and Support","?"],["legal","Legal","§"],["about","About","ⓘ"],["actions","Account actions","↗"]];
 function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=String(x);return n}
 function btn(x,c,fn){const n=el("button",c||"ct-settings-button",x);n.type="button";n.addEventListener("click",fn);return n}
 function fld(x,n,h){const w=el("label","ct-settings-field");w.append(el("span","",x),n);if(h)w.appendChild(el("small","ct-settings-muted",h));return w}
@@ -136,6 +136,16 @@ p.integrations.append(providerCard,smsCard,syncInfo);
 })();
 
 // BUILDING-LEVEL PLACE DIRECTORY
+// SETUP GUIDE
+const setup=card("Setup Guide","Role-specific guidance for getting your CleanTrack workspace ready. Reopen this guide whenever you need it.","✧");
+const setupIntro=el("p","ct-settings-muted","Choose your role to see the setup checklist. These steps are guidance and do not create or change records for you.");
+const setupRole=sel([["admin","Administrator"],["supervisor","Supervisor"],["employee","Employee"]],role||"employee","setup-role");
+const setupList=el("div","ct-settings-setup-list");
+const setupSteps={admin:[["Organisation","Confirm organisation details in Admin settings."],["Locations & maps","Add your real work locations and upload maps or floor plans."],["Zones","Create or import zones linked to locations."],["Teams & employees","Invite staff and assign roles and teams."],["Operations & schedules","Create operations and schedule work."],["Review & reports","Review logs and export Analytics visuals."]],supervisor:[["Assigned locations","Review locations and zones assigned to you."],["Team","Check team members and responsibilities."],["Operations","Review assigned operations and schedules."],["Reviews & logs","Review submissions and track completed work."]],employee:[["Profile","Check your profile and notification preferences."],["Schedule","Review your assigned work and due times."],["Complete work","Follow operation instructions and record progress."],["Submit evidence","Add required before/after photos and submit work."],["Notifications","Check announcements and review feedback."]]};
+function drawSetupChecklist(){setupList.replaceChildren();(setupSteps[setupRole.value]||setupSteps.employee).forEach((step,i)=>{const row=el("div","ct-settings-info-row"),copy=el("div");copy.append(el("strong","",String(i+1)+". "+step[0]),el("p","ct-settings-muted",step[1]));row.appendChild(copy);setupList.appendChild(row)});}
+setupRole.addEventListener("change",drawSetupChecklist);
+setup.append(setupIntro,fld("Account role",setupRole,"Checklist adapts to the selected role."),setupList,btn("Open setup guide","ct-settings-button ct-settings-button-primary",()=>{drawSetupChecklist();setupList.scrollIntoView({behavior:"smooth",block:"start"})}));
+drawSetupChecklist();p.setup.appendChild(setup);
 // HELP
 const help=card("Help and support","Available published help resources.","?");[["Help Center","center"],["User/Admin guide","guide"],["Contact support","contact"],["Report a problem","problem"],["Feedback","feedback"]].forEach(([label,id])=>help.appendChild(btn(label,"ct-settings-button",()=>{const target=document.querySelector('[data-help-action="'+id+'"]');if(target)target.click();else alert("No support destination is configured yet. No message was sent.")})));p.help.appendChild(help);
 // LEGAL
