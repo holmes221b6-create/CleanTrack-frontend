@@ -22,8 +22,8 @@
   function persistToken(token) {
     authToken = String(token || "");
     try {
-      if (authToken) window.sessionStorage.setItem("cleantrack_token", authToken);
-      else window.sessionStorage.removeItem("cleantrack_token");
+      if (authToken) window.localStorage.setItem("cleantrack_token", authToken);
+      else window.localStorage.removeItem("cleantrack_token");
     } catch (error) {
       // Keep the in-memory token for the current page when storage is unavailable.
     }
@@ -32,8 +32,8 @@
   function persistRefreshToken(token) {
     refreshToken = String(token || "");
     try {
-      if (refreshToken) window.sessionStorage.setItem("cleantrack_refresh_token", refreshToken);
-      else window.sessionStorage.removeItem("cleantrack_refresh_token");
+      if (refreshToken) window.localStorage.setItem("cleantrack_refresh_token", refreshToken);
+      else window.localStorage.removeItem("cleantrack_refresh_token");
     } catch (error) {
       // Keep the in-memory refresh token for the current page if storage is unavailable.
     }
@@ -42,7 +42,7 @@
   function getRefreshToken() {
     if (refreshToken) return refreshToken;
     try {
-      refreshToken = window.sessionStorage.getItem("cleantrack_refresh_token") || "";
+      refreshToken = window.localStorage.getItem("cleantrack_refresh_token") || "";
     } catch (error) {
       refreshToken = "";
     }
@@ -56,7 +56,7 @@
   function getAuthToken() {
     if (authToken) return authToken;
     try {
-      authToken = window.sessionStorage.getItem("cleantrack_token") || "";
+      authToken = window.localStorage.getItem("cleantrack_token") || "";
     } catch (error) {
       authToken = "";
     }
@@ -234,19 +234,42 @@ function normalizeUser(user) {
       currentUser = null;
       persistToken("");
       persistRefreshToken("");
+      try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); } catch (_) {}
       emitAuthEvent("cleantrack:logout", null);
     }
   }
 
+  const SESSION_LAST_ACTIVE_KEY = "cleantrack_last_active_at";
+  const SESSION_MAX_IDLE_MS = 7 * 24 * 60 * 60 * 1000;
+
+  function markActive() {
+    if (!getAuthToken()) return;
+    try { window.localStorage.setItem(SESSION_LAST_ACTIVE_KEY, String(Date.now())); } catch (_) {}
+  }
+
   async function restoreSession() {
     try {
+      const token = getAuthToken();
+      let lastActive = 0;
+      try { lastActive = Number(window.localStorage.getItem(SESSION_LAST_ACTIVE_KEY) || 0); } catch (_) {}
+      if (token && lastActive && Date.now() - lastActive > SESSION_MAX_IDLE_MS) {
+        currentUser = null;
+        persistToken("");
+        persistRefreshToken("");
+        try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); } catch (_) {}
+        emitAuthEvent("cleantrack:session-expired", null);
+        return null;
+      }
       const response = await api.get("auth/me");
       const user = response.user || response.data?.user || null;
 
       currentUser = normalizeUser(user);
 
       // Apply the signed-in user's saved preferences on every restored session.
-      if (currentUser) if (typeof window.CleanTrackPreferences?.setUser === "function") { window.CleanTrackPreferences.setUser(currentUser.id); }
+      if (currentUser) {
+        if (typeof window.CleanTrackPreferences?.setUser === "function") window.CleanTrackPreferences.setUser(currentUser.id);
+        markActive();
+      }
       emitAuthEvent("cleantrack:session-restored", currentUser);
       return currentUser;
     } catch (error) {
