@@ -139,6 +139,7 @@ function normalizeUser(user) {
 
     // Load this user's saved theme and locale as soon as authentication succeeds.
     if (typeof window.CleanTrackPreferences?.setUser === "function") { window.CleanTrackPreferences.setUser(currentUser.id); }
+    markActive();
     emitAuthEvent("cleantrack:login", currentUser);
     return currentUser;
   }
@@ -246,6 +247,18 @@ function normalizeUser(user) {
     if (!getAuthToken()) return;
     try { window.localStorage.setItem(SESSION_LAST_ACTIVE_KEY, String(Date.now())); } catch (_) {}
   }
+
+  let lastActivityWrite = 0;
+  function recordUserActivity() {
+    if (!getAuthToken()) return;
+    const now = Date.now();
+    if (now - lastActivityWrite < 60000) return;
+    lastActivityWrite = now;
+    markActive();
+  }
+  ["click", "keydown", "pointerdown", "touchstart", "input"].forEach(function (eventName) {
+    document.addEventListener(eventName, recordUserActivity, { passive: true });
+  });
 
   async function restoreSession() {
     try {
