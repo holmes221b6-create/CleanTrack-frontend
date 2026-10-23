@@ -180,6 +180,40 @@
   }
   
   
+
+  function setupKey(user, suffix) { return "cleantrack.setup." + suffix + "." + String(user && (user.id || user.email) || "unknown").toLowerCase(); }
+  function setupSteps(role) {
+    const steps = {
+      admin: [["Organisation","Confirm your organisation details.","settings"],["Locations & maps","Add real work locations and floor plans.","locations"],["Zones","Create or import zones linked to locations.","zones"],["Teams & employees","Invite staff and assign roles.","members"],["Operations & schedules","Create operations and schedule work.","operations"],["Reviews & reports","Review completed work and Analytics.","analytics"]],
+      supervisor: [["Assigned locations","Review the locations and zones assigned to you.","locations"],["Your team","Check team members and responsibilities.","members"],["Operations","Review assigned work and schedules.","operations"],["Reviews & logs","Review submissions and track work.","reviews"]],
+      employee: [["Your profile","Check your profile and notification preferences.","settings"],["Your schedule","Review assigned work and due times.","schedule"],["Complete work","Follow operation instructions and record progress.","operations"],["Submit evidence","Add required photos and submit completed work.","operations"],["Notifications","Check announcements and feedback.","home"]]
+    };
+    return steps[String(role || "").toLowerCase()] || steps.employee;
+  }
+  function showSetupGuide(user) {
+    if (!user) return;
+    const steps = setupSteps(user.role); let index = 0;
+    const overlay = document.createElement("div"); overlay.className = "ct-setup-overlay"; overlay.setAttribute("role","dialog"); overlay.setAttribute("aria-modal","true");
+    const style = document.createElement("style");
+    style.textContent = ".ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.8;line-height:1.5}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}";
+    const card = document.createElement("section"); card.className = "ct-setup-card";
+    const mark = document.createElement("div"); mark.className = "ct-setup-mark"; mark.textContent = "✧";
+    const title = document.createElement("h2"); title.textContent = "Account Setup";
+    const intro = document.createElement("p"); intro.className = "ct-setup-intro"; intro.textContent = "Let's get your CleanTrack workspace ready. Follow these role-specific steps; you can return to this guide from Settings anytime.";
+    const languageWrap = document.createElement("div"); languageWrap.className = "ct-setup-language";
+    const language = document.createElement("select"); language.setAttribute("aria-label","Guide language");
+    [["en","English"],["hi","Hindi"],["ur","Urdu"],["es","Español"],["pt","Português"]].forEach(function(pair){const o=document.createElement("option");o.value=pair[0];o.textContent=pair[1];language.appendChild(o)});
+    languageWrap.appendChild(language);
+    const progress = document.createElement("div"); progress.className = "ct-setup-progress";
+    const box = document.createElement("div"); box.className = "ct-setup-step";
+    const meta = document.createElement("p"); meta.className = "ct-setup-meta";
+    const actions = document.createElement("div"); actions.className = "ct-setup-actions";
+    card.append(mark,title,intro,languageWrap,progress,box,meta,actions); overlay.append(style,card); document.body.appendChild(overlay);
+    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}overlay.remove()}
+    function draw(){progress.replaceChildren();steps.forEach(function(_,i){const dot=document.createElement("span");dot.className="ct-setup-dot"+(i<=index?" active":"");progress.appendChild(dot)});const step=steps[index];box.replaceChildren();const h=document.createElement("h3");h.textContent=step[0];const p=document.createElement("p");p.textContent=step[1];box.append(h,p);meta.textContent="Step "+(index+1)+" of "+steps.length+" · About 3 minutes";actions.replaceChildren();const skip=document.createElement("button");skip.textContent="Skip setup";skip.addEventListener("click",finish);const back=document.createElement("button");back.textContent="Back";back.disabled=index===0;back.addEventListener("click",function(){if(index>0){index--;draw()}});const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish setup":"Continue";next.addEventListener("click",function(){if(index<steps.length-1){index++;draw()}else{const target=step[2];finish();if(target)navigation.setActivePage(target)}});actions.append(skip,back,next)}
+    draw();
+  }
+  function maybeShowFirstSetup(user){try{if(user&&localStorage.getItem(setupKey(user,"pending"))==="1"&&localStorage.getItem(setupKey(user,"completed"))!=="1")window.setTimeout(function(){showSetupGuide(user)},80)}catch(_){}}
   function showUnauthenticatedLayout() {
     setVisible(getElement("workspace-view"), false);
     setVisible(getElement("auth-view"), true);
@@ -1078,7 +1112,9 @@ function bindNavigation() {
 
         clearInvitationContext();
         if (result.user && result.membershipStatus !== "pending") {
+          try { localStorage.setItem(setupKey(result.user, "pending"), "1"); } catch (_) {}
           showAuthenticatedLayout(result.user);
+          maybeShowFirstSetup(result.user);
           navigation.setActivePage(navigation.getDefaultPage(result.user.role) || "home");
           if (message) message.textContent = "";
           form.reset();
@@ -1141,6 +1177,7 @@ function bindNavigation() {
         state.started = true;
         showAuthenticatedLayout(user);
         showMessage("You are now signed in.", "success");
+        maybeShowFirstSetup(user);
       } catch (error) {
         showMessage(
           error.message || "Unable to sign in. Please try again.",
