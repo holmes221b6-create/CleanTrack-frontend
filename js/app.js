@@ -1191,6 +1191,13 @@ function bindNavigation() {
       showUnauthenticatedLayout();
     } finally {
       setLoading(false);
+      const splash = document.getElementById("cleantrack-launch-splash");
+      if (splash) {
+        window.setTimeout(function () {
+          splash.classList.add("is-hidden");
+          window.setTimeout(function () { splash.remove(); }, 260);
+        }, 450);
+      }
     }
   }
 
