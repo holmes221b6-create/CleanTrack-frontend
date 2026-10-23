@@ -75,9 +75,23 @@
     <script src="js/app.js?v=20261017-org-profile-v2" defer></script>
     <script src="js/teams.js?v=20261016-team-zone-guard-v4" defer></script>
     <script src="js/sidebar-layout.js?v=20261022-assistant-knowledge-v2" defer></script>
+<style id="cleantrack-launch-splash-style">
+#cleantrack-launch-splash{position:fixed;inset:0;z-index:999999;background:#111315;color:#f4f5f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:opacity .22s ease}
+#cleantrack-launch-splash .ct-splash-mark{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;background:#050607;border:1px solid #62696d;box-shadow:0 0 0 5px #1c2022,0 0 32px #8c969922}
+#cleantrack-launch-splash .ct-splash-rings{width:64px;height:64px;border:2px solid #b6bec2;border-radius:50%;display:grid;place-items:center;position:relative}
+#cleantrack-launch-splash .ct-splash-rings:before,#cleantrack-launch-splash .ct-splash-rings:after{content:"";position:absolute;border:1px solid #737c81;border-radius:50%;inset:8px}
+#cleantrack-launch-splash .ct-splash-rings:after{inset:17px;border-color:#d4d8da}
+#cleantrack-launch-splash .ct-splash-core{width:7px;height:7px;border-radius:50%;background:#e8ebed;z-index:1;box-shadow:0 0 10px #c8d0d4}
+#cleantrack-launch-splash .ct-splash-wordmark{font-size:25px;font-weight:650;letter-spacing:.02em}
+#cleantrack-launch-splash .ct-splash-wordmark span{color:#a9b1b5}
+#cleantrack-launch-splash .ct-splash-owner{position:absolute;bottom:28px;color:#858d92;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+#cleantrack-launch-splash.is-hidden{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:no-preference){#cleantrack-launch-splash .ct-splash-rings{animation:ctSplashPulse 1.8s ease-in-out infinite}@keyframes ctSplashPulse{50%{transform:scale(1.045);opacity:.82}}}
+</style>
 </head>
 
 <body>
+    <div id="cleantrack-launch-splash" role="status" aria-label="Starting CleanTrack"><div class="ct-splash-mark" aria-hidden="true"><div class="ct-splash-rings"><div class="ct-splash-core"></div></div></div><div class="ct-splash-wordmark">Clean<span>Track</span></div><div class="ct-splash-owner">Operations · Quality · Teams</div></div>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div id="app" class="app-shell">
