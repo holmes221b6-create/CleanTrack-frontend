@@ -364,6 +364,15 @@
 .ct-shadow-eyes:before,.ct-shadow-eyes:after{height:26px!important;background:radial-gradient(ellipse at 50% 50%,#ff001b 0 8%,#ff1736 10% 17%,#4b000c 20% 30%,#f8f4ff 34% 72%,#8e8795 100%)!important;clip-path:polygon(0 48%,14% 28%,34% 17%,57% 0,79% 12%,100% 44%,82% 58%,65% 84%,44% 100%,20% 74%)!important;filter:drop-shadow(0 0 5px #ff001f) drop-shadow(0 0 15px #c00026)!important}
 .ct-shadow-hood i{top:53%!important;width:9px!important;height:5px!important;background:#ff001f!important;box-shadow:0 0 8px #ff001f,0 0 18px #b80026!important}
 @media(max-width:700px){.ct-shadow-eyes{top:clamp(80px,12.8vh,104px)!important}}
+/* Fix setup-guide controls: the decorative full-screen coach must never block clicks. */
+.ct-setup-overlay{pointer-events:auto!important}
+.ct-setup-card,.ct-setup-card button,.ct-setup-card .ct-setup-actions{pointer-events:auto!important;position:relative}
+.ct-setup-actions{z-index:2!important}
+.ct-setup-actions button{position:relative!important;z-index:3!important;touch-action:manipulation!important;pointer-events:auto!important;min-height:44px}
+.ct-tour-coach{pointer-events:none!important}
+.ct-tour-coach .ct-tour-speech,.ct-tour-coach .ct-tour-speech *,.ct-tour-coach button{pointer-events:auto!important}
+.ct-tour-coach button{position:relative!important;z-index:1000001!important;cursor:pointer!important;touch-action:manipulation!important}
+
 
 /* Reference match: tall near-featureless shadow, small crimson eyes, cold violet-blue rim light. */
 .ct-tour-avatar{background:radial-gradient(ellipse at 48% 54%,#0b123b88 0%,#080a2040 36%,transparent 72%)!important}
