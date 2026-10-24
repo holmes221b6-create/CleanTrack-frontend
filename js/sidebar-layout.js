@@ -1057,7 +1057,7 @@ if (identity) {
         const description=panel.querySelector("#ct-feedback-description").value.trim();
         if(!description){status.textContent="Please describe the issue or suggestion.";return;}
         const files=Array.from(imageInput.files||[]).slice(0,5).filter(file=>file.type.startsWith("image/"));
-        if(files.some(file=>file.size>5*1024*1024)){status.textContent="Each screenshot must be 5 MB or smaller.";return;}
+        if(files.some(file=>file.size>2*1024*1024)){status.textContent="Each screenshot must be 2 MB or smaller.";return;}
         submit.disabled=true;submit.textContent="Sending feedback…";status.textContent="";
         try{
           const screenshots=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({name:file.name,type:file.type,data:String(reader.result).split(",")[1]||""});reader.onerror=reject;reader.readAsDataURL(file);})));
