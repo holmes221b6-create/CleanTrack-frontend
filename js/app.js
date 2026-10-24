@@ -234,14 +234,14 @@
         const now = context.currentTime;
         const master = context.createGain();
         master.gain.setValueAtTime(0.0001, now);
-        master.gain.exponentialRampToValueAtTime(0.42, now + 0.12);
-        master.gain.setValueAtTime(0.31, now + 0.42);
+        master.gain.exponentialRampToValueAtTime(0.72, now + 0.12);
+        master.gain.setValueAtTime(0.56, now + 0.42);
         master.gain.exponentialRampToValueAtTime(0.0001, now + 3.05);
 
         const compressor = context.createDynamicsCompressor();
-        compressor.threshold.setValueAtTime(-20, now);
+        compressor.threshold.setValueAtTime(-24, now);
         compressor.knee.setValueAtTime(18, now);
-        compressor.ratio.setValueAtTime(4, now);
+        compressor.ratio.setValueAtTime(5.5, now);
         compressor.attack.setValueAtTime(0.008, now);
         compressor.release.setValueAtTime(0.35, now);
         master.connect(compressor);
@@ -254,7 +254,7 @@
         low.frequency.setValueAtTime(118, now);
         low.frequency.exponentialRampToValueAtTime(43, now + 2.35);
         lowGain.gain.setValueAtTime(0.0001, now);
-        lowGain.gain.exponentialRampToValueAtTime(0.55, now + 0.16);
+        lowGain.gain.exponentialRampToValueAtTime(0.78, now + 0.16);
         lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.7);
         low.connect(lowGain);
         lowGain.connect(master);
@@ -273,7 +273,7 @@
           formant.frequency.setValueAtTime(i === 2 ? 680 : 390 + i * 125, now);
           formant.Q.setValueAtTime(i === 2 ? 3.8 : 2.2, now);
           gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.exponentialRampToValueAtTime(i === 2 ? 0.15 : 0.22, now + 0.18 + i * 0.04);
+          gain.gain.exponentialRampToValueAtTime(i === 2 ? 0.22 : 0.30, now + 0.18 + i * 0.04);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.35);
           osc.connect(formant);
           formant.connect(gain);
@@ -301,7 +301,7 @@
         breathFilter.frequency.exponentialRampToValueAtTime(520, now + 1.75);
         breathFilter.Q.setValueAtTime(0.85, now);
         breathGain.gain.setValueAtTime(0.0001, now);
-        breathGain.gain.exponentialRampToValueAtTime(0.21, now + 0.38);
+        breathGain.gain.exponentialRampToValueAtTime(0.27, now + 0.38);
         breathGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
         noise.connect(breathFilter);
         breathFilter.connect(breathGain);
@@ -328,7 +328,7 @@
         const convolver = context.createConvolver();
         const wet = context.createGain();
         convolver.buffer = impulse;
-        wet.gain.setValueAtTime(0.29, now);
+        wet.gain.setValueAtTime(0.36, now);
         master.connect(convolver);
         convolver.connect(wet);
         wet.connect(compressor);
