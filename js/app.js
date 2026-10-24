@@ -231,40 +231,37 @@
         const now = context.currentTime;
         const master = context.createGain();
         master.gain.setValueAtTime(0.0001, now);
-        master.gain.exponentialRampToValueAtTime(0.075, now + 0.055);
-        master.gain.exponentialRampToValueAtTime(0.0001, now + 0.52);
+        master.gain.exponentialRampToValueAtTime(0.10, now + 0.12);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
         master.connect(context.destination);
-        const tone = context.createOscillator();
-        tone.type = "sine";
-        tone.frequency.setValueAtTime(620, now);
-        tone.frequency.exponentialRampToValueAtTime(390, now + 0.34);
-        tone.connect(master);
-        tone.start(now);
-        tone.stop(now + 0.54);
-        const shimmer = context.createOscillator();
-        const shimmerGain = context.createGain();
-        shimmer.type = "sine";
-        shimmer.frequency.setValueAtTime(930, now + 0.025);
-        shimmer.frequency.exponentialRampToValueAtTime(650, now + 0.24);
-        shimmerGain.gain.setValueAtTime(0.0001, now);
-        shimmerGain.gain.exponentialRampToValueAtTime(0.018, now + 0.045);
-        shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-        shimmer.connect(shimmerGain);
-        shimmerGain.connect(context.destination);
-        shimmer.start(now + 0.02);
-        shimmer.stop(now + 0.32);
-        window.setTimeout(function () { context.close().catch(function () {}); }, 700);
+        const drone = context.createOscillator(), droneGain = context.createGain();
+        drone.type = "triangle";
+        drone.frequency.setValueAtTime(145, now);
+        drone.frequency.exponentialRampToValueAtTime(54, now + 0.82);
+        droneGain.gain.setValueAtTime(0.0001, now);
+        droneGain.gain.exponentialRampToValueAtTime(0.72, now + 0.1);
+        droneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.92);
+        drone.connect(droneGain); droneGain.connect(master);
+        drone.start(now); drone.stop(now + 0.96);
+        const overtone = context.createOscillator(), overGain = context.createGain();
+        overtone.type = "sine";
+        overtone.frequency.setValueAtTime(410, now + 0.03);
+        overtone.frequency.exponentialRampToValueAtTime(178, now + 0.72);
+        overGain.gain.setValueAtTime(0.0001, now);
+        overGain.gain.exponentialRampToValueAtTime(0.22, now + 0.16);
+        overGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.78);
+        overtone.connect(overGain); overGain.connect(master);
+        overtone.start(now + 0.02); overtone.stop(now + 0.82);
+        window.setTimeout(function () { context.close().catch(function () {}); }, 1250);
       };
-      if (context.state === "suspended") {
-        context.resume().then(play).catch(function () { context.close().catch(function () {}); });
-      } else {
-        play();
-      }
+      if (context.state === "suspended") context.resume().then(play).catch(function () { context.close().catch(function () {}); });
+      else play();
       return true;
-    } catch (_) {
-      return false;
-    }
+    } catch (_) { return false; }
   }
+
+  window.CleanTrackSetupGuide = window.CleanTrackSetupGuide || {};
+  window.CleanTrackSetupGuide.previewSound = function () { return playShadowArrivalSound(true); };
 
   function showSetupGuide(user, startIndex) {
     if (!user) return;
@@ -353,20 +350,6 @@
       document.body.appendChild(coach);
       // A short, quiet arrival chime accompanies Shadow; it is generated locally.
       playShadowArrivalSound(false);
-      const soundToggle = document.createElement("button");
-      soundToggle.type = "button";
-      soundToggle.className = "ct-shadow-sound-toggle";
-      soundToggle.setAttribute("aria-pressed", shadowSoundEnabled() ? "true" : "false");
-      soundToggle.textContent = shadowSoundEnabled() ? "Sound: On" : "Sound: Off";
-      soundToggle.title = "Toggle Shadow's arrival sound";
-      soundToggle.addEventListener("click", function () {
-        const enabled = !shadowSoundEnabled();
-        setShadowSoundEnabled(enabled);
-        soundToggle.textContent = enabled ? "Sound: On" : "Sound: Off";
-        soundToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
-        if (enabled) playShadowArrivalSound(true);
-      });
-      buttons.insertBefore(soundToggle, buttons.firstChild);
       // Shadow's full character is present for the lesson briefing, then steps away
       // as soon as the user interacts with the app so the real workspace stays clear.
       const hideCharacterOnWorkspaceAction = function(event){
