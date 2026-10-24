@@ -298,6 +298,20 @@
       speech.append(kicker,h,p,status,buttons);
       coach.append(avatar,speech);
       document.body.appendChild(coach);
+      // Shadow's full character is present for the lesson briefing, then steps away
+      // as soon as the user interacts with the app so the real workspace stays clear.
+      const hideCharacterOnWorkspaceAction = function(event){
+        if(!coach.isConnected || coach.contains(event.target)) return;
+        coach.classList.add("ct-tour-character-away");
+      };
+      document.addEventListener("click",hideCharacterOnWorkspaceAction,true);
+      const cleanCharacterListener = function(){
+        document.removeEventListener("click",hideCharacterOnWorkspaceAction,true);
+      };
+      const coachObserver = new MutationObserver(function(){
+        if(!coach.isConnected){cleanCharacterListener();coachObserver.disconnect();}
+      });
+      coachObserver.observe(document.body,{childList:true,subtree:true});
       if(target && target !== pageItem && target !== heading){
         target.addEventListener("click",function onGuideTargetClick(){
           target.removeEventListener("click",onGuideTargetClick);
