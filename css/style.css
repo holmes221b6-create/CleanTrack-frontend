@@ -793,13 +793,32 @@ tbody tr:hover {
 .app-footer {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
   padding: 20px clamp(18px, 3vw, 42px);
   border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 0.78rem;
+  text-align: center;
+}
+
+.app-footer-help,
+.app-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.app-footer-help a,
+.app-footer-legal a {
+  text-align: center;
 }
 
 .footer-links {
