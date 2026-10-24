@@ -187,9 +187,14 @@
   // Each account sees each release once; bump the id for a genuinely new or materially changed feature.
   const SHADOW_FEATURE_RELEASES = [
     {
+      id: "notification-promotional-email-settings-2026-10-v1",
+      title: "You control promotional emails now",
+      message: "A new option has been added in Settings → Notifications: “Promotional emails and product updates.” Turn it on if you want CleanTrack feature news, product updates and offers. Turn it off whenever you prefer not to receive promotional email. Save your notification settings to keep your choice."
+    },
+    {
       id: "feedback-toolbar-2026-10-v1",
       title: "Report bugs and suggest improvements",
-      message: "You can now use the new feedback icon beside the notification bell to report a bug or suggest an improvement. Describe what happened, choose the screen or area, and attach up to five screenshots. Your report is saved for the CleanTrack team; email delivery depends on the developer inbox being configured."
+      message: "Use the feedback icon beside the notification bell to report a bug or suggest an improvement. Describe what happened, choose the screen or area, and attach screenshots. This release explains the feedback feature; delivery to the developer inbox depends on the feedback email integration being configured."
     }
   ];
 
@@ -200,7 +205,20 @@
     let seen = [];
     try { seen = JSON.parse(localStorage.getItem(key) || "[]"); if (!Array.isArray(seen)) seen = []; } catch (_) { seen = []; }
     const release = SHADOW_FEATURE_RELEASES.find(function(item) { return item && item.id && !seen.includes(item.id); });
-    if (!release || document.querySelector(".ct-shadow-welcome-back,.ct-shadow-feature-announcement,.ct-tour-coach")) return;
+    if (!release) return;
+    // Setup Guide and welcome-back have priority. Retry after they close so a new
+    // feature notice is queued instead of silently skipped during the overlay race.
+    if (document.querySelector(".ct-shadow-welcome-back,.ct-shadow-feature-announcement,.ct-tour-coach")) {
+      if (!window.__cleanTrackShadowReleaseRetry) window.__cleanTrackShadowReleaseRetry = 0;
+      if (window.__cleanTrackShadowReleaseRetry < 30) {
+        window.__cleanTrackShadowReleaseRetry += 1;
+        window.setTimeout(function(){ showShadowFeatureAnnouncement(user); }, 1000);
+      } else {
+        window.__cleanTrackShadowReleaseRetry = 0;
+      }
+      return;
+    }
+    window.__cleanTrackShadowReleaseRetry = 0;
 
     const style = document.createElement("style");
     style.dataset.cleanTrackShadowRelease = "true";
