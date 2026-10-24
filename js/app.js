@@ -178,9 +178,48 @@
       navigation.setActivePage(defaultPage);
     }
     showWelcomeBackIfNeeded(user);
+    window.setTimeout(function(){ showShadowFeatureAnnouncement(user); }, 160);
   }
   
   
+
+  // Add a release entry here whenever a user-visible CleanTrack feature/control is shipped.
+  // Each account sees each release once; bump the id for a genuinely new or materially changed feature.
+  const SHADOW_FEATURE_RELEASES = [
+    {
+      id: "shadow-guide-welcome-back-v1",
+      title: "Shadow has a new role",
+      message: "I can now welcome you back after a long break and help you get your bearings before you start working. I’ll keep an eye out for new CleanTrack features too, so you won’t have to discover every change on your own."
+    }
+  ];
+
+  function showShadowFeatureAnnouncement(user) {
+    if (!user || !SHADOW_FEATURE_RELEASES.length) return;
+    const identity = String(user.id || user.email || user.name || "user").trim().toLowerCase();
+    const key = "cleantrack.shadow.feature-releases." + identity;
+    let seen = [];
+    try { seen = JSON.parse(localStorage.getItem(key) || "[]"); if (!Array.isArray(seen)) seen = []; } catch (_) { seen = []; }
+    const release = SHADOW_FEATURE_RELEASES.find(function(item) { return item && item.id && !seen.includes(item.id); });
+    if (!release || document.querySelector(".ct-shadow-welcome-back,.ct-shadow-feature-announcement")) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "ct-setup-overlay ct-shadow-feature-announcement";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "ct-shadow-release-title");
+    const style = document.createElement("style");
+    style.textContent = ".ct-shadow-feature-announcement{z-index:1000003!important;background:radial-gradient(ellipse at 20% 55%,#17133b99 0%,#020207f5 70%)!important;pointer-events:auto!important}.ct-shadow-release-card{width:min(640px,100%);max-height:90vh;overflow:auto;padding:clamp(24px,5vw,40px);border:1px solid #51416f;border-radius:24px;background:linear-gradient(145deg,#11111efa,#030306fc);color:#f4f3fb;box-shadow:0 25px 100px #000c,0 0 45px #39265b55;pointer-events:auto!important;position:relative;z-index:2}.ct-shadow-release-card h2{font-size:clamp(25px,4vw,34px);margin:0 0 14px}.ct-shadow-release-card p{font-size:16px;line-height:1.7;color:#d1d0e0}.ct-shadow-release-card .ct-release-kicker{color:#ff799e;text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:800}.ct-shadow-release-card button{display:block;margin:22px 0 0 auto;padding:12px 22px;border:1px solid #8a3158;border-radius:12px;background:linear-gradient(100deg,#8c123a,#54132f);color:#fff;font:inherit;font-weight:750;cursor:pointer;min-height:46px;pointer-events:auto!important;position:relative;z-index:3}";
+    const card = document.createElement("section"); card.className = "ct-shadow-release-card";
+    const kicker = document.createElement("div"); kicker.className = "ct-release-kicker"; kicker.textContent = "New in CleanTrack · Shadow";
+    const heading = document.createElement("h2"); heading.id = "ct-shadow-release-title"; heading.textContent = release.title;
+    const message = document.createElement("p"); message.textContent = release.message;
+    const button = document.createElement("button"); button.type = "button"; button.textContent = "Got it"; button.addEventListener("click", function() {
+      try { seen.push(release.id); localStorage.setItem(key, JSON.stringify(seen)); } catch (_) {}
+      overlay.remove(); if (style.isConnected) style.remove();
+    });
+    card.append(kicker,heading,message,button); overlay.append(style,card); document.body.appendChild(overlay); button.focus();
+    overlay.addEventListener("keydown",function(event){if(event.key==="Escape"){event.preventDefault();button.click();}});
+  }
 
   function showWelcomeBackIfNeeded(user) {
     if (!user) return;
@@ -205,7 +244,7 @@
     const heading = document.createElement("h2"); heading.id = "ct-shadow-welcome-title"; heading.textContent = "Well, look who’s back, " + name + ".";
     const first = document.createElement("p"); first.textContent = "It’s been a while. A lot can happen in CleanTrack while you’re away — new activities, completed work, pending reviews, and changes across your team may have built up since your last visit.";
     const second = document.createElement("p"); second.textContent = "Before you jump in, take a moment to catch your bearings. I’ll help you find your way around and point you toward what matters. Let’s see what’s changed.";
-    const button = document.createElement("button"); button.type = "button"; button.textContent = "All right, let’s go"; button.addEventListener("click", function(){ overlay.remove(); if(style.isConnected) style.remove(); });
+    const button = document.createElement("button"); button.type = "button"; button.textContent = "All right, let’s go"; button.addEventListener("click", function(){ overlay.remove(); if(style.isConnected) style.remove(); window.setTimeout(function(){ showShadowFeatureAnnouncement(user); }, 120); });
     card.append(kicker,heading,first,second,button); overlay.append(style,card); document.body.appendChild(overlay); button.focus();
     overlay.addEventListener("keydown",function(event){if(event.key==="Escape"){event.preventDefault();overlay.remove();if(style.isConnected)style.remove();}});
   }
