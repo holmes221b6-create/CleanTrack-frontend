@@ -177,9 +177,38 @@
     if (defaultPage) {
       navigation.setActivePage(defaultPage);
     }
+    showWelcomeBackIfNeeded(user);
   }
   
   
+
+  function showWelcomeBackIfNeeded(user) {
+    if (!user) return;
+    const identity = String(user.id || user.email || user.name || "user").trim().toLowerCase();
+    const key = "cleantrack.shadow.last-seen." + identity;
+    const now = Date.now();
+    let previous = 0;
+    try { previous = Number(localStorage.getItem(key) || 0); } catch (_) {}
+    try { localStorage.setItem(key, String(now)); } catch (_) {}
+    if (!previous || now - previous < 7 * 24 * 60 * 60 * 1000 || document.querySelector(".ct-shadow-welcome-back")) return;
+
+    const name = String(user.name || user.full_name || user.email || "there").trim();
+    const overlay = document.createElement("div");
+    overlay.className = "ct-setup-overlay ct-shadow-welcome-back";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "ct-shadow-welcome-title");
+    const style = document.createElement("style");
+    style.textContent = ".ct-shadow-welcome-back{z-index:1000002!important;background:radial-gradient(ellipse at 20% 55%,#11163b88 0%,#020207f2 68%)!important;pointer-events:auto!important}.ct-shadow-welcome-card{width:min(680px,100%);max-height:90vh;overflow:auto;padding:clamp(24px,5vw,42px);border:1px solid #49416b;border-radius:24px;background:linear-gradient(145deg,#10111bfa,#030306fc);color:#f4f3fb;box-shadow:0 25px 100px #000c,0 0 45px #26235b44;text-align:left;pointer-events:auto!important;position:relative;z-index:2}.ct-shadow-welcome-card h2{font-size:clamp(25px,4vw,36px);line-height:1.15;margin:0 0 14px}.ct-shadow-welcome-card p{font-size:16px;line-height:1.7;color:#d1d0e0}.ct-shadow-welcome-card .ct-welcome-kicker{color:#ff799e;text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:800}.ct-shadow-welcome-card button{display:block;margin:22px 0 0 auto;padding:12px 22px;border:1px solid #8a3158;border-radius:12px;background:linear-gradient(100deg,#8c123a,#54132f);color:#fff;font:inherit;font-weight:750;cursor:pointer;min-height:46px;pointer-events:auto!important;position:relative;z-index:3}";
+    const card = document.createElement("section"); card.className = "ct-shadow-welcome-card";
+    const kicker = document.createElement("div"); kicker.className = "ct-welcome-kicker"; kicker.textContent = "Shadow · CleanTrack";
+    const heading = document.createElement("h2"); heading.id = "ct-shadow-welcome-title"; heading.textContent = "Well, look who’s back, " + name + ".";
+    const first = document.createElement("p"); first.textContent = "It’s been a while. A lot can happen in CleanTrack while you’re away — new activities, completed work, pending reviews, and changes across your team may have built up since your last visit.";
+    const second = document.createElement("p"); second.textContent = "Before you jump in, take a moment to catch your bearings. I’ll help you find your way around and point you toward what matters. Let’s see what’s changed.";
+    const button = document.createElement("button"); button.type = "button"; button.textContent = "All right, let’s go"; button.addEventListener("click", function(){ overlay.remove(); if(style.isConnected) style.remove(); });
+    card.append(kicker,heading,first,second,button); overlay.append(style,card); document.body.appendChild(overlay); button.focus();
+    overlay.addEventListener("keydown",function(event){if(event.key==="Escape"){event.preventDefault();overlay.remove();if(style.isConnected)style.remove();}});
+  }
 
   function setupKey(user, suffix) { return "cleantrack.setup." + suffix + "." + String(user && (user.id || user.email) || "unknown").toLowerCase(); }
   function setupSteps(role) {
