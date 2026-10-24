@@ -183,10 +183,33 @@
 
   function setupKey(user, suffix) { return "cleantrack.setup." + suffix + "." + String(user && (user.id || user.email) || "unknown").toLowerCase(); }
   function setupSteps(role) {
+    // Every lesson uses a real navigation route available to that role.
     const steps = {
-      admin: [["Organisation","Confirm your organisation details.","settings"],["Locations & maps","Add real work locations and floor plans.","locations"],["Zones","Create or import zones linked to locations.","zones"],["Teams & employees","Invite staff and assign roles.","members"],["Operations & schedules","Create operations and schedule work.","operations"],["Reviews & reports","Review completed work and Analytics.","analytics"]],
-      supervisor: [["Assigned locations","Review the locations and zones assigned to you.","locations"],["Your team","Check team members and responsibilities.","members"],["Operations","Review assigned work and schedules.","operations"],["Reviews & logs","Review submissions and track work.","reviews"]],
-      employee: [["Your profile","Check your profile and notification preferences.","settings"],["Your schedule","Review assigned work and due times.","schedule"],["Complete work","Follow operation instructions and record progress.","operations"],["Submit evidence","Add required photos and submit completed work.","operations"],["Notifications","Check announcements and feedback.","home"]]
+      admin: [
+        ["Your organisation","Meet the workspace controls. Organisation Settings is where you maintain the organisation details used across CleanTrack.","org-settings","organisation"],
+        ["Locations & maps","Locations are real work sites. Open a location to see its map or floor plan and connect the areas your organisation operates in.","locations","location"],
+        ["Zones","Zones are the specific operational areas inside a location. Learn how they connect to locations instead of treating them as separate sites.","zones","zone"],
+        ["Your people","Staff, teams and invitations help you bring the right people into the workspace and assign appropriate access.","teams","team"],
+        ["Plan the work","Operations describe the work to be done. Learn where to create an operation and how assigned work is tracked.","operations","operation"],
+        ["Review completed work","Logs and reviews help you check what actually happened, evidence submitted and items awaiting a decision.","reviews","review"],
+        ["Reports & insights","Use Analytics to compare performance and Reports to prepare an exportable report for a specific purpose.","reports","report"]
+      ],
+      supervisor: [
+        ["Your workspace","Start with your workspace to see the information and work available to your role.","workspace","workspace"],
+        ["Your people","Personnel and team tools help you understand who is assigned and who needs support.","personnel","person"],
+        ["Assigned operations","Open Operations Management to follow work and schedules relevant to your team.","operations","operation"],
+        ["Review submissions","Use the review queue to inspect completed work and follow up on items needing attention.","reviews","review"],
+        ["Sites & zones","Sites and Zones help you understand where your team is expected to work.","sites","site"],
+        ["Team communication","Use your team channel to keep work-related updates in one place.","team-channel","message"]
+      ],
+      employee: [
+        ["Welcome to your desk","Your desk is the starting point for updates and the next things to pay attention to.","my-desk","desk"],
+        ["Your assigned work","My Work shows the operations assigned to you. Open an item to read its instructions before starting.","my-tasks","task"],
+        ["Complete work carefully","Follow the operation instructions and use the available start or completion controls only when you are ready to do the work.","my-tasks","start"],
+        ["Keep your work history","Work History helps you revisit completed work and understand its recorded status.","my-history","history"],
+        ["Announcements & updates","Check announcements for workplace updates and guidance from your organisation.","announcements","announcement"],
+        ["Your preferences","Settings lets you review available profile and notification preferences.","settings","settings"]
+      ]
     };
     return steps[String(role || "").toLowerCase()] || steps.employee;
   }
@@ -225,15 +248,23 @@
       const heading = document.getElementById("page-title");
       const pageTitle = (heading && heading.textContent || step[0] || "").trim();
       const candidates = {
-        settings: /organisation settings|organization settings|edit organisation|edit organization|profile settings/i,
-        locations: /import location|add location|create location|upload floor plan|import map|add map/i,
-        zones: /create zone|add zone|import zones|new zone/i,
-        members: /invite member|invite employee|add member|add employee|team member/i,
-        operations: /create operation|new operation|create task|new task|start work/i,
-        analytics: /reports|analytics|generate report/i,
-        reviews: /review|approve|logs|activity history/i,
-        schedule: /schedule|my tasks|assigned work/i,
-        home: /announcement|notification|my desk|dashboard/i
+        organisation: /organisation settings|organization settings|edit organisation|edit organization|organisation details|organization details/i,
+        location: /import location|add location|create location|upload floor plan|import map|add map/i,
+        zone: /create zone|add zone|import zones|new zone/i,
+        team: /invite member|invite employee|add member|add employee|team member|create team/i,
+        operation: /create operation|new operation|create task|new task|start work/i,
+        report: /generate report|create report|export report|analytics/i,
+        review: /review|approve|logs|activity history/i,
+        workspace: /workspace|today|my desk|dashboard/i,
+        person: /personnel|team member|employee/i,
+        site: /site|location|zone/i,
+        message: /send message|new message|team channel|announcement/i,
+        desk: /my desk|today|dashboard/i,
+        task: /my work|my tasks|assigned work|view task|open operation/i,
+        start: /start work|start operation|mark complete|complete work|submit/i,
+        history: /work history|history|completed work/i,
+        announcement: /announcement|notification/i,
+        settings: /profile|preferences|settings/i
       };
       const pattern = candidates[page];
       const controls = Array.from(document.querySelectorAll("button,a,[role='button'],[data-action]")).filter(function(el){
