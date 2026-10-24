@@ -1077,7 +1077,10 @@ if (identity) {
           const payload={type:panel.querySelector('input[name="feedbackType"]:checked').value,area:panel.querySelector("#ct-feedback-area").value.trim(),description:description,screenshots:screenshots,app_version:"2026.10",screen:document.querySelector("#page-title")?.textContent||document.querySelector("h1")?.textContent||"",url:location.pathname,user_agent:navigator.userAgent,account_name:currentUser?.name||"",account_email:currentUser?.email||""};
           if(!window.CleanTrackApi||typeof window.CleanTrackApi.post!=="function")throw new Error("Feedback service is not available. Please try again later.");
           const result=await window.CleanTrackApi.post("feedback",payload);
-          status.style.color=result&&result.email_sent?"#91e6ad":"#ffd08a";status.textContent=result&&result.email_sent?"Thank you — your feedback has been sent to the CleanTrack developer inbox.":"Your feedback has been saved, but developer email delivery is not configured yet.";
+          status.style.color=result&&result.email_sent?"#91e6ad":"#ffd08a";
+          status.textContent=result&&result.email_sent
+            ? (payload.type==="suggestion" ? "Suggestion sent to the CleanTrack developer inbox. Thank you for helping improve the app." : "Bug report sent to the CleanTrack developer inbox. Thank you for reporting it.")
+            : (payload.type==="suggestion" ? "Suggestion saved, but developer email delivery is not configured yet." : "Bug report saved, but developer email delivery is not configured yet.");
           submit.textContent="Submitted ✓";panel.querySelector("form").reset();panel.querySelector("#ct-feedback-preview").replaceChildren();
           window.setTimeout(function(){panel.remove();css.remove();},1600);
         }catch(error){status.style.color="#ff9aa7";status.textContent=error.message||"Could not submit feedback. Please try again.";submit.disabled=false;submit.textContent="➤  Submit Feedback";}
