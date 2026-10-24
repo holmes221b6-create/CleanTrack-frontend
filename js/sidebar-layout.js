@@ -95,6 +95,13 @@ if (identity) {
     notificationsButton.title = "Notifications";
     notificationsButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>';
 
+    const feedbackButton = document.createElement("button");
+    feedbackButton.type = "button";
+    feedbackButton.className = "ct-toolbar-icon-button";
+    feedbackButton.setAttribute("aria-label", "Report a bug or suggest an improvement");
+    feedbackButton.title = "Feedback";
+    feedbackButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-4.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h8M8 15h5"/></svg>';
+
     const assistantButton = document.createElement("button");
     assistantButton.type = "button";
     assistantButton.className = "ct-toolbar-icon-button";
@@ -110,7 +117,7 @@ if (identity) {
     profileButton.innerHTML = '<span class="ct-profile-avatar" aria-hidden="true">U</span>';
 
     toolbar.append(backButton, toolbarSpacer, searchWrap, actions);
-    actions.append(toggle, notificationsButton, assistantButton, profileButton);
+    actions.append(toggle, notificationsButton, feedbackButton, assistantButton, profileButton);
 
     function getUser() {
       return window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser
@@ -1026,6 +1033,45 @@ if (identity) {
         wrap.appendChild(actionsRow);
       });
     }
+    feedbackButton.addEventListener("click", openFeedbackPanel);
+    function openFeedbackPanel() {
+      let panel = document.getElementById("ct-feedback-panel");
+      if (panel) { panel.remove(); return; }
+      panel = document.createElement("div");
+      panel.id = "ct-feedback-panel";
+      panel.className = "ct-feedback-panel";
+      panel.innerHTML = '<div class="ct-feedback-head"><div><div class="ct-feedback-eyebrow">CLEANTRACK FEEDBACK</div><h2>Help us improve</h2></div><button type="button" class="ct-feedback-close" aria-label="Close feedback">×</button></div><form id="ct-feedback-form"><div class="ct-feedback-types"><label class="ct-feedback-type is-selected"><input type="radio" name="feedbackType" value="bug" checked><span class="ct-feedback-type-icon">♧</span><strong>Report a Bug</strong><small>Something isn’t working</small></label><label class="ct-feedback-type"><input type="radio" name="feedbackType" value="suggestion"><span class="ct-feedback-type-icon">♧</span><strong>Suggest Improvement</strong><small>Suggest an enhancement</small></label></div><label class="ct-feedback-label" for="ct-feedback-area">Screen / Area <small>(optional)</small></label><input id="ct-feedback-area" name="area" class="ct-feedback-input" placeholder="e.g. Profile, Locations, Reports"><p class="ct-feedback-note">App version, device and current screen are attached automatically.</p><label class="ct-feedback-label" for="ct-feedback-description">Description <span>*</span></label><textarea id="ct-feedback-description" name="description" class="ct-feedback-textarea" required maxlength="8000" placeholder="Describe the issue: What happened? What did you expect?"></textarea><label class="ct-feedback-label" for="ct-feedback-images">Screenshots <small>(optional · up to 5)</small></label><label class="ct-feedback-upload" for="ct-feedback-images"><span class="ct-feedback-camera">◎</span><strong>Add screenshots</strong><small>Choose up to 5 images. They’ll be attached in full.</small></label><input id="ct-feedback-images" name="screenshots" type="file" accept="image/*" multiple hidden><div id="ct-feedback-preview" class="ct-feedback-preview"></div><p class="ct-feedback-status" role="status" aria-live="polite"></p><button class="ct-feedback-submit" type="submit">➤ &nbsp; Submit Feedback</button></form>';
+      const css = document.createElement("style");
+      css.id = "ct-feedback-styles";
+      css.textContent = ".ct-feedback-panel{position:fixed;z-index:1000004;top:76px;right:22px;width:min(620px,calc(100vw - 28px));max-height:calc(100vh - 94px);overflow:auto;padding:24px;border:1px solid #34343d;border-radius:22px;background:#08080b;color:#f7f7fb;box-shadow:0 22px 90px #000c;font-family:inherit}.ct-feedback-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:22px}.ct-feedback-head h2{margin:5px 0 0;font-size:25px}.ct-feedback-eyebrow{font-size:10px;letter-spacing:.16em;color:#f07483;font-weight:800}.ct-feedback-close{background:transparent;border:0;color:white;font-size:28px;cursor:pointer}.ct-feedback-types{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}.ct-feedback-type{display:flex;min-height:148px;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:15px;border:1px solid #303038;border-radius:18px;background:#0b0b0e;text-align:center;cursor:pointer}.ct-feedback-type input{position:absolute;opacity:0}.ct-feedback-type.is-selected{border:2px solid #e44f5e;background:#17090c}.ct-feedback-type-icon{font-size:28px}.ct-feedback-type strong{font-size:16px}.ct-feedback-type small{color:#b8b7c1;font-size:12px}.ct-feedback-label{display:block;margin:20px 0 9px;font-weight:750}.ct-feedback-label small{font-weight:400;color:#a9a9b4}.ct-feedback-label span{color:#ff6577}.ct-feedback-input,.ct-feedback-textarea{display:block;width:100%;box-sizing:border-box;background:#0b0b0e;border:1px solid #34343c;border-radius:14px;padding:14px;color:#fff;font:inherit}.ct-feedback-textarea{min-height:150px;resize:vertical}.ct-feedback-note{font-size:12px;color:#aaaab5;margin:8px 0}.ct-feedback-upload{display:flex;min-height:125px;align-items:center;justify-content:center;flex-direction:column;gap:12px;border:2px dashed #383840;border-radius:16px;background:#0b0b0e;cursor:pointer;text-align:center;padding:15px}.ct-feedback-upload small{color:#aaaab5}.ct-feedback-camera{font-size:30px}.ct-feedback-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ct-feedback-preview img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #444}.ct-feedback-status{color:#ffb2bd;font-size:13px}.ct-feedback-submit{width:100%;min-height:56px;margin-top:12px;border:0;border-radius:14px;background:#a62d36;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}.ct-feedback-submit:disabled{opacity:.55;cursor:wait}@media(max-width:560px){.ct-feedback-panel{top:64px;right:10px;padding:17px}.ct-feedback-types{grid-template-columns:1fr 1fr}.ct-feedback-type{min-height:130px;padding:8px}.ct-feedback-type strong{font-size:13px}}";
+      document.head.appendChild(css);
+      document.body.appendChild(panel);
+      panel.querySelector(".ct-feedback-close").addEventListener("click", function(){panel.remove();css.remove();});
+      const typeInputs = panel.querySelectorAll('input[name="feedbackType"]');
+      typeInputs.forEach(function(input){input.addEventListener("change",function(){panel.querySelectorAll(".ct-feedback-type").forEach(function(card){card.classList.toggle("is-selected",card.querySelector("input").checked);});});});
+      const imageInput = panel.querySelector("#ct-feedback-images");
+      imageInput.addEventListener("change",function(){const files=Array.from(imageInput.files||[]).slice(0,5);panel.querySelector("#ct-feedback-preview").replaceChildren();files.forEach(function(file){if(!file.type.startsWith("image/"))return;const img=document.createElement("img");img.alt=file.name;img.src=URL.createObjectURL(file);panel.querySelector("#ct-feedback-preview").appendChild(img);});if(imageInput.files.length>5)panel.querySelector(".ct-feedback-status").textContent="Only the first 5 screenshots will be attached.";});
+      panel.querySelector("form").addEventListener("submit",async function(event){
+        event.preventDefault();
+        const submit=panel.querySelector(".ct-feedback-submit"), status=panel.querySelector(".ct-feedback-status");
+        const description=panel.querySelector("#ct-feedback-description").value.trim();
+        if(!description){status.textContent="Please describe the issue or suggestion.";return;}
+        const files=Array.from(imageInput.files||[]).slice(0,5).filter(file=>file.type.startsWith("image/"));
+        if(files.some(file=>file.size>5*1024*1024)){status.textContent="Each screenshot must be 5 MB or smaller.";return;}
+        submit.disabled=true;submit.textContent="Sending feedback…";status.textContent="";
+        try{
+          const screenshots=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({name:file.name,type:file.type,data:String(reader.result).split(",")[1]||""});reader.onerror=reject;reader.readAsDataURL(file);})));
+          const currentUser=window.CleanTrackAuth&&window.CleanTrackAuth.getCurrentUser?window.CleanTrackAuth.getCurrentUser():null;
+          const payload={type:panel.querySelector('input[name="feedbackType"]:checked').value,area:panel.querySelector("#ct-feedback-area").value.trim(),description:description,screenshots:screenshots,app_version:"2026.10",screen:document.querySelector("#page-title")?.textContent||document.querySelector("h1")?.textContent||"",url:location.pathname,user_agent:navigator.userAgent,account_name:currentUser?.name||"",account_email:currentUser?.email||""};
+          if(!window.CleanTrackApi||typeof window.CleanTrackApi.post!=="function")throw new Error("Feedback service is not available. Please try again later.");
+          await window.CleanTrackApi.post("feedback",payload);
+          status.style.color="#91e6ad";status.textContent="Thank you — your feedback has been submitted to the CleanTrack team.";
+          submit.textContent="Submitted ✓";panel.querySelector("form").reset();panel.querySelector("#ct-feedback-preview").replaceChildren();
+          window.setTimeout(function(){panel.remove();css.remove();},1600);
+        }catch(error){status.style.color="#ff9aa7";status.textContent=error.message||"Could not submit feedback. Please try again.";submit.disabled=false;submit.textContent="➤  Submit Feedback";}
+      });
+    }
+
     notificationsButton.addEventListener("click", openNotifications);
     assistantButton.addEventListener("click", openAssistant);
     profileButton.addEventListener("click", openProfile);
