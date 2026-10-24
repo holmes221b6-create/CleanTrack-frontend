@@ -804,8 +804,7 @@ tbody tr:hover {
   text-align: center;
 }
 
-.app-footer-help,
-.app-footer-legal {
+.app-footer-help {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -816,9 +815,23 @@ tbody tr:hover {
   text-align: center;
 }
 
-.app-footer-help a,
-.app-footer-legal a {
+.app-footer-help a {
   text-align: center;
+}
+
+.app-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: auto;
+  margin-left: auto;
+  text-align: right;
+}
+
+.app-footer-legal a {
+  text-align: right;
 }
 
 .footer-links {
