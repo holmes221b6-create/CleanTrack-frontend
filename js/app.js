@@ -190,16 +190,22 @@
     };
     return steps[String(role || "").toLowerCase()] || steps.employee;
   }
-  function showSetupGuide(user) {
+  function showSetupGuide(user, startIndex) {
     if (!user) return;
-    const steps = setupSteps(user.role); let index = 0;
-    const overlay = document.createElement("div"); overlay.className = "ct-setup-overlay"; overlay.setAttribute("role","dialog"); overlay.setAttribute("aria-modal","true");
+    const steps = setupSteps(user.role);
+    let index = Math.max(0, Math.min(Number(startIndex) || 0, steps.length - 1));
+    const overlay = document.createElement("div");
+    overlay.className = "ct-setup-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "ct-setup-title");
     const style = document.createElement("style");
-    style.textContent = ".ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.8;line-height:1.5}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}";
-    const card = document.createElement("section"); card.className = "ct-setup-card";
+    style.textContent = ".ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.86;line-height:1.6}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}.ct-tour-focus{position:relative!important;z-index:999989!important;outline:3px solid #22c55e!important;outline-offset:5px!important;box-shadow:0 0 0 8px #22c55e30!important;scroll-margin:100px}.ct-tour-coach{position:fixed;z-index:999999;right:22px;bottom:22px;width:min(410px,calc(100vw - 32px));background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid #22c55e;border-radius:18px;padding:18px;box-shadow:0 18px 60px #0008}.ct-tour-coach h3{margin:0 0 8px}.ct-tour-coach p{line-height:1.5}.ct-tour-coach button{border-radius:10px;padding:10px 13px;margin:4px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;cursor:pointer}.ct-tour-coach .primary{background:#16a34a;color:white;border-color:#16a34a}";
+    const card = document.createElement("section");
+    card.className = "ct-setup-card";
     const mark = document.createElement("div"); mark.className = "ct-setup-mark"; mark.textContent = "✧";
-    const title = document.createElement("h2"); title.textContent = "Account Setup";
-    const intro = document.createElement("p"); intro.className = "ct-setup-intro"; intro.textContent = "Let's get your CleanTrack workspace ready. Follow these role-specific steps; you can return to this guide from Settings anytime.";
+    const title = document.createElement("h2"); title.id = "ct-setup-title"; title.textContent = "Learn CleanTrack by doing";
+    const intro = document.createElement("p"); intro.className = "ct-setup-intro"; intro.textContent = "We’ll show you the real pages and controls for your role, explain why they matter, and let you explore. Skip anytime.";
     const languageWrap = document.createElement("div"); languageWrap.className = "ct-setup-language";
     const language = document.createElement("select"); language.setAttribute("aria-label","Guide language");
     [["en","English"],["hi","Hindi"],["ur","Urdu"],["es","Español"],["pt","Português"]].forEach(function(pair){const o=document.createElement("option");o.value=pair[0];o.textContent=pair[1];language.appendChild(o)});
@@ -209,8 +215,43 @@
     const meta = document.createElement("p"); meta.className = "ct-setup-meta";
     const actions = document.createElement("div"); actions.className = "ct-setup-actions";
     card.append(mark,title,intro,languageWrap,progress,box,meta,actions); overlay.append(style,card); document.body.appendChild(overlay);
-    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}overlay.remove()}
-    function draw(){progress.replaceChildren();steps.forEach(function(_,i){const dot=document.createElement("span");dot.className="ct-setup-dot"+(i<=index?" active":"");progress.appendChild(dot)});const step=steps[index];box.replaceChildren();const h=document.createElement("h3");h.textContent=step[0];const p=document.createElement("p");p.textContent=step[1];box.append(h,p);meta.textContent="Step "+(index+1)+" of "+steps.length+" · About 3 minutes";actions.replaceChildren();const skip=document.createElement("button");skip.textContent="Skip setup";skip.addEventListener("click",finish);const back=document.createElement("button");back.textContent="Back";back.disabled=index===0;back.addEventListener("click",function(){if(index>0){index--;draw()}});const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish setup":"Continue";next.addEventListener("click",function(){if(index<steps.length-1){index++;draw()}else{const target=step[2];finish();if(target)navigation.setActivePage(target)}});actions.append(skip,back,next)}
+    function clearFocus(){document.querySelectorAll(".ct-tour-focus").forEach(function(el){el.classList.remove("ct-tour-focus")});}
+    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}clearFocus();const coach=document.querySelector(".ct-tour-coach");if(coach)coach.remove();overlay.remove();}
+    function showCoach(step){
+      overlay.remove();
+      const target=step[2];
+      const menu=document.getElementById("workspace-navigation");
+      const item=menu&&Array.from(menu.querySelectorAll("[data-page]")).find(function(el){return el.getAttribute("data-page")===target});
+      const heading=document.getElementById("page-title");
+      const focus=item||heading;
+      clearFocus();
+      if(focus){focus.classList.add("ct-tour-focus");focus.scrollIntoView({behavior:"smooth",block:"center"});}
+      const coach=document.createElement("aside");coach.className="ct-tour-coach";coach.setAttribute("role","status");
+      const h=document.createElement("h3");h.textContent="Explore: "+step[0];
+      const p=document.createElement("p");p.textContent=focus ? "This is the real CleanTrack page for this step. "+step[1]+" Look at the highlighted navigation item or page heading, then explore the available controls. Avoid saving real changes unless you intend to." : "We couldn't locate the navigation control for this step in the current layout. "+step[1];
+      const buttons=document.createElement("div");
+      const back=document.createElement("button");back.textContent="Back to guide";back.addEventListener("click",function(){coach.remove();clearFocus();showSetupGuide(user,index)});
+      const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",function(){coach.remove();finish()});
+      const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish":"Next lesson";next.addEventListener("click",function(){coach.remove();clearFocus();if(index<steps.length-1){index++;showSetupGuide(user,index)}else finish()});
+      buttons.append(back,skip,next);coach.append(h,p,buttons);document.body.appendChild(coach);
+    }
+    function draw(){
+      progress.replaceChildren();
+      steps.forEach(function(_,i){const dot=document.createElement("span");dot.className="ct-setup-dot"+(i<=index?" active":"");progress.appendChild(dot)});
+      const step=steps[index];box.replaceChildren();
+      const h=document.createElement("h3");h.textContent=step[0];
+      const p=document.createElement("p");p.textContent=step[1];
+      const detail=document.createElement("p");detail.textContent="Why this matters: CleanTrack connects people, places and actual work. Understanding this area helps you avoid missed assignments, disconnected zones or incomplete work records.";
+      const hint=document.createElement("p");hint.textContent="Choose “Show me this page” to open the real page and highlight its navigation item. Then explore the page and return for the next lesson.";
+      box.append(h,p,detail,hint);
+      meta.textContent="Lesson "+(index+1)+" of "+steps.length+" · Role: "+String(user.role||"employee")+" · You can skip at any time";
+      actions.replaceChildren();
+      const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",finish);
+      const back=document.createElement("button");back.textContent="Back";back.disabled=index===0;back.addEventListener("click",function(){if(index>0){index--;draw()}});
+      const show=document.createElement("button");show.textContent="Show me this page";show.addEventListener("click",function(){const target=step[2];if(!target){showCoach(step);return;}const moved=navigation.setActivePage(target);if(!moved){p.textContent="This page isn't available to your current role. Continue to the next lesson or skip the tutorial.";return;}window.setTimeout(function(){showCoach(step)},300)});
+      const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish tutorial":"Next lesson";next.addEventListener("click",function(){if(index<steps.length-1){index++;draw()}else finish()});
+      actions.append(skip,back,show,next);
+    }
     draw();
   }
   function maybeShowFirstSetup(user){try{if(user&&localStorage.getItem(setupKey(user,"pending"))==="1"&&localStorage.getItem(setupKey(user,"completed"))!=="1")window.setTimeout(function(){showSetupGuide(user)},80)}catch(_){}}
