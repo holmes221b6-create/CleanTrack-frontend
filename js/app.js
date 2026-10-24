@@ -213,7 +213,9 @@
     };
     return steps[String(role || "").toLowerCase()] || steps.employee;
   }
-  // Shadow's arrival chime is synthesized locally: no external audio file or paid service.
+  // Shadow's arrival sound: an original, locally generated eerie vocal-like sting.
+  // Layered filtered noise, detuned tones, and a short synthetic reverb create an
+  // uncanny, veiled presence without using a copied character recording.
   function shadowSoundEnabled() {
     try { return localStorage.getItem("cleantrack.shadow.sound") !== "off"; }
     catch (_) { return true; }
@@ -225,27 +227,124 @@
     if (!force && !shadowSoundEnabled()) return false;
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return false;
+    let context;
     try {
-      const context = new AudioContextClass();
+      context = new AudioContextClass();
       const play = function () {
-        const now = context.currentTime, master = context.createGain();
+        const now = context.currentTime;
+        const master = context.createGain();
         master.gain.setValueAtTime(0.0001, now);
-        master.gain.exponentialRampToValueAtTime(0.16, now + 0.09);
-        master.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
-        master.connect(context.destination);
-        const drone = context.createOscillator(), droneGain = context.createGain();
-        drone.type = "sawtooth"; drone.frequency.setValueAtTime(235, now); drone.frequency.exponentialRampToValueAtTime(105, now + 0.95);
-        droneGain.gain.setValueAtTime(0.0001, now); droneGain.gain.exponentialRampToValueAtTime(0.34, now + 0.1); droneGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.12);
-        drone.connect(droneGain); droneGain.connect(master); drone.start(now); drone.stop(now + 1.15);
-        const overtone = context.createOscillator(), overGain = context.createGain();
-        overtone.type = "sine"; overtone.frequency.setValueAtTime(520, now + 0.03); overtone.frequency.exponentialRampToValueAtTime(260, now + 0.82);
-        overGain.gain.setValueAtTime(0.0001, now); overGain.gain.exponentialRampToValueAtTime(0.18, now + 0.12); overGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
-        overtone.connect(overGain); overGain.connect(master); overtone.start(now + 0.02); overtone.stop(now + 0.94);
-        window.setTimeout(function () { context.close().catch(function () {}); }, 1500);
+        master.gain.exponentialRampToValueAtTime(0.42, now + 0.12);
+        master.gain.setValueAtTime(0.31, now + 0.42);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 2.35);
+
+        const compressor = context.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(-20, now);
+        compressor.knee.setValueAtTime(18, now);
+        compressor.ratio.setValueAtTime(4, now);
+        compressor.attack.setValueAtTime(0.008, now);
+        compressor.release.setValueAtTime(0.35, now);
+        master.connect(compressor);
+        compressor.connect(context.destination);
+
+        // Low, slowly descending presence.
+        const low = context.createOscillator();
+        const lowGain = context.createGain();
+        low.type = "triangle";
+        low.frequency.setValueAtTime(118, now);
+        low.frequency.exponentialRampToValueAtTime(49, now + 1.8);
+        lowGain.gain.setValueAtTime(0.0001, now);
+        lowGain.gain.exponentialRampToValueAtTime(0.55, now + 0.16);
+        lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.1);
+        low.connect(lowGain);
+        lowGain.connect(master);
+        low.start(now);
+        low.stop(now + 2.15);
+
+        // Detuned, ambiguous vocal-like resonances rather than a plain buzzy tone.
+        [172, 176.5, 258].forEach(function (frequency, i) {
+          const osc = context.createOscillator();
+          const gain = context.createGain();
+          const formant = context.createBiquadFilter();
+          osc.type = i === 2 ? "sawtooth" : "sine";
+          osc.frequency.setValueAtTime(frequency, now + 0.04);
+          osc.frequency.exponentialRampToValueAtTime(frequency * (i === 1 ? 0.72 : 0.78), now + 1.55);
+          formant.type = "bandpass";
+          formant.frequency.setValueAtTime(i === 2 ? 680 : 390 + i * 125, now);
+          formant.Q.setValueAtTime(i === 2 ? 3.8 : 2.2, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(i === 2 ? 0.12 : 0.19, now + 0.18 + i * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.75);
+          osc.connect(formant);
+          formant.connect(gain);
+          gain.connect(master);
+          osc.start(now + i * 0.025);
+          osc.stop(now + 1.82);
+        });
+
+        // Breath/whisper texture, shaped into a short rising-and-falling spectral swell.
+        const noiseLength = Math.ceil(context.sampleRate * 1.9);
+        const noiseBuffer = context.createBuffer(1, noiseLength, context.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseLength; i++) {
+          const fadeIn = Math.min(1, i / (context.sampleRate * 0.14));
+          const fadeOut = Math.max(0, 1 - i / noiseLength);
+          noiseData[i] = (Math.random() * 2 - 1) * fadeIn * fadeOut;
+        }
+        const noise = context.createBufferSource();
+        const breathFilter = context.createBiquadFilter();
+        const breathGain = context.createGain();
+        const breathPan = context.createStereoPanner ? context.createStereoPanner() : null;
+        noise.buffer = noiseBuffer;
+        breathFilter.type = "bandpass";
+        breathFilter.frequency.setValueAtTime(1250, now + 0.08);
+        breathFilter.frequency.exponentialRampToValueAtTime(620, now + 1.25);
+        breathFilter.Q.setValueAtTime(0.85, now);
+        breathGain.gain.setValueAtTime(0.0001, now);
+        breathGain.gain.exponentialRampToValueAtTime(0.17, now + 0.32);
+        breathGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        noise.connect(breathFilter);
+        breathFilter.connect(breathGain);
+        if (breathPan) {
+          breathPan.pan.setValueAtTime(-0.18, now);
+          breathPan.pan.linearRampToValueAtTime(0.18, now + 1.35);
+          breathGain.connect(breathPan);
+          breathPan.connect(master);
+        } else {
+          breathGain.connect(master);
+        }
+        noise.start(now + 0.06);
+        noise.stop(now + 1.92);
+
+        // Short synthetic reverb tail.
+        const reverbLength = Math.floor(context.sampleRate * 1.15);
+        const impulse = context.createBuffer(2, reverbLength, context.sampleRate);
+        for (let channel = 0; channel < 2; channel++) {
+          const samples = impulse.getChannelData(channel);
+          for (let i = 0; i < reverbLength; i++) {
+            samples[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLength, 2.8);
+          }
+        }
+        const convolver = context.createConvolver();
+        const wet = context.createGain();
+        convolver.buffer = impulse;
+        wet.gain.setValueAtTime(0.22, now);
+        master.connect(convolver);
+        convolver.connect(wet);
+        wet.connect(compressor);
+
+        window.setTimeout(function () {
+          if (context && context.state !== "closed") context.close().catch(function () {});
+        }, 2900);
       };
-      if (context.state === "suspended") context.resume().then(play).catch(function () { context.close().catch(function () {}); }); else play();
+      if (context.state === "suspended") {
+        context.resume().then(play).catch(function () { context.close().catch(function () {}); });
+      } else play();
       return true;
-    } catch (_) { return false; }
+    } catch (_) {
+      if (context && context.state !== "closed") context.close().catch(function () {});
+      return false;
+    }
   }
   function showSetupGuide(user, startIndex) {
     if (!user) return;
