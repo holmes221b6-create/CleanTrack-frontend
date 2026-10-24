@@ -200,7 +200,7 @@
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-labelledby", "ct-setup-title");
     const style = document.createElement("style");
-    style.textContent = ".ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.86;line-height:1.6}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}.ct-tour-focus{position:relative!important;z-index:999989!important;outline:3px solid #22c55e!important;outline-offset:5px!important;box-shadow:0 0 0 8px #22c55e30!important;scroll-margin:100px}.ct-tour-coach{position:fixed;z-index:999999;right:22px;bottom:22px;width:min(410px,calc(100vw - 32px));background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid #22c55e;border-radius:18px;padding:18px;box-shadow:0 18px 60px #0008}.ct-tour-coach h3{margin:0 0 8px}.ct-tour-coach p{line-height:1.5}.ct-tour-coach button{border-radius:10px;padding:10px 13px;margin:4px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;cursor:pointer}.ct-tour-coach .primary{background:#16a34a;color:white;border-color:#16a34a}";
+    style.textContent = ".ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.86;line-height:1.6}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}.ct-tour-focus{position:relative!important;z-index:999989!important;outline:3px solid #43e58b!important;outline-offset:5px!important;box-shadow:0 0 0 8px #22c55e35,0 0 28px #22c55e50!important;scroll-margin:110px;animation:ct-tour-pulse 1.8s ease-in-out infinite}@keyframes ct-tour-pulse{0%,100%{outline-offset:4px}50%{outline-offset:8px}}.ct-tour-coach{position:fixed;z-index:999999;right:22px;bottom:22px;display:flex;align-items:flex-start;gap:12px;width:min(490px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid #27c96b;border-radius:22px;padding:16px;box-shadow:0 22px 75px #000a;animation:ct-tour-arrive .28s ease-out}.ct-tour-avatar{flex:0 0 48px;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#1c9b61,#124a35);color:#fff;font-size:25px;font-weight:850;box-shadow:inset 0 0 0 2px #ffffff28}.ct-tour-speech{min-width:0;flex:1}.ct-tour-kicker{font-size:10px!important;letter-spacing:.15em;font-weight:800;opacity:.72;margin:0 0 5px!important}.ct-tour-coach h3{margin:0 0 8px;font-size:19px}.ct-tour-coach p{line-height:1.5;margin:7px 0}.ct-tour-status{font-size:12px;opacity:.68}.ct-tour-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.ct-tour-coach button{border-radius:10px;padding:10px 12px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;cursor:pointer}.ct-tour-coach .primary{background:#16a34a;color:white;border-color:#16a34a;font-weight:750}@keyframes ct-tour-arrive{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:600px){.ct-tour-coach{right:10px;bottom:10px;width:calc(100vw - 20px);padding:13px}.ct-tour-avatar{width:40px;height:40px;flex-basis:40px;border-radius:13px}}";
     const card = document.createElement("section");
     card.className = "ct-setup-card";
     const mark = document.createElement("div"); mark.className = "ct-setup-mark"; mark.textContent = "✧";
@@ -219,21 +219,62 @@
     function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}clearFocus();const coach=document.querySelector(".ct-tour-coach");if(coach)coach.remove();overlay.remove();if(style.isConnected)style.remove();}
     function showCoach(step){
       overlay.remove();
-      const target=step[2];
-      const menu=document.getElementById("workspace-navigation");
-      const item=menu&&Array.from(menu.querySelectorAll("[data-page]")).find(function(el){return el.getAttribute("data-page")===target});
-      const heading=document.getElementById("page-title");
-      const focus=item||heading;
+      const page = step[2];
+      const menu = document.getElementById("workspace-navigation");
+      const pageItem = menu && Array.from(menu.querySelectorAll("[data-page]")).find(function(el){return el.getAttribute("data-page")===page;});
+      const heading = document.getElementById("page-title");
+      const pageTitle = (heading && heading.textContent || step[0] || "").trim();
+      const candidates = {
+        settings: /organisation settings|organization settings|edit organisation|edit organization|profile settings/i,
+        locations: /import location|add location|create location|upload floor plan|import map|add map/i,
+        zones: /create zone|add zone|import zones|new zone/i,
+        members: /invite member|invite employee|add member|add employee|team member/i,
+        operations: /create operation|new operation|create task|new task|start work/i,
+        analytics: /reports|analytics|generate report/i,
+        reviews: /review|approve|logs|activity history/i,
+        schedule: /schedule|my tasks|assigned work/i,
+        home: /announcement|notification|my desk|dashboard/i
+      };
+      const pattern = candidates[page];
+      const controls = Array.from(document.querySelectorAll("button,a,[role='button'],[data-action]")).filter(function(el){
+        return !el.closest(".ct-setup-overlay,.ct-tour-coach") && el.offsetParent !== null && !el.disabled;
+      });
+      let target = pattern && controls.find(function(el){return pattern.test((el.innerText || el.textContent || el.getAttribute("aria-label") || "").trim());});
+      if (!target && pageItem && pageItem.offsetParent !== null) target = pageItem;
+      if (!target && heading) target = heading;
       clearFocus();
-      if(focus){focus.classList.add("ct-tour-focus");focus.scrollIntoView({behavior:"smooth",block:"center"});}
-      const coach=document.createElement("aside");coach.className="ct-tour-coach";coach.setAttribute("role","status");
-      const h=document.createElement("h3");h.textContent="Explore: "+step[0];
-      const p=document.createElement("p");p.textContent=focus ? "This is the real CleanTrack page for this step. "+step[1]+" Look at the highlighted navigation item or page heading, then explore the available controls. Avoid saving real changes unless you intend to." : "We couldn't locate the navigation control for this step in the current layout. "+step[1];
-      const buttons=document.createElement("div");
-      const back=document.createElement("button");back.textContent="Back to guide";back.addEventListener("click",function(){coach.remove();clearFocus();showSetupGuide(user,index)});
-      const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",function(){coach.remove();finish()});
-      const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish":"Next lesson";next.addEventListener("click",function(){coach.remove();clearFocus();if(index<steps.length-1){index++;showSetupGuide(user,index)}else finish()});
-      buttons.append(back,skip,next);coach.append(h,p,buttons);document.body.appendChild(coach);
+      if(target){target.classList.add("ct-tour-focus");try{target.scrollIntoView({behavior:"smooth",block:"center"});}catch(_){}}
+      const coach = document.createElement("aside");
+      coach.className = "ct-tour-coach";
+      coach.setAttribute("role","dialog");
+      coach.setAttribute("aria-live","polite");
+      const avatar = document.createElement("div"); avatar.className = "ct-tour-avatar"; avatar.setAttribute("aria-hidden","true"); avatar.textContent = "C";
+      const speech = document.createElement("div"); speech.className = "ct-tour-speech";
+      const kicker = document.createElement("p"); kicker.className = "ct-tour-kicker"; kicker.textContent = "YOUR CLEANTRACK GUIDE";
+      const h = document.createElement("h3"); h.textContent = "Let's explore: " + step[0];
+      const p = document.createElement("p");
+      p.textContent = target && target !== pageItem && target !== heading
+        ? "You're on " + (pageTitle || step[0]) + ". " + step[1] + " I've highlighted " + ((target.innerText || target.textContent || target.getAttribute("aria-label") || "the relevant control").trim().replace(/\\s+/g," ").slice(0,90)) + ". Click it to try the real feature. Avoid confirming or saving anything you don't intend to change."
+        : "You're learning the real " + (pageTitle || step[0]) + " page. " + step[1] + " Look around the highlighted area; if this control isn't available in your layout, you can continue without changing anything.";
+      const status = document.createElement("p"); status.className = "ct-tour-status"; status.textContent = "Lesson " + (index+1) + " of " + steps.length + " · You can skip at any time";
+      const buttons = document.createElement("div"); buttons.className = "ct-tour-actions";
+      const back = document.createElement("button"); back.textContent = "Guide menu"; back.addEventListener("click",function(){coach.remove();clearFocus();showSetupGuide(user,index);});
+      const skip = document.createElement("button"); skip.textContent = "Skip"; skip.addEventListener("click",function(){coach.remove();finish();});
+      const next = document.createElement("button"); next.className = "primary"; next.textContent = index===steps.length-1 ? "Finish journey" : "Next lesson";
+      next.addEventListener("click",function(){coach.remove();clearFocus();if(index<steps.length-1){index++;showSetupGuide(user,index);}else finish();});
+      buttons.append(back,skip,next);
+      speech.append(kicker,h,p,status,buttons);
+      coach.append(avatar,speech);
+      document.body.appendChild(coach);
+      if(target && target !== pageItem && target !== heading){
+        target.addEventListener("click",function onGuideTargetClick(){
+          target.removeEventListener("click",onGuideTargetClick);
+          if(!coach.isConnected) return;
+          p.textContent = "Nice — you tried the real control. Take a moment to look at what opened. When you're ready, choose Next lesson and I'll guide you to the next part. Don't save anything unless you mean to.";
+          status.textContent = "Feature explored · Lesson " + (index+1) + " of " + steps.length;
+          target.classList.remove("ct-tour-focus");
+        },{once:true});
+      }
     }
     function draw(){
       progress.replaceChildren();
