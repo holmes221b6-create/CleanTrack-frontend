@@ -228,41 +228,25 @@
     try {
       const context = new AudioContextClass();
       const play = function () {
-        const now = context.currentTime;
-        const master = context.createGain();
+        const now = context.currentTime, master = context.createGain();
         master.gain.setValueAtTime(0.0001, now);
-        master.gain.exponentialRampToValueAtTime(0.10, now + 0.12);
-        master.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+        master.gain.exponentialRampToValueAtTime(0.16, now + 0.09);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
         master.connect(context.destination);
         const drone = context.createOscillator(), droneGain = context.createGain();
-        drone.type = "triangle";
-        drone.frequency.setValueAtTime(145, now);
-        drone.frequency.exponentialRampToValueAtTime(54, now + 0.82);
-        droneGain.gain.setValueAtTime(0.0001, now);
-        droneGain.gain.exponentialRampToValueAtTime(0.72, now + 0.1);
-        droneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.92);
-        drone.connect(droneGain); droneGain.connect(master);
-        drone.start(now); drone.stop(now + 0.96);
+        drone.type = "sawtooth"; drone.frequency.setValueAtTime(235, now); drone.frequency.exponentialRampToValueAtTime(105, now + 0.95);
+        droneGain.gain.setValueAtTime(0.0001, now); droneGain.gain.exponentialRampToValueAtTime(0.34, now + 0.1); droneGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.12);
+        drone.connect(droneGain); droneGain.connect(master); drone.start(now); drone.stop(now + 1.15);
         const overtone = context.createOscillator(), overGain = context.createGain();
-        overtone.type = "sine";
-        overtone.frequency.setValueAtTime(410, now + 0.03);
-        overtone.frequency.exponentialRampToValueAtTime(178, now + 0.72);
-        overGain.gain.setValueAtTime(0.0001, now);
-        overGain.gain.exponentialRampToValueAtTime(0.22, now + 0.16);
-        overGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.78);
-        overtone.connect(overGain); overGain.connect(master);
-        overtone.start(now + 0.02); overtone.stop(now + 0.82);
-        window.setTimeout(function () { context.close().catch(function () {}); }, 1250);
+        overtone.type = "sine"; overtone.frequency.setValueAtTime(520, now + 0.03); overtone.frequency.exponentialRampToValueAtTime(260, now + 0.82);
+        overGain.gain.setValueAtTime(0.0001, now); overGain.gain.exponentialRampToValueAtTime(0.18, now + 0.12); overGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+        overtone.connect(overGain); overGain.connect(master); overtone.start(now + 0.02); overtone.stop(now + 0.94);
+        window.setTimeout(function () { context.close().catch(function () {}); }, 1500);
       };
-      if (context.state === "suspended") context.resume().then(play).catch(function () { context.close().catch(function () {}); });
-      else play();
+      if (context.state === "suspended") context.resume().then(play).catch(function () { context.close().catch(function () {}); }); else play();
       return true;
     } catch (_) { return false; }
   }
-
-  window.CleanTrackSetupGuide = window.CleanTrackSetupGuide || {};
-  window.CleanTrackSetupGuide.previewSound = function () { return playShadowArrivalSound(true); };
-
   function showSetupGuide(user, startIndex) {
     if (!user) return;
     const steps = setupSteps(user.role);
