@@ -184,32 +184,9 @@
   function setupKey(user, suffix) { return "cleantrack.setup." + suffix + "." + String(user && (user.id || user.email) || "unknown").toLowerCase(); }
   function setupSteps(role) {
     const steps = {
-      admin: [
-        ["Your workspace","The workspace is your starting point. Use the left navigation to move between the main areas of CleanTrack.","home","workspace"],
-        ["Organisation settings","Organisation details define the business context used across the app. Check these before building your workspace.","org-settings","organisation"],
-        ["Locations and maps","Locations represent real sites. Open a location to review its map or floor plan; keep real site data accurate.","locations","location"],
-        ["Zones","Zones are work areas within a location. Link zones to the correct location rather than creating disconnected duplicates.","zones","zone"],
-        ["Staff and invitations","Invite people and assign the appropriate role. Roles determine which pages and actions each person can access.","staff","staff"],
-        ["Operations","Operations describe the work to be done. Review instructions, assignments and due dates before saving real work.","operations","operation"],
-        ["Logs and reviews","Logs show what actually happened. Review evidence and status before approving or rejecting submitted work.","reviews","review"],
-        ["Analytics and exports","Use filters and chart types to explore work trends. Export the current visual when you need to share the same view.","analytics","analytics"]
-      ],
-      supervisor: [
-        ["Your workspace","Use your workspace to see the work and team context available to your role.","workspace","workspace"],
-        ["Personnel","Review the team members you are permitted to manage and their assigned responsibilities.","personnel","personnel"],
-        ["Sites and zones","Understand which locations and zones your team covers before coordinating work.","sites","site"],
-        ["Operations","Open assigned operations to understand instructions, timing and progress.","operations","operation"],
-        ["Review queue","Check submitted work and its evidence before making review decisions.","reviews","review"],
-        ["Team channel","Use team updates to keep coordination and work context visible.","team-channel","team"]
-      ],
-      employee: [
-        ["Your desk","Your desk is the starting point for your personal CleanTrack workspace and relevant updates.","my-desk","workspace"],
-        ["My work","Open assigned tasks to read instructions, due times and the expected result before starting.","my-tasks","task"],
-        ["Work history","Use history to understand previous submissions, completion records and feedback.","my-history","history"],
-        ["Announcements","Read workplace updates so you do not miss important instructions or changes.","announcements","announcement"],
-        ["Team channel","Use the team channel for work-related coordination available to your role.","team-channel","team"],
-        ["Profile and preferences","Keep your profile and notification preferences up to date.","settings","profile"]
-      ]
+      admin: [["Organisation","Confirm your organisation details.","settings"],["Locations & maps","Add real work locations and floor plans.","locations"],["Zones","Create or import zones linked to locations.","zones"],["Teams & employees","Invite staff and assign roles.","members"],["Operations & schedules","Create operations and schedule work.","operations"],["Reviews & reports","Review completed work and Analytics.","analytics"]],
+      supervisor: [["Assigned locations","Review the locations and zones assigned to you.","locations"],["Your team","Check team members and responsibilities.","members"],["Operations","Review assigned work and schedules.","operations"],["Reviews & logs","Review submissions and track work.","reviews"]],
+      employee: [["Your profile","Check your profile and notification preferences.","settings"],["Your schedule","Review assigned work and due times.","schedule"],["Complete work","Follow operation instructions and record progress.","operations"],["Submit evidence","Add required photos and submit completed work.","operations"],["Notifications","Check announcements and feedback.","home"]]
     };
     return steps[String(role || "").toLowerCase()] || steps.employee;
   }
@@ -246,15 +223,12 @@
       const menu=document.getElementById("workspace-navigation");
       const item=menu&&Array.from(menu.querySelectorAll("[data-page]")).find(function(el){return el.getAttribute("data-page")===target});
       const heading=document.getElementById("page-title");
-      const keyword=String(step[3]||"");
-      const candidates=Array.from(document.querySelectorAll("button,a,[role=button],label,h1,h2,h3,[data-tour]")).filter(function(el){return !el.closest(".ct-tour-coach,.ct-setup-overlay")&&el.offsetParent!==null});
-      const feature=candidates.find(function(el){const text=String(el.innerText||el.getAttribute("aria-label")||el.title||"").toLowerCase();return keyword&&text.includes(keyword)});
-      const focus=feature||item||heading;
+      const focus=item||heading;
       clearFocus();
       if(focus){focus.classList.add("ct-tour-focus");focus.scrollIntoView({behavior:"smooth",block:"center"});}
       const coach=document.createElement("aside");coach.className="ct-tour-coach";coach.setAttribute("role","status");
       const h=document.createElement("h3");h.textContent="Explore: "+step[0];
-      const p=document.createElement("p");p.textContent=focus ? (feature ? "Look at the highlighted control or section. " : item ? "This highlighted item opens the relevant page. ") + step[1] + " This area helps you understand how CleanTrack connects people, places and completed work. Explore without saving changes unless you intend to." : "We couldn't locate a matching control in this layout. "+step[1];
+      const p=document.createElement("p");p.textContent=focus ? "This is the real CleanTrack page for this step. "+step[1]+" Look at the highlighted navigation item or page heading, then explore the available controls. Avoid saving real changes unless you intend to." : "We couldn't locate the navigation control for this step in the current layout. "+step[1];
       const buttons=document.createElement("div");
       const back=document.createElement("button");back.textContent="Back to guide";back.addEventListener("click",function(){coach.remove();clearFocus();showSetupGuide(user,index)});
       const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",function(){coach.remove();finish()});
@@ -274,7 +248,7 @@
       actions.replaceChildren();
       const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",finish);
       const back=document.createElement("button");back.textContent="Back";back.disabled=index===0;back.addEventListener("click",function(){if(index>0){index--;draw()}});
-      const show=document.createElement("button");show.textContent="Show me";show.addEventListener("click",function(){const target=step[2];if(!target){showCoach(step);return;}const moved=navigation.setActivePage(target);if(!moved){p.textContent="This page isn't available to your current role. Continue to the next lesson or skip the tutorial.";return;}window.setTimeout(function(){showCoach(step)},300)});
+      const show=document.createElement("button");show.textContent="Show me this page";show.addEventListener("click",function(){const target=step[2];if(!target){showCoach(step);return;}const moved=navigation.setActivePage(target);if(!moved){p.textContent="This page isn't available to your current role. Continue to the next lesson or skip the tutorial.";return;}window.setTimeout(function(){showCoach(step)},300)});
       const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish tutorial":"Next lesson";next.addEventListener("click",function(){if(index<steps.length-1){index++;draw()}else finish()});
       actions.append(skip,back,show,next);
     }
