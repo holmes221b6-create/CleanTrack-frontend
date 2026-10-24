@@ -1318,6 +1318,10 @@
   }
 
 function bindNavigation() {
+  // App startup can run again after authentication transitions. Bind navigation
+  // handlers only once so a single Settings click cannot trigger duplicate renders.
+  if (window.__cleanTrackNavigationBound) return;
+  window.__cleanTrackNavigationBound = true;
   window.addEventListener("cleantrack:navigate", function (event) {
     if (event.detail && event.detail.page) {
       renderPage(event.detail.page);
