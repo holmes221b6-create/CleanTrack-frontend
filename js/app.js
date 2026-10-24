@@ -364,6 +364,20 @@
 .ct-shadow-eyes:before,.ct-shadow-eyes:after{height:26px!important;background:radial-gradient(ellipse at 50% 50%,#ff001b 0 8%,#ff1736 10% 17%,#4b000c 20% 30%,#f8f4ff 34% 72%,#8e8795 100%)!important;clip-path:polygon(0 48%,14% 28%,34% 17%,57% 0,79% 12%,100% 44%,82% 58%,65% 84%,44% 100%,20% 74%)!important;filter:drop-shadow(0 0 5px #ff001f) drop-shadow(0 0 15px #c00026)!important}
 .ct-shadow-hood i{top:53%!important;width:9px!important;height:5px!important;background:#ff001f!important;box-shadow:0 0 8px #ff001f,0 0 18px #b80026!important}
 @media(max-width:700px){.ct-shadow-eyes{top:clamp(80px,12.8vh,104px)!important}}
+
+/* Reference match: tall near-featureless shadow, small crimson eyes, cold violet-blue rim light. */
+.ct-tour-avatar{background:radial-gradient(ellipse at 48% 54%,#0b123b88 0%,#080a2040 36%,transparent 72%)!important}
+.ct-shadow-character{width:min(34vw,460px)!important;height:min(82vh,760px)!important;filter:drop-shadow(-7px 0 10px #4b4cba66) drop-shadow(8px 0 18px #141c6655) drop-shadow(0 28px 45px #000)!important}
+.ct-shadow-cloak{inset:104px 0 0!important;background:linear-gradient(90deg,#080910 0%,#030308 19%,#010104 52%,#020309 77%,#090b1c 100%)!important;clip-path:polygon(48% 0,55% 3%,61% 1%,66% 8%,72% 11%,79% 19%,85% 30%,90% 43%,96% 61%,100% 100%,0 100%,4% 68%,7% 47%,10% 31%,17% 20%,26% 12%,36% 7%,42% 3%)!important;border:0!important;box-shadow:inset 0 25px 40px #000!important}
+.ct-shadow-cloak:before{background:linear-gradient(90deg,#3e3c8122,transparent 18%,transparent 76%,#3b429044),linear-gradient(180deg,#000 0%,#010105 75%,#02030a 100%)!important;opacity:1!important}
+.ct-shadow-cloak:after{background:linear-gradient(90deg,transparent,#070812 50%,transparent)!important;opacity:.8!important}
+.ct-shadow-hood{top:0!important;width:clamp(155px,18vw,240px)!important;height:clamp(195px,29vh,285px)!important;border-radius:49% 49% 24% 24%!important;background:linear-gradient(100deg,#151528 0%,#05050c 22%,#010104 54%,#060611 80%,#17172d 100%)!important;clip-path:polygon(48% 0,54% 4%,58% 0,63% 7%,68% 8%,74% 17%,83% 27%,89% 43%,100% 70%,88% 100%,12% 100%,0 70%,10% 43%,17% 27%,26% 17%,32% 8%,39% 7%,43% 2%)!important;box-shadow:0 0 0 1px #37345f,0 0 22px #343b8a55!important}
+.ct-shadow-hood:before{inset:8% 8% 0!important;background:radial-gradient(ellipse at 48% 36%,#000 0%,#010105 70%,#080918 100%)!important;clip-path:polygon(48% 0,62% 7%,79% 24%,90% 55%,100% 100%,0 100%,10% 55%,21% 24%,38% 7%)!important}
+.ct-shadow-hood:after{content:""!important;position:absolute!important;left:0!important;right:0!important;top:0!important;height:23%!important;background:linear-gradient(180deg,#000 0%,#010105 75%,transparent)!important;clip-path:polygon(0 0,100% 0,100% 100%,82% 45%,69% 34%,59% 20%,51% 33%,43% 20%,31% 34%,18% 45%,0 100%)!important;opacity:1!important}
+.ct-shadow-eyes{top:clamp(108px,16vh,145px)!important;width:clamp(102px,11vw,140px)!important;height:20px!important;filter:drop-shadow(0 0 14px #e42a75aa)!important}
+.ct-shadow-eyes:before,.ct-shadow-eyes:after{top:4px!important;width:clamp(36px,3.8vw,49px)!important;height:12px!important;background:radial-gradient(ellipse at 50% 50%,#ffedf8 0 8%,#ff648f 12%,#d41450 30%,#4d082a 53%,#f3ddeb 68%,#b7a9ce 100%)!important;clip-path:polygon(0 55%,17% 26%,42% 8%,62% 12%,100% 42%,78% 65%,54% 88%,31% 100%,12% 80%)!important;filter:drop-shadow(0 0 4px #ff386e) drop-shadow(0 0 12px #d30b52)!important}
+.ct-shadow-hood i{top:53%!important;width:5px!important;height:3px!important;background:#ff7b9c!important;box-shadow:0 0 8px #ff3b78,0 0 17px #d30b52!important}
+@media(max-width:700px){.ct-shadow-character{width:min(58vw,340px)!important;height:min(76vh,620px)!important}.ct-shadow-hood{width:clamp(135px,40vw,185px)!important;height:clamp(165px,25vh,220px)!important}.ct-shadow-eyes{top:clamp(95px,14vh,120px)!important;width:clamp(92px,31vw,120px)!important}}
 `;
     const card = document.createElement("section");
     card.className = "ct-setup-card";
