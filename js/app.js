@@ -237,9 +237,9 @@
     const box = document.createElement("div"); box.className = "ct-setup-step";
     const meta = document.createElement("p"); meta.className = "ct-setup-meta";
     const actions = document.createElement("div"); actions.className = "ct-setup-actions";
-    card.append(mark,title,intro,languageWrap,progress,box,meta,actions); overlay.append(style,card); document.body.appendChild(overlay);
+    card.append(mark,title,intro,languageWrap,progress,box,meta,actions); document.head.appendChild(style); overlay.appendChild(card); document.body.appendChild(overlay);
     function clearFocus(){document.querySelectorAll(".ct-tour-focus").forEach(function(el){el.classList.remove("ct-tour-focus")});}
-    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}clearFocus();const coach=document.querySelector(".ct-tour-coach");if(coach)coach.remove();overlay.remove();}
+    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}clearFocus();const coach=document.querySelector(".ct-tour-coach");if(coach)coach.remove();overlay.remove();if(style.isConnected)style.remove();}
     function showCoach(step){
       overlay.remove();
       const target=step[2];
