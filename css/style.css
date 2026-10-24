@@ -792,7 +792,7 @@ tbody tr:hover {
 
 .app-footer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
   padding: 20px clamp(18px, 3vw, 42px);
@@ -803,15 +803,17 @@ tbody tr:hover {
 }
 
 .app-footer-help {
-  grid-column: 2;
+  grid-column: 1 / 4;
   grid-row: 1;
+  justify-self: center;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  width: auto;
-  margin: 0;
+  width: max-content;
+  max-width: calc(100% - 150px);
+  margin: 0 auto;
   text-align: center;
 }
 
