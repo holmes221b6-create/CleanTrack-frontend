@@ -792,8 +792,8 @@ tbody tr:hover {
 
 .app-footer {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
+  flex-wrap: nowrap;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -824,12 +824,13 @@ tbody tr:hover {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  align-self: flex-end;
+  align-self: auto;
   gap: 8px;
   width: auto;
-  margin-left: 0;
+  margin-left: auto;
   margin-right: 0;
   text-align: right;
+  white-space: nowrap;
 }
 
 .app-footer-legal a {
