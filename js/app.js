@@ -236,7 +236,7 @@
         master.gain.setValueAtTime(0.0001, now);
         master.gain.exponentialRampToValueAtTime(0.42, now + 0.12);
         master.gain.setValueAtTime(0.31, now + 0.42);
-        master.gain.exponentialRampToValueAtTime(0.0001, now + 2.35);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 3.05);
 
         const compressor = context.createDynamicsCompressor();
         compressor.threshold.setValueAtTime(-20, now);
@@ -252,14 +252,14 @@
         const lowGain = context.createGain();
         low.type = "triangle";
         low.frequency.setValueAtTime(118, now);
-        low.frequency.exponentialRampToValueAtTime(49, now + 1.8);
+        low.frequency.exponentialRampToValueAtTime(43, now + 2.35);
         lowGain.gain.setValueAtTime(0.0001, now);
         lowGain.gain.exponentialRampToValueAtTime(0.55, now + 0.16);
-        lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.1);
+        lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.7);
         low.connect(lowGain);
         lowGain.connect(master);
         low.start(now);
-        low.stop(now + 2.15);
+        low.stop(now + 2.75);
 
         // Detuned, ambiguous vocal-like resonances rather than a plain buzzy tone.
         [172, 176.5, 258].forEach(function (frequency, i) {
@@ -268,22 +268,22 @@
           const formant = context.createBiquadFilter();
           osc.type = i === 2 ? "sawtooth" : "sine";
           osc.frequency.setValueAtTime(frequency, now + 0.04);
-          osc.frequency.exponentialRampToValueAtTime(frequency * (i === 1 ? 0.72 : 0.78), now + 1.55);
+          osc.frequency.exponentialRampToValueAtTime(frequency * (i === 1 ? 0.68 : 0.74), now + 2.0);
           formant.type = "bandpass";
           formant.frequency.setValueAtTime(i === 2 ? 680 : 390 + i * 125, now);
           formant.Q.setValueAtTime(i === 2 ? 3.8 : 2.2, now);
           gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.exponentialRampToValueAtTime(i === 2 ? 0.12 : 0.19, now + 0.18 + i * 0.04);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.75);
+          gain.gain.exponentialRampToValueAtTime(i === 2 ? 0.15 : 0.22, now + 0.18 + i * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.35);
           osc.connect(formant);
           formant.connect(gain);
           gain.connect(master);
           osc.start(now + i * 0.025);
-          osc.stop(now + 1.82);
+          osc.stop(now + 2.42);
         });
 
         // Breath/whisper texture, shaped into a short rising-and-falling spectral swell.
-        const noiseLength = Math.ceil(context.sampleRate * 1.9);
+        const noiseLength = Math.ceil(context.sampleRate * 2.55);
         const noiseBuffer = context.createBuffer(1, noiseLength, context.sampleRate);
         const noiseData = noiseBuffer.getChannelData(0);
         for (let i = 0; i < noiseLength; i++) {
@@ -298,11 +298,11 @@
         noise.buffer = noiseBuffer;
         breathFilter.type = "bandpass";
         breathFilter.frequency.setValueAtTime(1250, now + 0.08);
-        breathFilter.frequency.exponentialRampToValueAtTime(620, now + 1.25);
+        breathFilter.frequency.exponentialRampToValueAtTime(520, now + 1.75);
         breathFilter.Q.setValueAtTime(0.85, now);
         breathGain.gain.setValueAtTime(0.0001, now);
-        breathGain.gain.exponentialRampToValueAtTime(0.17, now + 0.32);
-        breathGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        breathGain.gain.exponentialRampToValueAtTime(0.21, now + 0.38);
+        breathGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
         noise.connect(breathFilter);
         breathFilter.connect(breathGain);
         if (breathPan) {
@@ -314,10 +314,10 @@
           breathGain.connect(master);
         }
         noise.start(now + 0.06);
-        noise.stop(now + 1.92);
+        noise.stop(now + 2.58);
 
         // Short synthetic reverb tail.
-        const reverbLength = Math.floor(context.sampleRate * 1.15);
+        const reverbLength = Math.floor(context.sampleRate * 1.55);
         const impulse = context.createBuffer(2, reverbLength, context.sampleRate);
         for (let channel = 0; channel < 2; channel++) {
           const samples = impulse.getChannelData(channel);
@@ -328,14 +328,14 @@
         const convolver = context.createConvolver();
         const wet = context.createGain();
         convolver.buffer = impulse;
-        wet.gain.setValueAtTime(0.22, now);
+        wet.gain.setValueAtTime(0.29, now);
         master.connect(convolver);
         convolver.connect(wet);
         wet.connect(compressor);
 
         window.setTimeout(function () {
           if (context && context.state !== "closed") context.close().catch(function () {});
-        }, 2900);
+        }, 3650);
       };
       if (context.state === "suspended") {
         context.resume().then(play).catch(function () { context.close().catch(function () {}); });
