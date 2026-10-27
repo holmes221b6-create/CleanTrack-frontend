@@ -252,8 +252,8 @@
     avatar.setAttribute("aria-label", "Shadow, the CleanTrack guide");
     avatar.setAttribute("role", "img");
     const shadowImage = document.createElement("img");
-    shadowImage.className = "ct-shadow-character";
-    shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-clean.webp?v=1";
+    shadowImage.className = "ct-shadow-reference-image";
+    shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1";
     shadowImage.alt = "Shadow";
     shadowImage.draggable = false;
     avatar.appendChild(shadowImage);
@@ -514,7 +514,7 @@
 `;
     const card = document.createElement("section");
     card.className = "ct-setup-card";
-    const mark = document.createElement("div"); mark.className = "ct-setup-mark ct-shadow-mark"; mark.setAttribute("aria-label","Shadow, your CleanTrack guide"); const setupShadowImage = document.createElement("img"); setupShadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-clean.webp?v=1"; setupShadowImage.alt = "Shadow"; setupShadowImage.draggable = false; setupShadowImage.className = "ct-shadow-reference-image"; mark.appendChild(setupShadowImage);
+    const mark = document.createElement("div"); mark.className = "ct-setup-mark ct-shadow-mark"; mark.setAttribute("aria-label","Shadow, your CleanTrack guide"); const setupShadowImage = document.createElement("img"); setupShadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1"; setupShadowImage.alt = "Shadow"; setupShadowImage.draggable = false; setupShadowImage.className = "ct-shadow-reference-image"; mark.appendChild(setupShadowImage);
     const title = document.createElement("h2"); title.id = "ct-setup-title"; title.textContent = "Learn CleanTrack by doing";
     const intro = document.createElement("p"); intro.className = "ct-setup-intro"; intro.textContent = "I’m Shadow, your CleanTrack guide. I’ll lead you through your workspace, reveal what each important control does, and guide you as you try things yourself. You’re in control — skip or replay any lesson.";
     const languageWrap = document.createElement("div"); languageWrap.className = "ct-setup-language";
@@ -568,7 +568,7 @@
       coach.className = "ct-tour-coach";
       coach.setAttribute("role","dialog");
       coach.setAttribute("aria-live","polite");
-      const avatar = document.createElement("div"); avatar.className = "ct-tour-avatar"; avatar.setAttribute("aria-label","Shadow, the CleanTrack guide"); avatar.setAttribute("role","img"); const shadowImage = document.createElement("img"); shadowImage.className = "ct-shadow-reference-image"; shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-clean.webp?v=1"; shadowImage.alt = "Shadow"; shadowImage.draggable = false; avatar.appendChild(shadowImage);
+      const avatar = document.createElement("div"); avatar.className = "ct-tour-avatar"; avatar.setAttribute("aria-label","Shadow, the CleanTrack guide"); avatar.setAttribute("role","img"); const shadowImage = document.createElement("img"); shadowImage.className = "ct-shadow-reference-image"; shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1"; shadowImage.alt = "Shadow"; shadowImage.draggable = false; avatar.appendChild(shadowImage);
       const speech = document.createElement("div"); speech.className = "ct-tour-speech";
       const kicker = document.createElement("p"); kicker.className = "ct-tour-kicker"; kicker.textContent = "YOUR CLEANTRACK GUIDE · SHADOW";
       const h = document.createElement("h3"); h.textContent = (index===0 ? "Shadow here." : index===steps.length-1 ? "Final mission: " : "Next stop: ") + step[0];
