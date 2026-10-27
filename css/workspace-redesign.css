@@ -780,3 +780,62 @@ html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(
     padding: 16px !important;
   }
 }
+
+
+/* Final Reports alignment: match the app's standard home/analytics dark-navy surfaces. */
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports),
+html:not([data-theme="light"]):not([data-theme="black"]) body #workspace-view #page-content:has(.ct-reports) {
+  background: #050b16 !important;
+  background-color: #050b16 !important;
+  color: #e7effb !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-hero {
+  background: linear-gradient(135deg, #102746, #09172b) !important;
+  background-color: #09172b !important;
+  border-color: #244368 !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-panel,
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-table-wrap,
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-kpi {
+  background: #0b192e !important;
+  background-color: #0b192e !important;
+  border-color: #1b3150 !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-steps {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-step {
+  background: #091528 !important;
+  background-color: #091528 !important;
+  border-color: #1b3150 !important;
+  color: #9fb2cc !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-step.is-current {
+  background: #102746 !important;
+  border-color: #2a547f !important;
+  color: #f0f6ff !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-kpi {
+  background: #0a172b !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-input {
+  background: #071326 !important;
+  color: #edf4ff !important;
+  border-color: #233c5d !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-btn {
+  background: #101f35 !important;
+  color: #dce9fa !important;
+  border-color: #294363 !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-btn.primary {
+  background: #163d68 !important;
+  border-color: #2c5c8e !important;
+  color: #f5f9ff !important;
+}
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(.ct-reports) .ct-reports-table th {
+  background: #102440 !important;
+  color: #cbdcf2 !important;
+  border-color: #203956 !important;
+}
