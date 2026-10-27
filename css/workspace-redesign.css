@@ -490,3 +490,143 @@ html:not([data-theme="light"]) #page-content :is(table, .table-wrap, .table-cont
     padding: 17px 13px 28px !important;
   }
 }
+
+
+/* Expandable, grouped navigation matching the supplied project-board reference.
+   Existing role-specific destinations and their click handlers remain unchanged. */
+#workspace-view .ct-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+#workspace-view #workspace-navigation {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 13px !important;
+  min-width: 0 !important;
+  padding: 0 2px 16px !important;
+}
+#workspace-view .ct-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+#workspace-view .ct-nav-group-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 30px !important;
+  padding: 5px 9px !important;
+  border: 1px solid transparent !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #8ea4c2 !important;
+  text-align: left !important;
+  font: inherit !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+#workspace-view .ct-nav-group-toggle:hover {
+  color: #e8f1ff !important;
+  background: #0e1e34 !important;
+}
+#workspace-view .ct-nav-group-chevron {
+  display: inline-block;
+  color: #7e94b2;
+  font-size: 15px;
+  line-height: 1;
+  transition: transform .16s ease;
+}
+#workspace-view .ct-nav-group-toggle[aria-expanded="false"] .ct-nav-group-chevron {
+  transform: rotate(-90deg);
+}
+#workspace-view .ct-nav-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  margin-left: 7px;
+  padding-left: 8px;
+  border-left: 1px solid #203653;
+}
+#workspace-view .ct-nav-group-items[hidden] {
+  display: none !important;
+}
+#workspace-view #workspace-navigation .ct-nav-group-items > .nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 36px !important;
+  padding: 7px 9px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #a7b8d1 !important;
+  text-align: left !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+#workspace-view #workspace-navigation .ct-nav-group-items > .nav-item:hover {
+  background: #10213a !important;
+  border-color: #1b3555 !important;
+  color: #eef5ff !important;
+}
+#workspace-view #workspace-navigation .ct-nav-group-items > .nav-item.active,
+#workspace-view #workspace-navigation .ct-nav-group-items > .nav-item[aria-current="page"],
+#workspace-view #workspace-navigation .ct-nav-group-items > .nav-item.ct-nav-active {
+  color: #f4f8ff !important;
+  background: linear-gradient(100deg, #173354, #10233c) !important;
+  border-color: #294c74 !important;
+  box-shadow: inset 3px 0 #5b88c0 !important;
+}
+#workspace-view .ct-nav-group-items .nav-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  min-width: 19px;
+  color: #8fa9cc;
+  font-size: 15px;
+}
+#workspace-view .ct-nav-group-items .nav-item-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-toggle {
+  justify-content: center !important;
+  padding-inline: 0 !important;
+}
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-label,
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-chevron {
+  display: none !important;
+}
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-items {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: 0;
+}
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-items > .nav-item {
+  justify-content: center !important;
+  padding-inline: 5px !important;
+}
+#workspace-view .ct-sidebar-collapsed .ct-nav-group-items .nav-item-label {
+  display: none !important;
+}
+@media (max-width: 760px) {
+  #workspace-view .ct-sidebar .ct-nav-group-toggle { min-height: 34px !important; }
+  #workspace-view .ct-sidebar #workspace-navigation { gap: 10px !important; }
+}
