@@ -1588,7 +1588,7 @@ display: none !important;
 #notifications-button .notification-count[hidden] { display: none !important; }
 
 
-/* CleanTrack crimson brand mark: keep the surrounding product UI restrained. */
+/* CleanTrack muted violet eye mark, tuned for the charcoal theme. */
 .brand-mark {
   width: 42px;
   height: 42px;
@@ -1596,7 +1596,7 @@ display: none !important;
   border: 0;
   border-radius: 10px;
   background: #050607;
-  box-shadow: 0 0 0 1px rgb(255 36 45 / 18%);
+  box-shadow: 0 0 0 1px rgb(134 96 201 / 18%);
 }
 .brand-mark .ct-logo-symbol {
   display: block;
