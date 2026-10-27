@@ -1,0 +1,328 @@
+/*
+ * CleanTrack Workspace Layout Refresh
+ * Presentation-only redesign inspired by a modern project workspace.
+ * Keeps existing pages, controls, IDs, data bindings and behaviours intact.
+ * Intentionally preserves the current deep-navy/blue palette.
+ */
+:root {
+  --ct-layout-bg: #050b16;
+  --ct-layout-sidebar: #071225;
+  --ct-layout-panel: #0a162a;
+  --ct-layout-panel-2: #0d1b31;
+  --ct-layout-border: #1b3150;
+  --ct-layout-border-soft: rgba(76, 112, 158, .19);
+  --ct-layout-text: #e7effb;
+  --ct-layout-muted: #8fa5c5;
+  --ct-layout-blue: #315d8b;
+  --ct-layout-radius: 13px;
+}
+html:not([data-theme="light"]) body {
+  background: var(--ct-layout-bg) !important;
+}
+#workspace-view {
+  min-height: 100vh;
+  background: var(--ct-layout-bg) !important;
+}
+#workspace-view .ct-workspace-shell {
+  grid-template-columns: 226px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  min-height: 100vh;
+  background: var(--ct-layout-bg) !important;
+}
+#workspace-view .ct-sidebar {
+  width: 226px !important;
+  height: 100vh;
+  padding: 18px 12px 14px !important;
+  background: linear-gradient(180deg, #081428 0%, #060f1e 100%) !important;
+  border-right: 1px solid #1a2b45 !important;
+  box-shadow: 10px 0 34px rgba(0,0,0,.12) !important;
+}
+#workspace-view .ct-sidebar-brand {
+  min-height: 48px;
+  padding: 4px 8px 17px !important;
+  margin-bottom: 17px !important;
+  border-bottom: 1px solid var(--ct-layout-border-soft) !important;
+}
+#workspace-view .ct-sidebar-brand-mark {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(20,70,130,.16);
+}
+#workspace-view #workspace-navigation {
+  gap: 5px !important;
+}
+#workspace-view #workspace-navigation button,
+#workspace-view #workspace-navigation a {
+  min-height: 39px;
+  padding: 9px 11px !important;
+  border-radius: 9px !important;
+  border: 1px solid transparent !important;
+  font-size: 12.5px;
+  font-weight: 550;
+  letter-spacing: .005em;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+#workspace-view #workspace-navigation button:hover,
+#workspace-view #workspace-navigation a:hover {
+  background: #10213a !important;
+  border-color: #1c3555 !important;
+  transform: translateX(1px);
+}
+#workspace-view #workspace-navigation .active,
+#workspace-view #workspace-navigation [aria-current="page"],
+#workspace-view #workspace-navigation .ct-nav-active {
+  background: linear-gradient(100deg, #142d4c 0%, #0c1b30 100%) !important;
+  border-color: #294b72 !important;
+  box-shadow: inset 3px 0 #4c79ad, 0 4px 12px rgba(0,0,0,.12) !important;
+}
+#workspace-view .ct-workspace-main {
+  min-width: 0;
+  background: var(--ct-layout-bg) !important;
+}
+#workspace-view .ct-workspace-toolbar {
+  min-height: 60px !important;
+  padding: 9px clamp(16px, 2.1vw, 30px) !important;
+  background: rgba(5, 12, 25, .94) !important;
+  border-bottom: 1px solid #172b46 !important;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12) !important;
+}
+#workspace-view #page-content,
+#workspace-view .page-content,
+#page-content {
+  width: 100%;
+  max-width: none !important;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: clamp(18px, 2.1vw, 30px) clamp(16px, 2.2vw, 34px) 38px !important;
+  background: transparent !important;
+}
+#page-content > h1,
+#page-content > h2,
+#page-content > header h1,
+#page-content > header h2 {
+  margin-top: 0 !important;
+  margin-bottom: 7px !important;
+  font-size: clamp(22px, 1.9vw, 29px) !important;
+  line-height: 1.25;
+  font-weight: 750 !important;
+  letter-spacing: -.035em !important;
+}
+#page-content > p:first-of-type {
+  margin-top: 0;
+}
+#page-content h2,
+#page-content h3,
+#page-content h4 {
+  letter-spacing: -.02em;
+}
+#page-content :is(.card, .panel, .stat-card, .metric-card, .dashboard-card,
+  .form-card, .content-card, .section-card, .report-card, .analytics-card,
+  .settings-card, .ct-card, .ct-panel, .ct-section, .table-wrap,
+  .table-container, .chart-container, .chart-card, .widget, .widget-card) {
+  border-radius: var(--ct-layout-radius) !important;
+  border-color: var(--ct-layout-border) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.13), inset 0 1px rgba(255,255,255,.012) !important;
+}
+#page-content :is(.card, .panel, .stat-card, .metric-card, .dashboard-card,
+  .form-card, .content-card, .section-card, .report-card, .analytics-card,
+  .settings-card, .ct-card, .ct-panel, .chart-card, .widget, .widget-card) {
+  padding: clamp(13px, 1.25vw, 19px);
+}
+#page-content :is(.card, .panel, .stat-card, .metric-card, .dashboard-card,
+  .form-card, .content-card, .section-card, .report-card, .analytics-card,
+  .settings-card, .ct-card, .ct-panel, .chart-card, .widget, .widget-card):hover {
+  border-color: #28466a !important;
+}
+#page-content :is(.stats-grid, .stat-grid, .metrics-grid, .dashboard-stats,
+  .dashboard-metrics, .summary-grid, .kpi-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+  gap: 12px !important;
+}
+#page-content :is(.stats-grid, .stat-grid, .metrics-grid, .dashboard-stats,
+  .dashboard-metrics, .summary-grid, .kpi-grid) > * {
+  min-width: 0;
+}
+#page-content :is(.dashboard-grid, .dashboard-layout, .analytics-grid,
+  .reports-grid, .overview-grid, .content-grid, .workspace-grid) {
+  gap: 14px !important;
+  align-items: start;
+}
+#page-content :is(.section-header, .panel-header, .card-header, .page-header,
+  .toolbar-row, .list-header) {
+  gap: 12px;
+}
+#page-content :is(.section-header, .panel-header, .card-header, .page-header) {
+  margin-bottom: 13px;
+}
+#page-content :is(.tabs, .tab-list, .view-tabs, [role="tablist"]) {
+  gap: 5px;
+  border-bottom-color: var(--ct-layout-border) !important;
+}
+#page-content :is(.tabs, .tab-list, .view-tabs) button,
+#page-content [role="tablist"] [role="tab"] {
+  border-radius: 8px 8px 0 0 !important;
+}
+#page-content button,
+#page-content .btn,
+#page-content .button,
+#page-content [role="button"] {
+  min-height: 34px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+#page-content :is(input, select, textarea) {
+  min-height: 37px;
+  border-radius: 8px !important;
+}
+#page-content textarea {
+  min-height: 90px;
+}
+#page-content :is(.table-wrap, .table-container, .table-responsive, .data-table-wrap) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--ct-layout-border);
+  border-radius: 11px;
+}
+#page-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 620px;
+}
+#page-content table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 12px 13px !important;
+}
+#page-content table tbody td {
+  padding: 11px 13px !important;
+  vertical-align: middle;
+}
+#page-content table tbody tr {
+  transition: background .14s ease;
+}
+#page-content :is(.filter-bar, .filters-row, .table-toolbar, .list-toolbar,
+  .search-filter-row, .toolbar-filters) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 13px;
+}
+#page-content :is(.filter-bar, .filters-row, .table-toolbar, .list-toolbar,
+  .search-filter-row, .toolbar-filters) > * {
+  min-width: 0;
+}
+#page-content :is(.empty-state, .no-results, .empty-placeholder) {
+  border: 1px dashed #294363;
+  border-radius: 12px;
+  padding: 26px;
+  background: rgba(10, 22, 42, .55);
+}
+#page-content :is(.badge, .status-badge, .priority-badge, .pill, .chip) {
+  border-radius: 999px !important;
+  font-weight: 650;
+  letter-spacing: .01em;
+}
+#page-content :is(.modal, .modal-content, .dialog, .popover, .dropdown-menu) {
+  border-radius: 14px !important;
+}
+#page-content :is(.form-grid, .settings-grid, .profile-grid, .field-grid) {
+  gap: 14px !important;
+}
+#page-content :is(.form-group, .form-field, .field, .setting-row) {
+  min-width: 0;
+}
+#page-content img,
+#page-content canvas,
+#page-content svg {
+  max-width: 100%;
+}
+#page-content :is(.map-container, #map, .leaflet-container, .location-map, .zone-map) {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1d3655;
+}
+#page-content :is(.board, .kanban-board, .kanban-columns, .task-board, .board-columns) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 12px;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+#page-content :is(.board, .kanban-board, .kanban-columns, .task-board, .board-columns) > * {
+  min-width: 0;
+  border-radius: 12px;
+}
+#page-content :is(.board-column, .kanban-column, .task-column, .project-column) {
+  background: #081426;
+  border: 1px solid #1a2e49;
+  padding: 11px;
+}
+#page-content :is(.task-card, .project-card, .kanban-card, .board-item) {
+  border: 1px solid #1b3150;
+  border-radius: 10px;
+  background: #0c1a2f;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+#page-content :is(.task-card, .project-card, .kanban-card, .board-item):hover {
+  border-color: #31557f;
+}
+#page-content :is(.pagination, .table-pagination) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 13px;
+}
+#page-content :is(.pagination, .table-pagination) button {
+  min-width: 34px;
+}
+#page-content :focus-visible,
+#workspace-view :focus-visible {
+  outline-offset: 3px;
+}
+@media (min-width: 1500px) {
+  #page-content { padding-inline: 38px !important; }
+}
+@media (max-width: 1000px) {
+  #workspace-view .ct-workspace-shell { grid-template-columns: 206px minmax(0,1fr) !important; }
+  #workspace-view .ct-sidebar { width: 206px !important; }
+  #page-content :is(.dashboard-grid, .dashboard-layout, .analytics-grid, .reports-grid, .overview-grid) {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+}
+@media (max-width: 760px) {
+  #workspace-view .ct-workspace-shell { grid-template-columns: 0 minmax(0,1fr) !important; }
+  #workspace-view .ct-sidebar { width: 248px !important; }
+  #workspace-view .ct-workspace-toolbar { padding-inline: 13px !important; }
+  #page-content, #workspace-view #page-content {
+    padding: 17px 13px 28px !important;
+  }
+  #page-content :is(.stats-grid, .stat-grid, .metrics-grid, .dashboard-stats, .dashboard-metrics, .summary-grid, .kpi-grid) {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 9px !important;
+  }
+  #page-content :is(.board, .kanban-board, .kanban-columns, .task-board, .board-columns) {
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+  }
+  #page-content :is(.filter-bar, .filters-row, .table-toolbar, .list-toolbar, .search-filter-row, .toolbar-filters) > * {
+    flex: 1 1 135px;
+  }
+}
+@media (max-width: 420px) {
+  #page-content :is(.stats-grid, .stat-grid, .metrics-grid, .dashboard-stats, .dashboard-metrics, .summary-grid, .kpi-grid) {
+    grid-template-columns: minmax(0,1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #workspace-view *, #page-content * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
