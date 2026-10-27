@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 475 1080" role="img" aria-labelledby="title desc">
+<title id="title">Shadow, Imu-inspired CleanTrack guide character</title>
+<desc id="desc">A tall, faceless black-robed figure with three sharp crown-like spikes and two glowing red eyes, isolated on a transparent background.</desc>
+<defs>
+ <linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111015"/><stop offset=".48" stop-color="#020203"/><stop offset="1" stop-color="#08070b"/></linearGradient>
+ <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#5b3548"/><stop offset=".5" stop-color="#21141d"/><stop offset="1" stop-color="#5a2639"/></linearGradient>
+ <radialGradient id="eyeGlow"><stop stop-color="#fff" offset="0"/><stop stop-color="#ff7b8b" offset=".25"/><stop stop-color="#ff102d" offset=".62"/><stop stop-color="#a00018" offset="1"/></radialGradient>
+ <filter id="glow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<path d="M28 1080 47 992 70 890 95 783 116 700 98 675 110 652 134 604 148 552 151 501 161 456 181 419 203 394 210 385 208 65 214 45 220 91 226 383 233 0 242 0 247 383 260 20 268 20 263 389 282 402 307 426 326 458 338 500 343 550 357 600 380 649 392 675 377 699 402 788 425 890 448 991 473 1080Z" fill="#020203" stroke="#09080b" stroke-width="10" stroke-linejoin="round"/>
+<path d="M28 1080 47 992 70 890 95 783 116 700 98 675 110 652 134 604 148 552 151 501 161 456 181 419 203 394 210 385 208 65 214 45 220 91 226 383 233 0 242 0 247 383 260 20 268 20 263 389 282 402 307 426 326 458 338 500 343 550 357 600 380 649 392 675 377 699 402 788 425 890 448 991 473 1080Z" fill="url(#cloak)" stroke="url(#edge)" stroke-width="5" stroke-linejoin="round"/>
+<path d="M212 390 214 46M238 382 237 4M261 389 265 22" stroke="#161218" stroke-width="5" opacity=".9"/>
+<path d="M179 476 Q196 448 220 441 M296 441 Q324 453 337 489" fill="none" stroke="#29131d" stroke-width="5"/>
+<g filter="url(#glow)">
+ <path d="M177 474 Q194 455 213 474 Q195 491 177 474Z" fill="#f5dce0"/>
+ <path d="M258 474 Q277 455 295 474 Q277 491 258 474Z" fill="#f5dce0"/>
+ <ellipse cx="195" cy="474" rx="8.2" ry="9.5" fill="url(#eyeGlow)"/><ellipse cx="276" cy="474" rx="8.2" ry="9.5" fill="url(#eyeGlow)"/>
+ <circle cx="195" cy="474" r="3.3" fill="#5c000b"/><circle cx="276" cy="474" r="3.3" fill="#5c000b"/>
+ <circle cx="193" cy="471" r="2.2" fill="#fff"/><circle cx="274" cy="471" r="2.2" fill="#fff"/>
+</g>
+</svg>
