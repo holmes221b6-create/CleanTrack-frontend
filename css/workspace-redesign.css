@@ -326,3 +326,167 @@ html:not([data-theme="light"]) body {
 @media (prefers-reduced-motion: reduce) {
   #workspace-view *, #page-content * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+/* v2: selectors aligned to CleanTrack's real generated workspace and page components.
+   These rules intentionally override earlier generic styling while retaining all functionality. */
+html[data-theme="default"] #workspace-view,
+html:not([data-theme="light"]) #workspace-view {
+  background: #050b16 !important;
+}
+html[data-theme="default"] #workspace-view .ct-workspace-shell,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-shell {
+  display: grid !important;
+  grid-template-columns: 232px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  min-height: 100vh !important;
+  background: #050b16 !important;
+}
+html[data-theme="default"] #workspace-view .ct-workspace-shell > .ct-sidebar,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-shell > .ct-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  width: 232px !important;
+  min-width: 232px !important;
+  min-height: 100vh !important;
+  padding: 18px 12px 14px !important;
+  background: #081326 !important;
+  color: #e7effb !important;
+  border-right: 1px solid #203652 !important;
+  box-shadow: 8px 0 26px rgba(0,0,0,.17) !important;
+}
+html[data-theme="default"] #workspace-view .ct-sidebar-brand,
+html:not([data-theme="light"]) #workspace-view .ct-sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  min-height: 55px !important;
+  padding: 0 8px 16px !important;
+  margin: 0 0 15px !important;
+  border-bottom: 1px solid #1b304d !important;
+}
+html[data-theme="default"] #workspace-view .ct-sidebar-brand strong,
+html:not([data-theme="light"]) #workspace-view .ct-sidebar-brand strong {
+  color: #edf4ff !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+}
+html[data-theme="default"] #workspace-view .ct-sidebar-brand small,
+html:not([data-theme="light"]) #workspace-view .ct-sidebar-brand small,
+html[data-theme="default"] #workspace-view .ct-sidebar-label,
+html:not([data-theme="light"]) #workspace-view .ct-sidebar-label {
+  color: #8499b8 !important;
+}
+html[data-theme="default"] #workspace-view #workspace-navigation,
+html:not([data-theme="light"]) #workspace-view #workspace-navigation {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+}
+html[data-theme="default"] #workspace-view #workspace-navigation > *,
+html:not([data-theme="light"]) #workspace-view #workspace-navigation > * {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 39px !important;
+  padding: 9px 11px !important;
+  border-radius: 9px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: #9eb1cd !important;
+  text-align: left !important;
+  transition: background .16s ease, color .16s ease, border-color .16s ease !important;
+}
+html[data-theme="default"] #workspace-view #workspace-navigation > *:hover,
+html:not([data-theme="light"]) #workspace-view #workspace-navigation > *:hover {
+  background: #10213a !important;
+  border-color: #1c3555 !important;
+  color: #f0f6ff !important;
+}
+html[data-theme="default"] #workspace-view #workspace-navigation .ct-nav-active,
+html:not([data-theme="light"]) #workspace-view #workspace-navigation .ct-nav-active,
+html[data-theme="default"] #workspace-view #workspace-navigation [aria-current="page"],
+html:not([data-theme="light"]) #workspace-view #workspace-navigation [aria-current="page"] {
+  background: #142b48 !important;
+  color: #f3f7ff !important;
+  border-color: #2a4c73 !important;
+  box-shadow: inset 3px 0 #5684bd !important;
+}
+html[data-theme="default"] #workspace-view .ct-workspace-main,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-main {
+  width: 100% !important;
+  min-width: 0 !important;
+  background: #050b16 !important;
+  color: #e7effb !important;
+}
+html[data-theme="default"] #workspace-view .ct-workspace-toolbar,
+html:not([data-theme="light"]) #workspace-view .ct-workspace-toolbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  min-height: 62px !important;
+  padding: 10px clamp(16px, 2vw, 30px) !important;
+  background: rgba(6, 14, 28, .97) !important;
+  border-bottom: 1px solid #1c304c !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,.16) !important;
+  backdrop-filter: blur(16px) !important;
+}
+html[data-theme="default"] #workspace-view #page-content,
+html:not([data-theme="light"]) #workspace-view #page-content {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: 25px clamp(16px, 2.2vw, 34px) 40px !important;
+  margin: 0 !important;
+  background: #050b16 !important;
+  color: #e7effb !important;
+}
+html[data-theme="default"] #page-content > :is(.ct-ann-page, .ct-settings-page, .ct-org-settings-page, .ct-team-manager, .ct-staff-page, .ct-invitations-page, .ct-operations-page, .ct-analytics-page, .ct-locations-page, .ct-audit-page, .ct-admin-dashboard, .ct-profile-page, .ct-billing-page, .ct-reports-page),
+html:not([data-theme="light"]) #page-content > :is(.ct-ann-page, .ct-settings-page, .ct-org-settings-page, .ct-team-manager, .ct-staff-page, .ct-invitations-page, .ct-operations-page, .ct-analytics-page, .ct-locations-page, .ct-audit-page, .ct-admin-dashboard, .ct-profile-page, .ct-billing-page, .ct-reports-page) {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-inline: auto !important;
+}
+html[data-theme="default"] #page-content :is(.ct-dash-panel, .ct-dash-kpi, .ct-dash-quick-action, .ct-dash-activity-row, .ct-dash-location-row, .ct-ann-card, .ct-ann-compose-card, .ct-ann-metric, .ct-op-card, .ct-op-stat, .ct-audit-card, .ct-inv-card, .ct-staff-card, .ct-staff-kpi, .ct-staff-sidebar, .ct-team-notice, .ct-team-recent-panel, .ct-team-list-panel, .ct-team-create-form, .ct-team-detail, .ct-team-action-panel, .ct-settings-card, .ct-settings-nav, .ct-settings-scope-group, .ct-org-card, .ct-report-card, .ct-analytics-card),
+html:not([data-theme="light"]) #page-content :is(.ct-dash-panel, .ct-dash-kpi, .ct-dash-quick-action, .ct-dash-activity-row, .ct-dash-location-row, .ct-ann-card, .ct-ann-compose-card, .ct-ann-metric, .ct-op-card, .ct-op-stat, .ct-audit-card, .ct-inv-card, .ct-staff-card, .ct-staff-kpi, .ct-staff-sidebar, .ct-team-notice, .ct-team-recent-panel, .ct-team-list-panel, .ct-team-create-form, .ct-team-detail, .ct-team-action-panel, .ct-settings-card, .ct-settings-nav, .ct-settings-scope-group, .ct-org-card, .ct-report-card, .ct-analytics-card) {
+  border-radius: 12px !important;
+  border-color: #203653 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.16) !important;
+}
+html[data-theme="default"] #page-content :is(.ct-dash-panel, .ct-ann-card, .ct-ann-compose-card, .ct-op-card, .ct-audit-card, .ct-inv-card, .ct-staff-card, .ct-team-recent-panel, .ct-team-list-panel, .ct-team-create-form, .ct-team-detail, .ct-settings-card, .ct-org-card, .ct-report-card, .ct-analytics-card),
+html:not([data-theme="light"]) #page-content :is(.ct-dash-panel, .ct-ann-card, .ct-ann-compose-card, .ct-op-card, .ct-audit-card, .ct-inv-card, .ct-staff-card, .ct-team-recent-panel, .ct-team-list-panel, .ct-team-create-form, .ct-team-detail, .ct-settings-card, .ct-org-card, .ct-report-card, .ct-analytics-card) {
+  background-color: #0b172a !important;
+}
+html[data-theme="default"] #page-content :is(.ct-dash-kpi, .ct-dash-quick-action, .ct-dash-activity-row, .ct-dash-location-row, .ct-ann-metric, .ct-op-stat, .ct-staff-kpi),
+html:not([data-theme="light"]) #page-content :is(.ct-dash-kpi, .ct-dash-quick-action, .ct-dash-activity-row, .ct-dash-location-row, .ct-ann-metric, .ct-op-stat, .ct-staff-kpi) {
+  background-color: #0e1d33 !important;
+  border: 1px solid #203653 !important;
+}
+html[data-theme="default"] #page-content :is(h1, h2, h3, h4, .ct-page-title, .ct-section-title),
+html:not([data-theme="light"]) #page-content :is(h1, h2, h3, h4, .ct-page-title, .ct-section-title) {
+  letter-spacing: -.025em !important;
+}
+html[data-theme="default"] #page-content :is(input, select, textarea),
+html:not([data-theme="light"]) #page-content :is(input, select, textarea) {
+  border-radius: 8px !important;
+}
+html[data-theme="default"] #page-content :is(table, .table-wrap, .table-container, .table-responsive),
+html:not([data-theme="light"]) #page-content :is(table, .table-wrap, .table-container, .table-responsive) {
+  border-radius: 10px !important;
+}
+@media (max-width: 900px) {
+  html[data-theme="default"] #workspace-view .ct-workspace-shell,
+  html:not([data-theme="light"]) #workspace-view .ct-workspace-shell {
+    grid-template-columns: 0 minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 760px) {
+  html[data-theme="default"] #workspace-view #page-content,
+  html:not([data-theme="light"]) #workspace-view #page-content {
+    padding: 17px 13px 28px !important;
+  }
+}
