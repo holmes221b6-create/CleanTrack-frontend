@@ -8,8 +8,6 @@
       <stop offset="1" stop-color="#6d559b"/>
     </linearGradient>
   </defs>
-  <rect width="267" height="263" rx="0" fill="#08080b"/>
-  <circle cx="133.5" cy="131.5" r="119" fill="#0b0b10"/>
   <path fill="url(#metalViolet)" fill-rule="evenodd" d="M199 49
     C180 31 155 22 128 23
     C91 24 59 44 43 74
