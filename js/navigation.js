@@ -141,7 +141,6 @@
     }
 
     const user = auth.getCurrentUser();
-
     if (!user) {
       container.replaceChildren();
       return;
@@ -150,12 +149,34 @@
     const menu = getMenu(user.role);
     const fragment = document.createDocumentFragment();
 
-    menu.forEach(function (item) {
+    // Group the existing role-authorized pages into expandable sidebar sections.
+    // Every route is rendered exactly once; no route or permission is changed.
+    const groupDefinitions = [
+      { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
+      { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
+      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "reviews", "skills", "coverage"] },
+      { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "settings", "org-settings", "billing"] }
+    ];
+
+    const menuIds = new Set(menu.map(item => item.id));
+    const assigned = new Set();
+    const groups = groupDefinitions.map(group => ({
+      ...group,
+      items: menu.filter(item => group.pages.includes(item.id))
+    })).filter(group => group.items.length);
+
+    // Fail-safe for any future route: keep it visible in a final "More" section.
+    const ungrouped = menu.filter(item => !assigned.has(item.id) &&
+      !groupDefinitions.some(group => group.pages.includes(item.id)));
+    if (ungrouped.length) groups.push({ id: "more", label: "More", icon: "⋯", items: ungrouped });
+
+    function createNavItem(item) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "nav-item";
       button.dataset.page = item.id;
       button.setAttribute("aria-current", "false");
+      button.title = item.label;
 
       const icon = document.createElement("span");
       icon.className = "nav-item-icon";
@@ -163,10 +184,10 @@
       icon.textContent = item.icon;
 
       const label = document.createElement("span");
-      label.className = "nav-item-label";
+      label.className = "nav-item-label nav-label";
       label.textContent = item.label;
-
       button.append(icon, label);
+
       if (item.id === "announcements") {
         const badge = document.createElement("span");
         badge.className = "nav-unread-count";
@@ -179,12 +200,65 @@
       button.addEventListener("click", function () {
         setActivePage(item.id);
       });
+      return button;
+    }
 
-      fragment.appendChild(button);
+    groups.forEach(function (group) {
+      const section = document.createElement("section");
+      section.className = "ct-nav-group";
+      section.dataset.navGroup = group.id;
+
+      const heading = document.createElement("button");
+      heading.type = "button";
+      heading.className = "ct-nav-group-toggle";
+      heading.setAttribute("aria-controls", "ct-nav-group-items-" + group.id);
+      heading.setAttribute("aria-expanded", "true");
+
+      const headingLabel = document.createElement("span");
+      headingLabel.className = "ct-nav-group-label";
+      headingLabel.textContent = group.label;
+
+      const chevron = document.createElement("span");
+      chevron.className = "ct-nav-group-chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "⌄";
+      heading.append(headingLabel, chevron);
+
+      const items = document.createElement("div");
+      items.className = "ct-nav-group-items";
+      items.id = "ct-nav-group-items-" + group.id;
+
+      group.items.forEach(function (item) {
+        assigned.add(item.id);
+        items.appendChild(createNavItem(item));
+      });
+
+      heading.addEventListener("click", function () {
+        const expanded = heading.getAttribute("aria-expanded") === "true";
+        heading.setAttribute("aria-expanded", String(!expanded));
+        items.hidden = expanded;
+        section.classList.toggle("is-collapsed", expanded);
+      });
+
+      section.append(heading, items);
+      fragment.appendChild(section);
     });
 
     container.replaceChildren(fragment);
     updateActiveItem();
+
+    // Expand the section containing the current page so navigation never hides it.
+    const active = container.querySelector(".nav-item.active, .nav-item[aria-current='page']");
+    const activeGroup = active && active.closest(".ct-nav-group");
+    if (activeGroup) {
+      const heading = activeGroup.querySelector(".ct-nav-group-toggle");
+      const items = activeGroup.querySelector(".ct-nav-group-items");
+      if (heading && items) {
+        heading.setAttribute("aria-expanded", "true");
+        items.hidden = false;
+        activeGroup.classList.remove("is-collapsed");
+      }
+    }
   }
 
   function updateActiveItem() {
