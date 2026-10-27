@@ -100,3 +100,29 @@ html:not([data-theme="light"]):not([data-theme="black"]) #page-content .ct-repor
   color: #cbdcf2 !important;
   border-color: #203956 !important;
 }
+
+
+/* FINAL OVERRIDE: Reports matches the graphite/violet Home theme, not the old blue theme. */
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports { color:#e9e7ef!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-hero { background:linear-gradient(135deg,#211d2c,#15151f)!important; background-color:#191722!important; border-color:#302b3d!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-hero-mark { background:#211d2c!important; border-color:#3a334a!important; color:#c3b6e2!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-eyebrow { color:#b4a7dc!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-panel,
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-table-wrap { background:#191722!important; background-color:#191722!important; border-color:#302b3d!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-kpi { background:#171620!important; border-color:#302b3d!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-step { background:#15151f!important; border-color:#302b3d!important; color:#aaa5b8!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-step b { background:#292532!important; color:#c3b6e2!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-step.is-current { background:#211d2c!important; border-color:#655580!important; color:#f1edf8!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-step.is-current b { background:#4b3c63!important; color:#fff!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-field>span { color:#d0cadc!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-input { background:#101018!important; color:#f0edf6!important; border-color:#393346!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-input:focus { outline-color:#8c79b2!important; border-color:#655580!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-btn { background:#292532!important; color:#e9e4f2!important; border-color:#41384f!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-btn.primary { background:#514166!important; color:#fff!important; border-color:#6b5887!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-alert { background:#211d2c!important; border-color:#40364f!important; color:#e6dff2!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-table th { background:#292532!important; color:#d8cfea!important; border-color:#393346!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-table td { color:#e0dce8!important; border-color:#302b3d!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-table tbody tr:hover { background:#211d2c!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-badge { background:#292532!important; color:#d8cfea!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-storage { background:#302b3d!important; }
+html:not([data-theme="light"]):not([data-theme="black"]) body #page-content .ct-reports .ct-reports-storage span { background:#8c79b2!important; }
