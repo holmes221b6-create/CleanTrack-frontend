@@ -335,14 +335,21 @@ hr {
 
 .brand-mark {
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgb(100 216 176 / 24%);
-  border-radius: 12px;
-  background: rgb(100 216 176 / 12%);
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--primary);
+}
+.brand-mark .ct-logo-symbol {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .header-spacer {
