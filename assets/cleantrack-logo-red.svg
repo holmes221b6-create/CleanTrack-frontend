@@ -1,1 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" role="img" aria-labelledby="title desc"><title id="title">CleanTrack</title><desc id="desc">Crimson and black circular tracking mark with CleanTrack wordmark.</desc><defs><linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff242d"/><stop offset="1" stop-color="#c90013"/></linearGradient><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="420" height="150" rx="8" fill="#050607"/><g transform="translate(210 45)" filter="url(#glow)"><path d="M-4-39A40 40 0 0 0-37 17 40 40 0 0 0 9 38L-5 25A25 25 0 0 1-22-9 25 25 0 0 1 8-22Z" fill="url(#red)"/><path d="M3-39A40 40 0 0 1 39-3L20 15 16 5 29-8 15-3 8 6 0-3 8-14 20-24A29 29 0 0 0 3-39Z" fill="url(#red)"/><circle r="13" fill="url(#red)"/><circle r="4" fill="#050607"/><path d="M-31 25-13 9-7 15-24 31Z M18 7 35-10 39-4 24 12Z" fill="#050607"/></g><text x="210" y="105" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="29" letter-spacing="4" fill="#f6f6f6" font-weight="500">CLEAN<tspan fill="#f5222d" font-weight="700">TRACK</tspan></text><text x="210" y="127" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8.5" letter-spacing="2.5" fill="#d0d0d0">CLEANER SPACES. SAFER TOMORROW.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 267 263" role="img" aria-labelledby="title">
+  <title id="title">CleanTrack muted violet eye emblem</title>
+  <defs>
+    <linearGradient id="metalViolet" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d0c0eb"/>
+      <stop offset=".28" stop-color="#b5a0d9"/>
+      <stop offset=".62" stop-color="#8b70bc"/>
+      <stop offset="1" stop-color="#6d559b"/>
+    </linearGradient>
+  </defs>
+  <rect width="267" height="263" rx="0" fill="#08080b"/>
+  <circle cx="133.5" cy="131.5" r="119" fill="#0b0b10"/>
+  <path fill="url(#metalViolet)" fill-rule="evenodd" d="M199 49
+    C180 31 155 22 128 23
+    C91 24 59 44 43 74
+    C26 105 31 140 48 166
+    L36 216
+    L88 185
+    C105 194 126 200 147 197
+    C190 192 222 162 233 123
+    C237 108 236 94 231 80
+    L199 99
+    C205 118 199 140 186 157
+    C171 177 146 188 122 183
+    C93 179 72 157 67 129
+    C61 98 78 69 105 56
+    C131 43 162 47 184 66
+    Z
+    M190 72 L232 51 L207 91 Z"/>
+  <path fill="#08080b" d="M91 138
+    C98 117 115 104 135 104
+    C155 104 172 117 179 138
+    C171 159 154 172 135 172
+    C115 172 98 159 91 138 Z"/>
+  <circle cx="135" cy="138" r="27" fill="url(#metalViolet)"/>
+  <circle cx="135" cy="138" r="8" fill="#08080b"/>
+</svg>
