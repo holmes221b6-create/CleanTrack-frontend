@@ -39,9 +39,12 @@
   width: 36px;
   height: 36px;
   flex: 0 0 36px;
-  border-radius: 11px;
-  background: #b9e4cc;
-  color: #12382d;
+  border-radius: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  color: inherit;
   font-weight: 900;
   font-size: 19px;
 }
@@ -508,10 +511,15 @@ color: #ffffff !important;
 
 /* Use the actual violet CleanTrack app emblem in the workspace sidebar. */
 #workspace-view .ct-sidebar-brand-mark {
-  background: #17131f;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
   color: inherit;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 0;
+  padding: 0;
 }
 #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
   display: block;
@@ -527,4 +535,17 @@ color: #ffffff !important;
   background: rgba(139,112,188,.12);
   border-color: rgba(139,112,188,.28);
   box-shadow: inset 3px 0 #8b70bc;
+}
+
+
+/* Actual dynamically-created sidebar logo wrapper: no background tile whatsoever. */
+#workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark,
+#workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark img.ct-logo-symbol {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  filter: none !important;
 }
