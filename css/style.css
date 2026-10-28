@@ -1628,3 +1628,30 @@ display: none !important;
 #workspace-view .sidebar-brand .brand-mark {
   isolation: isolate;
 }
+
+
+/* Sidebar logo: clear the tile on the mark AND its surrounding brand wrappers. */
+#sidebar .sidebar-brand,
+#sidebar .sidebar-brand .brand-mark,
+#workspace-view .sidebar-brand,
+#workspace-view .sidebar-brand .brand-mark,
+#workspace-view .sidebar-brand .brand-mark img,
+#workspace-view .sidebar-brand img.ct-logo-symbol,
+#sidebar .sidebar-brand .brand-mark,
+#sidebar .sidebar-brand .brand-mark img {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  filter: none !important;
+}
+#sidebar .sidebar-brand .brand-mark,
+#workspace-view .sidebar-brand .brand-mark {
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
