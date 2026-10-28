@@ -2106,3 +2106,26 @@ html:not([data-theme="light"]) body #page-content .ct-settings-page .ct-settings
     padding: 16px !important;
   }
 }
+
+
+/* Sidebar brand: display only the CleanTrack emblem, with no tile or backdrop. */
+body #workspace-view .sidebar-brand .brand-mark,
+body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark,
+body #workspace-view .sidebar-brand img.ct-logo-symbol,
+body #workspace-view .ct-sidebar-brand img.ct-logo-symbol {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+body #workspace-view .sidebar-brand .brand-mark,
+body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark {
+  padding: 0 !important;
+  overflow: visible !important;
+}
+body #workspace-view .sidebar-brand .brand-mark img.ct-logo-symbol,
+body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark img.ct-logo-symbol {
+  object-fit: contain !important;
+  mix-blend-mode: normal !important;
+}
