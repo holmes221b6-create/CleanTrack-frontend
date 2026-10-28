@@ -1655,3 +1655,32 @@ display: none !important;
   border-radius: 0 !important;
   overflow: visible !important;
 }
+
+
+/* Hard override for the sidebar logo tile. Keep the logo image; remove every wrapper fill. */
+html body #sidebar .sidebar-brand .brand-mark,
+html body #workspace-view .sidebar-brand .brand-mark,
+html body #sidebar .sidebar-brand .brand-mark::before,
+html body #sidebar .sidebar-brand .brand-mark::after,
+html body #workspace-view .sidebar-brand .brand-mark::before,
+html body #workspace-view .sidebar-brand .brand-mark::after {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  filter: none !important;
+  border-radius: 0 !important;
+}
+html body #sidebar .sidebar-brand .brand-mark img,
+html body #workspace-view .sidebar-brand .brand-mark img,
+html body #sidebar .sidebar-brand img.ct-logo-symbol,
+html body #workspace-view .sidebar-brand img.ct-logo-symbol {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
