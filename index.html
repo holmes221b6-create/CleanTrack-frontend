@@ -687,15 +687,32 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
                                 >
                             </div>
 
-                            <button
-                                class="button button-primary button-full"
-                                type="submit"
-                            >
-                                Request password reset
+                            <div class="form-field" id="reset-code-field" hidden>
+                                <label for="forgot-password-code">Six-digit reset code</label>
+                                <input id="forgot-password-code" name="code" type="text"
+                                    inputmode="numeric" autocomplete="one-time-code"
+                                    pattern="[0-9]{6}" maxlength="6" placeholder="123456">
+                            </div>
+
+                            <div class="form-field" id="reset-new-password-field" hidden>
+                                <label for="forgot-password-new-password">New password</label>
+                                <input id="forgot-password-new-password" name="new_password"
+                                    type="password" autocomplete="new-password"
+                                    minlength="8" maxlength="128" placeholder="At least 8 characters">
+                            </div>
+
+                            <div class="form-field" id="reset-confirm-password-field" hidden>
+                                <label for="forgot-password-confirm-password">Confirm new password</label>
+                                <input id="forgot-password-confirm-password" name="confirm_password"
+                                    type="password" autocomplete="new-password"
+                                    minlength="8" maxlength="128" placeholder="Re-enter your new password">
+                            </div>
+
+                            <button class="button button-primary button-full" id="forgot-password-submit" type="submit">
+                                Send reset code
                             </button>
 
-                            <p class="form-message" id="forgot-password-message"
-                                role="status"></p>
+                            <p class="form-message" id="forgot-password-message" role="status"></p>
                         </form>
 
                         <p class="auth-switch">
