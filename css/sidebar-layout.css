@@ -549,3 +549,21 @@ color: #ffffff !important;
   outline: 0 !important;
   filter: none !important;
 }
+
+
+/* Final visual correction: the sidebar brand mark itself must not render a black tile. */
+html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark,
+html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark img,
+html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark img.ct-logo-symbol {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark {
+  isolation: isolate !important;
+}
