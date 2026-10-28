@@ -18,7 +18,7 @@
 
     const brand = document.createElement("div");
     brand.className = "ct-sidebar-brand";
-    brand.innerHTML = '<span class="ct-sidebar-brand-mark" aria-hidden="true"><img class="ct-logo-symbol" src="assets/cleantrack-mark-violet.svg?v=20261027-violet-global-v6" alt=""></span><span><strong>CleanTrack</strong><small>Operations</small></span>';
+    brand.innerHTML = '<span class="ct-sidebar-brand-mark" aria-hidden="true"><img class="ct-logo-symbol" src="assets/cleantrack-mark-transparent.svg?v=20261028-v3" alt=""></span><span><strong>CleanTrack</strong><small>Operations</small></span>';
 
     const navLabel = document.createElement("div");
     navLabel.className = "ct-sidebar-label";
