@@ -1614,3 +1614,17 @@ display: none !important;
 @media (max-width: 800px) {
   .brand-mark { width: 35px; height: 35px; }
 }
+
+
+/* Definitive sidebar logo fix: the old .brand-mark rule drew a square via box-shadow. */
+#workspace-view .sidebar-brand .brand-mark,
+#workspace-view .sidebar-brand .brand-mark .ct-logo-symbol {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+}
+#workspace-view .sidebar-brand .brand-mark {
+  isolation: isolate;
+}
