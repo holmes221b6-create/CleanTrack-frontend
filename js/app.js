@@ -1571,16 +1571,69 @@ function bindNavigation() {
     const form = getElement("login-form");
     if (!form) return;
 
-    // Keep password-recovery form honest while email delivery/reset tokens are not configured.
+    // Two-stage recovery: request emailed code, then validate code and set a new password.
     const recoveryForm = getElement("forgot-password-form");
     if (recoveryForm && recoveryForm.dataset.bound !== "true") {
       recoveryForm.dataset.bound = "true";
-      recoveryForm.addEventListener("submit", function (event) {
+      let recoveryStage = "request";
+      recoveryForm.addEventListener("submit", async function (event) {
         event.preventDefault();
         const message = getElement("forgot-password-message");
-        if (message) {
-          message.textContent = "Password recovery by email is not configured yet. No reset email was sent. Please contact your organization Admin or CleanTrack support.";
-          message.className = "form-message error";
+        const submit = getElement("forgot-password-submit");
+        const email = String(getElement("forgot-password-email")?.value || "").trim().toLowerCase();
+        const codeField = getElement("reset-code-field");
+        const newField = getElement("reset-new-password-field");
+        const confirmField = getElement("reset-confirm-password-field");
+        const codeInput = getElement("forgot-password-code");
+        const newPasswordInput = getElement("forgot-password-new-password");
+        const confirmPasswordInput = getElement("forgot-password-confirm-password");
+        const setMessage = (text, kind) => {
+          if (message) { message.textContent = text; message.className = "form-message " + (kind || ""); }
+        };
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          setMessage("Enter a valid registered email address.", "error");
+          return;
+        }
+        if (submit) { submit.disabled = true; submit.textContent = recoveryStage === "request" ? "Sending code…" : "Resetting password…"; }
+        try {
+          if (recoveryStage === "request") {
+            await window.CleanTrackApi.post("auth/forgot-password", { email });
+            recoveryStage = "reset";
+            if (codeField) codeField.hidden = false;
+            if (newField) newField.hidden = false;
+            if (confirmField) confirmField.hidden = false;
+            if (codeInput) { codeInput.required = true; codeInput.focus(); }
+            if (newPasswordInput) newPasswordInput.required = true;
+            if (confirmPasswordInput) confirmPasswordInput.required = true;
+            if (submit) submit.textContent = "Reset password";
+            setMessage("If an account exists for that email, a reset code has been sent. Check your inbox and spam folder. The code expires in 10 minutes.", "success");
+          } else {
+            const code = String(codeInput?.value || "").trim();
+            const newPassword = String(newPasswordInput?.value || "");
+            const confirmPassword = String(confirmPasswordInput?.value || "");
+            if (!/^\d{6}$/.test(code)) throw new Error("Enter the six-digit code sent to your email.");
+            if (newPassword.length < 8 || newPassword.length > 128) throw new Error("Your new password must be 8 to 128 characters.");
+            if (newPassword !== confirmPassword) throw new Error("The passwords do not match.");
+            const result = await window.CleanTrackApi.post("auth/reset-password", {
+              email, code, new_password: newPassword
+            });
+            setMessage(result.message || "Password updated. You can now sign in.", "success");
+            recoveryForm.reset();
+            recoveryStage = "request";
+            [codeField, newField, confirmField].forEach(el => { if (el) el.hidden = true; });
+            [codeInput, newPasswordInput, confirmPasswordInput].forEach(el => { if (el) el.required = false; });
+            if (submit) submit.textContent = "Send reset code";
+            window.setTimeout(() => {
+              const back = document.querySelector('[data-view="login"]');
+              if (back) back.click();
+            }, 1800);
+          }
+        } catch (error) {
+          setMessage(error.message || "Password recovery failed. Please try again.", "error");
+        } finally {
+          if (submit) submit.disabled = false;
+          if (submit && recoveryStage === "request") submit.textContent = "Send reset code";
+          else if (submit && recoveryStage === "reset") submit.textContent = "Reset password";
         }
       });
     }
