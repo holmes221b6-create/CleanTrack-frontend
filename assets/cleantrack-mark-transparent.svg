@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 267 263" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 267 263" style="background:transparent" role="img" aria-labelledby="title">
   <title id="title">CleanTrack muted violet eye emblem</title>
   <defs>
     <linearGradient id="metalViolet" x1="0" y1="0" x2="0.9" y2="1">
@@ -8,7 +8,7 @@
       <stop offset="1" stop-color="#6d559b"/>
     </linearGradient>
   </defs>
-  <path fill="url(#metalViolet)" fill-rule="evenodd" d="M199 49
+  <path fill="url(#metalViolet)" fill-rule="nonzero" d="M199 49
     C180 31 155 22 128 23
     C91 24 59 44 43 74
     C26 105 31 140 48 166
