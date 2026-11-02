@@ -1,6 +1,6 @@
 /* CleanTrack workspace sidebar patch */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 270px;
+  --ct-sidebar-width: 310px;
   display: grid;
   grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
   min-height: 100%;
@@ -202,7 +202,7 @@ color: #ffffff !important;
 
 /* Sidebar behavior: full-width presentation mode and icon-only hamburger */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 270px;
+  --ct-sidebar-width: 310px;
   background: #0b1120 !important;
   color: #e7edf7 !important;
   transition: grid-template-columns .2s ease;
@@ -295,7 +295,7 @@ color: #ffffff !important;
 
 /* Slide the navigation panel off-canvas; keep page content visible and expanding. */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 270px;
+  --ct-sidebar-width: 310px;
   display: grid;
   grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
   overflow-x: clip;
@@ -307,8 +307,8 @@ color: #ffffff !important;
 }
 #workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile) > .ct-sidebar {
   display: block !important;
-  width: 270px !important;
-  min-width: 270px !important;
+  width: 310px !important;
+  min-width: 310px !important;
   transform: translateX(0);
   opacity: 1;
   pointer-events: auto;
@@ -316,8 +316,8 @@ color: #ffffff !important;
 }
 #workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed > .ct-sidebar {
   display: block !important;
-  width: 270px !important;
-  min-width: 270px !important;
+  width: 310px !important;
+  min-width: 310px !important;
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
@@ -569,8 +569,8 @@ html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark {
 }
 
 /* OMNIX horizontal logo in the persistent workspace sidebar */
-#workspace-view .ct-sidebar-brand{gap:0;padding:8px 4px 18px;}
-#workspace-view .ct-sidebar-brand-mark.omnix-sidebar-lockup{width:236px;height:64px;flex:0 0 236px;display:flex;align-items:center;justify-content:flex-start;overflow:visible;}
+#workspace-view .ct-sidebar-brand{gap:0;padding:8px 2px 18px;}
+#workspace-view .ct-sidebar-brand-mark.omnix-sidebar-lockup{width:280px;height:76px;flex:0 0 280px;display:flex;align-items:center;justify-content:flex-start;overflow:visible;}
 #workspace-view .ct-sidebar-brand-mark.omnix-sidebar-lockup img{display:block;width:100%;height:100%;object-fit:fill;object-position:left center;filter:drop-shadow(0 0 10px rgba(128,76,255,.4));}
 #workspace-view .ct-sidebar-collapsed .ct-sidebar-brand-mark.omnix-sidebar-lockup{width:38px;height:38px;flex-basis:38px;}
 #workspace-view .ct-sidebar-collapsed .ct-sidebar-brand-mark.omnix-sidebar-lockup img{content:url('../assets/omnix-mark.svg');}
