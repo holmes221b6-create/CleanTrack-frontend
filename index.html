@@ -834,10 +834,33 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
 #cleantrack-launch-splash .ct-splash-logo { display:block; width:min(520px,88vw); max-height:150px; object-fit:contain; filter:drop-shadow(0 0 22px rgba(125,73,255,.48)); }
 #cleantrack-launch-splash .ct-splash-owner { letter-spacing:.22em; color:#aaa1d2; }
 #app-header .brand-mark.omnix-brand-mark { width:min(280px,30vw); height:66px; }
-.auth-intro .brand-mark.omnix-brand-mark { width:min(360px,42vw); height:84px; }
+/* Login and registration share this intro panel: give the full OMNIX lockup a proper hero-scale footprint without crossing the panel edges. */
+#auth-view .auth-intro > .brand.omnix-brand { display:flex; align-self:flex-start; width:fit-content; max-width:100%; min-width:0; }
+#auth-view .auth-intro > .brand.omnix-brand .brand-mark.omnix-brand-mark {
+  box-sizing:border-box;
+  width:min(420px,100%);
+  max-width:100%;
+  height:clamp(82px,8vw,126px);
+  flex:0 1 420px;
+  overflow:visible;
+}
+#auth-view .auth-intro > .brand.omnix-brand .omnix-logo-lockup {
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:contain;
+  object-position:left center;
+  filter:drop-shadow(0 0 14px rgba(126,78,255,.42));
+}
 #workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:min(226px,100%); height:58px; }
 @media(max-width:760px) {
-  .auth-intro .brand-mark.omnix-brand-mark { width:min(300px,76vw); height:70px; }
+  #auth-view .auth-intro > .brand.omnix-brand .brand-mark.omnix-brand-mark {
+    width:min(300px,82vw);
+    max-width:100%;
+    height:82px;
+    flex-basis:300px;
+  }
   #app-header .brand-mark.omnix-brand-mark { width:min(230px,48vw); height:54px; }
 }
 @media(max-width:540px) {
