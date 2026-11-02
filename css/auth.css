@@ -765,3 +765,46 @@ body {
 .app-footer a {
     color: #9cdbb8;
 }
+
+/* OMNIX authentication-page lockup.
+   The logo is the full horizontal wordmark above the login/signup intro copy.
+   Size it here (the auth stylesheet), not in the misplaced post-document style block. */
+#auth-view .auth-intro > a.brand.omnix-brand {
+    display: flex !important;
+    align-self: flex-start !important;
+    width: min(420px, 100%) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 8px !important;
+    flex: 0 1 auto !important;
+}
+#auth-view .auth-intro > a.brand.omnix-brand > .brand-mark.omnix-brand-mark {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    aspect-ratio: 790 / 180 !important;
+    flex: 0 1 auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+#auth-view .auth-intro > a.brand.omnix-brand > .brand-mark.omnix-brand-mark > img.omnix-logo-lockup {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+}
+@media (max-width: 680px) {
+    #auth-view .auth-intro > a.brand.omnix-brand {
+        width: min(320px, 100%) !important;
+        margin-bottom: 4px !important;
+    }
+}
