@@ -18,7 +18,7 @@
 
     const brand = document.createElement("div");
     brand.className = "ct-sidebar-brand";
-    brand.innerHTML = '<span class="ct-sidebar-brand-mark omnix-sidebar-lockup" aria-label="OMNIX"><img class="ct-logo-symbol" src="assets/omnix-logo.svg?v=1" alt="OMNIX"></span>';
+    brand.innerHTML = '<span class="ct-sidebar-brand-mark omnix-sidebar-lockup" aria-label="OMNIX"><img class="ct-logo-symbol" src="assets/omnix-logo.svg?v=3" alt="OMNIX"></span>';
 
     const navLabel = document.createElement("div");
     navLabel.className = "ct-sidebar-label";
