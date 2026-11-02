@@ -79,7 +79,7 @@
 <style id="cleantrack-launch-splash-style">
 #cleantrack-launch-splash{position:fixed;inset:0;z-index:999999;background:#09090b;color:#f4f5f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:opacity .22s ease}
 #cleantrack-launch-splash .ct-splash-mark{width:min(250px,66vw);height:auto;display:grid;place-items:center;background:transparent;border:0;border-radius:0;box-shadow:none}
-#cleantrack-launch-splash .ct-splash-logo{display:block;width:min(250px,66vw);max-width:100%;height:auto;max-height:132px;object-fit:contain;filter:drop-shadow(0 0 18px #f5222d1c)}
+#cleantrack-launch-splash .ct-splash-logo{display:block;width:min(520px,88vw);max-width:100%;height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px #f5222d1c)}
 #cleantrack-launch-splash .ct-splash-rings{width:64px;height:64px;border:2px solid #b6bec2;border-radius:50%;display:grid;place-items:center;position:relative}
 #cleantrack-launch-splash .ct-splash-rings:before,#cleantrack-launch-splash .ct-splash-rings:after{content:"";position:absolute;border:1px solid #737c81;border-radius:50%;inset:8px}
 #cleantrack-launch-splash .ct-splash-rings:after{inset:17px;border-color:#d4d8da}
@@ -160,16 +160,15 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
 </head>
 
 <body>
-    <div id="cleantrack-launch-splash" role="status" aria-label="Starting OMNIX"><div class="ct-splash-mark" aria-hidden="true"><img class="ct-splash-logo" src="assets/cleantrack-mark-transparent.svg?v=20261028-v5" alt=""></div><div class="ct-splash-owner">INTELLIGENCE · OPERATIONS · SYSTEMS</div></div>
+    <div id="cleantrack-launch-splash" role="status" aria-label="Starting OMNIX"><div class="ct-splash-mark" aria-hidden="true"><img class="ct-splash-logo" src="assets/omnix-logo.svg?v=2" alt="OMNIX"></div><div class="ct-splash-owner">INTELLIGENCE · OPERATIONS · SYSTEMS</div></div>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div id="app" class="app-shell">
 
         <!-- Global application header -->
         <header id="app-header" class="app-header" hidden>
-            <a class="brand" href="#dashboard" aria-label="CleanTrack home">
-                <span class="brand-mark" aria-hidden="true"><img class="ct-logo-symbol" src="assets/cleantrack-mark-transparent.svg?v=20261028-v5" alt=""></span>
-                <span class="brand-name">Clean<span class="ct-wordmark-accent">Track</span></span>
+            <a class="brand omnix-brand" href="#dashboard" aria-label="OMNIX home">
+                <span class="brand-mark omnix-brand-mark" aria-hidden="true"><img class="omnix-logo-lockup" src="assets/omnix-logo.svg?v=2" alt="OMNIX"></span>
             </a>
 
             <div class="header-actions">
@@ -246,9 +245,8 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
             <section id="auth-view" class="auth-layout" aria-labelledby="auth-title">
 
                 <aside class="auth-intro">
-                    <a class="brand brand-light" href="#login">
-                        <span class="brand-mark" aria-hidden="true"><img class="ct-logo-symbol" src="assets/cleantrack-mark-transparent.svg?v=20261028-v5" alt=""></span>
-                        <span class="brand-name">Clean<span class="ct-wordmark-accent">Track</span></span>
+                    <a class="brand brand-light omnix-brand" href="#login" aria-label="OMNIX">
+                        <span class="brand-mark omnix-brand-mark" aria-hidden="true"><img class="omnix-logo-lockup" src="assets/omnix-logo.svg?v=2" alt="OMNIX"></span>
                     </a>
 
                     <div class="auth-intro-content">
@@ -731,8 +729,7 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
                 <aside id="sidebar" class="sidebar" aria-label="Main navigation">
          
 <div class="sidebar-brand">
-    <span class="brand-mark" aria-hidden="true"><img class="ct-logo-symbol" src="assets/cleantrack-mark-transparent.svg?v=20261028-v5" alt=""></span>
-    <span class="brand-name">Clean<span class="ct-wordmark-accent">Track</span></span>
+    <span class="brand-mark omnix-brand-mark" aria-label="OMNIX"><img class="omnix-logo-lockup" src="assets/omnix-logo.svg?v=2" alt="OMNIX"></span>
 </div>
 
 <div class="workspace-identity">
@@ -829,14 +826,22 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
 </html>
 
 <style id="omnix-global-brand-lockup">
-/* OMNIX metallic identity: consistent horizontal lockup across app surfaces. */
-.brand.omnix-brand, .brand { gap: 12px; }
-.brand-mark.omnix-brand-mark { width: min(245px, 34vw); height: 58px; min-width: 0; display:flex; align-items:center; justify-content:flex-start; overflow:visible; }
-.brand-mark.omnix-brand-mark .omnix-logo-lockup { width:100%; height:100%; max-width:245px; object-fit:contain; object-position:left center; filter:drop-shadow(0 0 9px rgba(126,78,255,.32)); }
-#cleantrack-launch-splash .ct-splash-mark { width:min(390px,84vw); }
-#cleantrack-launch-splash .ct-splash-logo { width:min(390px,84vw); max-height:110px; filter:drop-shadow(0 0 20px rgba(125,73,255,.45)); }
+/* OMNIX premium horizontal lockup — sized to the real header, auth panel and sidebar layouts. */
+.brand.omnix-brand { display:inline-flex; align-items:center; gap:0; min-width:0; }
+.brand-mark.omnix-brand-mark { display:flex; align-items:center; justify-content:flex-start; flex:0 0 auto; width:min(320px,38vw); height:76px; min-width:0; overflow:visible; background:transparent!important; border:0!important; box-shadow:none!important; padding:0!important; }
+.brand-mark.omnix-brand-mark .omnix-logo-lockup { display:block; width:100%; height:100%; max-width:none; object-fit:contain; object-position:left center; filter:drop-shadow(0 0 12px rgba(126,78,255,.38)); }
+#cleantrack-launch-splash .ct-splash-mark { width:min(520px,88vw); }
+#cleantrack-launch-splash .ct-splash-logo { display:block; width:min(520px,88vw); max-height:150px; object-fit:contain; filter:drop-shadow(0 0 22px rgba(125,73,255,.48)); }
 #cleantrack-launch-splash .ct-splash-owner { letter-spacing:.22em; color:#aaa1d2; }
-#app-header .brand-mark.omnix-brand-mark, .auth-intro .brand-mark.omnix-brand-mark { width:min(245px,34vw); height:56px; }
-#workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:210px; height:48px; }
-@media(max-width:540px){ .brand-mark.omnix-brand-mark { width:176px; height:42px; } #workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:180px; height:42px; } }
+#app-header .brand-mark.omnix-brand-mark { width:min(280px,30vw); height:66px; }
+.auth-intro .brand-mark.omnix-brand-mark { width:min(360px,42vw); height:84px; }
+#workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:min(226px,100%); height:58px; }
+@media(max-width:760px) {
+  .auth-intro .brand-mark.omnix-brand-mark { width:min(300px,76vw); height:70px; }
+  #app-header .brand-mark.omnix-brand-mark { width:min(230px,48vw); height:54px; }
+}
+@media(max-width:540px) {
+  .brand-mark.omnix-brand-mark { width:min(220px,70vw); height:52px; }
+  #workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:205px; height:52px; }
+}
 </style>
