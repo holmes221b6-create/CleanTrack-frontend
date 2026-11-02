@@ -1,6 +1,6 @@
 /* CleanTrack workspace sidebar patch */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 310px;
+  --ct-sidebar-width: 340px;
   display: grid;
   grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
   min-height: 100%;
@@ -202,7 +202,7 @@ color: #ffffff !important;
 
 /* Sidebar behavior: full-width presentation mode and icon-only hamburger */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 310px;
+  --ct-sidebar-width: 340px;
   background: #0b1120 !important;
   color: #e7edf7 !important;
   transition: grid-template-columns .2s ease;
@@ -295,7 +295,7 @@ color: #ffffff !important;
 
 /* Slide the navigation panel off-canvas; keep page content visible and expanding. */
 #workspace-view .ct-workspace-shell {
-  --ct-sidebar-width: 310px;
+  --ct-sidebar-width: 340px;
   display: grid;
   grid-template-columns: var(--ct-sidebar-width) minmax(0, 1fr);
   overflow-x: clip;
@@ -307,8 +307,8 @@ color: #ffffff !important;
 }
 #workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile) > .ct-sidebar {
   display: block !important;
-  width: 310px !important;
-  min-width: 310px !important;
+  width: 340px !important;
+  min-width: 340px !important;
   transform: translateX(0);
   opacity: 1;
   pointer-events: auto;
@@ -316,8 +316,8 @@ color: #ffffff !important;
 }
 #workspace-view .ct-workspace-shell:not(.ct-sidebar-mobile).ct-sidebar-collapsed > .ct-sidebar {
   display: block !important;
-  width: 310px !important;
-  min-width: 310px !important;
+  width: 340px !important;
+  min-width: 340px !important;
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
@@ -568,6 +568,69 @@ html body #workspace-view .ct-sidebar-brand .ct-sidebar-brand-mark {
   isolation: isolate !important;
 }
 
+/* FINAL OVERRIDE: this is the brand directly above Home and the workspace page links. */
+html body #workspace-view .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  width:316px !important;
+  min-width:316px !important;
+  max-width:316px !important;
+  height:86px !important;
+  min-height:86px !important;
+  flex:0 0 316px !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:visible !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+html body #workspace-view .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup img.ct-logo-symbol {
+  display:block !important;
+  width:316px !important;
+  min-width:316px !important;
+  max-width:316px !important;
+  height:86px !important;
+  min-height:86px !important;
+  max-height:86px !important;
+  object-fit:fill !important;
+  object-position:left center !important;
+  filter:drop-shadow(0 0 12px rgba(128,76,255,.42)) !important;
+}
+html body #workspace-view .ct-sidebar .ct-sidebar-brand {
+  width:100% !important;
+  min-height:112px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:0 !important;
+  padding:8px 0 18px !important;
+  margin:0 0 18px !important;
+  overflow:visible !important;
+}
+@media (max-width: 760px) {
+  html body #workspace-view .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup,
+  html body #workspace-view .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup img.ct-logo-symbol {
+    width:224px !important;
+    min-width:224px !important;
+    max-width:224px !important;
+    height:62px !important;
+    min-height:62px !important;
+    max-height:62px !important;
+    flex-basis:224px !important;
+  }
+}
+html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup,
+html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .ct-sidebar-brand .ct-sidebar-brand-mark.omnix-sidebar-lockup img.ct-logo-symbol {
+  width:38px !important;
+  min-width:38px !important;
+  max-width:38px !important;
+  height:38px !important;
+  min-height:38px !important;
+  max-height:38px !important;
+  flex-basis:38px !important;
+}
 /* OMNIX horizontal logo in the persistent workspace sidebar */
 #workspace-view .ct-sidebar-brand{gap:0;padding:8px 2px 18px;}
 #workspace-view .ct-sidebar-brand-mark.omnix-sidebar-lockup{width:280px;height:76px;flex:0 0 280px;display:flex;align-items:center;justify-content:flex-start;overflow:visible;}
