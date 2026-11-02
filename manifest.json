@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "CleanTrack - Operations Management",
-  "short_name": "CleanTrack",
-  "description": "Manage teams, locations, tasks, and operational quality.",
+  "name": "OMNIX - Intelligent Operations",
+  "short_name": "OMNIX",
+  "description": "Intelligent operations, connected teams, and enterprise workflow management.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -16,13 +16,13 @@
   ],
   "icons": [
     {
-      "src": "assets/cleantrack-mark-violet.svg?v=20261027-violet-global-v5",
+      "src": "assets/omnix-mark.svg?v=1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "assets/cleantrack-mark-violet.svg?v=20261027-violet-global-v5",
+      "src": "assets/omnix-mark.svg?v=1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"

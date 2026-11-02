@@ -1684,3 +1684,8 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
   filter: none !important;
   mix-blend-mode: normal !important;
 }
+
+/* OMNIX brand lockup sizing */
+.brand-mark.omnix-brand-mark{width:220px;height:52px;display:flex;align-items:center;justify-content:flex-start;}
+.brand-mark.omnix-brand-mark .omnix-logo-lockup{width:100%;height:100%;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 8px rgba(132,77,255,.3));}
+@media(max-width:540px){.brand-mark.omnix-brand-mark{width:170px;height:42px;}}
