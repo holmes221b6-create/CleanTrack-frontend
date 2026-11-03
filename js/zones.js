@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const API=window.CleanTrackApi,CLOSED=new Set(["completed","complete","approved","done","closed","cancelled","canceled"]);
-let root=null,zones=[],locations=[],teams=[],operations=[],supervisors=[],q="",status="all",locFilter="all",selected=null,map=null,drawing=false,points=[],mapCleanup=null,floorPlanUrl=null;
+let root=null,zones=[],locations=[],teams=[],operations=[],supervisors=[],q="",status="all",locFilter="all",selected=null,map=null,drawing=false,points=[],mapCleanup=null,floorPlanUrl=null,facilityPlanUrl=null,facilityMapLocationId="";
 const e=(t,c,v)=>{const n=document.createElement(t);if(c)n.className=c;if(v!==undefined&&v!==null)n.textContent=String(v);return n};
 const b=(v,c,f)=>{const n=e("button",c||"ct-zone-btn",v);n.type="button";n.addEventListener("click",f);return n};
 const rows=(r,k)=>Array.isArray(r)?r:(Array.isArray(r?.[k])?r[k]:[]);
@@ -71,8 +71,93 @@ await importZonesPackage(pkg);
 }catch(ex){notice(ex.message||"The map file could not be imported.","error");}
 finally{event.target.value="";}
 }
+function renderFacilityMap(){
+ const card=e("section","ct-zone-facility-map");
+ const head=e("div","ct-zone-section-head"),intro=e("div");
+ intro.append(e("p","ct-zone-eyebrow","SPATIAL OPERATIONS"),e("h2","","Indoor facility map"),e("p","ct-zone-muted","View saved zones on the parent Location floor plan. Select a zone on the map to open its existing details and management tools."));
+ head.append(intro);card.append(head);
+ const toolbar=e("div","ct-zone-facility-toolbar"),locationSelect=e("select","ct-zone-input"),floorSelect=e("select","ct-zone-input");
+ locationSelect.setAttribute("aria-label","Choose facility location");floorSelect.setAttribute("aria-label","Filter facility floor");
+ locationSelect.append(new Option("Choose a location…",""));
+ locations.filter(x=>String(x.status||"active")!=="archived").forEach(x=>locationSelect.append(new Option(x.name,String(x.id))));
+ const preferred=locations.find(x=>String(x.id)===String(locFilter))||locations.find(x=>zones.some(z=>String(z.location_id)===String(x.id)&&z.boundary?.type==="IndoorPolygon"))||locations[0];
+ facilityMapLocationId=preferred?String(preferred.id):"";
+ locationSelect.value=facilityMapLocationId;
+ floorSelect.append(new Option("All floors","all"));
+ const refreshFloors=()=>{const current=floorSelect.value;floorSelect.replaceChildren(new Option("All floors","all"));const labels=[...new Set(zones.filter(z=>String(z.location_id)===facilityMapLocationId).map(z=>String(z.floor_label||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));labels.forEach(v=>floorSelect.append(new Option(v,v)));floorSelect.value=[...floorSelect.options].some(o=>o.value===current)?current:"all";};
+ refreshFloors();
+ locationSelect.addEventListener("change",()=>{facilityMapLocationId=locationSelect.value;refreshFloors();loadFacilityMap();});
+ floorSelect.addEventListener("change",()=>drawFacilityZones());
+ toolbar.append(locationSelect,floorSelect);card.append(toolbar);
+ const noticeLine=e("p","ct-zone-muted",""),layout=e("div","ct-zone-facility-layout"),viewer=e("div","ct-zone-facility-viewer"),side=e("aside","ct-zone-facility-side");
+ const preview=e("div","ct-zone-facility-preview");preview.dataset.facilityPreview="1";
+ const zoneList=e("div","ct-zone-facility-zone-list");zoneList.dataset.facilityZoneList="1";
+ viewer.append(preview);side.append(e("h3","","Zones on this floor"),zoneList);layout.append(viewer,side);card.append(layout);
+ const legend=e("div","ct-zone-facility-legend");
+ [["active","Active"],["inactive","Inactive"],["archived","Archived"],["unmapped","No indoor boundary"]].forEach(([v,label])=>{const item=e("span","ct-zone-facility-legend-item is-"+v);item.append(e("i",""),e("span","",label));legend.append(item);});
+ card.append(legend);
+ const state={card,locationSelect,floorSelect,noticeLine,preview,zoneList,svg:null,selectedZone:null};
+ card._facilityState=state;
+ const statusBox=e("div","ct-zone-notice");statusBox.hidden=true;statusBox.dataset.facilityNotice="1";card.insertBefore(statusBox,layout);
+ state.notice=statusBox;
+ if(!facilityMapLocationId){noticeLine.textContent="Create a Location first, then upload its floor plan in Location details.";card.append(noticeLine);return card;}
+ loadFacilityMap(state);
+ return card;
+}
+function facilityZonesFor(state){
+ return zones.filter(z=>String(z.location_id)===String(state.locationSelect.value)&&String(z.status||"active")!=="archived" ? true : String(z.location_id)===String(state.locationSelect.value)&&String(z.status)==="archived")
+ .filter(z=>state.floorSelect.value==="all"||String(z.floor_label||"")===state.floorSelect.value);
+}
+function drawFacilityZones(state){
+ if(!state||!state.svg)return;
+ const svg=state.svg;svg.replaceChildren();
+ const matching=facilityZonesFor(state);
+ matching.forEach(z=>{
+  const boundary=z.boundary;
+  if(!boundary||boundary.type!=="IndoorPolygon"||!Array.isArray(boundary.points)||boundary.points.length<3)return;
+  const points=boundary.points.filter(p=>Array.isArray(p)&&p.length===2&&p.every(n=>Number.isFinite(Number(n))));
+  if(points.length<3)return;
+  const polygon=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+  polygon.setAttribute("points",points.map(p=>(Number(p[0])*1000)+","+(Number(p[1])*1000)).join(" "));
+  polygon.setAttribute("class","ct-zone-facility-polygon is-"+String(z.status||"active").toLowerCase());
+  polygon.setAttribute("tabindex","0");polygon.setAttribute("role","button");polygon.setAttribute("aria-label","Open zone "+z.name);
+  polygon.addEventListener("click",()=>details(z.id));polygon.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();details(z.id);}});
+  const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=z.name+" · "+String(z.status||"active");polygon.append(title);svg.append(polygon);
+ });
+ const list=state.zoneList;list.replaceChildren();
+ if(!matching.length){list.append(e("p","ct-zone-empty-inline","No zones are linked to this location yet."));return;}
+ matching.forEach(z=>{
+  const row=b(z.name,"ct-zone-facility-zone is-"+String(z.status||"active").toLowerCase(),()=>details(z.id));
+  const meta=e("small","",z.floor_label||"Floor not specified");
+  const mapped=Boolean(z.boundary?.type==="IndoorPolygon"&&Array.isArray(z.boundary.points)&&z.boundary.points.length>=3);
+  row.append(meta,e("small","",mapped?"Mapped":"No indoor boundary"));list.append(row);
+ });
+}
+async function loadFacilityMap(state){
+ if(!state||!state.card.isConnected)return;
+ if(facilityPlanUrl){URL.revokeObjectURL(facilityPlanUrl);facilityPlanUrl=null;}
+ state.preview.replaceChildren();state.svg=null;state.notice.hidden=true;
+ const id=state.locationSelect.value;
+ if(!id){state.preview.append(e("p","ct-zone-muted","Choose a saved Location to view its indoor map."));return;}
+ const headers=new Headers({Accept:"image/png, image/jpeg, image/webp, application/pdf"});
+ const token=window.CleanTrackAuth?.getAuthToken?.()||window.sessionStorage.getItem("cleantrack_token");if(token)headers.set("Authorization","Bearer "+token);
+ state.preview.append(e("p","ct-zone-muted","Loading the private Location floor plan…"));
+ try{
+  const response=await fetch(window.CleanTrackConfig.apiBaseUrl+"/locations/"+encodeURIComponent(id)+"/floor-plan",{method:"GET",headers,credentials:"include",cache:"no-store"});
+  if(!response.ok){const data=await response.json().catch(()=>({}));if(response.status===404){state.preview.replaceChildren(e("p","ct-zone-empty-inline","No shared floor plan is uploaded for this Location yet. Open Locations → select this Location → upload its floor plan. Your existing locations and zones remain unchanged."));drawFacilityZones(state);return;}throw Error(data.error||data.message||"Floor plan could not be loaded (HTTP "+response.status+").");}
+  const blob=await response.blob();if(!["application/pdf","image/png","image/jpeg","image/webp"].includes(blob.type))throw Error("Unsupported floor-plan format.");
+  if(!state.card.isConnected)return;
+  facilityPlanUrl=URL.createObjectURL(blob);state.preview.replaceChildren();
+  if(blob.type==="application/pdf"){const frame=e("iframe","ct-zone-floor-plan-pdf");frame.title="Facility floor plan";frame.src=facilityPlanUrl;frame.loading="lazy";state.preview.append(frame);state.preview.append(e("p","ct-zone-muted","PDF preview is available. Convert the plan to PNG, JPEG or WebP to display interactive zone overlays."));drawFacilityZones(state);return;}
+  const frame=e("div","ct-zone-facility-image-frame"),img=e("img","ct-zone-facility-image"),svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  img.alt="Indoor floor plan for "+(locations.find(x=>String(x.id)===String(id))?.name||"selected location");img.src=facilityPlanUrl;
+  svg.setAttribute("viewBox","0 0 1000 1000");svg.setAttribute("preserveAspectRatio","none");svg.setAttribute("class","ct-zone-facility-overlay");
+  frame.append(img,svg);state.preview.append(frame);state.svg=svg;
+  drawFacilityZones(state);
+ }catch(ex){state.preview.replaceChildren(e("p","ct-zone-notice error",ex.message||"Facility map could not be loaded."));}
+}
 function build(){root.replaceChildren();const page=e("section","ct-zones-page"),head=e("header","ct-zones-header"),copy=e("div");copy.append(e("p","ct-zone-eyebrow","OPERATIONAL AREAS"),e("h1","","Zones"),e("p","ct-zone-muted","A zone is an operational area inside a parent Location—not another Locations directory. Manage team assignment, operations, map boundary, QR identity and activity."));const acts=e("div","ct-zones-header-actions");const packageInput=e("input","ct-zone-input");packageInput.type="file";packageInput.accept=".json,.geojson,.kml,.kmz,.gpx,.csv,.zip,application/json,application/geo+json,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/gpx+xml,application/zip";packageInput.hidden=true;packageInput.addEventListener("change",handleZonePackageFile);const importLabel=e("label","ct-zone-btn","Import Zones");importLabel.title="Import named zones and supplied boundaries from CleanTrack packages, GeoJSON, KML/KMZ, GPX waypoints, CSV, or zipped ESRI Shapefiles. PDF/image plans are managed in Location details.";importLabel.append(packageInput);acts.append(importLabel,b("Export zone CSV","ct-zone-btn",exportCsv),b("Export summary report","ct-zone-btn",exportReport),b("+ Create Zone","ct-zone-btn ct-zone-btn-primary",()=>editor("create")));head.append(copy,acts);page.append(head);const note=e("div","ct-zone-notice");note.dataset.zoneNotice="1";note.hidden=true;page.append(note);
-const met=e("div","ct-zone-metrics");met.dataset.zoneMetrics="1";page.append(met);const locationShortcuts=e("section","ct-zone-location-shortcuts");locationShortcuts.dataset.zoneLocations="1";page.append(locationShortcuts);const detail=e("section","ct-zone-detail");detail.dataset.zoneDetail="1";detail.hidden=true;page.append(detail);const edit=e("section","ct-zone-editor");edit.dataset.zoneEditor="1";edit.hidden=true;page.append(edit);
+const met=e("div","ct-zone-metrics");met.dataset.zoneMetrics="1";page.append(met);const locationShortcuts=e("section","ct-zone-location-shortcuts");locationShortcuts.dataset.zoneLocations="1";page.append(locationShortcuts);page.append(renderFacilityMap());const detail=e("section","ct-zone-detail");detail.dataset.zoneDetail="1";detail.hidden=true;page.append(detail);const edit=e("section","ct-zone-editor");edit.dataset.zoneEditor="1";edit.hidden=true;page.append(edit);
 const dir=e("section","ct-zone-directory"),dh=e("div","ct-zone-section-head"),dc=e("div");dc.append(e("h2","","Zone directory"),e("p","ct-zone-muted","Search actual saved zones and filter by parent Location and lifecycle status."));dh.append(dc);dir.append(dh);
 const toolbar=e("div","ct-zone-toolbar"),search=e("input","ct-zone-input");search.type="search";search.placeholder="Search zone, location, team, floor…";search.setAttribute("aria-label","Search zones");search.addEventListener("input",()=>{q=search.value.trim().toLowerCase();list();});const filter=e("select","ct-zone-input");filter.setAttribute("aria-label","Filter by parent location");filter.append(new Option("All locations","all"));locations.forEach(x=>filter.append(new Option(x.name,String(x.id))));filter.value=[...filter.options].some(o=>o.value===locFilter)?locFilter:"all";filter.addEventListener("change",()=>{locFilter=filter.value;list();});toolbar.append(search,filter);dir.append(toolbar);
 const tabs=e("div","ct-zone-tabs");tabs.dataset.zoneTabs="1";[["all","All zones"],["active","Active"],["inactive","Inactive"],["archived","Archived"]].forEach(([v,label])=>{tabs.append(b(label,"ct-zone-tab"+(status===v?" is-active":""),()=>{status=v;list();}));});dir.append(tabs);const results=e("div","ct-zone-list");results.dataset.zoneList="1";dir.append(results);page.append(dir);root.append(page);metrics();renderLocationShortcuts();list();const hash=location.hash.match(/^#zones-(\d+)$/);if(hash)details(Number(hash[1]));}
