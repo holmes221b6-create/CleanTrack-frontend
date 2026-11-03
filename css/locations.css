@@ -236,3 +236,6 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 .ct-zone-facility-zone.is-op-in-progress,.ct-loc-facility-zone.is-op-in-progress{border-left-color:#3989e8}
 .ct-zone-facility-zone.is-op-pending,.ct-loc-facility-zone.is-op-pending{border-left-color:#e0ad3f}
 .ct-zone-facility-zone.is-op-completed,.ct-loc-facility-zone.is-op-completed{border-left-color:#35b982}
+
+/* Workforce coverage mode on the Locations facility overview. */
+.ct-loc-facility-polygon.is-workforce-assigned{fill:#3989e8;stroke:#b5d8ff}.ct-loc-facility-polygon.is-workforce-unassigned{fill:#e87945;stroke:#ffd0b6}.ct-loc-workforce-legend .is-workforce-assigned i{background:#3989e8}.ct-loc-workforce-legend .is-workforce-unassigned i{background:#e87945}.ct-loc-facility-controls select{max-width:260px}
