@@ -170,7 +170,7 @@ function normalizeUser(user) {
       );
     }
 
-    if (!["admin", "supervisor", "employee"].includes(role)) {
+    if (!["admin", "supervisor", "staff"].includes(role)) {
       throw new Error("Please select a valid registration role.");
     }
     
