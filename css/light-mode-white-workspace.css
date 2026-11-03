@@ -371,3 +371,13 @@ html[data-theme="light"] body #page-content [class*="table"] {
   color: #111827 !important;
   border-color: #e5e7eb !important;
 }
+
+
+/* White appearance only: use contrast-tuned OMNIX artwork; other themes keep the original assets. */
+html[data-theme="light"] body img.omnix-logo-lockup,
+html[data-theme="light"] body img.ct-splash-logo {
+  content: url("../assets/omnix-logo-light.svg?v=1") !important;
+}
+html[data-theme="light"] body #workspace-view img.ct-logo-symbol {
+  content: url("../assets/omnix-sidebar-logo-light.svg?v=1") !important;
+}
