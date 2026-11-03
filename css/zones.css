@@ -50,3 +50,25 @@
 .ct-zone-facility-legend-item.is-archived i{background:#8b929d}
 @media(max-width:850px){.ct-zone-facility-layout{grid-template-columns:1fr}.ct-zone-facility-zone-list{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));max-height:280px}}
 @media(max-width:560px){.ct-zone-facility-map{padding:12px}.ct-zone-facility-preview{min-height:220px}.ct-zone-facility-toolbar select{width:100%}}
+
+/* Operational heatmap uses real zone-linked operation records; lifecycle colours remain as a separate cue. */
+.ct-zone-facility-polygon.is-op-overdue,.__unused-loc-polygon.is-op-overdue{fill:#e34d5b;stroke:#ffb4bc}
+.ct-zone-facility-polygon.is-op-attention,.__unused-loc-polygon.is-op-attention{fill:#e87945;stroke:#ffd0b6}
+.ct-zone-facility-polygon.is-op-in-progress,.__unused-loc-polygon.is-op-in-progress{fill:#3989e8;stroke:#b5d8ff}
+.ct-zone-facility-polygon.is-op-pending,.__unused-loc-polygon.is-op-pending{fill:#e0ad3f;stroke:#ffe6a3}
+.ct-zone-facility-polygon.is-op-completed,.__unused-loc-polygon.is-op-completed{fill:#35b982;stroke:#b5ffdc}
+.ct-zone-facility-polygon.is-op-no-data,.__unused-loc-polygon.is-op-no-data{fill:#8b929d;stroke:#d0d4da}
+.ct-zone-facility-operation-legend,.__unused-loc-operation-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--zb,var(--border-strong,#34445b))}
+.ct-zone-facility-legend-item.is-op-overdue i,.__unused-loc-operation-legend .is-op-overdue i{background:#e34d5b}
+.ct-zone-facility-legend-item.is-op-attention i,.__unused-loc-operation-legend .is-op-attention i{background:#e87945}
+.ct-zone-facility-legend-item.is-op-in-progress i,.__unused-loc-operation-legend .is-op-in-progress i{background:#3989e8}
+.ct-zone-facility-legend-item.is-op-pending i,.__unused-loc-operation-legend .is-op-pending i{background:#e0ad3f}
+.ct-zone-facility-legend-item.is-op-completed i,.__unused-loc-operation-legend .is-op-completed i{background:#35b982}
+.ct-zone-facility-legend-item.is-op-no-data i,.__unused-loc-operation-legend .is-op-no-data i{background:#8b929d}
+.ct-zone-facility-operation-legend .ct-zone-facility-legend-item{display:inline-flex;align-items:center;gap:6px;color:var(--zm,var(--text-muted,#aab7c9));font-size:.78rem}
+.ct-zone-facility-operation-legend .ct-zone-facility-legend-item i,.__unused-loc-operation-legend .ct-zone-facility-legend-item i{width:9px;height:9px;border-radius:50%}
+.ct-zone-facility-zone.is-op-overdue,.__unused-loc-zone.is-op-overdue{border-left-color:#e34d5b}
+.ct-zone-facility-zone.is-op-attention,.__unused-loc-zone.is-op-attention{border-left-color:#e87945}
+.ct-zone-facility-zone.is-op-in-progress,.__unused-loc-zone.is-op-in-progress{border-left-color:#3989e8}
+.ct-zone-facility-zone.is-op-pending,.__unused-loc-zone.is-op-pending{border-left-color:#e0ad3f}
+.ct-zone-facility-zone.is-op-completed,.__unused-loc-zone.is-op-completed{border-left-color:#35b982}
