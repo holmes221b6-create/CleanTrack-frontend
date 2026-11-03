@@ -145,12 +145,11 @@
   function renderIndoorFacilityOverview(){
     const card=el("section","ct-loc-card ct-loc-facility-overview");
     const head=el("div","ct-loc-section-head"),intro=el("div");
-    intro.append(el("p","ct-loc-eyebrow","FACILITY INTELLIGENCE"),el("h2","","Indoor facility overview"),el("p","ct-loc-muted","Explore saved building floor plans and their existing zones. Manage locations, assignments and records using the controls already available below."));
+    intro.append(el("p","ct-loc-eyebrow","FACILITY INTELLIGENCE"),el("h2","","Indoor facility overview"),el("p","ct-loc-muted","View the saved building plan with its real zone boundaries, operational status and team coverage."));
     head.append(intro);card.append(head);
     const controls=el("div","ct-loc-facility-controls"),select=el("select","ct-loc-input"),viewSelect=el("select","ct-loc-input");
     viewSelect.setAttribute("aria-label","Choose facility overview view");viewSelect.append(new Option("Operational status","operations"),new Option("Workforce coverage","workforce"));
-    select.setAttribute("aria-label","Choose a location for indoor facility overview");
-    select.append(new Option("Choose a location…",""));
+    select.setAttribute("aria-label","Choose a location for indoor facility overview");select.append(new Option("Choose a location…",""));
     locations.forEach(x=>select.append(new Option(x.name,String(x.id))));
     const preferred=locations.find(x=>String(x.id)===String(selectedId))||locations.find(x=>x.has_floor_plan)||locations[0];
     if(preferred)select.value=String(preferred.id);
@@ -158,27 +157,62 @@
     controls.append(select,viewSelect,refresh);card.append(controls);
     const body=el("div","ct-loc-facility-layout"),viewer=el("div","ct-loc-facility-viewer"),side=el("aside","ct-loc-facility-side");
     const preview=el("div","ct-loc-facility-preview"),list=el("div","ct-loc-facility-zone-list");
-    preview.append(el("p","ct-loc-muted","Select a location to load its saved indoor floor plan."));
-    side.append(el("h3","","Facility zones"),list);body.append(viewer,side);viewer.append(preview);card.append(body);
+    preview.append(el("p","ct-loc-muted","Choose a location to view its saved indoor plan."));
+    const sideHead=el("div","ct-loc-facility-side-head");sideHead.append(el("h3","","Zones"),el("span","ct-loc-facility-zone-count","0 zones"));
+    const detail=el("section","ct-loc-facility-selected");detail.setAttribute("aria-live","polite");detail.append(el("p","ct-loc-muted","Select a zone on the plan or in the list to inspect its live details."));
+    side.append(sideHead,list,detail);body.append(viewer,side);viewer.append(preview);card.append(body);
     const legend=el("div","ct-loc-facility-legend");
     [["active","Active"],["inactive","Inactive"],["archived","Archived"],["unmapped","No indoor boundary"]].forEach(([key,label])=>{const item=el("span","ct-loc-facility-legend-item is-"+key);item.append(el("i",""),el("span","",label));legend.append(item);});
-    card.append(legend);const operationLegend=el("div","ct-loc-facility-operation-legend");operationLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-op-overdue\"><i></i><span>Overdue</span></span><span class=\"ct-zone-facility-legend-item is-op-attention\"><i></i><span>Needs attention</span></span><span class=\"ct-zone-facility-legend-item is-op-in-progress\"><i></i><span>In progress</span></span><span class=\"ct-zone-facility-legend-item is-op-pending\"><i></i><span>Pending</span></span><span class=\"ct-zone-facility-legend-item is-op-completed\"><i></i><span>Completed</span></span><span class=\"ct-zone-facility-legend-item is-op-no-data\"><i></i><span>No operations</span></span>";card.append(operationLegend);const workforceLegend=el("div","ct-loc-facility-operation-legend ct-loc-workforce-legend");workforceLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-workforce-assigned\"><i></i><span>Team assigned</span></span><span class=\"ct-zone-facility-legend-item is-workforce-unassigned\"><i></i><span>No team assigned</span></span>";workforceLegend.hidden=true;card.append(workforceLegend);
-    const state={card,select,viewSelect,preview,list,svg:null,viewMode:"operations",legend,operationLegend,workforceLegend};
-    select.addEventListener("change",()=>loadIndoorFacilityOverview(state));viewSelect.addEventListener("change",()=>{state.viewMode=viewSelect.value;legend.hidden=state.viewMode==="workforce";operationLegend.hidden=state.viewMode==="workforce";workforceLegend.hidden=state.viewMode!=="workforce";const location=locations.find(x=>String(x.id)===String(select.value));if(location)drawIndoorFacilityZones(state,location);});
+    card.append(legend);
+    const operationLegend=el("div","ct-loc-facility-operation-legend");
+    operationLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-op-overdue\"><i></i><span>Overdue</span></span><span class=\"ct-zone-facility-legend-item is-op-attention\"><i></i><span>Needs attention</span></span><span class=\"ct-zone-facility-legend-item is-op-in-progress\"><i></i><span>In progress</span></span><span class=\"ct-zone-facility-legend-item is-op-pending\"><i></i><span>Pending</span></span><span class=\"ct-zone-facility-legend-item is-op-completed\"><i></i><span>Completed</span></span><span class=\"ct-zone-facility-legend-item is-op-no-data\"><i></i><span>No operations</span></span>";
+    card.append(operationLegend);
+    const workforceLegend=el("div","ct-loc-facility-operation-legend ct-loc-workforce-legend");
+    workforceLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-workforce-assigned\"><i></i><span>Team assigned</span></span><span class=\"ct-zone-facility-legend-item is-workforce-unassigned\"><i></i><span>No team assigned</span></span>";
+    workforceLegend.hidden=true;card.append(workforceLegend);
+    const state={card,select,viewSelect,preview,list,detail,zoneCount:sideHead.querySelector(".ct-loc-facility-zone-count"),svg:null,viewMode:"operations",selectedZoneId:null,legend,operationLegend,workforceLegend};
+    select.addEventListener("change",()=>{state.selectedZoneId=null;loadIndoorFacilityOverview(state);});
+    viewSelect.addEventListener("change",()=>{state.viewMode=viewSelect.value;legend.hidden=state.viewMode==="workforce";operationLegend.hidden=state.viewMode==="workforce";workforceLegend.hidden=state.viewMode!=="workforce";const location=locations.find(x=>String(x.id)===String(select.value));if(location)drawIndoorFacilityZones(state,location);});
     if(select.value)loadIndoorFacilityOverview(state);
     return card;
   }
+  function renderSelectedFacilityZone(state,location,zone){
+    state.detail.replaceChildren();
+    if(!zone){state.detail.append(el("p","ct-loc-muted","Select a zone on the plan or in the list to inspect its live details."));return;}
+    const zoneOps=operations.filter(o=>String(o.zone_id)===String(zone.id)),heat=operationHeat(zoneOps);
+    const teamId=zone.effective_team_id||zone.team_id||location.team_id,people=Array.isArray(zone.assigned_people)?zone.assigned_people:[];
+    const teamLabel=teamId?(zone.effective_team_name||zone.team_name||teamName(teamId)):"No team assigned";
+    const title=el("div","ct-loc-facility-selected-head");
+    title.append(el("span","ct-loc-facility-selected-kicker","SELECTED ZONE"),el("strong","",zone.name||"Unnamed zone"),el("span","ct-loc-status status-"+String(zone.status||"active").toLowerCase(),txt(zone.status,"active")));
+    state.detail.append(title);
+    if(zone.description)state.detail.append(el("p","ct-loc-muted",zone.description));
+    const facts=el("div","ct-loc-facility-facts");
+    [["Floor / area",txt(zone.floor_label,"Not specified")],["Assigned team",teamLabel],["Active members",String(zone.member_count??people.length)],["Supervisors",String(zone.supervisor_count??people.filter(p=>String(p.role||"").toLowerCase()==="supervisor").length)],["Operations",String(zone.operation_count??zoneOps.length)],["Open operations",String(zone.active_operation_count??heat.open)],["Overdue",String(heat.overdue)],["Indoor boundary",zone.boundary?.type==="IndoorPolygon"&&Array.isArray(zone.boundary.points)?"Mapped":"Not mapped"]].forEach(([label,value])=>{const fact=el("div","ct-loc-facility-fact");fact.append(el("small","",label),el("strong","",value));facts.append(fact);});
+    state.detail.append(facts);
+    const assigned=el("div","ct-loc-facility-assigned");assigned.append(el("h4","","Assigned people"));
+    if(people.length){people.forEach(person=>{const row=el("div","ct-loc-facility-person");row.append(el("span","",person.name||"Unnamed member"),el("small","",person.role||"Member"));assigned.append(row);});}
+    else assigned.append(el("p","ct-loc-muted",teamId?"No active team members are returned for this assignment.":"This zone has no effective team assignment."));
+    state.detail.append(assigned);
+    const opHead=el("div","ct-loc-facility-operation-head");opHead.append(el("h4","","Operations"),el("span","ct-loc-muted",heat.label));state.detail.append(opHead);
+    if(zoneOps.length){zoneOps.slice(0,6).forEach(op=>{const row=el("div","ct-loc-facility-op");row.append(el("span","",op.title||"Untitled operation"),el("small","",txt(op.status,"Pending")+" · "+(op.due_at?d(op.due_at):"No due date")));state.detail.append(row);});if(zoneOps.length>6)state.detail.append(el("small","ct-loc-muted",(zoneOps.length-6)+" more operations are available in Operations."));}
+    else state.detail.append(el("p","ct-loc-muted","No operations are currently linked directly to this zone."));
+  }
   function drawIndoorFacilityZones(state,location){
-    const list=state.list;list.replaceChildren();
-    const linked=zonesAt(location);
-    if(!linked.length)list.append(el("p","ct-loc-muted","No zones are linked to this location yet."));
+    const list=state.list;list.replaceChildren();const linked=zonesAt(location);
+    if(state.zoneCount)state.zoneCount.textContent=linked.length+" zone"+(linked.length===1?"":"s");
+    if(!linked.length)list.append(el("p","ct-loc-muted","No zones are linked to this location yet. Create zones in the Zones page and link them to this location."));
     linked.forEach(z=>{
-      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id))),teamId=z.effective_team_id||z.team_id||location.team_id,people=Array.isArray(z.assigned_people)?z.assigned_people:[],teamAssigned=Boolean(teamId),teamLabel=teamAssigned?(z.effective_team_name||z.team_name||teamName(teamId)):"No team assigned";const row=btn(z.name||"Unnamed zone","ct-loc-facility-zone "+(state.viewMode==="workforce"?(teamAssigned?"is-workforce-assigned":"is-workforce-unassigned"):"is-"+String(z.status||"active").toLowerCase()+" is-op-"+heat.key),()=>showDetails(location.id,false));
+      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id))),teamId=z.effective_team_id||z.team_id||location.team_id;
+      const people=Array.isArray(z.assigned_people)?z.assigned_people:[],teamAssigned=Boolean(teamId),teamLabel=teamAssigned?(z.effective_team_name||z.team_name||teamName(teamId)):"No team assigned";
       const mapped=z.boundary?.type==="IndoorPolygon"&&Array.isArray(z.boundary.points)&&z.boundary.points.length>=3;
-      row.append(el("small","",txt(z.floor_label,"Floor not specified")),el("small","",mapped?"Mapped on floor plan":"No indoor boundary"));
-      if(state.viewMode==="workforce"){const supervisors=people.filter(p=>String(p.role||"").toLowerCase()==="supervisor").map(p=>p.name).filter(Boolean);row.append(el("small","",teamLabel+" · "+people.length+" active members"),el("small","",supervisors.length?"Supervisor: "+supervisors.join(", "):"No active supervisor recorded"));}else row.append(el("small","",heat.label+" · "+heat.count+" operations"));
+      const row=btn(z.name||"Unnamed zone","ct-loc-facility-zone "+(state.viewMode==="workforce"?(teamAssigned?"is-workforce-assigned":"is-workforce-unassigned"):"is-op-"+heat.key)+(String(state.selectedZoneId)===String(z.id)?" is-selected":""),()=>{state.selectedZoneId=z.id;drawIndoorFacilityZones(state,location);});
+      row.append(el("small","",txt(z.floor_label,"Floor / area not specified")),el("small","",mapped?"Indoor boundary mapped":"No indoor boundary"));
+      row.append(el("small","",state.viewMode==="workforce"?teamLabel+" · "+(z.member_count??people.length)+" active members":heat.label+" · "+heat.count+" linked operations"));
       list.append(row);
     });
+    const selected=linked.find(z=>String(z.id)===String(state.selectedZoneId))||null;
+    if(selected)state.selectedZoneId=selected.id;
+    renderSelectedFacilityZone(state,location,selected);
     if(!state.svg)return;
     state.svg.replaceChildren();
     linked.forEach(z=>{
@@ -188,11 +222,14 @@
       if(valid.length<3)return;
       const poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
       poly.setAttribute("points",valid.map(p=>(Number(p[0])*1000)+","+(Number(p[1])*1000)).join(" "));
-      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id))),teamId=z.effective_team_id||z.team_id||location.team_id,teamAssigned=Boolean(teamId);poly.setAttribute("class","ct-loc-facility-polygon "+(state.viewMode==="workforce"?(teamAssigned?"is-workforce-assigned":"is-workforce-unassigned"):"is-"+String(z.status||"active").toLowerCase()+" is-op-"+heat.key));
-      poly.setAttribute("tabindex","0");poly.setAttribute("role","button");poly.setAttribute("aria-label","Open "+z.name);
-      const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=state.viewMode==="workforce"?(z.name||"Zone")+" · "+(teamAssigned?(z.effective_team_name||z.team_name||teamName(teamId)):"No team assigned")+" · "+(Array.isArray(z.assigned_people)?z.assigned_people.length:0)+" active team members":(z.name||"Zone")+" · "+heat.label+" · "+heat.count+" operations ("+heat.open+" open, "+heat.completed+" completed"+(heat.overdue?", "+heat.overdue+" overdue":"")+")";poly.append(title);
-      poly.addEventListener("click",()=>showDetails(location.id,false));
-      poly.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();showDetails(location.id,false);}});
+      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id))),teamId=z.effective_team_id||z.team_id||location.team_id,teamAssigned=Boolean(teamId);
+      poly.setAttribute("class","ct-loc-facility-polygon "+(state.viewMode==="workforce"?(teamAssigned?"is-workforce-assigned":"is-workforce-unassigned"):"is-op-"+heat.key)+(String(state.selectedZoneId)===String(z.id)?" is-selected":""));
+      poly.setAttribute("tabindex","0");poly.setAttribute("role","button");poly.setAttribute("aria-label","Select "+z.name);
+      const title=document.createElementNS("http://www.w3.org/2000/svg","title");
+      title.textContent=state.viewMode==="workforce"?(z.name||"Zone")+" · "+(teamAssigned?(z.effective_team_name||z.team_name||teamName(teamId)):"No team assigned")+" · "+(z.member_count??(Array.isArray(z.assigned_people)?z.assigned_people.length:0))+" active members":(z.name||"Zone")+" · "+heat.label+" · "+heat.count+" operations ("+heat.open+" open, "+heat.completed+" completed"+(heat.overdue?", "+heat.overdue+" overdue":"")+")";
+      poly.append(title);
+      const choose=()=>{state.selectedZoneId=z.id;drawIndoorFacilityZones(state,location);};
+      poly.addEventListener("click",choose);poly.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();choose();}});
       state.svg.append(poly);
     });
   }
@@ -202,7 +239,7 @@
     state.preview.replaceChildren();state.svg=null;state.list.replaceChildren();
     const id=state.select.value,location=locations.find(x=>String(x.id)===String(id));
     if(!location){state.preview.append(el("p","ct-loc-muted","Choose a saved location."));return;}
-    if(!location.has_floor_plan){state.preview.append(el("p","ct-loc-empty","No shared indoor floor plan is uploaded for this location. Open its Details to upload one. Existing location and zone management remains available."));drawIndoorFacilityZones(state,location);return;}
+    if(!location.has_floor_plan){state.preview.append(el("p","ct-loc-empty","No shared indoor floor plan is uploaded for this location. Open its Details to upload one. Zone records and assignments remain available in the list."));drawIndoorFacilityZones(state,location);return;}
     state.preview.append(el("p","ct-loc-muted","Loading private floor plan…"));
     try{
       const headers=new Headers({Accept:"application/pdf, image/png, image/jpeg, image/webp"}),token=window.CleanTrackAuth?.getAuthToken?.()||window.sessionStorage.getItem("cleantrack_token");
@@ -213,11 +250,13 @@
       if(!["application/pdf","image/png","image/jpeg","image/webp"].includes(blob.type))throw Error("Unsupported floor-plan format.");
       if(request!==facilityOverviewRequest||!state.card.isConnected)return;
       facilityOverviewUrl=URL.createObjectURL(blob);state.preview.replaceChildren();
-      if(blob.type==="application/pdf"){const frame=el("iframe","ct-loc-facility-pdf");frame.title="Indoor floor plan for "+location.name;frame.src=facilityOverviewUrl;frame.loading="lazy";state.preview.append(frame);state.preview.append(el("p","ct-loc-muted","PDF floor plan preview. Image floor plans support interactive zone overlays."));drawIndoorFacilityZones(state,location);return;}
+      if(blob.type==="application/pdf"){const frame=el("iframe","ct-loc-facility-pdf");frame.title="Indoor floor plan for "+location.name;frame.src=facilityOverviewUrl;frame.loading="lazy";state.preview.append(frame);state.preview.append(el("p","ct-loc-muted","PDF preview loaded. Convert the plan to PNG, JPEG or WebP to use interactive zone overlays."));drawIndoorFacilityZones(state,location);return;}
       const frame=el("div","ct-loc-facility-image-frame"),img=el("img","ct-loc-facility-image"),svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
       img.alt="Indoor floor plan for "+location.name;img.src=facilityOverviewUrl;
       svg.setAttribute("viewBox","0 0 1000 1000");svg.setAttribute("preserveAspectRatio","none");svg.setAttribute("class","ct-loc-facility-overlay");
-      frame.append(img,svg);state.preview.append(frame);state.svg=svg;drawIndoorFacilityZones(state,location);
+      frame.append(img,svg);state.preview.append(frame);state.svg=svg;
+      img.addEventListener("load",()=>{if(request===facilityOverviewRequest&&state.card.isConnected)drawIndoorFacilityZones(state,location);},{once:true});
+      drawIndoorFacilityZones(state,location);
     }catch(err){if(request===facilityOverviewRequest)state.preview.replaceChildren(el("p","ct-loc-notice error",err.message||"Could not load the indoor floor plan."));}
   }
   function renderMetrics(box){if(!box)return;box.replaceChildren();const active=locations.filter(x=>String(x.status||"active")==="active").length,mapped=locations.filter(coords).length,open=operations.filter(x=>!["completed","complete","approved","done","closed","cancelled","canceled"].includes(String(x.status||"").toLowerCase())).length;
