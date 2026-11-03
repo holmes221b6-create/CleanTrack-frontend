@@ -19,7 +19,7 @@
     roles: {
       ADMIN: "admin",
       SUPERVISOR: "supervisor",
-      EMPLOYEE: "staff"
+      STAFF: "staff"
     },
     operationStatuses: [
       "Created",
