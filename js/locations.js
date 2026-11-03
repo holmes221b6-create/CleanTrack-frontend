@@ -10,7 +10,21 @@
   const coords=x=>{if(!x)return false;const lat=x.latitude,lon=x.longitude;if(lat===null||lat===undefined||lon===null||lon===undefined||String(lat).trim()===""||String(lon).trim()==="")return false;const a=Number(lat),b=Number(lon);return Number.isFinite(a)&&a>=-90&&a<=90&&Number.isFinite(b)&&b>=-180&&b<=180;};
   const teamName=id=>id===null||id===undefined||id===""?"Unassigned":(teams.find(t=>String(t.id)===String(id))?.name||(dataStatus.teams?"Team #"+id+" (not found)":"Team #"+id+" (team list unavailable)"));
   const zonesAt=x=>zones.filter(z=>String(z.location_id)===String(x.id));
-  const opsAt=x=>{const ids=new Set(zonesAt(x).map(z=>String(z.id)));return operations.filter(o=>String(o.location_id)===String(x.id)||ids.has(String(o.zone_id)));};
+  const opsAt=x=>{const ids=new Set(zonesAt(x).map(z=>String(z.id)));return operations.filter(o=>String(o.location_id)===String(x.id)||ids.has(String(o.zone_id)));};function operationHeat(ops){
+ if(!Array.isArray(ops)||!ops.length)return {key:"no-data",label:"No operations",count:0,open:0,overdue:0,completed:0};
+ const norm=o=>String(o.status||"pending").trim().toLowerCase().replace(/[_-]+/g," ");
+ const done=o=>["completed","complete","approved","verified","done","closed"].includes(norm(o));
+ const cancelled=o=>["cancelled","canceled"].includes(norm(o));
+ const overdue=o=>!done(o)&&!cancelled(o)&&(o.overdue===true||(o.due_at&&Number.isFinite(new Date(o.due_at).getTime())&&new Date(o.due_at)<new Date()));
+ const overdueCount=ops.filter(overdue).length,completedCount=ops.filter(done).length,openCount=ops.filter(o=>!done(o)&&!cancelled(o)).length;
+ const progress=ops.some(o=>["in progress","started"].includes(norm(o)));
+ const rejected=ops.some(o=>norm(o)==="rejected");
+ const submitted=ops.some(o=>norm(o)==="submitted");
+ const key=overdueCount?"overdue":rejected?"attention":progress?"in-progress":openCount?"pending":"completed";
+ const label={overdue:"Overdue",attention:"Needs attention", "in-progress":"In progress",pending:submitted?"Awaiting review":"Pending",completed:"Completed"}[key];
+ return {key,label,count:ops.length,open:openCount,overdue:overdueCount,completed:completedCount};
+}
+
   const dt=x=>!x?"—":(window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x)+" "+window.CleanTrackPreferences.formatTime(x):new Date(x).toLocaleString());
   const d=x=>!x?"—":(window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x):new Date(x).toLocaleDateString());
   const rows=(data,key)=>Array.isArray(data?.[key])?data[key]:[];
@@ -147,7 +161,7 @@
     side.append(el("h3","","Facility zones"),list);body.append(viewer,side);viewer.append(preview);card.append(body);
     const legend=el("div","ct-loc-facility-legend");
     [["active","Active"],["inactive","Inactive"],["archived","Archived"],["unmapped","No indoor boundary"]].forEach(([key,label])=>{const item=el("span","ct-loc-facility-legend-item is-"+key);item.append(el("i",""),el("span","",label));legend.append(item);});
-    card.append(legend);
+    card.append(legend);const operationLegend=el("div","ct-loc-facility-operation-legend");operationLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-op-overdue\"><i></i><span>Overdue</span></span><span class=\"ct-zone-facility-legend-item is-op-attention\"><i></i><span>Needs attention</span></span><span class=\"ct-zone-facility-legend-item is-op-in-progress\"><i></i><span>In progress</span></span><span class=\"ct-zone-facility-legend-item is-op-pending\"><i></i><span>Pending</span></span><span class=\"ct-zone-facility-legend-item is-op-completed\"><i></i><span>Completed</span></span><span class=\"ct-zone-facility-legend-item is-op-no-data\"><i></i><span>No operations</span></span>";card.append(operationLegend);
     const state={card,select,preview,list,svg:null};
     select.addEventListener("change",()=>loadIndoorFacilityOverview(state));
     if(select.value)loadIndoorFacilityOverview(state);
@@ -155,12 +169,12 @@
   }
   function drawIndoorFacilityZones(state,location){
     const list=state.list;list.replaceChildren();
-    const linked=zonesAt(location).filter(z=>String(z.status||"active").toLowerCase()!=="archived"||true);
+    const linked=zonesAt(location);
     if(!linked.length)list.append(el("p","ct-loc-muted","No zones are linked to this location yet."));
     linked.forEach(z=>{
-      const row=btn(z.name||"Unnamed zone","ct-loc-facility-zone is-"+String(z.status||"active").toLowerCase(),()=>showDetails(location.id,false));
+      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id)));const row=btn(z.name||"Unnamed zone","ct-loc-facility-zone is-"+String(z.status||"active").toLowerCase()+" is-op-"+heat.key,()=>showDetails(location.id,false));
       const mapped=z.boundary?.type==="IndoorPolygon"&&Array.isArray(z.boundary.points)&&z.boundary.points.length>=3;
-      row.append(el("small","",txt(z.floor_label,"Floor not specified")),el("small","",mapped?"Mapped on floor plan":"No indoor boundary"));
+      row.append(el("small","",txt(z.floor_label,"Floor not specified")),el("small","",mapped?"Mapped on floor plan":"No indoor boundary"),el("small","",heat.label+" · "+heat.count+" operations"));
       list.append(row);
     });
     if(!state.svg)return;
@@ -172,9 +186,9 @@
       if(valid.length<3)return;
       const poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
       poly.setAttribute("points",valid.map(p=>(Number(p[0])*1000)+","+(Number(p[1])*1000)).join(" "));
-      poly.setAttribute("class","ct-loc-facility-polygon is-"+String(z.status||"active").toLowerCase());
+      const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id)));poly.setAttribute("class","ct-loc-facility-polygon is-"+String(z.status||"active").toLowerCase()+" is-op-"+heat.key);
       poly.setAttribute("tabindex","0");poly.setAttribute("role","button");poly.setAttribute("aria-label","Open "+z.name);
-      const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=(z.name||"Zone")+" · "+String(z.status||"active");poly.append(title);
+      const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=(z.name||"Zone")+" · "+heat.label+" · "+heat.count+" operations ("+heat.open+" open, "+heat.completed+" completed"+(heat.overdue?", "+heat.overdue+" overdue":"")+")";poly.append(title);
       poly.addEventListener("click",()=>showDetails(location.id,false));
       poly.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();showDetails(location.id,false);}});
       state.svg.append(poly);
