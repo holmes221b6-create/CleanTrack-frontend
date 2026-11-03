@@ -2259,3 +2259,18 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
   padding: 0 !important;
   box-sizing: border-box !important;
 }
+
+
+/* Fast, low-cost appearance transition. Only paint properties are animated; layout is never transitioned. */
+html.omnix-theme-transitioning body,
+html.omnix-theme-transitioning body :where(header, nav, aside, main, section, article, footer, button, a, input, select, textarea, [class*="card"], [class*="panel"], [class*="surface"], [class*="toolbar"], [class*="sidebar"]) {
+  transition-property: background-color, color, border-color, box-shadow !important;
+  transition-duration: 180ms !important;
+  transition-timing-function: cubic-bezier(.22, .61, .36, 1) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.omnix-theme-transitioning body,
+  html.omnix-theme-transitioning body * {
+    transition: none !important;
+  }
+}
