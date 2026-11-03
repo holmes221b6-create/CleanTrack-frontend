@@ -215,6 +215,14 @@ html[data-theme="black"] body #auth-view .status-panel {
   background-color: #09090b !important;
   background-image: none !important;
 }
+
+/* On white surfaces, add a restrained dark edge to the existing OMNIX artwork.
+   This improves contrast without recolouring, replacing or altering the SVG. */
+html[data-theme="light"] body .omnix-logo-lockup,
+html[data-theme="light"] body .ct-splash-logo {
+  filter: drop-shadow(0 0 1px rgba(38, 45, 65, .9))
+          drop-shadow(0 1px 2px rgba(38, 45, 65, .22)) !important;
+}
 </style>
 </head>
 
