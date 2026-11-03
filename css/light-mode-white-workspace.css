@@ -303,3 +303,71 @@ html[data-theme="light"] body #workspace-view .ct-sidebar img {
 html[data-theme="light"] body #workspace-view .ct-sidebar {
   scrollbar-color: #cbd5e1 #ffffff !important;
 }
+
+
+/*
+ * Application-wide Light theme reset.
+ * Many feature modules (Billing, Analytics, Reports, Operations, Zones, etc.)
+ * ship their own hard-coded charcoal surfaces and white typography. A short
+ * component allow-list cannot cover every page, so reset the entire rendered
+ * page-content tree only while Light is selected.
+ */
+html[data-theme="light"] body #page-content,
+html[data-theme="light"] body #page-content *,
+html[data-theme="light"] body #page-content *::before,
+html[data-theme="light"] body #page-content *::after {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #e5e7eb !important;
+  text-shadow: none !important;
+}
+
+/* Neutralise old dark-theme shadows and gradients throughout every module. */
+html[data-theme="light"] body #page-content * {
+  box-shadow: none !important;
+}
+
+/* Keep functional/visual media intact; they are not theme surfaces. */
+html[data-theme="light"] body #page-content canvas,
+html[data-theme="light"] body #page-content canvas *,
+html[data-theme="light"] body #page-content svg,
+html[data-theme="light"] body #page-content svg *,
+html[data-theme="light"] body #page-content .leaflet-container,
+html[data-theme="light"] body #page-content .leaflet-container *,
+html[data-theme="light"] body #page-content img,
+html[data-theme="light"] body #page-content video,
+html[data-theme="light"] body #page-content iframe {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Reapply clear field boundaries after the universal component reset. */
+html[data-theme="light"] body #page-content input,
+html[data-theme="light"] body #page-content select,
+html[data-theme="light"] body #page-content textarea {
+  color: #111827 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html[data-theme="light"] body #page-content input::placeholder,
+html[data-theme="light"] body #page-content textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* No module may reintroduce dark cards or panels in Light appearance. */
+html[data-theme="light"] body #page-content [class*="ct-"],
+html[data-theme="light"] body #page-content [class*="card"],
+html[data-theme="light"] body #page-content [class*="panel"],
+html[data-theme="light"] body #page-content [class*="section"],
+html[data-theme="light"] body #page-content [class*="hero"],
+html[data-theme="light"] body #page-content [class*="plan"],
+html[data-theme="light"] body #page-content [class*="provider"],
+html[data-theme="light"] body #page-content [class*="table"] {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+}
