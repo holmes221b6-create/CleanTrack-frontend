@@ -239,3 +239,28 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 
 /* Workforce coverage mode on the Locations facility overview. */
 .ct-loc-facility-polygon.is-workforce-assigned{fill:#3989e8;stroke:#b5d8ff}.ct-loc-facility-polygon.is-workforce-unassigned{fill:#e87945;stroke:#ffd0b6}.ct-loc-workforce-legend .is-workforce-assigned i{background:#3989e8}.ct-loc-workforce-legend .is-workforce-unassigned i{background:#e87945}.ct-loc-facility-controls select{max-width:260px}
+
+/* Locations facility plan: keep the SVG coordinate plane exactly aligned with the displayed image. */
+.ct-loc-facility-image-frame{display:block;width:100%;max-width:100%;line-height:0}
+.ct-loc-facility-image{display:block;width:100%;max-width:100%;max-height:680px;height:auto;object-fit:contain}
+.ct-loc-facility-overlay{pointer-events:none}
+.ct-loc-facility-polygon{pointer-events:auto;fill-opacity:.34}
+.ct-loc-facility-polygon.is-selected{fill-opacity:.78;stroke:#fff;stroke-width:3.5;filter:drop-shadow(0 0 3px rgba(255,255,255,.55))}
+.ct-loc-facility-side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.ct-loc-facility-side-head h3{margin:0}
+.ct-loc-facility-zone-count{font-size:.75rem;color:var(--text-muted,#aab7c9)}
+.ct-loc-facility-zone.is-selected{border-color:var(--accent,#8b70ff);background:var(--bg-hover,#202b40);box-shadow:inset 0 0 0 1px var(--accent,#8b70ff)}
+.ct-loc-facility-selected{margin-top:14px;padding:12px;border:1px solid var(--border-strong,#34445b);border-radius:10px;background:var(--bg-card,#151f31)}
+.ct-loc-facility-selected-head{display:grid;grid-template-columns:1fr auto;gap:5px 8px;align-items:center}
+.ct-loc-facility-selected-head strong{font-size:1rem;min-width:0;overflow-wrap:anywhere}
+.ct-loc-facility-selected-kicker{grid-column:1/-1;font-size:.66rem;letter-spacing:.12em;color:var(--text-muted,#aab7c9)}
+.ct-loc-facility-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.ct-loc-facility-fact{display:grid;gap:3px;min-width:0;padding:8px;border-radius:7px;background:var(--bg-elevated,#10182a)}
+.ct-loc-facility-fact small,.ct-loc-facility-person small,.ct-loc-facility-op small{font-size:.7rem;color:var(--text-muted,#aab7c9)}
+.ct-loc-facility-fact strong{font-size:.82rem;overflow-wrap:anywhere}
+.ct-loc-facility-assigned h4,.ct-loc-facility-operation-head h4{margin:12px 0 7px;font-size:.82rem}
+.ct-loc-facility-person,.ct-loc-facility-op{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--border-strong,#34445b);font-size:.78rem}
+.ct-loc-facility-person span,.ct-loc-facility-op span{min-width:0;overflow-wrap:anywhere}
+.ct-loc-facility-operation-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ct-loc-facility-operation-head h4{margin-bottom:7px}
+@media(max-width:850px){.ct-loc-facility-selected{margin-top:10px}}
