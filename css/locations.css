@@ -241,8 +241,8 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 .ct-loc-facility-polygon.is-workforce-assigned{fill:#3989e8;stroke:#b5d8ff}.ct-loc-facility-polygon.is-workforce-unassigned{fill:#e87945;stroke:#ffd0b6}.ct-loc-workforce-legend .is-workforce-assigned i{background:#3989e8}.ct-loc-workforce-legend .is-workforce-unassigned i{background:#e87945}.ct-loc-facility-controls select{max-width:260px}
 
 /* Locations facility plan: keep the SVG coordinate plane exactly aligned with the displayed image. */
-.ct-loc-facility-image-frame{display:block;width:100%;max-width:100%;line-height:0}
-.ct-loc-facility-image{display:block;width:100%;max-width:100%;max-height:680px;height:auto;object-fit:contain}
+.ct-loc-facility-image-frame{position:relative;display:block;width:fit-content;max-width:100%;margin:0 auto;line-height:0}
+.ct-loc-facility-image{display:block;width:auto;height:auto;max-width:100%;max-height:680px;object-fit:contain}
 .ct-loc-facility-overlay{pointer-events:none}
 .ct-loc-facility-polygon{pointer-events:auto;fill-opacity:.34}
 .ct-loc-facility-polygon.is-selected{fill-opacity:.78;stroke:#fff;stroke-width:3.5;filter:drop-shadow(0 0 3px rgba(255,255,255,.55))}
