@@ -627,3 +627,9 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
     height:52px !important;
   }
 }
+
+
+/* Slightly increase the plain OMNIX sidebar label without adding decorative styling. */
+#workspace-view .ct-sidebar-brand > span {
+  font-size: 18px;
+}
