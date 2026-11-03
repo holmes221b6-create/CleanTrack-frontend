@@ -839,3 +839,31 @@ html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(
   color: #cbdcf2 !important;
   border-color: #203956 !important;
 }
+
+
+/* OMNIX appearance parity: theme changes must never resize or reflow the workspace.
+   Keep one shared sidebar geometry in Default, Light and Dark appearances. */
+#workspace-view .ct-workspace-shell {
+  grid-template-columns: 252px minmax(0, 1fr) !important;
+}
+#workspace-view .ct-workspace-shell > .ct-sidebar {
+  width: 252px !important;
+  min-width: 252px !important;
+  max-width: 252px !important;
+  box-sizing: border-box !important;
+}
+#workspace-view .ct-nav-group-items .nav-item-label {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+@media (max-width: 1000px) and (min-width: 761px) {
+  #workspace-view .ct-workspace-shell { grid-template-columns: 252px minmax(0, 1fr) !important; }
+  #workspace-view .ct-workspace-shell > .ct-sidebar {
+    width: 252px !important;
+    min-width: 252px !important;
+    max-width: 252px !important;
+  }
+}
