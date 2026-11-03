@@ -214,7 +214,7 @@ function normalizeUser(user) {
       currentUser = normalizeUser(user);
       emitAuthEvent("cleantrack:register", currentUser);
     } else {
-      // Supervisors and staff stay signed out until their membership is approved.
+      // Supervisors and employees stay signed out until their membership is approved.
       currentUser = null;
       persistToken("");
     }
