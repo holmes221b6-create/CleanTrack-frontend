@@ -205,7 +205,7 @@ function renderDetail(d,p){
  p.append(actions);const action=el("section","ct-team-action-panel");action.dataset.teamAction="1";action.hidden=true;p.append(action);
  const over=el("section","ct-team-overview");over.append(el("h3","","Overview"));const metrics=el("div","ct-team-metrics");
  [
- ["Supervisors",t.supervisor_count],["Staff",t.staff_count],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],
+ ["Supervisors",t.supervisor_count],["Employees",t.employee_count],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],
  ["Active tasks",t.active_task_count],["Pending / review",t.pending_task_count],["Overdue tasks",t.overdue_task_count,null,Number(t.overdue_task_count)>0],
  ["Completion rate",t.completion_rate===null?"—":t.completion_rate+"%",t.task_count+" linked tasks"],
  ["Configured capacity",t.capacity===null||t.capacity===undefined?"Not set":txt(t.member_count,"0")+" / "+t.capacity,t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"No capacity rule",t.capacity_status==="over_capacity"]
