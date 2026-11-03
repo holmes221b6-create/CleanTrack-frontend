@@ -931,7 +931,10 @@ html[data-theme="light"] body .ct-splash-logo {
   object-position:left center;
   filter:drop-shadow(0 0 14px rgba(126,78,255,.42));
 }
-#workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:min(226px,100%); height:58px; }
+/* Sidebar-only logo sizing.
+   Previous size preserved for easy restoration: desktop 226px × 58px;
+   compact/mobile 205px × 52px. */
+#workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:min(200px,100%); height:52px; }
 @media(max-width:760px) {
   #auth-view .auth-intro > .brand.omnix-brand .brand-mark.omnix-brand-mark {
     width:min(300px,82vw);
@@ -943,6 +946,6 @@ html[data-theme="light"] body .ct-splash-logo {
 }
 @media(max-width:540px) {
   .brand-mark.omnix-brand-mark { width:min(220px,70vw); height:52px; }
-  #workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:205px; height:52px; }
+  #workspace-view .sidebar-brand .brand-mark.omnix-brand-mark { width:185px; height:48px; }
 }
 </style>
