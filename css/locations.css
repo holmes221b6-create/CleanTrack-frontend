@@ -214,3 +214,25 @@ html[data-theme="light"] .ct-locations-page .ct-loc-map-chip { background:#e1e7e
 .ct-loc-facility-pdf{display:block;width:100%;height:min(70vh,760px);min-height:400px;border:0;background:#fff}
 @media(max-width:850px){.ct-loc-facility-layout{grid-template-columns:1fr}.ct-loc-facility-zone-list{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));max-height:280px}}
 @media(max-width:560px){.ct-loc-facility-overview{padding:12px}.ct-loc-facility-preview{min-height:220px}.ct-loc-facility-controls select{width:100%}}
+
+/* Operational heatmap uses real zone-linked operation records; lifecycle colours remain as a separate cue. */
+.ct-zone-facility-polygon.is-op-overdue,.ct-loc-facility-polygon.is-op-overdue{fill:#e34d5b;stroke:#ffb4bc}
+.ct-zone-facility-polygon.is-op-attention,.ct-loc-facility-polygon.is-op-attention{fill:#e87945;stroke:#ffd0b6}
+.ct-zone-facility-polygon.is-op-in-progress,.ct-loc-facility-polygon.is-op-in-progress{fill:#3989e8;stroke:#b5d8ff}
+.ct-zone-facility-polygon.is-op-pending,.ct-loc-facility-polygon.is-op-pending{fill:#e0ad3f;stroke:#ffe6a3}
+.ct-zone-facility-polygon.is-op-completed,.ct-loc-facility-polygon.is-op-completed{fill:#35b982;stroke:#b5ffdc}
+.ct-zone-facility-polygon.is-op-no-data,.ct-loc-facility-polygon.is-op-no-data{fill:#8b929d;stroke:#d0d4da}
+.ct-zone-facility-operation-legend,.ct-loc-facility-operation-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--zb,var(--border-strong,#34445b))}
+.ct-zone-facility-legend-item.is-op-overdue i,.ct-loc-facility-operation-legend .is-op-overdue i{background:#e34d5b}
+.ct-zone-facility-legend-item.is-op-attention i,.ct-loc-facility-operation-legend .is-op-attention i{background:#e87945}
+.ct-zone-facility-legend-item.is-op-in-progress i,.ct-loc-facility-operation-legend .is-op-in-progress i{background:#3989e8}
+.ct-zone-facility-legend-item.is-op-pending i,.ct-loc-facility-operation-legend .is-op-pending i{background:#e0ad3f}
+.ct-zone-facility-legend-item.is-op-completed i,.ct-loc-facility-operation-legend .is-op-completed i{background:#35b982}
+.ct-zone-facility-legend-item.is-op-no-data i,.ct-loc-facility-operation-legend .is-op-no-data i{background:#8b929d}
+.ct-zone-facility-operation-legend .ct-zone-facility-legend-item{display:inline-flex;align-items:center;gap:6px;color:var(--zm,var(--text-muted,#aab7c9));font-size:.78rem}
+.ct-zone-facility-operation-legend .ct-zone-facility-legend-item i,.ct-loc-facility-operation-legend .ct-zone-facility-legend-item i{width:9px;height:9px;border-radius:50%}
+.ct-zone-facility-zone.is-op-overdue,.ct-loc-facility-zone.is-op-overdue{border-left-color:#e34d5b}
+.ct-zone-facility-zone.is-op-attention,.ct-loc-facility-zone.is-op-attention{border-left-color:#e87945}
+.ct-zone-facility-zone.is-op-in-progress,.ct-loc-facility-zone.is-op-in-progress{border-left-color:#3989e8}
+.ct-zone-facility-zone.is-op-pending,.ct-loc-facility-zone.is-op-pending{border-left-color:#e0ad3f}
+.ct-zone-facility-zone.is-op-completed,.ct-loc-facility-zone.is-op-completed{border-left-color:#35b982}
