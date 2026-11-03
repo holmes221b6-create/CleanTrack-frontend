@@ -469,9 +469,21 @@
       user.organization_name || user.organizationName || "your organization";
     const role = "Administrator";
 
+    // Show "Welcome" on the first home visit for this account in this browser.
+    // Keep the flag per account so subsequent logins display "Welcome back".
+    const accountKey = String(user.id || user.email || name).trim().toLowerCase();
+    const firstHomeKey = "omnix_home_seen_v1:" + accountKey;
+    let isFirstHomeVisit = false;
+    try {
+      isFirstHomeVisit = !window.localStorage.getItem(firstHomeKey);
+      if (isFirstHomeVisit) window.localStorage.setItem(firstHomeKey, "1");
+    } catch (_) {
+      // If browser storage is unavailable, use the returning-user greeting.
+    }
+
     const welcome = el("section", "ct-home-welcome");
     welcome.append(el("p", "ct-home-kicker", "ORGANIZATION CONTROL CENTER"));
-    welcome.append(el("h1", "", "Welcome back, " + name));
+    welcome.append(el("h1", "", (isFirstHomeVisit ? "Welcome, " : "Welcome back, ") + name));
     welcome.append(el("p", "ct-home-welcome-copy", "Here’s your organization at a glance, with the controls you need to keep your people and work organized."));
     const identity = el("div", "ct-home-identity");
     identity.append(el("span", "ct-home-identity-item", orgName));
