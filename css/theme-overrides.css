@@ -2261,19 +2261,32 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
 }
 
 
-/* Theme changes begin on the same frame as the selected appearance.
-   Animate paint-only properties; never animate geometry, typography or transforms. */
-html,
-html body,
-html body :where(header, nav, aside, main, section, article, footer, button, a, input, select, textarea, [class*="card"], [class*="panel"], [class*="surface"], [class*="toolbar"], [class*="sidebar"]) {
-  transition-property: background-color, color, border-color, box-shadow !important;
-  transition-duration: 130ms !important;
-  transition-timing-function: ease-out !important;
+/* OMNIX atomic theme transition.
+   Apply one identical paint transition to every rendered layer (including pseudo-elements)
+   so no component switches ahead of its parent. Geometry and typography never animate. */
+html[data-theme] *,
+html[data-theme] *::before,
+html[data-theme] *::after {
+  transition:
+    background 180ms ease-in-out,
+    color 180ms ease-in-out,
+    border-color 180ms ease-in-out,
+    box-shadow 180ms ease-in-out,
+    fill 180ms ease-in-out,
+    stroke 180ms ease-in-out !important;
+  transition-delay: 0ms !important;
+}
+html[data-theme] {
+  transition:
+    background-color 180ms ease-in-out,
+    color 180ms ease-in-out !important;
+  transition-delay: 0ms !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  html,
-  html body,
-  html body * {
+  html[data-theme],
+  html[data-theme] *,
+  html[data-theme] *::before,
+  html[data-theme] *::after {
     transition: none !important;
   }
 }
