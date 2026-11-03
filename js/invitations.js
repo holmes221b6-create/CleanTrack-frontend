@@ -53,7 +53,7 @@
   function organizationJoinUrl(code) {
     const url = new URL("/", window.location.origin);
     url.searchParams.set("join", code);
-    url.searchParams.set("role", "employee");
+    url.searchParams.set("role", "staff");
     return url.href;
   }
   function shareMessage(code, url, organizationName) {
