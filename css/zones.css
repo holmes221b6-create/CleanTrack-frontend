@@ -18,3 +18,35 @@
 /* Clickable parent-location shortcuts in the Zones directory */
 .ct-zone-location-shortcuts{margin:18px 0;padding:16px;border:1px solid var(--zb);border-radius:14px;background:var(--panel,rgba(128,128,128,.04))}.ct-zone-location-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.ct-zone-location-card{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:12px 14px;border:1px solid var(--zb);border-radius:10px;background:var(--card,rgba(128,128,128,.06));color:var(--text,inherit);text-align:left;font:inherit;font-weight:650;cursor:pointer}.ct-zone-location-card:hover,.ct-zone-location-card.is-selected{border-color:var(--accent,#4bd6a2);box-shadow:0 0 0 1px var(--accent,#4bd6a2) inset}.ct-zone-location-count{flex-shrink:0;font-size:.82rem;font-weight:500;color:var(--muted,#9ca3af)}
 @media(max-width:560px){.ct-zone-location-shortcuts{padding:12px}.ct-zone-location-grid{grid-template-columns:1fr}}
+
+
+/* Phase 1: additive indoor facility map. Existing zone directory and editors remain intact. */
+.ct-zone-facility-map{margin:18px 0 22px;padding:18px;border:1px solid var(--zb);border-radius:16px;background:var(--zp)}
+.ct-zone-facility-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.ct-zone-facility-toolbar select{min-width:190px}
+.ct-zone-facility-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px;align-items:stretch}
+.ct-zone-facility-viewer,.ct-zone-facility-side{min-width:0;border:1px solid var(--zb);border-radius:12px;background:var(--zc);padding:12px}
+.ct-zone-facility-preview{display:grid;place-items:center;min-height:300px;overflow:auto}
+.ct-zone-facility-image-frame{position:relative;width:100%;max-height:680px;display:grid;place-items:center}
+.ct-zone-facility-image{display:block;max-width:100%;max-height:680px;width:auto;height:auto;object-fit:contain}
+.ct-zone-facility-overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ct-zone-facility-polygon{cursor:pointer;stroke:#f4f0ff;stroke-width:2;vector-effect:non-scaling-stroke;fill-opacity:.34;transition:fill-opacity .15s,stroke-width .15s}
+.ct-zone-facility-polygon:hover,.ct-zone-facility-polygon:focus{fill-opacity:.62;stroke-width:3;outline:none}
+.ct-zone-facility-polygon.is-active{fill:#35c98a;stroke:#b5ffdc}
+.ct-zone-facility-polygon.is-inactive{fill:#e2aa43;stroke:#ffe1a0}
+.ct-zone-facility-polygon.is-archived{fill:#8b929d;stroke:#d0d4da}
+.ct-zone-facility-side h3{margin:3px 0 12px}
+.ct-zone-facility-zone-list{display:grid;gap:7px;max-height:560px;overflow:auto}
+.ct-zone-facility-zone{display:grid;gap:4px;width:100%;padding:10px 11px;border:1px solid var(--zb);border-radius:9px;background:var(--z2);color:var(--zt);text-align:left;font:inherit;cursor:pointer}
+.ct-zone-facility-zone small{color:var(--zm);font-size:.76rem}
+.ct-zone-facility-zone.is-active{border-left:3px solid #35c98a}
+.ct-zone-facility-zone.is-inactive{border-left:3px solid #e2aa43}
+.ct-zone-facility-zone.is-archived{border-left:3px solid #8b929d}
+.ct-zone-facility-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+.ct-zone-facility-legend-item{display:inline-flex;align-items:center;gap:6px;color:var(--zm);font-size:.78rem}
+.ct-zone-facility-legend-item i{width:9px;height:9px;border-radius:50%;background:#8b929d}
+.ct-zone-facility-legend-item.is-active i{background:#35c98a}
+.ct-zone-facility-legend-item.is-inactive i{background:#e2aa43}
+.ct-zone-facility-legend-item.is-archived i{background:#8b929d}
+@media(max-width:850px){.ct-zone-facility-layout{grid-template-columns:1fr}.ct-zone-facility-zone-list{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));max-height:280px}}
+@media(max-width:560px){.ct-zone-facility-map{padding:12px}.ct-zone-facility-preview{min-height:220px}.ct-zone-facility-toolbar select{width:100%}}
