@@ -974,4 +974,4 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
 @media(max-width:740px){.ct-op-row-actions{grid-column:2;grid-row:1/4;align-items:stretch;flex-direction:column}.ct-op-row-actions .ct-op-button{width:100%}}
 
 /* Maintenance is a first-class operational category, using the existing assignment, evidence and verification workflow. */
-.ct-op-viewbar [data-op-view="maintenance"]{border-color:rgba(80,150,230,.38)}
+.ct-op-viewbar button:nth-child(2){border-color:rgba(80,150,230,.38)}
