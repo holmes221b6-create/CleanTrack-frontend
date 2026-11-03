@@ -899,7 +899,18 @@ html[data-theme="light"] body .ct-splash-logo {
 .brand-mark.omnix-brand-mark .omnix-logo-lockup { display:block; width:100%; height:100%; max-width:none; object-fit:contain; object-position:left center; filter:drop-shadow(0 0 12px rgba(126,78,255,.38)); }
 #cleantrack-launch-splash .ct-splash-mark { width:min(520px,88vw); }
 #cleantrack-launch-splash .ct-splash-logo { display:block; width:min(520px,88vw); max-height:150px; object-fit:contain; filter:drop-shadow(0 0 22px rgba(125,73,255,.48)); }
-#cleantrack-launch-splash .ct-splash-owner { letter-spacing:.22em; color:#aaa1d2; }
+/* The SVG viewBox has slightly more visual mass on the left; offset the artwork
+   by the measured 1.5% so the complete emblem + OMNIX wordmark is optically centred. */
+#cleantrack-launch-splash .ct-splash-logo { transform:translateX(1.5%); }
+#cleantrack-launch-splash .ct-splash-owner {
+  left:0;
+  right:0;
+  width:100%;
+  box-sizing:border-box;
+  text-align:center;
+  letter-spacing:.22em;
+  color:#aaa1d2;
+}
 #app-header .brand-mark.omnix-brand-mark { width:min(280px,30vw); height:66px; }
 /* Login and registration share this intro panel: give the full OMNIX lockup a proper hero-scale footprint without crossing the panel edges. */
 #auth-view .auth-intro > .brand.omnix-brand { display:flex; align-self:flex-start; width:fit-content; max-width:100%; min-width:0; }
