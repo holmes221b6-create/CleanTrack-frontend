@@ -170,7 +170,7 @@ function normalizeUser(user) {
       );
     }
 
-    if (!["admin", "supervisor", "employee"].includes(role)) {
+    if (!["admin", "supervisor", "staff"].includes(role)) {
       throw new Error("Please select a valid registration role.");
     }
     
@@ -214,7 +214,7 @@ function normalizeUser(user) {
       currentUser = normalizeUser(user);
       emitAuthEvent("cleantrack:register", currentUser);
     } else {
-      // Supervisors and employees stay signed out until their membership is approved.
+      // Supervisors and staff stay signed out until their membership is approved.
       currentUser = null;
       persistToken("");
     }
