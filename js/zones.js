@@ -9,7 +9,21 @@ const d=v=>{if(!v)return"—";const x=new Date(v);return Number.isNaN(x.getTime(
 const st=z=>String(z.status||"active").toLowerCase();
 const loc=id=>locations.find(x=>String(x.id)===String(id));
 const team=id=>teams.find(x=>String(x.id)===String(id));
-const info=v=>v===null||v===undefined||String(v).trim()===""?"Not recorded":String(v);
+const info=v=>v===null||v===undefined||String(v).trim()===""?"Not recorded":String(v);function operationHeat(ops){
+ if(!Array.isArray(ops)||!ops.length)return {key:"no-data",label:"No operations",count:0,open:0,overdue:0,completed:0};
+ const norm=o=>String(o.status||"pending").trim().toLowerCase().replace(/[_-]+/g," ");
+ const done=o=>["completed","complete","approved","verified","done","closed"].includes(norm(o));
+ const cancelled=o=>["cancelled","canceled"].includes(norm(o));
+ const overdue=o=>!done(o)&&!cancelled(o)&&(o.overdue===true||(o.due_at&&Number.isFinite(new Date(o.due_at).getTime())&&new Date(o.due_at)<new Date()));
+ const overdueCount=ops.filter(overdue).length,completedCount=ops.filter(done).length,openCount=ops.filter(o=>!done(o)&&!cancelled(o)).length;
+ const progress=ops.some(o=>["in progress","started"].includes(norm(o)));
+ const rejected=ops.some(o=>norm(o)==="rejected");
+ const submitted=ops.some(o=>norm(o)==="submitted");
+ const key=overdueCount?"overdue":rejected?"attention":progress?"in-progress":openCount?"pending":"completed";
+ const label={overdue:"Overdue",attention:"Needs attention", "in-progress":"In progress",pending:submitted?"Awaiting review":"Pending",completed:"Completed"}[key];
+ return {key,label,count:ops.length,open:openCount,overdue:overdueCount,completed:completedCount};
+}
+
 function notice(msg,type="info"){const n=root?.querySelector("[data-zone-notice]");if(!n)return;n.textContent=msg||"";n.className="ct-zone-notice "+type;n.hidden=!msg;}
 function pill(s){return e("span","ct-zone-status is-"+String(s||"active").toLowerCase(),info(s));}
 async function load(){const res=await Promise.allSettled([API.get("zones"),API.get("locations"),API.get("teams"),API.get("operations"),API.get("organizations/staff")]);if(res[0].status!=="fulfilled")throw res[0].reason;zones=rows(res[0].value,"zones");locations=res[1].status==="fulfilled"?rows(res[1].value,"locations"):[];teams=res[2].status==="fulfilled"?rows(res[2].value,"teams"):[];operations=res[3].status==="fulfilled"?rows(res[3].value,"operations"):[];supervisors=res[4].status==="fulfilled"?rows(res[4].value,"staff").filter(x=>String(x.role||"").toLowerCase()==="supervisor"&&String(x.account_status||"").toLowerCase()==="active"):[];const failed=res.slice(1).map((x,i)=>x.status==="rejected"?["locations","teams","operations","supervisor directory"][i]:null).filter(Boolean);if(failed.length)notice("Related data unavailable: "+failed.join(", ")+". The zone directory still uses saved database records; unavailable details are not guessed.","warning");}
@@ -95,7 +109,7 @@ function renderFacilityMap(){
  viewer.append(preview);side.append(e("h3","","Zones on this floor"),zoneList);layout.append(viewer,side);card.append(layout);
  const legend=e("div","ct-zone-facility-legend");
  [["active","Active"],["inactive","Inactive"],["archived","Archived"],["unmapped","No indoor boundary"]].forEach(([v,label])=>{const item=e("span","ct-zone-facility-legend-item is-"+v);item.append(e("i",""),e("span","",label));legend.append(item);});
- card.append(legend);
+ card.append(legend);const operationLegend=e("div","ct-zone-facility-operation-legend");operationLegend.innerHTML="<span class=\"ct-zone-facility-legend-item is-op-overdue\"><i></i><span>Overdue</span></span><span class=\"ct-zone-facility-legend-item is-op-attention\"><i></i><span>Needs attention</span></span><span class=\"ct-zone-facility-legend-item is-op-in-progress\"><i></i><span>In progress</span></span><span class=\"ct-zone-facility-legend-item is-op-pending\"><i></i><span>Pending</span></span><span class=\"ct-zone-facility-legend-item is-op-completed\"><i></i><span>Completed</span></span><span class=\"ct-zone-facility-legend-item is-op-no-data\"><i></i><span>No operations</span></span>";card.append(operationLegend);
  const state={card,locationSelect,floorSelect,noticeLine,preview,zoneList,svg:null,selectedZone:null};
  card._facilityState=state;
  const statusBox=e("div","ct-zone-notice");statusBox.hidden=true;statusBox.dataset.facilityNotice="1";card.insertBefore(statusBox,layout);
@@ -119,18 +133,19 @@ function drawFacilityZones(state){
   if(points.length<3)return;
   const polygon=document.createElementNS("http://www.w3.org/2000/svg","polygon");
   polygon.setAttribute("points",points.map(p=>(Number(p[0])*1000)+","+(Number(p[1])*1000)).join(" "));
-  polygon.setAttribute("class","ct-zone-facility-polygon is-"+String(z.status||"active").toLowerCase());
+  const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id)));
+  polygon.setAttribute("class","ct-zone-facility-polygon is-"+String(z.status||"active").toLowerCase()+" is-op-"+heat.key);
   polygon.setAttribute("tabindex","0");polygon.setAttribute("role","button");polygon.setAttribute("aria-label","Open zone "+z.name);
   polygon.addEventListener("click",()=>details(z.id));polygon.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();details(z.id);}});
-  const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=z.name+" · "+String(z.status||"active");polygon.append(title);svg.append(polygon);
+  const title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=z.name+" · "+heat.label+" · "+heat.count+" operations ("+heat.open+" open, "+heat.completed+" completed"+(heat.overdue?", "+heat.overdue+" overdue":"")+")";polygon.append(title);svg.append(polygon);
  });
  const list=state.zoneList;list.replaceChildren();
  if(!matching.length){list.append(e("p","ct-zone-empty-inline","No zones are linked to this location yet."));return;}
  matching.forEach(z=>{
   const row=b(z.name,"ct-zone-facility-zone is-"+String(z.status||"active").toLowerCase(),()=>details(z.id));
-  const meta=e("small","",z.floor_label||"Floor not specified");
+  const heat=operationHeat(operations.filter(o=>String(o.zone_id)===String(z.id)));const meta=e("small","",z.floor_label||"Floor not specified");
   const mapped=Boolean(z.boundary?.type==="IndoorPolygon"&&Array.isArray(z.boundary.points)&&z.boundary.points.length>=3);
-  row.append(meta,e("small","",mapped?"Mapped":"No indoor boundary"));list.append(row);
+  row.append(meta,e("small","",mapped?"Mapped":"No indoor boundary"),e("small","",heat.label+" · "+heat.count+" operations"));row.classList.add("is-op-"+heat.key);list.append(row);
  });
 }
 async function loadFacilityMap(state){
