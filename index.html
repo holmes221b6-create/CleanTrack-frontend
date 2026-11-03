@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
 <script>
-/* Apply the last selected appearance before the login UI or launch splash paints. */
+/* Resolve the saved device appearance before any page stylesheet or body content paints. */
 (function () {
+  var theme = "default";
   try {
-    var theme = localStorage.getItem("cleantrack.appearance.v1") || "default";
-    if (["default", "light", "black"].indexOf(theme) === -1) theme = "default";
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
-  } catch (_) {
-    document.documentElement.dataset.theme = "default";
-  }
+    var saved = localStorage.getItem("cleantrack.appearance.v1");
+    if (saved === "light" || saved === "black" || saved === "default") theme = saved;
+  } catch (_) {}
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
+  window.__OMNIX_INITIAL_APPEARANCE__ = theme;
 })();
 </script>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#09090b">
@@ -171,9 +172,9 @@ html body #workspace-view .ct-sidebar-brand-mark img.ct-logo-symbol {
 }
 </style>
 
-<style id="omnix-auth-appearance-sync">
-/* Authentication, registration, recovery, onboarding and launch splash follow
-   the same device-selected appearance as the signed-in workspace. */
+<style id="omnix-auth-background-sync">
+/* Backgrounds only: appearance follows the saved theme. Text, icons and logo
+   artwork retain their original colours and rendering in every appearance. */
 html[data-theme="light"] body,
 html[data-theme="light"] body #auth-view,
 html[data-theme="light"] body #auth-view .auth-layout,
@@ -183,95 +184,36 @@ html[data-theme="light"] body #auth-view .auth-card,
 html[data-theme="light"] body #auth-view .status-panel,
 html[data-theme="light"] body #app-footer,
 html[data-theme="light"] body #cleantrack-launch-splash {
-  color: #111827 !important;
-  background: #ffffff !important;
   background-color: #ffffff !important;
   background-image: none !important;
-  border-color: #e5e7eb !important;
-  box-shadow: none !important;
-}
-html[data-theme="light"] body #auth-view .auth-intro *,
-html[data-theme="light"] body #auth-view .auth-panel *,
-html[data-theme="light"] body #auth-view .auth-card *,
-html[data-theme="light"] body #app-footer,
-html[data-theme="light"] body #app-footer * {
-  color: #111827 !important;
-  text-shadow: none !important;
 }
 html[data-theme="light"] body #auth-view .form-field input,
 html[data-theme="light"] body #auth-view .form-field textarea,
+html[data-theme="light"] body #auth-view select,
 html[data-theme="light"] body #auth-view .role-option,
-html[data-theme="light"] body #auth-view .status-panel,
-html[data-theme="light"] body #auth-view .app-footer,
-html[data-theme="light"] body #auth-view select {
-  color: #111827 !important;
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
+html[data-theme="light"] body #auth-view .status-panel {
+  background-color: #ffffff !important;
+  background-image: none !important;
 }
-html[data-theme="light"] body #auth-view .button-primary {
-  color: #ffffff !important;
-  background: #173f35 !important;
-  border-color: #173f35 !important;
-}
-html[data-theme="light"] body #auth-view .button-secondary {
-  color: #173f35 !important;
-  background: #f3f7f3 !important;
-  border-color: #cddbd0 !important;
-}
-html[data-theme="light"] body #auth-view .text-button,
-html[data-theme="light"] body #auth-view .terms-checkbox a,
-html[data-theme="light"] body #auth-view .app-footer a {
-  color: #17624b !important;
-}
-html[data-theme="light"] body #cleantrack-launch-splash {
-  color: #111827 !important;
-}
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-rings {
-  border-color: #94a3b8 !important;
-}
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-rings::before,
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-rings::after {
-  border-color: #cbd5e1 !important;
-}
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-core {
-  background: #334155 !important;
-  box-shadow: none !important;
-}
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-owner,
-html[data-theme="light"] body #cleantrack-launch-splash .ct-splash-wordmark span {
-  color: #64748b !important;
-}
+html[data-theme="black"] body,
 html[data-theme="black"] body #auth-view,
 html[data-theme="black"] body #auth-view .auth-layout,
 html[data-theme="black"] body #auth-view .auth-intro,
 html[data-theme="black"] body #auth-view .auth-panel,
 html[data-theme="black"] body #auth-view .auth-card,
 html[data-theme="black"] body #auth-view .status-panel,
+html[data-theme="black"] body #app-footer,
 html[data-theme="black"] body #cleantrack-launch-splash {
-  color: #f8fafc !important;
-  background: #000000 !important;
   background-color: #000000 !important;
   background-image: none !important;
-  border-color: #27272a !important;
-}
-html[data-theme="black"] body #auth-view .auth-intro *,
-html[data-theme="black"] body #auth-view .auth-panel *,
-html[data-theme="black"] body #auth-view .auth-card * {
-  color: #f8fafc !important;
 }
 html[data-theme="black"] body #auth-view .form-field input,
 html[data-theme="black"] body #auth-view .form-field textarea,
-html[data-theme="black"] body #auth-view .role-option {
-  color: #f8fafc !important;
-  background: #09090b !important;
-  border-color: #3f3f46 !important;
-}
-html[data-theme="black"] body #auth-view .button-primary {
-  color: #ffffff !important;
-  background: #173f35 !important;
-}
-html[data-theme="black"] body #cleantrack-launch-splash .ct-splash-rings {
-  border-color: #71717a !important;
+html[data-theme="black"] body #auth-view select,
+html[data-theme="black"] body #auth-view .role-option,
+html[data-theme="black"] body #auth-view .status-panel {
+  background-color: #09090b !important;
+  background-image: none !important;
 }
 </style>
 </head>
