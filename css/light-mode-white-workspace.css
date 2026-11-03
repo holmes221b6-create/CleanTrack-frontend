@@ -230,3 +230,76 @@ html[data-theme="light"] body #workspace-view .omnix-logo-lockup,
 html[data-theme="light"] body #workspace-view img {
   background-color: transparent !important;
 }
+
+
+/*
+ * Sidebar hard override.
+ * The navigation is generated dynamically and contains legacy nested wrappers
+ * with their own dark backgrounds. Reset the entire sidebar subtree in Light
+ * mode, rather than relying on a short list of wrapper class names.
+ */
+html[data-theme="light"] body #workspace-view .ct-workspace-shell > .ct-sidebar,
+html[data-theme="light"] body #workspace-view .ct-workspace-shell > aside.ct-sidebar,
+html[data-theme="light"] body #workspace-view .ct-sidebar,
+html[data-theme="light"] body #workspace-view .ct-sidebar::before,
+html[data-theme="light"] body #workspace-view .ct-sidebar::after,
+html[data-theme="light"] body #workspace-view .ct-sidebar > *,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation > *,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation > *::before,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation > *::after {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Legacy navigation groups and nested labels must not retain navy fills. */
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation *:not(svg):not(path):not(img),
+html[data-theme="light"] body #workspace-view .ct-sidebar .ct-sidebar-label,
+html[data-theme="light"] body #workspace-view .ct-sidebar .workspace-identity,
+html[data-theme="light"] body #workspace-view .ct-sidebar .workspace-identity *,
+html[data-theme="light"] body #workspace-view .ct-sidebar .ct-sidebar-brand,
+html[data-theme="light"] body #workspace-view .ct-sidebar .ct-sidebar-brand *:not(img) {
+  color: #111827 !important;
+  text-shadow: none !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Neutral navigation rows stay white; only the selected row gets a light tint. */
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation button,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation a {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation button:hover,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation a:hover {
+  background: #f3f4f6 !important;
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation .active,
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation [aria-current="page"],
+html[data-theme="light"] body #workspace-view .ct-sidebar #workspace-navigation .ct-nav-active {
+  background: #eef2f7 !important;
+  background-color: #eef2f7 !important;
+  color: #111827 !important;
+  border-color: #dbe2ea !important;
+  box-shadow: inset 3px 0 #64748b !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar svg,
+html[data-theme="light"] body #workspace-view .ct-sidebar svg * {
+  color: #374151 !important;
+  stroke: currentColor !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar img {
+  background: transparent !important;
+}
+html[data-theme="light"] body #workspace-view .ct-sidebar {
+  scrollbar-color: #cbd5e1 #ffffff !important;
+}
