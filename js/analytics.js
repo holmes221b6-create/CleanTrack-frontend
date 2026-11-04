@@ -426,15 +426,22 @@ if(durationCard.open){durationStatus.textContent=text;durationStatus.className="
 if(anomalyCard.open){anomalyStatus.textContent=text;anomalyStatus.className="ct-analytics3-ai-status is-limited";}
 }
 
-const historyDrawer=$("aside","ct-analytics3-history-drawer");
-historyDrawer.hidden=true;historyDrawer.setAttribute("aria-label","Prediction history");
-const historyHead=$("div","ct-analytics3-history-head"),historyClose=B("Close ×","ct-analytics3-history-close",()=>{historyDrawer.hidden=true;});
-historyClose.setAttribute("type","button");historyClose.setAttribute("aria-label","Close prediction history");historyClose.title="Close prediction history";
+const historyBackdrop=$("div","ct-analytics3-history-backdrop");
+historyBackdrop.hidden=true;
+const historyDrawer=$("section","ct-analytics3-history-drawer");
+historyDrawer.hidden=true;historyDrawer.setAttribute("role","dialog");historyDrawer.setAttribute("aria-modal","true");historyDrawer.setAttribute("aria-label","Prediction history");
+const closePredictionHistory=()=>{historyDrawer.hidden=true;historyBackdrop.hidden=true;};
+const historyHead=$("div","ct-analytics3-history-head"),historyClose=B("×","ct-analytics3-history-close",closePredictionHistory);
+historyClose.setAttribute("type","button");historyClose.setAttribute("aria-label","Close prediction history");historyClose.title="Close";
 historyHead.append($("strong","","Prediction history"),historyClose);
 const historyContent=$("div","ct-analytics3-history-content");
-historyDrawer.append(historyHead,historyContent);page.appendChild(historyDrawer);
+historyDrawer.append(historyHead,historyContent);
+historyBackdrop.addEventListener("click",closePredictionHistory);
+historyDrawer.addEventListener("click",event=>event.stopPropagation());
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!historyDrawer.hidden)closePredictionHistory();});
+document.body.append(historyBackdrop,historyDrawer);
 async function openPredictionHistory(){
- historyDrawer.hidden=false;historyContent.replaceChildren($("p","ct-analytics3-ai-status","Loading saved prediction history…"));
+ historyBackdrop.hidden=false;historyDrawer.hidden=false;historyClose.focus();historyContent.replaceChildren($("p","ct-analytics3-ai-status","Loading saved prediction history…"));
  try{
   const data=await API.get("analytics/predictions/history?limit=40");
   historyContent.replaceChildren();
