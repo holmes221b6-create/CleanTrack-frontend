@@ -83,7 +83,19 @@ aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming 
 const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement.");
 const aiStatus=$("p","ct-analytics3-ai-status","Waiting for organisation analytics…");aiStatus.setAttribute("role","status");aiStatus.setAttribute("aria-live","polite");
 const aiMeta=$("div","ct-analytics3-ai-meta"),aiChart=$("div","ct-analytics3-ai-chart"),aiRows=$("div","ct-analytics3-ai-rows");
-aic.append(aiNotice,aiStatus,aiMeta,aiChart,aiRows);
+const workloadBody=$("div","ct-analytics3-ai-card-body");
+workloadBody.append(aiStatus,aiMeta,aiChart,aiRows);
+function predictionCard(title,badge,description,content){
+const card=$("details","ct-analytics3-ai-card"),summary=$("summary","ct-analytics3-ai-card-summary");
+const heading=$("div","ct-analytics3-ai-card-heading");
+heading.append($("strong","",title),$("span","ct-analytics3-ai-badge",badge));
+summary.append(heading,$("span","ct-analytics3-ai-card-chevron","⌄"));
+const body=$("div","ct-analytics3-ai-card-body");
+if(description)body.append($("p","ct-analytics3-ai-footnote",description));
+body.append(...content);
+card.append(summary,body);return card;
+}
+aic.append(aiNotice,predictionCard("Workload forecast","7-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]));
 const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
 riskHead.append($("h3","","Overdue risk estimates"),$("span","ct-analytics3-ai-badge","Historical pattern analysis"));
 const riskIntro=$("p","ct-analytics3-ai-footnote","Estimates the likelihood of currently open operations becoming overdue using historical outcomes for comparable operation types and priorities.");
@@ -108,7 +120,12 @@ const anomalyIntro=$("p","ct-analytics3-ai-footnote","Highlights unusual workloa
 const anomalyStatus=$("p","ct-analytics3-ai-status","Scanning historical operational patterns…");anomalyStatus.setAttribute("role","status");anomalyStatus.setAttribute("aria-live","polite");
 const anomalyMeta=$("div","ct-analytics3-ai-meta"),anomalyList=$("div","ct-analytics3-ai-anomaly-list");
 anomalySection.append(anomalyHead,anomalyIntro,anomalyStatus,anomalyMeta,anomalyList);
-aic.append(riskSection,workforceSection,durationSection,anomalySection);ai.append(aic);page.appendChild(ai);
+aic.append(
+predictionCard("Overdue risk estimates","Risk analysis",riskIntro.textContent,[riskStatus,riskMeta,riskList]),
+predictionCard("Workforce demand forecast","Team workload",workforceIntro.textContent,[workforceStatus,workforceMeta,workforceList]),
+predictionCard("Completion-time estimates","Execution history",durationIntro.textContent,[durationStatus,durationMeta,durationList]),
+predictionCard("Recurring problems & anomalies","Pattern detection",anomalyIntro.textContent,[anomalyStatus,anomalyMeta,anomalyList])
+);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
 let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0,anomalySequence=0;
