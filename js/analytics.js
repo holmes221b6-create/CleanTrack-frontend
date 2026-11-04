@@ -316,6 +316,7 @@ return;
 }
 anomalyStatus.textContent=data.summary||"Historical pattern analysis complete.";
 anomalyStatus.className="ct-analytics3-ai-status "+(data.findings&&data.findings.length?"is-limited":"is-ready");
+if(data.method)anomalyList.append($("p","ct-analytics3-ai-footnote","Detection method: "+data.method));
 if(!data.findings||!data.findings.length){
 anomalyList.append($("p","ct-analytics3-ai-footnote","No unusual recurring patterns were detected in the selected historical scope."));
 return;
