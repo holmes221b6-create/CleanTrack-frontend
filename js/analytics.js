@@ -355,6 +355,7 @@ card.append(top,$("p","ct-analytics3-ai-footnote",item.description||"Historical 
 const metrics=$("div","ct-analytics3-ai-anomaly-metrics");
 if(item.change_percent!==undefined)metrics.append($("span","","Volume change: "+Number(item.change_percent).toFixed(1)+"%"));
 if(item.observed_late_rate_percent!==undefined)metrics.append($("span","","Observed late rate: "+Number(item.observed_late_rate_percent).toFixed(1)+"%"));
+if(item.comparison_late_rate_percent!==undefined)metrics.append($("span","","Other operation types: "+Number(item.comparison_late_rate_percent).toFixed(1)+"% ("+NUM(item.comparison_sample_count||0)+" outcomes)"));
 if(item.organisation_late_rate_percent!==undefined)metrics.append($("span","","Organisation rate: "+Number(item.organisation_late_rate_percent).toFixed(1)+"%"));
 if(item.evidence_count!==undefined)metrics.append($("span","","Evidence records: "+NUM(item.evidence_count)));
 if(item.baseline!==undefined)metrics.append($("span","","Daily baseline: "+Number(item.baseline).toFixed(2)));
