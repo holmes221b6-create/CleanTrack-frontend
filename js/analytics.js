@@ -358,6 +358,25 @@ const data=await API.get("analytics/predictions?"+params.toString());
 if(n!==predictionSequence)return;renderPredictions(data);
 }catch(error){if(n!==predictionSequence)return;aiStatus.textContent=error.message||"Could not load AI predictions.";aiStatus.className="ct-analytics3-ai-status is-limited";}
 }
+function invalidatePredictionRequests(){
+++predictionSequence;++riskSequence;++workforceSequence;++durationSequence;++anomalySequence;
+}
+function preparePredictionRefresh(){
+invalidatePredictionRequests();
+if(workloadCard.open){aiStatus.textContent="Refreshing forecast for the selected filters…";aiStatus.className="ct-analytics3-ai-status";aiMeta.replaceChildren();aiChart.replaceChildren();aiRows.replaceChildren();}
+if(riskCard.open){riskStatus.textContent="Refreshing overdue risk for the selected filters…";riskStatus.className="ct-analytics3-ai-status";riskMeta.replaceChildren();riskList.replaceChildren();}
+if(workforceCard.open){workforceStatus.textContent="Refreshing workforce forecast for the selected filters…";workforceStatus.className="ct-analytics3-ai-status";workforceMeta.replaceChildren();workforceList.replaceChildren();}
+if(durationCard.open){durationStatus.textContent="Refreshing completion estimates for the selected filters…";durationStatus.className="ct-analytics3-ai-status";durationMeta.replaceChildren();durationList.replaceChildren();}
+if(anomalyCard.open){anomalyStatus.textContent="Refreshing anomaly analysis for the selected filters…";anomalyStatus.className="ct-analytics3-ai-status";anomalyMeta.replaceChildren();anomalyList.replaceChildren();}
+}
+function failPredictionRefresh(message){
+const text=message||"Analytics could not be refreshed. Prediction results for the previous filters are no longer shown.";
+if(workloadCard.open){aiStatus.textContent=text;aiStatus.className="ct-analytics3-ai-status is-limited";}
+if(riskCard.open){riskStatus.textContent=text;riskStatus.className="ct-analytics3-ai-status is-limited";}
+if(workforceCard.open){workforceStatus.textContent=text;workforceStatus.className="ct-analytics3-ai-status is-limited";}
+if(durationCard.open){durationStatus.textContent=text;durationStatus.className="ct-analytics3-ai-status is-limited";}
+if(anomalyCard.open){anomalyStatus.textContent=text;anomalyStatus.className="ct-analytics3-ai-status is-limited";}
+}
 function loadPredictions(){
 if(workloadCard.open)loadWorkloadForecast();
 if(riskCard.open)loadOverdueRisk();
@@ -443,12 +462,12 @@ if(dv==="trends"){rows.push(["Period",...current.series.map(s=>s.name)]);current
 const blob=new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=$("a","");a.href=url;a.download="cleantrack-analytics-"+dv+"-"+report.period.start_date+"-to-"+report.period.end_date+".csv";document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function load(){
 if(!from.value||!to.value){status.textContent="Choose both start and end dates.";status.className="ct-analytics3-status is-error";return;}if(from.value>to.value){status.textContent="Start date must be on or before end date.";status.className="ct-analytics3-status is-error";return;}
-const n=++sequence;apply.disabled=true;status.textContent="Loading filtered organization records…";status.className="ct-analytics3-status";
+const n=++sequence;preparePredictionRefresh();apply.disabled=true;status.textContent="Loading filtered organization records…";status.className="ct-analytics3-status";
 try{const r=await API.get("analytics/workspace?"+query().toString());if(n!==sequence)return;report=r;const pt=PICK(team),pl=PICK(location),pz=PICK(zone),pe=PICK(employee),py=type.value;options(team,r.filters?.teams||[],pt,"name","id");options(location,r.filters?.locations||[],pl,"name","id");options(zone,r.filters?.zones||[],pz,"name","id");options(employee,r.filters?.employees||[],pe,"name","id");options(type,(r.filters?.operation_types||[]).map(x=>({name:x,value:x})),py,"name","value");lastLoadedQuery=query().toString();loadPredictions();
 kpiDefs.forEach(([lab,key,note,kind])=>{const v=r.summary?.[key];kv[key].v.textContent=kind==="p"?PCT(v):kind==="h"?(v===null||v===undefined?"N/A":NUM(v)+" h"):NUM(v);});configureMetric();draw();
 mb.replaceChildren();[["Cohort",r.methodology?.cohort],["Trends",r.methodology?.trends],["Completion rate",r.methodology?.completion_rate],["On-time rate",r.methodology?.on_time_rate],["Average completion time",r.methodology?.average_completion_hours],["Filters",r.methodology?.filters],["Time zone",r.methodology?.time_zone]].forEach(([a,b])=>{if(!b)return;const p=$("p");p.append($("strong","",a+": "),$("span","",b));mb.appendChild(p);});
 status.textContent="Loaded "+readableDate(r.period.start_date)+" – "+readableDate(r.period.end_date)+". Trend labels are shortened; expand the data table for full results.";status.className="ct-analytics3-status is-success";refreshRangeControls();
-}catch(e){if(n!==sequence)return;report=null;drawing.replaceChildren();tableWrap.replaceChildren();Object.values(kv).forEach(x=>x.v.textContent="—");status.textContent=e.message||"Could not load analytics.";status.className="ct-analytics3-status is-error";}
+}catch(e){if(n!==sequence)return;report=null;drawing.replaceChildren();tableWrap.replaceChildren();Object.values(kv).forEach(x=>x.v.textContent="—");status.textContent=e.message||"Could not load analytics.";status.className="ct-analytics3-status is-error";failPredictionRefresh("Analytics could not be refreshed for the selected filters. "+(e.message||"Please try again."));}
 finally{if(n===sequence)apply.disabled=false;}}
 view.addEventListener("change",()=>{configureMetric();draw();});chart.addEventListener("change",draw);metric.addEventListener("change",draw);
 load();
