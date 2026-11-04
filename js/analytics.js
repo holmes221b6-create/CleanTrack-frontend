@@ -83,7 +83,13 @@ aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming 
 const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement.");
 const aiStatus=$("p","ct-analytics3-ai-status","Waiting for organisation analytics…");aiStatus.setAttribute("role","status");aiStatus.setAttribute("aria-live","polite");
 const aiMeta=$("div","ct-analytics3-ai-meta"),aiChart=$("div","ct-analytics3-ai-chart"),aiRows=$("div","ct-analytics3-ai-rows");
-aic.append(aiNotice,aiStatus,aiMeta,aiChart,aiRows);ai.append(aic);page.appendChild(ai);
+aic.append(aiNotice,aiStatus,aiMeta,aiChart,aiRows);
+const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
+riskHead.append($("h3","","Overdue risk estimates"),$("span","ct-analytics3-ai-badge","Historical pattern analysis"));
+const riskIntro=$("p","ct-analytics3-ai-footnote","Estimates the likelihood of currently open operations becoming overdue using historical outcomes for comparable operation types and priorities.");
+const riskStatus=$("p","ct-analytics3-ai-status","Checking historical overdue patterns…");riskStatus.setAttribute("role","status");riskStatus.setAttribute("aria-live","polite");
+const riskMeta=$("div","ct-analytics3-ai-meta"),riskList=$("div","ct-analytics3-ai-risk-list");
+riskSection.append(riskHead,riskIntro,riskStatus,riskMeta,riskList);aic.append(riskSection);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
 let predictionSequence=0;
@@ -129,8 +135,43 @@ section.append(heading,copy,grid,verdictNode,$("small","ct-analytics3-ai-footnot
 aiRows.append(section);
 }
 }
+function renderOverdueRisk(data){
+riskMeta.replaceChildren();riskList.replaceChildren();
+if(data.status!=="available"){
+riskStatus.textContent=data.message||"Overdue risk estimates are unavailable.";
+riskStatus.className="ct-analytics3-ai-status is-limited";
+riskMeta.append($("span","","Matured historical operations: "+NUM(data.historical_sample_count)));
+return;
+}
+riskStatus.textContent=data.message||"Historical overdue risk estimates are ready.";
+riskStatus.className="ct-analytics3-ai-status is-ready";
+riskMeta.append($("span","","Historical sample: "+NUM(data.historical_sample_count)),
+$("span","","Historical late rate: "+PCT(data.historical_late_rate_percent)),
+$("span","","Open operations evaluated: "+NUM(data.evaluated_open_operations)));
+if(!data.at_risk_operations.length){riskList.append($("p","ct-analytics3-ai-footnote","No currently open operations with future due dates match these filters."));return;}
+data.at_risk_operations.forEach(item=>{
+const row=$("article","ct-analytics3-ai-risk-row"),main=$("div","ct-analytics3-ai-risk-main");
+const title=$("strong","",item.title||("Operation #"+item.operation_id));
+const sub=$("span","",String(item.task_type||"General")+" · "+String(item.priority||"Normal")+" priority");
+const due=$("span","",item.due_at?"Due "+readableDate(item.due_at.slice(0,10)):"Due date unavailable");
+const risk=$("div","ct-analytics3-ai-risk-value");
+risk.append($("strong","",Number(item.estimated_late_risk_percent).toFixed(1)+"%"),$("span","","estimated late risk"));
+main.append(title,sub,due);
+const evidence=$("small","",item.basis+" · "+NUM(item.historical_comparable_sample)+" historical comparisons");
+row.append(main,risk,evidence);riskList.append(row);
+});
+}
+async function loadOverdueRisk(){
+const n=++predictionSequence;
+riskStatus.textContent="Analysing matured organisation history…";riskStatus.className="ct-analytics3-ai-status";
+try{
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const data=await API.get("analytics/predictions/overdue-risk?"+params.toString());
+if(n!==predictionSequence)return;renderOverdueRisk(data);
+}catch(error){if(n!==predictionSequence)return;riskStatus.textContent=error.message||"Could not load overdue risk estimates.";riskStatus.className="ct-analytics3-ai-status is-limited";}
+}
 async function loadPredictions(){
-const n=++predictionSequence;aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+const n=++predictionSequence;loadOverdueRisk();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions?"+params.toString());
