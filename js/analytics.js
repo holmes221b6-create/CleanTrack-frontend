@@ -89,10 +89,17 @@ riskHead.append($("h3","","Overdue risk estimates"),$("span","ct-analytics3-ai-b
 const riskIntro=$("p","ct-analytics3-ai-footnote","Estimates the likelihood of currently open operations becoming overdue using historical outcomes for comparable operation types and priorities.");
 const riskStatus=$("p","ct-analytics3-ai-status","Checking historical overdue patterns…");riskStatus.setAttribute("role","status");riskStatus.setAttribute("aria-live","polite");
 const riskMeta=$("div","ct-analytics3-ai-meta"),riskList=$("div","ct-analytics3-ai-risk-list");
-riskSection.append(riskHead,riskIntro,riskStatus,riskMeta,riskList);aic.append(riskSection);ai.append(aic);page.appendChild(ai);
+riskSection.append(riskHead,riskIntro,riskStatus,riskMeta,riskList);
+const workforceSection=$("section","ct-analytics3-ai-workforce"),workforceHead=$("div","ct-analytics3-ai-risk-head");
+workforceHead.append($("h3","","Workforce demand forecast"),$("span","ct-analytics3-ai-badge","Team workload"));
+const workforceIntro=$("p","ct-analytics3-ai-footnote","Estimates incoming operations by team and compares expected workload with current active team membership. It does not assume that every member is available for every shift.");
+const workforceStatus=$("p","ct-analytics3-ai-status","Calculating team workload…");workforceStatus.setAttribute("role","status");workforceStatus.setAttribute("aria-live","polite");
+const workforceMeta=$("div","ct-analytics3-ai-meta"),workforceList=$("div","ct-analytics3-ai-workforce-list");
+workforceSection.append(workforceHead,workforceIntro,workforceStatus,workforceMeta,workforceList);
+aic.append(riskSection,workforceSection);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
-let predictionSequence=0,riskSequence=0;
+let predictionSequence=0,riskSequence=0,workforceSequence=0;
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
 if(data.status!=="available"){
@@ -170,8 +177,51 @@ const data=await API.get("analytics/predictions/overdue-risk?"+params.toString()
 if(n!==riskSequence)return;renderOverdueRisk(data);
 }catch(error){if(n!==riskSequence)return;riskStatus.textContent=error.message||"Could not load overdue risk estimates.";riskStatus.className="ct-analytics3-ai-status is-limited";}
 }
+function renderWorkforceDemand(data){
+workforceMeta.replaceChildren();workforceList.replaceChildren();
+if(data.status!=="available"){
+workforceStatus.textContent=data.message||"Workforce demand estimates are unavailable.";
+workforceStatus.className="ct-analytics3-ai-status is-limited";
+workforceMeta.append($("span","","Historical operations: "+NUM(data.historical_sample_count||0)),$("span","","History: "+NUM(data.history_days||56)+" days"));
+return;
+}
+workforceStatus.textContent="Team-level workload estimates generated from organisation history.";
+workforceStatus.className="ct-analytics3-ai-status is-ready";
+workforceMeta.append($("span","","Historical operations: "+NUM(data.historical_sample_count)),$("span","","History: "+data.history_start+" – "+data.history_end),$("span","","Method: "+data.method));
+if(!data.teams.length){workforceList.append($("p","ct-analytics3-ai-footnote","No teams with matching historical activity were found for these filters."));return;}
+data.teams.forEach(team=>{
+const card=$("article","ct-analytics3-ai-workforce-card"),top=$("div","ct-analytics3-ai-workforce-top");
+const name=$("strong","",team.team_name);
+const count=$("span","",Number(team.forecast_operations_next_7_days).toFixed(1)+" expected operations / 7 days");
+top.append(name,count);
+const stats=$("div","ct-analytics3-ai-workforce-stats");
+[
+["Active team members",NUM(team.active_team_members)],
+["Expected operations per member",team.expected_operations_per_active_member===null?"Not available":Number(team.expected_operations_per_active_member).toFixed(1)],
+["Estimated effort",team.estimated_effort_hours_next_7_days===null?"Insufficient recorded estimates":Number(team.estimated_effort_hours_next_7_days).toFixed(1)+" hours"],
+["Historical operations",NUM(team.historical_operations)]
+].forEach(([label,value])=>{const cell=$("div","ct-analytics3-ai-workforce-stat");cell.append($("span","",label),$("strong","",value));stats.append(cell);});
+const daily=$("div","ct-analytics3-ai-workforce-days");
+team.forecast_by_day.forEach(day=>{
+const cell=$("div","ct-analytics3-ai-workforce-day"),dateLabel=new Date(day.date+"T12:00:00");
+cell.append($("span","",new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(dateLabel)),$("strong","",Number(day.expected_operations).toFixed(1)));
+daily.append(cell);
+});
+const note=$("small","ct-analytics3-ai-footnote",team.effort_estimate_sample_count+" historical operations contained an estimated duration. Effort hours are based on those recorded estimates, not measured working time. Staffing capacity is not assessed.");
+card.append(top,stats,daily,note);workforceList.append(card);
+});
+}
+async function loadWorkforceDemand(){
+const n=++workforceSequence;
+workforceStatus.textContent="Calculating team workload from organisation history…";workforceStatus.className="ct-analytics3-ai-status";
+try{
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const data=await API.get("analytics/predictions/workforce-demand?"+params.toString());
+if(n!==workforceSequence)return;renderWorkforceDemand(data);
+}catch(error){if(n!==workforceSequence)return;workforceStatus.textContent=error.message||"Could not load workforce demand estimates.";workforceStatus.className="ct-analytics3-ai-status is-limited";}
+}
 async function loadPredictions(){
-const n=++predictionSequence;loadOverdueRisk();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions?"+params.toString());
