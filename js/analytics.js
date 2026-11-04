@@ -139,8 +139,10 @@ const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3
 let report=null,current=null,sequence=0,lastLoadedQuery="";
 let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0,anomalySequence=0;
 
+const lastPredictionSnapshots={};
 async function savePredictionSnapshot(type,label,summary,evidence){
- try{await API.post("analytics/predictions/history",{prediction_type:type,label,summary,evidence});}catch(_){/* History is supplementary; never block analytics rendering. */}
+ const signature=JSON.stringify({summary,evidence});if(lastPredictionSnapshots[type]===signature)return;
+ try{await API.post("analytics/predictions/history",{prediction_type:type,label,summary,evidence});lastPredictionSnapshots[type]=signature;}catch(_){/* History is supplementary; never block analytics rendering. */}
 }
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
