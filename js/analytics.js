@@ -102,10 +102,16 @@ const durationIntro=$("p","ct-analytics3-ai-footnote","Estimates how long open o
 const durationStatus=$("p","ct-analytics3-ai-status","Analysing recorded execution durations…");durationStatus.setAttribute("role","status");durationStatus.setAttribute("aria-live","polite");
 const durationMeta=$("div","ct-analytics3-ai-meta"),durationList=$("div","ct-analytics3-ai-duration-list");
 durationSection.append(durationHead,durationIntro,durationStatus,durationMeta,durationList);
-aic.append(riskSection,workforceSection,durationSection);ai.append(aic);page.appendChild(ai);
+const anomalySection=$("section","ct-analytics3-ai-anomalies"),anomalyHead=$("div","ct-analytics3-ai-risk-head");
+anomalyHead.append($("h3","","Recurring problems & anomalies"),$("span","ct-analytics3-ai-badge","Pattern detection"));
+const anomalyIntro=$("p","ct-analytics3-ai-footnote","Highlights unusual workload changes, operation types with recurring overdue outcomes and operations with repeated execution attempts.");
+const anomalyStatus=$("p","ct-analytics3-ai-status","Scanning historical operational patterns…");anomalyStatus.setAttribute("role","status");anomalyStatus.setAttribute("aria-live","polite");
+const anomalyMeta=$("div","ct-analytics3-ai-meta"),anomalyList=$("div","ct-analytics3-ai-anomaly-list");
+anomalySection.append(anomalyHead,anomalyIntro,anomalyStatus,anomalyMeta,anomalyList);
+aic.append(riskSection,workforceSection,durationSection,anomalySection);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
-let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0;
+let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0,anomalySequence=0;
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
 if(data.status!=="available"){
@@ -267,8 +273,48 @@ const data=await API.get("analytics/predictions/completion-time?"+params.toStrin
 if(n!==durationSequence)return;renderCompletionTime(data);
 }catch(error){if(n!==durationSequence)return;durationStatus.textContent=error.message||"Could not load completion-time estimates.";durationStatus.className="ct-analytics3-ai-status is-limited";}
 }
+function renderAnomalies(data){
+anomalyMeta.replaceChildren();anomalyList.replaceChildren();
+anomalyStatus.textContent=data.summary||"Historical pattern analysis complete.";
+anomalyStatus.className="ct-analytics3-ai-status "+(data.findings&&data.findings.length?"is-limited":"is-ready");
+anomalyMeta.append($("span","","Historical operations: "+NUM(data.historical_operation_count||0)),
+$("span","","Matured deadline outcomes: "+NUM(data.matured_deadline_outcomes||0)),
+$("span","","History: "+NUM(data.history_days||90)+" days"));
+if(!data.findings||!data.findings.length){
+anomalyList.append($("p","ct-analytics3-ai-footnote","No unusual recurring patterns were detected in the selected historical scope."));
+return;
+}
+data.findings.forEach(item=>{
+const card=$("article","ct-analytics3-ai-anomaly-card"),top=$("div","ct-analytics3-ai-anomaly-top");
+top.append($("strong","",item.title||"Operational pattern"),$("span","ct-analytics3-ai-anomaly-severity "+(item.severity==="elevated"?"is-elevated":"is-watch"),item.severity==="elevated"?"Needs review":"Monitor"));
+card.append(top,$("p","ct-analytics3-ai-footnote",item.description||"Historical pattern detected."));
+const metrics=$("div","ct-analytics3-ai-anomaly-metrics");
+if(item.change_percent!==undefined)metrics.append($("span","","Volume change: "+Number(item.change_percent).toFixed(1)+"%"));
+if(item.observed_late_rate_percent!==undefined)metrics.append($("span","","Observed late rate: "+Number(item.observed_late_rate_percent).toFixed(1)+"%"));
+if(item.organisation_late_rate_percent!==undefined)metrics.append($("span","","Organisation rate: "+Number(item.organisation_late_rate_percent).toFixed(1)+"%"));
+if(item.evidence_count!==undefined)metrics.append($("span","","Evidence records: "+NUM(item.evidence_count)));
+if(item.baseline!==undefined)metrics.append($("span","","Daily baseline: "+Number(item.baseline).toFixed(2)));
+if(item.observed!==undefined)metrics.append($("span","","Recent daily average: "+Number(item.observed).toFixed(2)));
+card.append(metrics);
+if(item.examples&&item.examples.length){
+const examples=$("div","ct-analytics3-ai-anomaly-examples");
+item.examples.forEach(example=>examples.append($("div","ct-analytics3-ai-anomaly-example",(example.title||("Operation #"+example.operation_id))+" · "+NUM(example.attempts)+" attempts")));
+card.append(examples);
+}
+anomalyList.append(card);
+});
+}
+async function loadAnomalies(){
+const n=++anomalySequence;
+anomalyStatus.textContent="Scanning historical operational patterns…";anomalyStatus.className="ct-analytics3-ai-status";
+try{
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const data=await API.get("analytics/predictions/anomalies?"+params.toString());
+if(n!==anomalySequence)return;renderAnomalies(data);
+}catch(error){if(n!==anomalySequence)return;anomalyStatus.textContent=error.message||"Could not analyse historical patterns.";anomalyStatus.className="ct-analytics3-ai-status is-limited";}
+}
 async function loadPredictions(){
-const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();loadAnomalies();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions?"+params.toString());
