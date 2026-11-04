@@ -506,3 +506,16 @@
 #page-content .ct-analytics3-history-item p{margin:7px 0}
 [data-theme="light"] #page-content .ct-analytics3-history-drawer{background:#fff}
 [data-theme="light"] #page-content .ct-analytics3-history-head{background:#fff}
+
+/* Prediction history opens as a centered modal, matching the app's support dialog. */
+.ct-analytics3-history-backdrop{position:fixed;inset:0;z-index:1098;background:rgba(0,0,0,.76);backdrop-filter:blur(2px)}
+.ct-analytics3-history-drawer{position:fixed;z-index:1099;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1000px,calc(100vw - 48px));max-height:min(78vh,760px);overflow:auto;padding:28px 30px 30px;border:1px solid var(--border-strong,#51446b);border-radius:2px;background:var(--surface,#11141c);color:var(--text,#f4f4f6);box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.ct-analytics3-history-head{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:0 0 18px;margin-bottom:16px;border-bottom:1px solid var(--border,#303440)}
+.ct-analytics3-history-head strong{font-size:clamp(22px,2vw,30px);font-weight:700}
+.ct-analytics3-history-close{width:34px;height:34px;min-width:34px;border-radius:9px;font-size:20px}
+.ct-analytics3-history-content{display:grid;gap:10px;max-height:calc(78vh - 125px);overflow:auto}
+.ct-analytics3-history-item{padding:13px 15px;border:1px solid var(--border,#303440);border-radius:8px}
+.ct-analytics3-history-item p{margin:7px 0}
+[data-theme="light"] .ct-analytics3-history-drawer{background:#fff;color:#171923}
+[data-theme="light"] .ct-analytics3-history-head{border-color:#e1e3e9}
+@media(max-width:600px){.ct-analytics3-history-drawer{width:calc(100vw - 24px);max-height:86vh;padding:20px 16px}.ct-analytics3-history-content{max-height:calc(86vh - 110px)}}
