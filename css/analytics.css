@@ -439,3 +439,19 @@
 #page-content .ct-analytics3-ai-duration-value span,#page-content .ct-analytics3-ai-duration-value small { color:var(--text-secondary,#a9b8cc); font-size:.68rem; }
 [data-theme="light"] #page-content .ct-analytics3-ai-duration { background:#fff; }
 @media(max-width:560px){#page-content .ct-analytics3-ai-duration-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}}
+
+#page-content .ct-analytics3-ai-anomalies { display:grid; gap:11px; margin-top:12px; padding:14px; border:1px solid var(--border,#29374d); border-radius:10px; background:var(--surface,#141e31); }
+#page-content .ct-analytics3-ai-anomaly-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+#page-content .ct-analytics3-ai-anomaly-card { display:grid; gap:9px; min-width:0; padding:12px; border:1px solid var(--border,#29374d); border-radius:9px; }
+#page-content .ct-analytics3-ai-anomaly-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+#page-content .ct-analytics3-ai-anomaly-top strong { color:var(--text,#edf3fc); font-size:.85rem; }
+#page-content .ct-analytics3-ai-anomaly-severity { padding:4px 7px; border-radius:20px; font-size:.65rem; }
+#page-content .ct-analytics3-ai-anomaly-severity.is-elevated { color:#e8a1a1; background:rgba(200,70,70,.13); }
+#page-content .ct-analytics3-ai-anomaly-severity.is-watch { color:#e5c17b; background:rgba(210,160,60,.13); }
+#page-content .ct-analytics3-ai-anomaly-metrics { display:flex; flex-wrap:wrap; gap:6px; }
+#page-content .ct-analytics3-ai-anomaly-metrics span { padding:5px 7px; border:1px solid var(--border,#29374d); border-radius:6px; color:var(--text-secondary,#a9b8cc); font-size:.68rem; }
+#page-content .ct-analytics3-ai-anomaly-examples { display:grid; gap:5px; }
+#page-content .ct-analytics3-ai-anomaly-example { padding:7px 8px; border-radius:6px; background:var(--bg-elevated,#10182a); color:var(--text-secondary,#a9b8cc); font-size:.7rem; }
+[data-theme="light"] #page-content .ct-analytics3-ai-anomalies { background:#fff; }
+[data-theme="light"] #page-content .ct-analytics3-ai-anomaly-example { background:#f2f5f9; }
+@media(max-width:760px){#page-content .ct-analytics3-ai-anomaly-list{grid-template-columns:1fr}}
