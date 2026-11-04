@@ -408,3 +408,22 @@
 #page-content .ct-analytics3-ai-risk-row small { grid-column:1/-1; color:var(--text-secondary,#a9b8cc); font-size:.68rem; }
 [data-theme="light"] #page-content .ct-analytics3-ai-risk { background:#fff; }
 @media(max-width:560px){#page-content .ct-analytics3-ai-risk-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}}
+
+#page-content .ct-analytics3-ai-workforce { display:grid; gap:11px; margin-top:12px; padding:14px; border:1px solid var(--border,#29374d); border-radius:10px; background:var(--surface,#141e31); }
+#page-content .ct-analytics3-ai-workforce-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+#page-content .ct-analytics3-ai-workforce-card { display:grid; gap:11px; min-width:0; padding:12px; border:1px solid var(--border,#29374d); border-radius:9px; }
+#page-content .ct-analytics3-ai-workforce-top { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:8px; }
+#page-content .ct-analytics3-ai-workforce-top strong { color:var(--text,#edf3fc); font-size:.9rem; }
+#page-content .ct-analytics3-ai-workforce-top span { color:var(--primary,#64d8b0); font-size:.8rem; }
+#page-content .ct-analytics3-ai-workforce-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+#page-content .ct-analytics3-ai-workforce-stat { display:grid; gap:4px; padding:8px; border-radius:7px; background:var(--bg-elevated,#10182a); }
+#page-content .ct-analytics3-ai-workforce-stat span { color:var(--text-secondary,#a9b8cc); font-size:.68rem; }
+#page-content .ct-analytics3-ai-workforce-stat strong { color:var(--text,#edf3fc); font-size:.85rem; overflow-wrap:anywhere; }
+#page-content .ct-analytics3-ai-workforce-days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+#page-content .ct-analytics3-ai-workforce-day { display:grid; gap:4px; justify-items:center; padding:7px 2px; border:1px solid var(--border,#29374d); border-radius:6px; }
+#page-content .ct-analytics3-ai-workforce-day span { color:var(--text-secondary,#a9b8cc); font-size:.65rem; }
+#page-content .ct-analytics3-ai-workforce-day strong { color:var(--text,#edf3fc); font-size:.78rem; }
+[data-theme="light"] #page-content .ct-analytics3-ai-workforce { background:#fff; }
+[data-theme="light"] #page-content .ct-analytics3-ai-workforce-stat { background:#f2f5f9; }
+@media(max-width:850px){#page-content .ct-analytics3-ai-workforce-list{grid-template-columns:1fr}}
+@media(max-width:420px){#page-content .ct-analytics3-ai-workforce-days{gap:2px}#page-content .ct-analytics3-ai-workforce-day{padding:6px 0}}
