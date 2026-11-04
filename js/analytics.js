@@ -112,6 +112,22 @@ chart.appendChild(row);
 });
 aiChart.append(chart);
 aiRows.append($("p","ct-analytics3-ai-footnote","The shaded range represents variation in this organisation's historical counts for the same weekday. It is an estimate, not a statistical guarantee."));
+const validation=data.validation;
+if(validation){
+const section=$("section","ct-analytics3-ai-validation"),heading=$("h3","","Historical accuracy check");
+const copy=$("p","ct-analytics3-ai-footnote","OMNIX tested the forecasting method against the most recent 14 historical days that were excluded from its training window.");
+const grid=$("div","ct-analytics3-ai-validation-grid");
+[
+["Forecast MAE",validation.model_mae+" operations/day"],
+["Simple baseline MAE",validation.baseline_mae+" operations/day"],
+["Forecast WAPE",validation.model_wape_percent===null?"N/A":validation.model_wape_percent+"%"],
+["Baseline WAPE",validation.baseline_wape_percent===null?"N/A":validation.baseline_wape_percent+"%"]
+].forEach(([label,value])=>{const card=$("div","ct-analytics3-ai-validation-card");card.append($("span","",label),$("strong","",String(value)));grid.append(card);});
+const verdict=validation.beats_baseline?"The forecast performed better than the simple historical-average baseline in this holdout.":"The forecast did not outperform the simple historical-average baseline in this holdout. Treat the forecast cautiously.";
+const verdictNode=$("p","ct-analytics3-ai-validation-verdict",verdict);
+section.append(heading,copy,grid,verdictNode,$("small","ct-analytics3-ai-footnote","Validation: "+validation.method+". Actual operations in holdout: "+NUM(validation.actual_operations)+". These are organisation-specific historical results, not a promise of future accuracy."));
+aiRows.append(section);
+}
 }
 async function loadPredictions(){
 const n=++predictionSequence;aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
