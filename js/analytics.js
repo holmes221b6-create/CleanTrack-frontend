@@ -241,10 +241,15 @@ const daily=$("div","ct-analytics3-ai-workforce-days");
 team.forecast_by_day.forEach(day=>{
 const cell=$("div","ct-analytics3-ai-workforce-day"),dateLabel=new Date(day.date+"T12:00:00");
 cell.append($("span","",new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(dateLabel)),$("strong","",Number(day.expected_operations).toFixed(1)));
+if(day.lower_estimate!==undefined&&day.upper_estimate!==undefined)cell.append($("small","",Number(day.lower_estimate).toFixed(1)+"–"+Number(day.upper_estimate).toFixed(1)+" historical range"));
+if(day.weekday_sample_count!==undefined)cell.append($("small","",NUM(day.weekday_sample_count)+" weekday samples"));
 daily.append(cell);
 });
+const validation=team.validation||{};
+const validationNote=$("small","ct-analytics3-ai-footnote",validation.model_mae===null||validation.model_mae===undefined?"Forecast validation unavailable for this history.":"14-day holdout MAE: "+Number(validation.model_mae).toFixed(2)+" operations/day; flat-baseline MAE: "+Number(validation.baseline_mae).toFixed(2)+". "+(validation.beats_baseline===true?"This model beat the baseline in this holdout.":validation.beats_baseline===false?"This model did not beat the baseline in this holdout.":"No baseline comparison available."));
+const rangeNote=$("small","ct-analytics3-ai-footnote",team.range_method||"Daily ranges are historical estimates, not guaranteed bounds.");
 const note=$("small","ct-analytics3-ai-footnote",team.effort_estimate_sample_count+" historical operations contained an estimated duration. Effort hours are based on those recorded estimates, not measured working time. Staffing capacity is not assessed.");
-card.append(top,stats,daily,note);workforceList.append(card);
+card.append(top,stats,daily,validationNote,rangeNote,note);workforceList.append(card);
 });
 }
 async function loadWorkforceDemand(){
