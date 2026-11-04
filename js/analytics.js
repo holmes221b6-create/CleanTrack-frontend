@@ -286,7 +286,21 @@ durationStatus.className="ct-analytics3-ai-status is-ready";
 durationMeta.append($("span","","Recorded execution sessions: "+NUM(data.historical_execution_sample_count)),
 $("span","","Organisation median: "+Number(data.organisation_median_minutes).toFixed(1)+" minutes"),
 $("span","","Open operations estimated: "+NUM(data.predicted_open_operations)));
-durationList.append($("p","ct-analytics3-ai-footnote","Only submitted or completed execution attempts are used as duration evidence. Rejected and unfinished attempts are excluded. The displayed 25th–75th percentile range is descriptive, not a confidence interval."));
+const validation=data.validation||{};
+const validationBox=$("section","ct-analytics3-ai-validation");
+validationBox.append($("h3","","Historical accuracy check"));
+const validationGrid=$("div","ct-analytics3-ai-validation-grid");
+[
+["Training sessions",NUM(validation.training_sample_count||0)],
+["Holdout sessions",NUM(validation.holdout_sample_count||0)],
+["Model MAE",validation.model_mae_minutes==null?"Not available":Number(validation.model_mae_minutes).toFixed(1)+" min"],
+["Baseline MAE",validation.baseline_mae_minutes==null?"Not available":Number(validation.baseline_mae_minutes).toFixed(1)+" min"]
+].forEach(([label,value])=>{const cell=$("div","ct-analytics3-ai-validation-card");cell.append($("span","",label),$("strong","",value));validationGrid.append(cell);});
+validationBox.append(validationGrid,$("p","ct-analytics3-ai-validation-verdict",
+validation.status!=="evaluated"?"Not enough chronological holdout evidence to assess accuracy.":
+validation.beats_baseline?"The cohort estimates outperformed the organisation-median baseline on the held-out sessions.":
+"The cohort estimates did not outperform the organisation-median baseline on the held-out sessions."));
+durationList.append(validationBox,$("p","ct-analytics3-ai-footnote","Only submitted or completed execution attempts are used as duration evidence. Rejected and unfinished attempts are excluded. Small type/priority groups are pooled into broader history unless they contain at least five sessions. The displayed 25th–75th percentile range is descriptive, not a confidence interval."));
 if(!data.predictions.length){durationList.append($("p","ct-analytics3-ai-footnote","No open operations matched the available execution history and current filters."));return;}
 data.predictions.forEach(item=>{
 const row=$("article","ct-analytics3-ai-duration-row"),main=$("div","ct-analytics3-ai-duration-main");
