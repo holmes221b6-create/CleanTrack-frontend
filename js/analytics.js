@@ -75,9 +75,53 @@ const tableDetails=$("details","ct-analytics3-data-details"),tableSummary=$("sum
 tableSummary.append(tableTitle,tableDisclosure);tableDetails.append(tableSummary,tableWrap);
 tableDetails.addEventListener("toggle",()=>{tableDisclosure.textContent=tableDetails.open?"Hide data":"Show data";});
 panel.append(ph,builder,title,legend,drawing,tableDetails,note);page.appendChild(panel);
-const ai=$("section","ct-analytics3-ai-panel"),aic=$("div");ai.append($("span","ct-analytics3-ai-icon","✦"));aic.append($("h2","","AI predictions"),$("p","","Under development. Predictions will appear only after a validated prediction model is connected. No predicted values are shown yet."));ai.append(aic,$("span","ct-analytics3-ai-badge","In development"));page.appendChild(ai);
+const ai=$("section","ct-analytics3-ai-panel ct-analytics3-predictions"),aic=$("div","ct-analytics3-predictions-content");
+ai.append($("span","ct-analytics3-ai-icon","✦"));
+const aiHead=$("div","ct-analytics3-predictions-head");
+aiHead.append($("h2","","AI predictions"),$("span","ct-analytics3-ai-badge","Workload forecast"));
+aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity."));
+const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement.");
+const aiStatus=$("p","ct-analytics3-ai-status","Waiting for organisation analytics…");aiStatus.setAttribute("role","status");aiStatus.setAttribute("aria-live","polite");
+const aiMeta=$("div","ct-analytics3-ai-meta"),aiChart=$("div","ct-analytics3-ai-chart"),aiRows=$("div","ct-analytics3-ai-rows");
+aic.append(aiNotice,aiStatus,aiMeta,aiChart,aiRows);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
+let predictionSequence=0;
+function renderPredictions(data){
+aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
+if(data.status!=="available"){
+aiStatus.textContent=data.message||"Predictions are currently unavailable.";
+aiStatus.className="ct-analytics3-ai-status is-limited";
+aiMeta.append($("span","","Historical operations: "+NUM(data.sample_count)), $("span","","History: "+NUM(data.history_days)+" days"));
+return;
+}
+aiStatus.textContent=data.message||"Forecast ready.";
+aiStatus.className="ct-analytics3-ai-status is-ready";
+aiMeta.append($("span","","Historical operations: "+NUM(data.sample_count)), $("span","","History: "+data.history_start+" – "+data.history_end), $("span","","Model: "+data.model));
+const max=Math.max(1,...data.forecast.map(x=>Number(x.upper_estimate)||0));
+const chart=$("div","ct-analytics3-ai-bars");
+data.forecast.forEach(item=>{
+const row=$("div","ct-analytics3-ai-bar-row"),label=$("div","ct-analytics3-ai-bar-label");
+const day=new Date(item.date+"T12:00:00");
+label.append($("strong","",new Intl.DateTimeFormat(undefined,{weekday:"short",day:"numeric",month:"short"}).format(day)),$("span","",Number(item.predicted_operations).toFixed(1)+" expected"));
+const track=$("div","ct-analytics3-ai-track"),rangeBar=$("span","ct-analytics3-ai-range"),fill=$("span","ct-analytics3-ai-fill");
+rangeBar.style.width=Math.max(0,Number(item.upper_estimate)/max*100)+"%";
+fill.style.width=Math.max(0,Number(item.predicted_operations)/max*100)+"%";
+track.append(rangeBar,fill);row.append(label,track,$("small","","Estimated range "+Number(item.lower_estimate).toFixed(1)+"–"+Number(item.upper_estimate).toFixed(1)));
+chart.appendChild(row);
+});
+aiChart.append(chart);
+aiRows.append($("p","ct-analytics3-ai-footnote","The shaded range represents variation in this organisation's historical counts for the same weekday. It is an estimate, not a statistical guarantee."));
+}
+async function loadPredictions(){
+const n=++predictionSequence;aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+try{
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const data=await API.get("analytics/predictions?"+params.toString());
+if(n!==predictionSequence)return;renderPredictions(data);
+}catch(error){if(n!==predictionSequence)return;aiStatus.textContent=error.message||"Could not load AI predictions.";aiStatus.className="ct-analytics3-ai-status is-limited";}
+}
+
 function query(){const p=new URLSearchParams({start_date:from.value,end_date:to.value,bucket:bucket.value});const prefs=window.CleanTrackPreferences&&window.CleanTrackPreferences.get?window.CleanTrackPreferences.get():{};p.set("time_zone",prefs.timeZone||Intl.DateTimeFormat().resolvedOptions().timeZone||"UTC");if(PICK(team).length)p.set("team_ids",PICK(team).join(","));if(PICK(location).length)p.set("location_ids",PICK(location).join(","));if(PICK(zone).length)p.set("zone_ids",PICK(zone).join(","));if(PICK(employee).length)p.set("employee_ids",PICK(employee).join(","));if(type.value)p.set("task_type",type.value);return p;}
 function fillFilters(f){const t=PICK(team),l=PICK(location),z=PICK(zone),e=PICK(employee),ty=type.value;options(team,f.teams||[],t,"name","id");options(location,f.locations||[],l,"name","id");options(zone,f.zones||[],z,"name","id");options(employee,f.employees||[],e,"name","id");options(type,(f.operation_types||[]).map(n=>({name:n,value:n})),ty,"name","value");}
 function configureMetric(){const allowed=view.value==="trends"?TRENDS:view.value==="statuses"?[["statuses","Operations by current status"]]:METRICS,old=metric.value;metric.replaceChildren();allowed.forEach(([v,l])=>{const o=$("option","",l);o.value=v;metric.appendChild(o);});metric.value=allowed.some(a=>a[0]===old)?old:allowed[0][0];}
@@ -154,7 +198,7 @@ const blob=new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{typ
 async function load(){
 if(!from.value||!to.value){status.textContent="Choose both start and end dates.";status.className="ct-analytics3-status is-error";return;}if(from.value>to.value){status.textContent="Start date must be on or before end date.";status.className="ct-analytics3-status is-error";return;}
 const n=++sequence;apply.disabled=true;status.textContent="Loading filtered organization records…";status.className="ct-analytics3-status";
-try{const r=await API.get("analytics/workspace?"+query().toString());if(n!==sequence)return;report=r;const pt=PICK(team),pl=PICK(location),pz=PICK(zone),pe=PICK(employee),py=type.value;options(team,r.filters?.teams||[],pt,"name","id");options(location,r.filters?.locations||[],pl,"name","id");options(zone,r.filters?.zones||[],pz,"name","id");options(employee,r.filters?.employees||[],pe,"name","id");options(type,(r.filters?.operation_types||[]).map(x=>({name:x,value:x})),py,"name","value");lastLoadedQuery=query().toString();
+try{const r=await API.get("analytics/workspace?"+query().toString());if(n!==sequence)return;report=r;loadPredictions();const pt=PICK(team),pl=PICK(location),pz=PICK(zone),pe=PICK(employee),py=type.value;options(team,r.filters?.teams||[],pt,"name","id");options(location,r.filters?.locations||[],pl,"name","id");options(zone,r.filters?.zones||[],pz,"name","id");options(employee,r.filters?.employees||[],pe,"name","id");options(type,(r.filters?.operation_types||[]).map(x=>({name:x,value:x})),py,"name","value");lastLoadedQuery=query().toString();
 kpiDefs.forEach(([lab,key,note,kind])=>{const v=r.summary?.[key];kv[key].v.textContent=kind==="p"?PCT(v):kind==="h"?(v===null||v===undefined?"N/A":NUM(v)+" h"):NUM(v);});configureMetric();draw();
 mb.replaceChildren();[["Cohort",r.methodology?.cohort],["Trends",r.methodology?.trends],["Completion rate",r.methodology?.completion_rate],["On-time rate",r.methodology?.on_time_rate],["Average completion time",r.methodology?.average_completion_hours],["Filters",r.methodology?.filters],["Time zone",r.methodology?.time_zone]].forEach(([a,b])=>{if(!b)return;const p=$("p");p.append($("strong","",a+": "),$("span","",b));mb.appendChild(p);});
 status.textContent="Loaded "+readableDate(r.period.start_date)+" – "+readableDate(r.period.end_date)+". Trend labels are shortened; expand the data table for full results.";status.className="ct-analytics3-status is-success";refreshRangeControls();
