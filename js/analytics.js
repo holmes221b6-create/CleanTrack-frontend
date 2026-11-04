@@ -186,11 +186,23 @@ riskStatus.className="ct-analytics3-ai-status is-limited";
 riskMeta.append($("span","","Matured historical operations: "+NUM(data.historical_sample_count)));
 return;
 }
-riskStatus.textContent=data.message||"Historical overdue risk estimates are ready.";
+riskStatus.textContent=data.message||"Historical overdue-risk estimates are ready.";
 riskStatus.className="ct-analytics3-ai-status is-ready";
 riskMeta.append($("span","","Historical sample: "+NUM(data.historical_sample_count)),
 $("span","","Historical late rate: "+PCT(data.historical_late_rate_percent)),
 $("span","","Open operations evaluated: "+NUM(data.evaluated_open_operations)));
+const validation=data.validation||{};
+const validationCard=$("section","ct-analytics3-ai-validation");
+validationCard.append($("h3","","Historical validation"));
+if(validation.status==="evaluated"){
+const grid=$("div","ct-analytics3-ai-validation-grid");
+[["Cohort estimate Brier score",validation.model_brier_score],["Organisation baseline Brier score",validation.baseline_brier_score],["Holdout operations",NUM(validation.holdout_sample_count)]].forEach(([label,value])=>{const card=$("div","ct-analytics3-ai-validation-card");card.append($("span","",label),$("strong","",String(value)));grid.append(card);});
+validationCard.append(grid,$("p","ct-analytics3-ai-validation-verdict",validation.beats_baseline?"Historical cohort estimates outperformed the organisation-wide baseline on this chronological holdout.":"Historical cohort estimates did not outperform the organisation-wide baseline on this chronological holdout. Treat individual estimates cautiously."));
+}else{
+validationCard.append($("p","ct-analytics3-ai-footnote","Not enough matured historical outcomes are available for chronological validation. Validation requires at least 10 training outcomes and 5 later holdout outcomes."));
+}
+validationCard.append($("small","ct-analytics3-ai-footnote",validation.method||"Validation compares historical estimates with a simple organisation-wide baseline."));
+riskList.append(validationCard);
 if(!data.at_risk_operations.length){riskList.append($("p","ct-analytics3-ai-footnote","No currently open operations with future due dates match these filters."));return;}
 data.at_risk_operations.forEach(item=>{
 const row=$("article","ct-analytics3-ai-risk-row"),main=$("div","ct-analytics3-ai-risk-main");
