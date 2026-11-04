@@ -95,7 +95,9 @@ if(description)body.append($("p","ct-analytics3-ai-footnote",description));
 body.append(...content);
 card.append(summary,body);return card;
 }
-aic.append(aiNotice,predictionCard("Workload forecast","7-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]));
+const workloadCard=predictionCard("Workload forecast","7-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
+workloadCard.addEventListener("toggle",()=>{if(workloadCard.open)loadWorkloadForecast();});
+aic.append(aiNotice,workloadCard);
 const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
 riskHead.append($("h3","","Overdue risk estimates"),$("span","ct-analytics3-ai-badge","Historical pattern analysis"));
 const riskIntro=$("p","ct-analytics3-ai-footnote","Estimates the likelihood of currently open operations becoming overdue using historical outcomes for comparable operation types and priorities.");
@@ -120,12 +122,15 @@ const anomalyIntro=$("p","ct-analytics3-ai-footnote","Highlights unusual workloa
 const anomalyStatus=$("p","ct-analytics3-ai-status","Scanning historical operational patterns…");anomalyStatus.setAttribute("role","status");anomalyStatus.setAttribute("aria-live","polite");
 const anomalyMeta=$("div","ct-analytics3-ai-meta"),anomalyList=$("div","ct-analytics3-ai-anomaly-list");
 anomalySection.append(anomalyHead,anomalyIntro,anomalyStatus,anomalyMeta,anomalyList);
-aic.append(
-predictionCard("Overdue risk estimates","Risk analysis",riskIntro.textContent,[riskStatus,riskMeta,riskList]),
-predictionCard("Workforce demand forecast","Team workload",workforceIntro.textContent,[workforceStatus,workforceMeta,workforceList]),
-predictionCard("Completion-time estimates","Execution history",durationIntro.textContent,[durationStatus,durationMeta,durationList]),
-predictionCard("Recurring problems & anomalies","Pattern detection",anomalyIntro.textContent,[anomalyStatus,anomalyMeta,anomalyList])
-);ai.append(aic);page.appendChild(ai);
+const riskCard=predictionCard("Overdue risk estimates","Risk analysis",riskIntro.textContent,[riskStatus,riskMeta,riskList]);
+const workforceCard=predictionCard("Workforce demand forecast","Team workload",workforceIntro.textContent,[workforceStatus,workforceMeta,workforceList]);
+const durationCard=predictionCard("Completion-time estimates","Execution history",durationIntro.textContent,[durationStatus,durationMeta,durationList]);
+const anomalyCard=predictionCard("Recurring problems & anomalies","Pattern detection",anomalyIntro.textContent,[anomalyStatus,anomalyMeta,anomalyList]);
+riskCard.addEventListener("toggle",()=>{if(riskCard.open)loadOverdueRisk();});
+workforceCard.addEventListener("toggle",()=>{if(workforceCard.open)loadWorkforceDemand();});
+durationCard.addEventListener("toggle",()=>{if(durationCard.open)loadCompletionTime();});
+anomalyCard.addEventListener("toggle",()=>{if(anomalyCard.open)loadAnomalies();});
+aic.append(riskCard,workforceCard,durationCard,anomalyCard);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
 let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0,anomalySequence=0;
@@ -330,13 +335,20 @@ const data=await API.get("analytics/predictions/anomalies?"+params.toString());
 if(n!==anomalySequence)return;renderAnomalies(data);
 }catch(error){if(n!==anomalySequence)return;anomalyStatus.textContent=error.message||"Could not analyse historical patterns.";anomalyStatus.className="ct-analytics3-ai-status is-limited";}
 }
-async function loadPredictions(){
-const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();loadAnomalies();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+async function loadWorkloadForecast(){
+const n=++predictionSequence;aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions?"+params.toString());
 if(n!==predictionSequence)return;renderPredictions(data);
 }catch(error){if(n!==predictionSequence)return;aiStatus.textContent=error.message||"Could not load AI predictions.";aiStatus.className="ct-analytics3-ai-status is-limited";}
+}
+function loadPredictions(){
+if(workloadCard.open)loadWorkloadForecast();
+if(riskCard.open)loadOverdueRisk();
+if(workforceCard.open)loadWorkforceDemand();
+if(durationCard.open)loadCompletionTime();
+if(anomalyCard.open)loadAnomalies();
 }
 
 function query(){const p=new URLSearchParams({start_date:from.value,end_date:to.value,bucket:bucket.value});const prefs=window.CleanTrackPreferences&&window.CleanTrackPreferences.get?window.CleanTrackPreferences.get():{};p.set("time_zone",prefs.timeZone||Intl.DateTimeFormat().resolvedOptions().timeZone||"UTC");if(PICK(team).length)p.set("team_ids",PICK(team).join(","));if(PICK(location).length)p.set("location_ids",PICK(location).join(","));if(PICK(zone).length)p.set("zone_ids",PICK(zone).join(","));if(PICK(employee).length)p.set("employee_ids",PICK(employee).join(","));if(type.value)p.set("task_type",type.value);return p;}
