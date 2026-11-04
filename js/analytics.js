@@ -333,7 +333,8 @@ function renderAnomalies(data){
 anomalyMeta.replaceChildren();anomalyList.replaceChildren();
 anomalyMeta.append($("span","","Historical operations: "+NUM(data.historical_operation_count||0)),
 $("span","","Matured deadline outcomes: "+NUM(data.matured_deadline_outcomes||0)),
-$("span","","History: "+NUM(data.history_days||90)+" days"));
+$("span","","History: "+NUM(data.history_days||90)+" days"),
+$("span","","Active baseline days: "+NUM(data.analysis_evidence?.baseline_active_days||0)+" / "+NUM(data.analysis_evidence?.baseline_days||0)));
 if(data.status==="no_history"||!Number(data.historical_operation_count||0)){
 anomalyStatus.textContent=data.summary||"No historical operations are available in this selected scope yet.";
 anomalyStatus.className="ct-analytics3-ai-status is-limited";
@@ -344,7 +345,7 @@ anomalyStatus.textContent=data.summary||"Historical pattern analysis complete.";
 anomalyStatus.className="ct-analytics3-ai-status "+(data.findings&&data.findings.length?"is-limited":"is-ready");
 if(data.method)anomalyList.append($("p","ct-analytics3-ai-footnote","Detection method: "+data.method));
 if(!data.findings||!data.findings.length){
-anomalyList.append($("p","ct-analytics3-ai-footnote","No unusual recurring patterns were detected in the selected historical scope."));
+anomalyList.append($("p","ct-analytics3-ai-footnote",data.analysis_evidence?.overdue_rate_assessable===false?"No unusual volume pattern was detected. There are not yet enough matured deadline outcomes to assess recurring overdue patterns.":"No unusual recurring patterns were detected in the selected historical scope."));
 return;
 }
 data.findings.forEach(item=>{
