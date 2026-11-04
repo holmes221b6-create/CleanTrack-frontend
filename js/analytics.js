@@ -185,6 +185,13 @@ aiRows.append(section);
 }
 addReasoningButton(aiRows,"Why this forecast?",["The estimate uses the organisation’s 56 complete historical days, weekday-specific operation counts and a capped recent-trend adjustment ("+Number(data.trend_adjustment||1).toFixed(2)+"×).","Historical sample: "+NUM(data.sample_count)+" operations. Forecast horizon: "+horizon.value+" days.","Holdout MAE: "+(validation.model_mae==null?"not available":validation.model_mae+" operations/day")+". The comparison is historical evidence, not a guarantee."]);
 }
+
+function recommendationPanel(title,items){
+ const box=$("section","ct-analytics3-ai-validation");
+ box.append($("h3","",title));
+ items.forEach(item=>box.append($("p","ct-analytics3-ai-footnote","• "+item)));
+ return box;
+}
 function renderOverdueRisk(data){
 riskMeta.replaceChildren();riskList.replaceChildren();
 if(data.status!=="available"){
@@ -210,6 +217,8 @@ validationCard.append($("p","ct-analytics3-ai-footnote","Not enough matured hist
 }
 validationCard.append($("small","ct-analytics3-ai-footnote",validation.method||"Validation compares historical estimates with a simple organisation-wide baseline."));
 riskList.append(validationCard);
+const lateRate=Number(data.historical_late_rate_percent||0);
+if(lateRate>=25)riskList.append(recommendationPanel("Data-based management actions",["Review due dates and assignment load for the highest-risk open operations.","Check whether recurring late outcomes cluster by operation type or priority before reallocating staff."]));
 addReasoningButton(riskList,"How overdue risk is estimated",["Uses matured outcomes from this organisation and comparable operation cohorts.","Historical sample: "+NUM(data.historical_sample_count)+". Historical late rate: "+PCT(data.historical_late_rate_percent)+".","Small cohorts are pooled; this is an empirical historical rate, not an individual causal prediction."]);
 if(!data.at_risk_operations.length){riskList.append($("p","ct-analytics3-ai-footnote","No currently open operations with future due dates match these filters."));return;}
 data.at_risk_operations.forEach(item=>{
@@ -269,7 +278,7 @@ const validation=team.validation||{};
 const validationNote=$("small","ct-analytics3-ai-footnote",validation.model_mae===null||validation.model_mae===undefined?"Forecast validation unavailable for this history.":"14-day holdout MAE: "+Number(validation.model_mae).toFixed(2)+" operations/day; flat-baseline MAE: "+Number(validation.baseline_mae).toFixed(2)+". "+(validation.beats_baseline===true?"This model beat the baseline in this holdout.":validation.beats_baseline===false?"This model did not beat the baseline in this holdout.":"No baseline comparison available."));
 const rangeNote=$("small","ct-analytics3-ai-footnote",team.range_method||"Daily ranges are historical estimates, not guaranteed bounds.");
 const note=$("small","ct-analytics3-ai-footnote",team.effort_estimate_sample_count+" historical operations contained an estimated duration. Effort hours are based on those recorded estimates, not measured working time. Staffing capacity is not assessed.");
-card.append(top,stats,daily,validationNote,rangeNote,note);workforceList.append(card);
+card.append(top,stats,daily,validationNote,rangeNote,note);if(team.expected_operations_per_active_member!==null&&team.expected_operations_per_active_member>5)card.append(recommendationPanel("Suggested action",["Review this team’s upcoming assignments and balance work across available members. Active membership does not confirm shift availability."]));workforceList.append(card);
 });
 }
 async function loadWorkforceDemand(){
@@ -309,6 +318,7 @@ validation.status!=="evaluated"?"Not enough chronological holdout evidence to as
 validation.beats_baseline?"The cohort estimates outperformed the organisation-median baseline on the held-out sessions.":
 "The cohort estimates did not outperform the organisation-median baseline on the held-out sessions."));
 durationList.append(validationBox,$("p","ct-analytics3-ai-footnote","Only submitted or completed execution attempts are used as duration evidence. Rejected and unfinished attempts are excluded. Small type/priority groups are pooled into broader history unless they contain at least five sessions. The displayed 25th–75th percentile range is descriptive, not a confidence interval."));
+if(data.organisation_median_minutes>120)durationList.append(recommendationPanel("Suggested action",["Review complex operation templates, instructions and hand-offs; compare similar operation types before changing estimates."]));
 if(!data.predictions.length){durationList.append($("p","ct-analytics3-ai-footnote","No open operations matched the available execution history and current filters."));return;}
 data.predictions.forEach(item=>{
 const row=$("article","ct-analytics3-ai-duration-row"),main=$("div","ct-analytics3-ai-duration-main");
@@ -443,11 +453,8 @@ function addReasoningButton(target,title,lines){
  box.append(body);target.append(box);
 }
 function loadPredictions(){
-if(workloadCard.open)loadWorkloadForecast();
-if(riskCard.open)loadOverdueRisk();
-if(workforceCard.open)loadWorkforceDemand();
-if(durationCard.open)loadCompletionTime();
-if(anomalyCard.open)loadAnomalies();
+// Refresh all prediction datasets in the background; collapsed cards remain visually collapsed.
+loadWorkloadForecast();loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();loadAnomalies();
 }
 
 function query(){const p=new URLSearchParams({start_date:from.value,end_date:to.value,bucket:bucket.value});const prefs=window.CleanTrackPreferences&&window.CleanTrackPreferences.get?window.CleanTrackPreferences.get():{};p.set("time_zone",prefs.timeZone||Intl.DateTimeFormat().resolvedOptions().timeZone||"UTC");if(PICK(team).length)p.set("team_ids",PICK(team).join(","));if(PICK(location).length)p.set("location_ids",PICK(location).join(","));if(PICK(zone).length)p.set("zone_ids",PICK(zone).join(","));if(PICK(employee).length)p.set("employee_ids",PICK(employee).join(","));if(type.value)p.set("task_type",type.value);return p;}
