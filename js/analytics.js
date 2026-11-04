@@ -83,7 +83,7 @@ const aiHead=$("div","ct-analytics3-predictions-head");
 aiHead.append($("h2","","AI predictions"),$("span","ct-analytics3-ai-badge","Workload forecast"));
 aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity."));
 const horizon=SEL("prediction_horizon",[["7","7 days"],["14","14 days"],["30","30 days"]]);horizon.value="7";
-const historyButton=B("Prediction history","ct-analytics3-button ct-analytics3-button-secondary",openPredictionHistory);
+const historyButton=B("↺ Prediction history","ct-analytics3-button ct-analytics3-button-secondary ct-analytics3-history-launcher",openPredictionHistory);
 const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement. Each prediction uses its own historical lookback window, so the selected report start and end dates do not change its training period. Team, location, zone, staff and operation-type filters are applied.");
 const aiStatus=$("p","ct-analytics3-ai-status","Waiting for organisation analytics…");aiStatus.setAttribute("role","status");aiStatus.setAttribute("aria-live","polite");
 const aiMeta=$("div","ct-analytics3-ai-meta"),aiChart=$("div","ct-analytics3-ai-chart"),aiRows=$("div","ct-analytics3-ai-rows");
