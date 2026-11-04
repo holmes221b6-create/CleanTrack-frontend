@@ -92,7 +92,7 @@ const riskMeta=$("div","ct-analytics3-ai-meta"),riskList=$("div","ct-analytics3-
 riskSection.append(riskHead,riskIntro,riskStatus,riskMeta,riskList);aic.append(riskSection);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
-let predictionSequence=0;
+let predictionSequence=0,riskSequence=0;
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
 if(data.status!=="available"){
@@ -162,13 +162,13 @@ row.append(main,risk,evidence);riskList.append(row);
 });
 }
 async function loadOverdueRisk(){
-const n=++predictionSequence;
+const n=++riskSequence;
 riskStatus.textContent="Analysing matured organisation history…";riskStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions/overdue-risk?"+params.toString());
-if(n!==predictionSequence)return;renderOverdueRisk(data);
-}catch(error){if(n!==predictionSequence)return;riskStatus.textContent=error.message||"Could not load overdue risk estimates.";riskStatus.className="ct-analytics3-ai-status is-limited";}
+if(n!==riskSequence)return;renderOverdueRisk(data);
+}catch(error){if(n!==riskSequence)return;riskStatus.textContent=error.message||"Could not load overdue risk estimates.";riskStatus.className="ct-analytics3-ai-status is-limited";}
 }
 async function loadPredictions(){
 const n=++predictionSequence;loadOverdueRisk();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
