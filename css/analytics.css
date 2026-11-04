@@ -427,3 +427,15 @@
 [data-theme="light"] #page-content .ct-analytics3-ai-workforce-stat { background:#f2f5f9; }
 @media(max-width:850px){#page-content .ct-analytics3-ai-workforce-list{grid-template-columns:1fr}}
 @media(max-width:420px){#page-content .ct-analytics3-ai-workforce-days{gap:2px}#page-content .ct-analytics3-ai-workforce-day{padding:6px 0}}
+
+#page-content .ct-analytics3-ai-duration { display:grid; gap:11px; margin-top:12px; padding:14px; border:1px solid var(--border,#29374d); border-radius:10px; background:var(--surface,#141e31); }
+#page-content .ct-analytics3-ai-duration-list { display:grid; gap:8px; }
+#page-content .ct-analytics3-ai-duration-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px 16px; align-items:center; padding:11px; border:1px solid var(--border,#29374d); border-radius:8px; }
+#page-content .ct-analytics3-ai-duration-main { display:grid; gap:4px; min-width:0; }
+#page-content .ct-analytics3-ai-duration-main strong { color:var(--text,#edf3fc); font-size:.84rem; overflow-wrap:anywhere; }
+#page-content .ct-analytics3-ai-duration-main span,#page-content .ct-analytics3-ai-duration-main small { color:var(--text-secondary,#a9b8cc); font-size:.7rem; }
+#page-content .ct-analytics3-ai-duration-value { display:grid; justify-items:end; gap:3px; }
+#page-content .ct-analytics3-ai-duration-value strong { color:var(--primary,#64d8b0); font-size:1.1rem; font-variant-numeric:tabular-nums; }
+#page-content .ct-analytics3-ai-duration-value span,#page-content .ct-analytics3-ai-duration-value small { color:var(--text-secondary,#a9b8cc); font-size:.68rem; }
+[data-theme="light"] #page-content .ct-analytics3-ai-duration { background:#fff; }
+@media(max-width:560px){#page-content .ct-analytics3-ai-duration-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}}
