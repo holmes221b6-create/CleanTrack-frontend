@@ -428,7 +428,8 @@ if(anomalyCard.open){anomalyStatus.textContent=text;anomalyStatus.className="ct-
 
 const historyDrawer=$("aside","ct-analytics3-history-drawer");
 historyDrawer.hidden=true;historyDrawer.setAttribute("aria-label","Prediction history");
-const historyHead=$("div","ct-analytics3-history-head"),historyClose=B("×","ct-analytics3-button",()=>{historyDrawer.hidden=true;});
+const historyHead=$("div","ct-analytics3-history-head"),historyClose=B("Close ×","ct-analytics3-history-close",()=>{historyDrawer.hidden=true;});
+historyClose.setAttribute("type","button");historyClose.setAttribute("aria-label","Close prediction history");historyClose.title="Close prediction history";
 historyHead.append($("strong","","Prediction history"),historyClose);
 const historyContent=$("div","ct-analytics3-history-content");
 historyDrawer.append(historyHead,historyContent);page.appendChild(historyDrawer);
