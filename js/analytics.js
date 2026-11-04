@@ -96,10 +96,16 @@ const workforceIntro=$("p","ct-analytics3-ai-footnote","Estimates incoming opera
 const workforceStatus=$("p","ct-analytics3-ai-status","Calculating team workload…");workforceStatus.setAttribute("role","status");workforceStatus.setAttribute("aria-live","polite");
 const workforceMeta=$("div","ct-analytics3-ai-meta"),workforceList=$("div","ct-analytics3-ai-workforce-list");
 workforceSection.append(workforceHead,workforceIntro,workforceStatus,workforceMeta,workforceList);
-aic.append(riskSection,workforceSection);ai.append(aic);page.appendChild(ai);
+const durationSection=$("section","ct-analytics3-ai-duration"),durationHead=$("div","ct-analytics3-ai-risk-head");
+durationHead.append($("h3","","Completion-time estimates"),$("span","ct-analytics3-ai-badge","Execution history"));
+const durationIntro=$("p","ct-analytics3-ai-footnote","Estimates how long open operations may take using actual recorded execution sessions from comparable historical operations.");
+const durationStatus=$("p","ct-analytics3-ai-status","Analysing recorded execution durations…");durationStatus.setAttribute("role","status");durationStatus.setAttribute("aria-live","polite");
+const durationMeta=$("div","ct-analytics3-ai-meta"),durationList=$("div","ct-analytics3-ai-duration-list");
+durationSection.append(durationHead,durationIntro,durationStatus,durationMeta,durationList);
+aic.append(riskSection,workforceSection,durationSection);ai.append(aic);page.appendChild(ai);
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
-let predictionSequence=0,riskSequence=0,workforceSequence=0;
+let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0;
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
 if(data.status!=="available"){
@@ -225,8 +231,49 @@ const data=await API.get("analytics/predictions/workforce-demand?"+params.toStri
 if(n!==workforceSequence)return;renderWorkforceDemand(data);
 }catch(error){if(n!==workforceSequence)return;workforceStatus.textContent=error.message||"Could not load workforce demand estimates.";workforceStatus.className="ct-analytics3-ai-status is-limited";}
 }
+function renderCompletionTime(data){
+durationMeta.replaceChildren();durationList.replaceChildren();
+if(data.status!=="available"){
+durationStatus.textContent=data.message||"Completion-time estimates are unavailable.";
+durationStatus.className="ct-analytics3-ai-status is-limited";
+durationMeta.append($("span","","Recorded execution sessions: "+NUM(data.historical_execution_sample_count||0)));
+return;
+}
+durationStatus.textContent="Estimates generated from recorded execution sessions.";
+durationStatus.className="ct-analytics3-ai-status is-ready";
+durationMeta.append($("span","","Recorded execution sessions: "+NUM(data.historical_execution_sample_count)),
+$("span","","Organisation median: "+Number(data.organisation_median_minutes).toFixed(1)+" minutes"),
+$("span","","Open operations estimated: "+NUM(data.predicted_open_operations)));
+if(!data.predictions.length){durationList.append($("p","ct-analytics3-ai-footnote","No open operations matched the available execution history and current filters."));return;}
+data.predictions.forEach(item=>{
+const row=$("article","ct-analytics3-ai-duration-row"),main=$("div","ct-analytics3-ai-duration-main");
+main.append($("strong","",item.title||("Operation #"+item.operation_id)),
+$("span","",String(item.task_type||"General")+" · "+String(item.priority||"Normal")+" priority"),
+$("small","",item.basis+" · "+NUM(item.historical_comparable_sample)+" comparable execution sessions"));
+const estimate=$("div","ct-analytics3-ai-duration-value");
+estimate.append($("strong","",formatDuration(item.estimated_minutes)),
+$("span","","Estimated duration"),
+$("small","",formatDuration(item.lower_estimate_minutes)+"–"+formatDuration(item.upper_estimate_minutes)));
+row.append(main,estimate);durationList.append(row);
+});
+}
+function formatDuration(minutes){
+const n=Math.max(0,Number(minutes)||0);
+if(n<60)return Math.round(n)+" min";
+const hours=Math.floor(n/60),mins=Math.round(n%60);
+return hours+"h"+(mins?" "+mins+"m":"");
+}
+async function loadCompletionTime(){
+const n=++durationSequence;
+durationStatus.textContent="Analysing recorded execution durations…";durationStatus.className="ct-analytics3-ai-status";
+try{
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const data=await API.get("analytics/predictions/completion-time?"+params.toString());
+if(n!==durationSequence)return;renderCompletionTime(data);
+}catch(error){if(n!==durationSequence)return;durationStatus.textContent=error.message||"Could not load completion-time estimates.";durationStatus.className="ct-analytics3-ai-status is-limited";}
+}
 async function loadPredictions(){
-const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
+const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions?"+params.toString());
