@@ -138,6 +138,10 @@ aic.append(riskCard,workforceCard,durationCard,anomalyCard);ai.append(aic);page.
 const details=$("details","ct-analytics3-methodology"),mb=$("div","ct-analytics3-methodology-body");details.append($("summary","","How this report is calculated"),mb);page.appendChild(details);container.appendChild(page);
 let report=null,current=null,sequence=0,lastLoadedQuery="";
 let predictionSequence=0,riskSequence=0,workforceSequence=0,durationSequence=0,anomalySequence=0;
+
+async function savePredictionSnapshot(type,label,summary,evidence){
+ try{await API.post("analytics/predictions/history",{prediction_type:type,label,summary,evidence});}catch(_){/* History is supplementary; never block analytics rendering. */}
+}
 function renderPredictions(data){
 aiChart.replaceChildren();aiRows.replaceChildren();aiMeta.replaceChildren();
 if(data.status!=="available"){
@@ -226,7 +230,7 @@ riskStatus.textContent="Analysing matured organisation history…";riskStatus.cl
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions/overdue-risk?"+params.toString());
-if(n!==riskSequence)return;renderOverdueRisk(data);
+if(n!==riskSequence)return;renderOverdueRisk(data);if(data.status==="available")savePredictionSnapshot("overdue_risk","Overdue risk",data.message,{historical_sample_count:data.historical_sample_count,late_rate_percent:data.historical_late_rate_percent,evaluated_open_operations:data.evaluated_open_operations});
 }catch(error){if(n!==riskSequence)return;riskStatus.textContent=error.message||"Could not load overdue risk estimates.";riskStatus.className="ct-analytics3-ai-status is-limited";}
 }
 function renderWorkforceDemand(data){
@@ -274,7 +278,7 @@ workforceStatus.textContent="Calculating team workload from organisation history
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions/workforce-demand?"+params.toString());
-if(n!==workforceSequence)return;renderWorkforceDemand(data);
+if(n!==workforceSequence)return;renderWorkforceDemand(data);if(data.status==="available")savePredictionSnapshot("workforce","Workforce demand",data.message,{historical_sample_count:data.historical_sample_count,team_count:data.teams?.length});
 }catch(error){if(n!==workforceSequence)return;workforceStatus.textContent=error.message||"Could not load workforce demand estimates.";workforceStatus.className="ct-analytics3-ai-status is-limited";}
 }
 function renderCompletionTime(data){
@@ -330,7 +334,7 @@ durationStatus.textContent="Analysing recorded execution durations…";durationS
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions/completion-time?"+params.toString());
-if(n!==durationSequence)return;renderCompletionTime(data);
+if(n!==durationSequence)return;renderCompletionTime(data);if(data.status==="available")savePredictionSnapshot("completion_time","Completion-time estimates",data.message,{sample_count:data.historical_execution_sample_count,median_minutes:data.organisation_median_minutes});
 }catch(error){if(n!==durationSequence)return;durationStatus.textContent=error.message||"Could not load completion-time estimates.";durationStatus.className="ct-analytics3-ai-status is-limited";}
 }
 function renderAnomalies(data){
@@ -379,7 +383,7 @@ anomalyStatus.textContent="Scanning historical operational patterns…";anomalyS
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
 const data=await API.get("analytics/predictions/anomalies?"+params.toString());
-if(n!==anomalySequence)return;renderAnomalies(data);
+if(n!==anomalySequence)return;renderAnomalies(data);savePredictionSnapshot("anomalies","Recurring problems & anomalies",data.summary||"Historical pattern analysis completed.",{historical_operation_count:data.historical_operation_count,finding_count:data.findings?.length||0,matured_deadline_outcomes:data.matured_deadline_outcomes});
 }catch(error){if(n!==anomalySequence)return;anomalyStatus.textContent=error.message||"Could not analyse historical patterns.";anomalyStatus.className="ct-analytics3-ai-status is-limited";}
 }
 async function loadWorkloadForecast(){
@@ -387,7 +391,7 @@ const n=++predictionSequence;aiStatus.textContent="Calculating forecast from org
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");params.set("horizon",horizon.value);
 const data=await API.get("analytics/predictions?"+params.toString());
-if(n!==predictionSequence)return;renderPredictions(data);
+if(n!==predictionSequence)return;renderPredictions(data);if(data.status==="available")savePredictionSnapshot("workload","Workload forecast",data.message,{sample_count:data.sample_count,horizon_days:horizon.value,trend_adjustment:data.trend_adjustment,model_mae:data.validation?.model_mae});
 }catch(error){if(n!==predictionSequence)return;aiStatus.textContent=error.message||"Could not load AI predictions.";aiStatus.className="ct-analytics3-ai-status is-limited";}
 }
 function invalidatePredictionRequests(){
