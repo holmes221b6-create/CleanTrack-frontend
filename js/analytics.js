@@ -191,6 +191,11 @@ workforceMeta.append($("span","","Historical operations: "+NUM(data.historical_s
 if(!data.teams.length){workforceList.append($("p","ct-analytics3-ai-footnote","No teams with matching historical activity were found for these filters."));return;}
 data.teams.forEach(team=>{
 const card=$("article","ct-analytics3-ai-workforce-card"),top=$("div","ct-analytics3-ai-workforce-top");
+if(team.status==="insufficient_team_data"){
+top.append($("strong","",team.team_name),$("span","","Insufficient history"));
+card.append(top,$("p","ct-analytics3-ai-footnote",team.message||"Not enough team-specific history to forecast reliably."),$("small","ct-analytics3-ai-footnote",NUM(team.historical_operations)+" historical operations in the 56-day window."));
+workforceList.append(card);return;
+}
 const name=$("strong","",team.team_name);
 const count=$("span","",Number(team.forecast_operations_next_7_days).toFixed(1)+" expected operations / 7 days");
 top.append(name,count);
