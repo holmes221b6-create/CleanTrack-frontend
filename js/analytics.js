@@ -82,6 +82,8 @@ ai.append($("span","ct-analytics3-ai-icon","✦"));
 const aiHead=$("div","ct-analytics3-predictions-head");
 aiHead.append($("h2","","AI predictions"),$("span","ct-analytics3-ai-badge","Workload forecast"));
 aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity."));
+const horizon=SEL("prediction_horizon",[["7","7 days"],["14","14 days"],["30","30 days"]]);horizon.value="7";
+const historyButton=B("Prediction history","ct-analytics3-button ct-analytics3-button-secondary",openPredictionHistory);
 const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement. Each prediction uses its own historical lookback window, so the selected report start and end dates do not change its training period. Team, location, zone, staff and operation-type filters are applied.");
 const aiStatus=$("p","ct-analytics3-ai-status","Waiting for organisation analytics…");aiStatus.setAttribute("role","status");aiStatus.setAttribute("aria-live","polite");
 const aiMeta=$("div","ct-analytics3-ai-meta"),aiChart=$("div","ct-analytics3-ai-chart"),aiRows=$("div","ct-analytics3-ai-rows");
@@ -99,7 +101,7 @@ card.append(summary,body);return card;
 }
 const workloadCard=predictionCard("Workload forecast","7-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
 workloadCard.addEventListener("toggle",()=>{if(workloadCard.open)loadWorkloadForecast();});
-aic.append(aiNotice,workloadCard);
+aic.append(aiNotice,historyButton,W("Forecast horizon",horizon),workloadCard);
 const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
 riskHead.append($("h3","","Overdue risk estimates"),$("span","ct-analytics3-ai-badge","Historical pattern analysis"));
 const riskIntro=$("p","ct-analytics3-ai-footnote","Estimates the likelihood of currently open operations becoming overdue using historical outcomes for comparable operation types and priorities.");
@@ -177,6 +179,7 @@ const verdictNode=$("p","ct-analytics3-ai-validation-verdict",verdict);
 section.append(heading,copy,grid,verdictNode,$("small","ct-analytics3-ai-footnote","Validation: "+validation.method+". Actual operations in holdout: "+NUM(validation.actual_operations)+". These are organisation-specific historical results, not a promise of future accuracy."));
 aiRows.append(section);
 }
+addReasoningButton(aiRows,"Why this forecast?",["The estimate uses the organisation’s 56 complete historical days, weekday-specific operation counts and a capped recent-trend adjustment ("+Number(data.trend_adjustment||1).toFixed(2)+"×).","Historical sample: "+NUM(data.sample_count)+" operations. Forecast horizon: "+horizon.value+" days.","Holdout MAE: "+(validation.model_mae==null?"not available":validation.model_mae+" operations/day")+". The comparison is historical evidence, not a guarantee."]);
 }
 function renderOverdueRisk(data){
 riskMeta.replaceChildren();riskList.replaceChildren();
@@ -203,6 +206,7 @@ validationCard.append($("p","ct-analytics3-ai-footnote","Not enough matured hist
 }
 validationCard.append($("small","ct-analytics3-ai-footnote",validation.method||"Validation compares historical estimates with a simple organisation-wide baseline."));
 riskList.append(validationCard);
+addReasoningButton(riskList,"How overdue risk is estimated",["Uses matured outcomes from this organisation and comparable operation cohorts.","Historical sample: "+NUM(data.historical_sample_count)+". Historical late rate: "+PCT(data.historical_late_rate_percent)+".","Small cohorts are pooled; this is an empirical historical rate, not an individual causal prediction."]);
 if(!data.at_risk_operations.length){riskList.append($("p","ct-analytics3-ai-footnote","No currently open operations with future due dates match these filters."));return;}
 data.at_risk_operations.forEach(item=>{
 const row=$("article","ct-analytics3-ai-risk-row"),main=$("div","ct-analytics3-ai-risk-main");
@@ -381,7 +385,7 @@ if(n!==anomalySequence)return;renderAnomalies(data);
 async function loadWorkloadForecast(){
 const n=++predictionSequence;aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
-const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");params.set("horizon",horizon.value);
 const data=await API.get("analytics/predictions?"+params.toString());
 if(n!==predictionSequence)return;renderPredictions(data);
 }catch(error){if(n!==predictionSequence)return;aiStatus.textContent=error.message||"Could not load AI predictions.";aiStatus.className="ct-analytics3-ai-status is-limited";}
@@ -404,6 +408,35 @@ if(riskCard.open){riskStatus.textContent=text;riskStatus.className="ct-analytics
 if(workforceCard.open){workforceStatus.textContent=text;workforceStatus.className="ct-analytics3-ai-status is-limited";}
 if(durationCard.open){durationStatus.textContent=text;durationStatus.className="ct-analytics3-ai-status is-limited";}
 if(anomalyCard.open){anomalyStatus.textContent=text;anomalyStatus.className="ct-analytics3-ai-status is-limited";}
+}
+
+const historyDrawer=$("aside","ct-analytics3-history-drawer");
+historyDrawer.hidden=true;historyDrawer.setAttribute("aria-label","Prediction history");
+const historyHead=$("div","ct-analytics3-history-head"),historyClose=B("×","ct-analytics3-button",()=>{historyDrawer.hidden=true;});
+historyHead.append($("strong","","Prediction history"),historyClose);
+const historyContent=$("div","ct-analytics3-history-content");
+historyDrawer.append(historyHead,historyContent);page.appendChild(historyDrawer);
+async function openPredictionHistory(){
+ historyDrawer.hidden=false;historyContent.replaceChildren($("p","ct-analytics3-ai-status","Loading saved prediction history…"));
+ try{
+  const data=await API.get("analytics/predictions/history?limit=40");
+  historyContent.replaceChildren();
+  if(!data.items||!data.items.length){historyContent.append($("p","ct-analytics3-ai-footnote","No saved predictions yet. New generated forecasts will appear here."));return;}
+  data.items.forEach(item=>{
+   const row=$("article","ct-analytics3-history-item");
+   row.append($("strong","",item.label||item.prediction_type),$("p","ct-analytics3-ai-footnote",item.summary||"Prediction snapshot"),$("small","",item.generated_at?new Date(item.generated_at).toLocaleString():""));
+   historyContent.append(row);
+  });
+ }catch(error){historyContent.replaceChildren($("p","ct-analytics3-ai-status is-limited",error.message||"Could not load prediction history."));}
+}
+horizon.addEventListener("change",()=>{invalidatePredictionRequests();if(workloadCard.open)loadWorkloadForecast();});
+function addReasoningButton(target,title,lines){
+ const box=$("details","ct-analytics3-reasoning"),summary=$("summary","","Show reasoning");
+ box.append(summary);
+ const body=$("div","ct-analytics3-ai-footnote");
+ body.append($("strong","",title));
+ lines.filter(Boolean).forEach(line=>body.append($("p","",line)));
+ box.append(body);target.append(box);
 }
 function loadPredictions(){
 if(workloadCard.open)loadWorkloadForecast();
@@ -499,7 +532,7 @@ status.textContent="Loaded "+readableDate(r.period.start_date)+" – "+readableD
 finally{if(n===sequence)apply.disabled=false;}}
 view.addEventListener("change",()=>{configureMetric();draw();});chart.addEventListener("change",draw);metric.addEventListener("change",draw);
 load();
-const refreshInterval=window.setInterval(()=>{if(!page.isConnected){window.clearInterval(refreshInterval);return;}if(document.visibilityState!=="hidden"&&report&&query().toString()===lastLoadedQuery)load();},60000);
+const refreshInterval=window.setInterval(()=>{if(!page.isConnected){window.clearInterval(refreshInterval);return;}if(document.visibilityState!=="hidden"){if(report&&query().toString()===lastLoadedQuery)load();loadPredictions();}},60000);
 }
 window.CleanTrackAnalytics=Object.freeze({render});
 })();
