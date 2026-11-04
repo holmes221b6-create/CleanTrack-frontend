@@ -274,6 +274,7 @@ durationStatus.className="ct-analytics3-ai-status is-ready";
 durationMeta.append($("span","","Recorded execution sessions: "+NUM(data.historical_execution_sample_count)),
 $("span","","Organisation median: "+Number(data.organisation_median_minutes).toFixed(1)+" minutes"),
 $("span","","Open operations estimated: "+NUM(data.predicted_open_operations)));
+durationList.append($("p","ct-analytics3-ai-footnote","Only submitted or completed execution attempts are used as duration evidence. Rejected and unfinished attempts are excluded. The displayed 25th–75th percentile range is descriptive, not a confidence interval."));
 if(!data.predictions.length){durationList.append($("p","ct-analytics3-ai-footnote","No open operations matched the available execution history and current filters."));return;}
 data.predictions.forEach(item=>{
 const row=$("article","ct-analytics3-ai-duration-row"),main=$("div","ct-analytics3-ai-duration-main");
