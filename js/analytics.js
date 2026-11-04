@@ -313,7 +313,7 @@ const data=await API.get("analytics/predictions/anomalies?"+params.toString());
 if(n!==anomalySequence)return;renderAnomalies(data);
 }catch(error){if(n!==anomalySequence)return;anomalyStatus.textContent=error.message||"Could not analyse historical patterns.";anomalyStatus.className="ct-analytics3-ai-status is-limited";}
 }
-async function loadPredictions(){
+async async function loadPredictions(){
 const n=++predictionSequence;loadOverdueRisk();loadWorkforceDemand();loadCompletionTime();loadAnomalies();aiStatus.textContent="Calculating forecast from organisation history…";aiStatus.className="ct-analytics3-ai-status";
 try{
 const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
