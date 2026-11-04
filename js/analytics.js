@@ -297,11 +297,17 @@ if(n!==durationSequence)return;renderCompletionTime(data);
 }
 function renderAnomalies(data){
 anomalyMeta.replaceChildren();anomalyList.replaceChildren();
-anomalyStatus.textContent=data.summary||"Historical pattern analysis complete.";
-anomalyStatus.className="ct-analytics3-ai-status "+(data.findings&&data.findings.length?"is-limited":"is-ready");
 anomalyMeta.append($("span","","Historical operations: "+NUM(data.historical_operation_count||0)),
 $("span","","Matured deadline outcomes: "+NUM(data.matured_deadline_outcomes||0)),
 $("span","","History: "+NUM(data.history_days||90)+" days"));
+if(data.status==="no_history"||!Number(data.historical_operation_count||0)){
+anomalyStatus.textContent=data.summary||"No historical operations are available in this selected scope yet.";
+anomalyStatus.className="ct-analytics3-ai-status is-limited";
+anomalyList.append($("p","ct-analytics3-ai-footnote","OMNIX needs recorded operations before it can identify recurring patterns."));
+return;
+}
+anomalyStatus.textContent=data.summary||"Historical pattern analysis complete.";
+anomalyStatus.className="ct-analytics3-ai-status "+(data.findings&&data.findings.length?"is-limited":"is-ready");
 if(!data.findings||!data.findings.length){
 anomalyList.append($("p","ct-analytics3-ai-footnote","No unusual recurring patterns were detected in the selected historical scope."));
 return;
