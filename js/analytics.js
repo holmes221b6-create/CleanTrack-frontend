@@ -172,7 +172,7 @@ const grid=$("div","ct-analytics3-ai-validation-grid");
 ["Forecast WAPE",validation.model_wape_percent===null?"N/A":validation.model_wape_percent+"%"],
 ["Baseline WAPE",validation.baseline_wape_percent===null?"N/A":validation.baseline_wape_percent+"%"]
 ].forEach(([label,value])=>{const card=$("div","ct-analytics3-ai-validation-card");card.append($("span","",label),$("strong","",String(value)));grid.append(card);});
-const verdict=validation.beats_baseline?"The forecast performed better than the simple historical-average baseline in this holdout.":"The forecast did not outperform the simple historical-average baseline in this holdout. Treat the forecast cautiously.";
+const verdict=validation.status!=="evaluated"?"Not enough historical operations in the holdout to make a reliable performance comparison. The error metrics are descriptive only.":validation.beats_baseline?"The forecast performed better than the simple historical-average baseline in this holdout.":"The forecast did not outperform the simple historical-average baseline in this holdout. Treat the forecast cautiously.";
 const verdictNode=$("p","ct-analytics3-ai-validation-verdict",verdict);
 section.append(heading,copy,grid,verdictNode,$("small","ct-analytics3-ai-footnote","Validation: "+validation.method+". Actual operations in holdout: "+NUM(validation.actual_operations)+". These are organisation-specific historical results, not a promise of future accuracy."));
 aiRows.append(section);
