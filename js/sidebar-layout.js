@@ -34,10 +34,6 @@ if (identity) {
 } else {
   sidebar.append(brand, navLabel, navigation);
 }
-    // Secondary actions live in the mobile drawer to keep the phone toolbar uncluttered.
-    const mobileTools = document.createElement("div");
-    mobileTools.className = "ct-sidebar-mobile-tools";
-    mobileTools.setAttribute("aria-label", "Workspace actions");
     const main = document.createElement("div");
     main.className = "ct-workspace-main";
 
@@ -121,9 +117,7 @@ if (identity) {
     profileButton.innerHTML = '<span class="ct-profile-avatar" aria-hidden="true">U</span>';
 
     toolbar.append(backButton, toolbarSpacer, searchWrap, actions);
-    actions.append(toggle);
-    mobileTools.append(notificationsButton, feedbackButton, assistantButton, profileButton);
-    sidebar.append(mobileTools);
+    actions.append(toggle, notificationsButton, feedbackButton, assistantButton, profileButton);
 
     function getUser() {
       return window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser
