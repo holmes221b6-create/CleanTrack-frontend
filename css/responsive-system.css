@@ -150,3 +150,40 @@ html, body { min-width: 320px; width: 100%; overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
   #workspace-view .ct-sidebar, #workspace-view .ct-sidebar-backdrop { transition: none !important; }
 }
+
+
+/* Critical mobile visibility correction: never let the responsive shell clip
+   the workspace content or its fixed navigation drawer. */
+@media (max-width: 760px) {
+  html, body, #app, #workspace-view {
+    width: 100% !important; max-width: 100% !important; min-width: 0 !important;
+  }
+  #workspace-view {
+    display: block !important; min-height: 100dvh !important;
+    height: auto !important; overflow: visible !important;
+  }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile {
+    display: block !important; width: 100% !important;
+    min-height: 100dvh !important; height: auto !important;
+    overflow: visible !important; clip-path: none !important; contain: none !important;
+  }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile > .ct-workspace-main {
+    display: block !important; position: relative !important;
+    width: 100% !important; min-width: 0 !important;
+    min-height: 100dvh !important; height: auto !important;
+    overflow: visible !important; visibility: visible !important; opacity: 1 !important;
+  }
+  #workspace-view .ct-workspace-toolbar {
+    display: flex !important; visibility: visible !important;
+    opacity: 1 !important; width: 100% !important; min-height: 54px !important;
+  }
+  #workspace-view .ct-workspace-toolbar .ct-sidebar-toggle {
+    display: inline-grid !important; flex: 0 0 40px !important;
+    position: relative !important; z-index: 90 !important;
+  }
+  #workspace-view .ct-sidebar-backdrop { position: fixed !important; }
+  #page-content {
+    display: block; width: 100% !important; min-width: 0 !important;
+    min-height: 50vh; visibility: visible;
+  }
+}
