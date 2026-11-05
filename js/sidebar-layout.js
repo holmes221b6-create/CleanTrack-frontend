@@ -1136,9 +1136,10 @@ existingChildren.forEach(function (node) {
       toggle.title = open ? "Close navigation" : "Open navigation";
       backdrop.setAttribute("aria-hidden", String(!open));
       backdrop.tabIndex = open ? 0 : -1;
-      if (shell.classList.contains("ct-sidebar-mobile")) {
-        document.body.classList.toggle("ct-navigation-open", open);
-      }
+      document.body.classList.toggle(
+        "ct-navigation-open",
+        shell.classList.contains("ct-sidebar-mobile") && open
+      );
     }
 
     toggle.addEventListener("click", function () {
