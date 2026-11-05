@@ -93,11 +93,13 @@ function predictionCard(title,badge,description,content){
 const card=$("details","ct-analytics3-ai-card"),summary=$("summary","ct-analytics3-ai-card-summary");
 const heading=$("div","ct-analytics3-ai-card-heading");
 heading.append($("strong","",title),$("span","ct-analytics3-ai-badge",badge));
-summary.append(heading,$("span","ct-analytics3-ai-card-chevron","⌄"));
+summary.append(heading,$("span","ct-analytics3-ai-card-chevron","›"));
 const body=$("div","ct-analytics3-ai-card-body");
 if(description)body.append($("p","ct-analytics3-ai-footnote",description));
 body.append(...content);
-card.append(summary,body);return card;
+card.append(summary,body);
+summary.addEventListener("click",event=>{event.preventDefault();openPredictionPanel(card,title);});
+return card;
 }
 const workloadCard=predictionCard("Workload forecast",horizon.value+"-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
 workloadCard.addEventListener("toggle",()=>{if(workloadCard.open)loadWorkloadForecast();});
@@ -427,6 +429,37 @@ if(durationCard.open){durationStatus.textContent=text;durationStatus.className="
 if(anomalyCard.open){anomalyStatus.textContent=text;anomalyStatus.className="ct-analytics3-ai-status is-limited";}
 }
 
+
+const predictionBackdrop=$("div","ct-analytics3-history-backdrop");
+predictionBackdrop.hidden=true;
+const predictionDialog=$("section","ct-analytics3-history-drawer ct-analytics3-detail-dialog");
+predictionDialog.hidden=true;predictionDialog.setAttribute("role","dialog");predictionDialog.setAttribute("aria-modal","true");predictionDialog.setAttribute("aria-label","Prediction details");
+const predictionDialogHead=$("div","ct-analytics3-history-head");
+const predictionBack=B("← Back to predictions","ct-analytics3-button ct-analytics3-button-secondary",closePredictionPanel);
+predictionBack.setAttribute("type","button");
+const predictionDialogTitle=$("strong","");
+predictionDialogHead.append(predictionDialogTitle,predictionBack);
+const predictionDialogBody=$("div","ct-analytics3-history-content");
+predictionDialog.append(predictionDialogHead,predictionDialogBody);
+document.body.append(predictionBackdrop,predictionDialog);
+let activePredictionCard=null,activePredictionNextSibling=null;
+function openPredictionPanel(card,title){
+ activePredictionCard=card;activePredictionNextSibling=card.nextSibling;
+ predictionDialogTitle.textContent=title;predictionDialogBody.replaceChildren(card);
+ predictionBackdrop.hidden=false;predictionDialog.hidden=false;card.open=true;
+}
+function closePredictionPanel(){
+ if(activePredictionCard){
+  activePredictionCard.open=false;
+  if(activePredictionNextSibling&&activePredictionNextSibling.parentNode===aic)aic.insertBefore(activePredictionCard,activePredictionNextSibling);
+  else aic.append(activePredictionCard);
+  activePredictionCard=null;activePredictionNextSibling=null;
+ }
+ predictionDialog.hidden=true;predictionBackdrop.hidden=true;
+}
+predictionBackdrop.addEventListener("click",closePredictionPanel);
+predictionDialog.addEventListener("click",event=>event.stopPropagation());
+
 const historyBackdrop=$("div","ct-analytics3-history-backdrop");
 historyBackdrop.hidden=true;
 const historyDrawer=$("section","ct-analytics3-history-drawer");
@@ -439,7 +472,7 @@ const historyContent=$("div","ct-analytics3-history-content");
 historyDrawer.append(historyHead,historyContent);
 historyBackdrop.addEventListener("click",closePredictionHistory);
 historyDrawer.addEventListener("click",event=>event.stopPropagation());
-document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!historyDrawer.hidden)closePredictionHistory();});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"){if(!predictionDialog.hidden)closePredictionPanel();else if(!historyDrawer.hidden)closePredictionHistory();}});
 document.body.append(historyBackdrop,historyDrawer);
 async function openPredictionHistory(){
  historyBackdrop.hidden=false;historyDrawer.hidden=false;historyClose.focus();historyContent.replaceChildren($("p","ct-analytics3-ai-status","Loading saved prediction history…"));
