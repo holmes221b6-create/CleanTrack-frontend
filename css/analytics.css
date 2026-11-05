@@ -519,3 +519,16 @@
 [data-theme="light"] .ct-analytics3-history-drawer{background:#fff;color:#171923}
 [data-theme="light"] .ct-analytics3-history-head{border-color:#e1e3e9}
 @media(max-width:600px){.ct-analytics3-history-drawer{width:calc(100vw - 24px);max-height:86vh;padding:20px 16px}.ct-analytics3-history-content{max-height:calc(86vh - 110px)}}
+
+/* AI prediction cards open focused modal detail panels instead of expanding inline. */
+#page-content .ct-analytics3-ai-card{display:block;cursor:pointer}
+#page-content .ct-analytics3-ai-card-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;list-style:none;padding:16px 18px}
+#page-content .ct-analytics3-ai-card-summary::-webkit-details-marker{display:none}
+#page-content .ct-analytics3-ai-card-summary:hover{background:rgba(130,110,190,.08)}
+#page-content .ct-analytics3-ai-card-chevron{font-size:25px;line-height:1}
+#page-content .ct-analytics3-detail-dialog{width:min(1100px,calc(100vw - 48px))}
+#page-content .ct-analytics3-detail-dialog .ct-analytics3-history-head{align-items:center}
+#page-content .ct-analytics3-detail-dialog .ct-analytics3-history-content{max-height:calc(78vh - 120px)}
+#page-content .ct-analytics3-detail-dialog .ct-analytics3-ai-card{border:0;background:transparent;box-shadow:none;padding:0;cursor:default}
+#page-content .ct-analytics3-detail-dialog .ct-analytics3-ai-card>summary{display:none}
+#page-content .ct-analytics3-detail-dialog .ct-analytics3-ai-card>.ct-analytics3-ai-card-body{display:block!important;padding:0}
