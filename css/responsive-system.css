@@ -1,0 +1,152 @@
+/* OMNIX responsive system — shared layout rules for phones, tablets and desktops. */
+:root {
+  --ct-safe-top: env(safe-area-inset-top, 0px);
+  --ct-safe-right: env(safe-area-inset-right, 0px);
+  --ct-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ct-safe-left: env(safe-area-inset-left, 0px);
+}
+html, body { min-width: 320px; width: 100%; overflow-x: clip; }
+#app, #main-content, #workspace-view, .ct-workspace-shell,
+.ct-workspace-main, #page-content, .page-content {
+  min-width: 0; max-width: 100%;
+}
+#workspace-view .ct-workspace-shell { width: 100%; }
+#workspace-view .ct-workspace-main { overflow-x: clip; }
+#page-content {
+  width: 100%;
+  padding-left: clamp(14px, 2.2vw, 34px);
+  padding-right: clamp(14px, 2.2vw, 34px);
+  padding-bottom: max(28px, var(--ct-safe-bottom));
+}
+#page-content > * { min-width: 0; max-width: 100%; }
+#page-content img, #page-content svg, #page-content video, #page-content canvas { max-width: 100%; }
+#page-content input, #page-content select, #page-content textarea,
+#workspace-view input, #workspace-view select, #workspace-view textarea { max-width: 100%; min-width: 0; }
+#page-content button, #workspace-view button, #page-content a { touch-action: manipulation; }
+#page-content .table-wrap, #page-content .table-responsive,
+#page-content .table-container, #page-content .ct-table-wrap,
+#page-content .ct-reports-table-wrap, #page-content .ct-analytics-table-wrap {
+  max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+#page-content table { max-width: 100%; }
+#page-content pre, #page-content code { overflow-wrap: anywhere; }
+#workspace-view .ct-sidebar-backdrop { display: none; }
+@media (min-width: 1440px) {
+  #page-content { padding-left: clamp(32px, 2.6vw, 52px); padding-right: clamp(32px, 2.6vw, 52px); }
+}
+@media (max-width: 1100px) {
+  #page-content .ct-staff-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #page-content .ct-staff-layout { grid-template-columns: minmax(190px, 230px) minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  html, body { overscroll-behavior-x: none; }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile {
+    position: relative; display: block; width: 100%; min-height: 100dvh; overflow: clip;
+  }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile > .ct-sidebar-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 999; width: 100%; height: 100dvh;
+    padding: 0; border: 0; border-radius: 0; background: rgba(4, 7, 14, .62);
+    opacity: 1; visibility: visible; transition: opacity .2s ease, visibility .2s ease; cursor: pointer;
+  }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile.ct-sidebar-collapsed > .ct-sidebar-backdrop {
+    opacity: 0; visibility: hidden; pointer-events: none;
+  }
+  #workspace-view .ct-workspace-shell.ct-sidebar-mobile > .ct-sidebar {
+    z-index: 1000; width: min(320px, 88vw) !important;
+    padding-top: max(12px, var(--ct-safe-top)); padding-bottom: max(16px, var(--ct-safe-bottom));
+    overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  body.ct-navigation-open { overflow: hidden; touch-action: none; }
+  #workspace-view .ct-workspace-toolbar {
+    position: sticky; top: 0; z-index: 80; min-height: 56px;
+    padding: 7px max(10px, var(--ct-safe-right)) 7px max(10px, var(--ct-safe-left)); gap: 7px;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-toolbar-leading-space { min-width: 0; }
+  #workspace-view .ct-workspace-toolbar > .ct-global-search { flex: 1 1 auto; min-width: 0; max-width: none; }
+  #workspace-view .ct-workspace-toolbar > .ct-toolbar-actions { gap: 5px; min-width: 0; }
+  #workspace-view .ct-toolbar-actions > button, #workspace-view .ct-sidebar-toggle {
+    width: 40px; min-width: 40px; height: 40px; min-height: 40px;
+  }
+  #page-content {
+    padding: 18px max(14px, var(--ct-safe-right)) max(28px, var(--ct-safe-bottom)) max(14px, var(--ct-safe-left));
+  }
+  #page-content .page-header, #page-content .ct-staff-header,
+  #page-content .ct-reports-hero, #page-content .ct-analytics3-header {
+    flex-direction: column; align-items: stretch; gap: 12px;
+  }
+  #page-content .page-header > :last-child, #page-content .ct-staff-toolbar { width: 100%; }
+  #page-content .page-header .actions, #page-content .toolbar,
+  #page-content .ct-staff-toolbar, #page-content .ct-reports-actions {
+    justify-content: flex-start; flex-wrap: wrap;
+  }
+  #page-content .content-grid, #page-content .dashboard-grid,
+  #page-content .stats-grid, #page-content .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #page-content .ct-staff-layout { grid-template-columns: minmax(0, 1fr); }
+  #page-content .ct-staff-sidebar { position: static; }
+  #page-content .ct-staff-summary, #page-content .ct-staff-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #page-content .ct-reports-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #page-content .ct-reports-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #page-content .ct-analytics3-filters, #page-content .ct-analytics3-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #page-content .ct-analytics3-card, #page-content .ct-reports-panel { min-width: 0; }
+  #page-content .modal, #page-content .dialog, #app-modal, #app-modal .modal-content {
+    max-width: calc(100vw - 24px);
+  }
+}
+@media (max-width: 540px) {
+  #workspace-view .ct-workspace-toolbar { gap: 5px; padding-inline: 8px; }
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back {
+    width: 36px !important; min-width: 36px !important; max-width: 36px !important;
+    height: 38px !important; min-height: 38px !important;
+  }
+  #workspace-view .ct-workspace-toolbar > .ct-global-search { display: flex; min-width: 0; }
+  #workspace-view .ct-global-search input { min-width: 0; width: 100%; font-size: 16px; }
+  #workspace-view .ct-toolbar-actions > button, #workspace-view .ct-sidebar-toggle {
+    width: 36px; min-width: 36px; height: 38px; min-height: 38px;
+  }
+  #workspace-view .ct-toolbar-actions { gap: 3px !important; }
+  #page-content { padding: 15px max(12px, var(--ct-safe-right)) max(24px, var(--ct-safe-bottom)) max(12px, var(--ct-safe-left)); }
+  #page-content .content-grid, #page-content .dashboard-grid, #page-content .stats-grid,
+  #page-content .metrics-grid, #page-content .ct-reports-grid, #page-content .ct-reports-kpis,
+  #page-content .ct-analytics3-filters, #page-content .ct-analytics3-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #page-content .ct-staff-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  #page-content .ct-staff-filters, #page-content .form-grid { grid-template-columns: minmax(0, 1fr); }
+  #page-content .ct-staff-directory-row { grid-template-columns: 18px minmax(0, 1fr); }
+  #page-content .ct-staff-directory-meta { grid-column: 2; justify-content: flex-start; }
+  #page-content .ct-reports-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #page-content .ct-reports-panel { padding: 14px; }
+  #page-content .ct-reports-history-item { grid-template-columns: minmax(0, 1fr); }
+  #page-content .ct-reports-history-actions { justify-content: flex-start; }
+  #page-content .form-grid .full-width { grid-column: auto; }
+  #page-content .ct-analytics3-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #page-content .ct-analytics3-toolbar { flex-wrap: wrap; }
+  #page-content .ct-analytics3-toolbar > * { max-width: 100%; }
+  #page-content .ct-analytics3-prediction-dialog, #page-content .ct-analytics3-history-dialog {
+    width: calc(100vw - 20px); max-height: calc(100dvh - 24px);
+  }
+  #page-content table { font-size: .78rem; }
+  #page-content th, #page-content td { padding: 9px 10px; }
+  #page-content button, #page-content .button, #page-content .btn { min-height: 40px; }
+  #page-content input, #page-content select, #page-content textarea { min-height: 42px; font-size: 16px; }
+  #page-content .page-header h1 { font-size: clamp(1.55rem, 7vw, 2rem); }
+}
+@media (max-width: 360px) {
+  #workspace-view .ct-workspace-toolbar > .ct-workspace-back { display: none !important; }
+  #workspace-view .ct-workspace-toolbar > .ct-global-search { flex: 1 1 0; }
+  #workspace-view .ct-toolbar-actions > button, #workspace-view .ct-sidebar-toggle { width: 34px; min-width: 34px; }
+  #page-content .ct-staff-summary { grid-template-columns: minmax(0, 1fr); }
+}
+@media (hover: none) and (pointer: coarse) {
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  button, a { touch-action: manipulation; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #workspace-view .ct-sidebar, #workspace-view .ct-sidebar-backdrop { transition: none !important; }
+}
