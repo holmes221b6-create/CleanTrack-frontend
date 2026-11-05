@@ -1115,50 +1115,22 @@ existingChildren.forEach(function (node) {
 });
 
 
-    // Mobile drawer backdrop: keeps navigation reachable without covering the
-    // workspace permanently and gives touch users an obvious dismiss target.
-    const backdrop = document.createElement("button");
-    backdrop.type = "button";
-    backdrop.className = "ct-sidebar-backdrop";
-    backdrop.setAttribute("aria-label", "Close navigation");
-    backdrop.setAttribute("aria-hidden", "true");
-    backdrop.tabIndex = -1;
-
     // Keep the existing page/navigation element so app.js references remain valid.
-    shell.append(backdrop, sidebar, main);
+    shell.append(sidebar, main);
     workspace.replaceChildren(shell);
     main.prepend(toolbar);
 
-    function setSidebarOpen(open) {
-      shell.classList.toggle("ct-sidebar-collapsed", !open);
-      toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
-      toggle.title = open ? "Close navigation" : "Open navigation";
-      backdrop.setAttribute("aria-hidden", String(!open));
-      backdrop.tabIndex = open ? 0 : -1;
-      document.body.classList.toggle(
-        "ct-navigation-open",
-        shell.classList.contains("ct-sidebar-mobile") && open
-      );
-    }
-
     toggle.addEventListener("click", function () {
-      setSidebarOpen(shell.classList.contains("ct-sidebar-collapsed"));
-    });
-    backdrop.addEventListener("click", function () { setSidebarOpen(false); });
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && shell.classList.contains("ct-sidebar-mobile") &&
-          !shell.classList.contains("ct-sidebar-collapsed")) {
-        setSidebarOpen(false);
-        toggle.focus();
-      }
+      const collapsed = shell.classList.toggle("ct-sidebar-collapsed");
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", collapsed ? "Open navigation" : "Close navigation");
+      toggle.title = collapsed ? "Open navigation" : "Close navigation";
     });
 
     // Keep the active navigation page highlighted by the existing navigation renderer.
     navigation.addEventListener("click", function (event) {
       const target = event.target.closest("button, a");
       if (!target) return;
-      if (shell.classList.contains("ct-sidebar-mobile")) setSidebarOpen(false);
       window.setTimeout(function () {
         navigation.querySelectorAll(".active, [aria-current='page']").forEach(function (item) {
           item.classList.add("ct-nav-active");
@@ -1177,7 +1149,9 @@ existingChildren.forEach(function (node) {
         shell.classList.remove("ct-sidebar-collapsed");
       }
       const collapsed = shell.classList.contains("ct-sidebar-collapsed");
-      setSidebarOpen(!collapsed);
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", collapsed ? "Open navigation" : "Close navigation");
+      toggle.title = collapsed ? "Open navigation" : "Close navigation";
     }
     if (media.addEventListener) media.addEventListener("change", updateMobileMode);
     else if (media.addListener) media.addListener(updateMobileMode);
