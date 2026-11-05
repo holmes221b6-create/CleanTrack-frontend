@@ -185,7 +185,8 @@ const verdictNode=$("p","ct-analytics3-ai-validation-verdict",verdict);
 section.append(heading,copy,grid,verdictNode,$("small","ct-analytics3-ai-footnote","Validation: "+validation.method+". Actual operations in holdout: "+NUM(validation.actual_operations)+". These are organisation-specific historical results, not a promise of future accuracy."));
 aiRows.append(section);
 }
-addReasoningButton(aiRows,"Why this forecast?",["The estimate uses the organisation’s 56 complete historical days, weekday-specific operation counts and a capped recent-trend adjustment ("+Number(data.trend_adjustment||1).toFixed(2)+"×).","Historical sample: "+NUM(data.sample_count)+" operations. Forecast horizon: "+horizon.value+" days.","Holdout MAE: "+(validation.model_mae==null?"not available":validation.model_mae+" operations/day")+". The comparison is historical evidence, not a guarantee."]);
+const peakDay=data.forecast.reduce((best,row)=>!best||row.predicted_operations>best.predicted_operations?row:best,null);
+ addReasoningButton(aiRows,"56-day weekday averages × "+Number(data.trend_adjustment||1).toFixed(2)+" trend; "+NUM(data.sample_count)+" operations. Peak: "+(peakDay?peakDay.date+" ("+peakDay.predicted_operations+")":"not available")+".");
 }
 
 function recommendationPanel(title,items){
@@ -221,7 +222,7 @@ validationCard.append($("small","ct-analytics3-ai-footnote",validation.method||"
 riskList.append(validationCard);
 const lateRate=Number(data.historical_late_rate_percent||0);
 if(lateRate>=25)riskList.append(recommendationPanel("Data-based management actions",["Review due dates and assignment load for the highest-risk open operations.","Check whether recurring late outcomes cluster by operation type or priority before reallocating staff."]));
-addReasoningButton(riskList,"How overdue risk is estimated",["Uses matured outcomes from this organisation and comparable operation cohorts.","Historical sample: "+NUM(data.historical_sample_count)+". Historical late rate: "+PCT(data.historical_late_rate_percent)+".","Small cohorts are pooled; this is an empirical historical rate, not an individual causal prediction."]);
+addReasoningButton(riskList,NUM(data.historical_sample_count)+" matured outcomes; "+PCT(data.historical_late_rate_percent)+" historical late rate. Estimates use comparable operation cohorts.");
 if(!data.at_risk_operations.length){riskList.append($("p","ct-analytics3-ai-footnote","No currently open operations with future due dates match these filters."));return;}
 data.at_risk_operations.forEach(item=>{
 const row=$("article","ct-analytics3-ai-risk-row"),main=$("div","ct-analytics3-ai-risk-main");
@@ -259,13 +260,13 @@ if(!data.teams.length){workforceList.append($("p","ct-analytics3-ai-footnote","N
 data.teams.forEach(team=>{
 const card=$("article","ct-analytics3-ai-workforce-card"),top=$("div","ct-analytics3-ai-workforce-top");
 const name=$("strong","",team.team_name);
-const count=$("span","",Number(team.forecast_operations_next_7_days).toFixed(1)+" expected operations / 7 days");
+const count=$("span","",Number(team.forecast_operations).toFixed(1)+" expected operations / "+horizon.value+" days");
 top.append(name,count);
 const stats=$("div","ct-analytics3-ai-workforce-stats");
 [
 ["Active team members",NUM(team.active_team_members)],
 ["Expected operations per member",team.expected_operations_per_active_member===null?"Not available":Number(team.expected_operations_per_active_member).toFixed(1)],
-["Estimated effort",team.estimated_effort_hours_next_7_days===null?"Insufficient recorded estimates":Number(team.estimated_effort_hours_next_7_days).toFixed(1)+" hours"],
+["Estimated effort",team.estimated_effort_hours===null?"Insufficient recorded estimates":Number(team.estimated_effort_hours).toFixed(1)+" hours"],
 ["Historical operations",NUM(team.historical_operations)]
 ].forEach(([label,value])=>{const cell=$("div","ct-analytics3-ai-workforce-stat");cell.append($("span","",label),$("strong","",value));stats.append(cell);});
 const daily=$("div","ct-analytics3-ai-workforce-days");
@@ -453,14 +454,12 @@ async function openPredictionHistory(){
   });
  }catch(error){historyContent.replaceChildren($("p","ct-analytics3-ai-status is-limited",error.message||"Could not load prediction history."));}
 }
-horizon.addEventListener("change",()=>{invalidatePredictionRequests();if(workloadCard.open)loadWorkloadForecast();});
-function addReasoningButton(target,title,lines){
+horizon.addEventListener("change",()=>{invalidatePredictionRequests();loadWorkloadForecast();loadWorkforceDemand();});
+function addReasoningButton(target,reason){
  const box=$("details","ct-analytics3-reasoning"),summary=$("summary","","Show reasoning");
  box.append(summary);
- const body=$("div","ct-analytics3-ai-footnote");
- body.append($("strong","",title));
- lines.filter(Boolean).forEach(line=>body.append($("p","",line)));
- box.append(body);target.append(box);
+ box.append($("p","ct-analytics3-ai-footnote",reason));
+ target.append(box);
 }
 function loadPredictions(){
 // Refresh all prediction datasets in the background; collapsed cards remain visually collapsed.
