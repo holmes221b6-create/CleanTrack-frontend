@@ -99,7 +99,7 @@ if(description)body.append($("p","ct-analytics3-ai-footnote",description));
 body.append(...content);
 card.append(summary,body);return card;
 }
-const workloadCard=predictionCard("Workload forecast","7-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
+const workloadCard=predictionCard("Workload forecast",horizon.value+"-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
 workloadCard.addEventListener("toggle",()=>{if(workloadCard.open)loadWorkloadForecast();});
 aic.append(aiNotice,historyButton,W("Forecast horizon",horizon),workloadCard);
 const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
@@ -288,7 +288,7 @@ async function loadWorkforceDemand(){
 const n=++workforceSequence;
 workforceStatus.textContent="Calculating team workload from organisation history…";workforceStatus.className="ct-analytics3-ai-status";
 try{
-const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");
+const params=query();params.delete("start_date");params.delete("end_date");params.delete("bucket");params.set("horizon",horizon.value);
 const data=await API.get("analytics/predictions/workforce-demand?"+params.toString());
 if(n!==workforceSequence)return;renderWorkforceDemand(data);if(data.status==="available")savePredictionSnapshot("workforce","Workforce demand",data.message,{historical_sample_count:data.historical_sample_count,team_count:data.teams?.length});
 }catch(error){if(n!==workforceSequence)return;workforceStatus.textContent=error.message||"Could not load workforce demand estimates.";workforceStatus.className="ct-analytics3-ai-status is-limited";}
@@ -454,7 +454,7 @@ async function openPredictionHistory(){
   });
  }catch(error){historyContent.replaceChildren($("p","ct-analytics3-ai-status is-limited",error.message||"Could not load prediction history."));}
 }
-horizon.addEventListener("change",()=>{invalidatePredictionRequests();loadWorkloadForecast();loadWorkforceDemand();});
+horizon.addEventListener("change",()=>{workloadCard.querySelector(".ct-analytics3-ai-badge").textContent=horizon.value+"-day outlook";invalidatePredictionRequests();loadWorkloadForecast();loadWorkforceDemand();});
 function addReasoningButton(target,reason){
  const box=$("details","ct-analytics3-reasoning"),summary=$("summary","","Show reasoning");
  box.append(summary);
