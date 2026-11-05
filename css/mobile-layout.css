@@ -1,6 +1,4 @@
-/* OMNIX mobile-first workspace layout. These rules define a deliberate phone
-   information hierarchy instead of shrinking the desktop interface. */
-@media (max-width:760px) { :root { --ct-mobile-gutter:16px; --ct-mobile-card-radius:14px; } }
+/* Mobile-only responsive overrides. Desktop/tablet base layout is untouched. */
 @media (max-width:760px) {
   html,body { width:100%; min-width:320px; overflow-x:hidden; overscroll-behavior-x:none; }
   body { -webkit-text-size-adjust:100%; }
