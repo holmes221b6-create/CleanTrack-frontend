@@ -1,5 +1,11 @@
 /* Mobile-only responsive overrides. Desktop/tablet base layout is untouched. */
 @media (max-width:760px) {
+  :root {
+    --ct-safe-top: env(safe-area-inset-top, 0px);
+    --ct-safe-right: env(safe-area-inset-right, 0px);
+    --ct-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --ct-safe-left: env(safe-area-inset-left, 0px);
+  }
   html,body { width:100%; min-width:320px; overflow-x:hidden; overscroll-behavior-x:none; }
   body { -webkit-text-size-adjust:100%; }
   #workspace-view { display:block!important; width:100%!important; min-height:100dvh; overflow:visible!important; }
@@ -150,7 +156,6 @@
     grid-template-columns:minmax(0,1fr)!important;
   }
 }
-@media(min-width:761px) { #workspace-view .ct-sidebar-mobile-tools { display:none!important; } }
-@media(prefers-reduced-motion:reduce) {
+@media (max-width:760px) and (prefers-reduced-motion:reduce) {
   #workspace-view .ct-sidebar,#workspace-view .ct-sidebar-backdrop { transition:none!important; }
 }
