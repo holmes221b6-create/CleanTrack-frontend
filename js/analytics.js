@@ -81,7 +81,7 @@ const ai=$("section","ct-analytics3-ai-panel ct-analytics3-predictions"),aic=$("
 ai.append($("span","ct-analytics3-ai-icon","✦"));
 const aiHead=$("div","ct-analytics3-predictions-head");
 aiHead.append($("h2","","AI predictions"),$("span","ct-analytics3-ai-badge","Workload forecast"));
-aic.append(aiHead,$("p","ct-analytics3-muted","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity."));
+aic.append(aiHead,$("p","ct-analytics3-muted","Forecasts incoming operations over the selected horizon using this organisation's historical activity."));
 const horizon=SEL("prediction_horizon",[["7","7 days"],["14","14 days"],["30","30 days"]]);horizon.value="7";
 const historyButton=B("↺ Prediction history","ct-analytics3-button ct-analytics3-button-secondary ct-analytics3-history-launcher",openPredictionHistory);
 const aiNotice=$("p","ct-analytics3-ai-disclaimer","AI-generated estimates may be wrong. Predictions are based only on your organisation's historical operational data; they are not guaranteed outcomes and should support, not replace, human judgement. Each prediction uses its own historical lookback window, so the selected report start and end dates do not change its training period. Team, location, zone, staff and operation-type filters are applied.");
@@ -101,7 +101,7 @@ card.append(summary,body);
 summary.addEventListener("click",event=>{event.preventDefault();openPredictionPanel(card,title);});
 return card;
 }
-const workloadCard=predictionCard("Workload forecast",horizon.value+"-day outlook","A seven-day estimate of incoming operations, calculated from this organisation's own historical activity.",[workloadBody]);
+const workloadCard=predictionCard("Workload forecast",horizon.value+"-day outlook","Forecasts incoming operations over the selected "+horizon.value+"-day horizon using this organisation's historical activity.",[workloadBody]);
 workloadCard.addEventListener("toggle",()=>{if(workloadCard.open)loadWorkloadForecast();});
 aic.append(aiNotice,historyButton,W("Forecast horizon",horizon),workloadCard);
 const riskSection=$("section","ct-analytics3-ai-risk"),riskHead=$("div","ct-analytics3-ai-risk-head");
