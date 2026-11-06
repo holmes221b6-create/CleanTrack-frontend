@@ -38,16 +38,14 @@
     supervisor: [
       { id: "workspace", label: "My Workspace", icon: "⌂" },
       { id: "personnel", label: "Personnel", icon: "♙" },
-      { id: "operations", label: "Operations Management", icon: "☷" },
+      { id: "teams", label: "Teams", icon: "♧" },
+      { id: "operations", label: "Operations", icon: "☷" },
       { id: "reviews", label: "Review Queue", icon: "✓" },
-      { id: "sites", label: "Sites and Zones", icon: "⌖" },
-      { id: "team-channel", label: "Team Channel", icon: "♧" },
+      { id: "sites", label: "Sites & Zones", icon: "⌖" },
+      { id: "team-channel", label: "Team Channel", icon: "▤" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
-      { id: "team-pulse", label: "Team Pulse", icon: "♡" },
-      { id: "skills", label: "Skills and Eligibility", icon: "★" },
-      { id: "coverage", label: "Delegation and Temporary Coverage", icon: "⇄" },
-      { id: "settings", label: "Settings", icon: "⚙" },
-      { id: "audit", label: "Settings & Audit History", icon: "◷" }
+      { id: "reports", label: "Reports", icon: "▧" },
+      { id: "settings", label: "Settings", icon: "⚙" }
     ],
 
     employee: [
@@ -154,7 +152,7 @@
     const groupDefinitions = [
       { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
       { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
-      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "reviews", "skills", "coverage"] },
+      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "reviews"] },
       { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "settings", "org-settings", "billing"] }
     ];
 
