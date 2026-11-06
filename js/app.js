@@ -877,6 +877,65 @@
       return;
     }
 
+    // Supervisor pages are deliberately role-specific. This first pass establishes
+    // the approved page structure without inventing records or exposing Admin views.
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {
+      const heading = document.createElement("h1");
+      heading.textContent = "My Workspace";
+      const intro = document.createElement("p");
+      intro.textContent = "Your team's operational overview and the work assigned to you by Admin.";
+      intro.style.cssText = "max-width:760px;line-height:1.6;opacity:.82;";
+      const calendar = document.createElement("section");
+      calendar.className = "content-card";
+      calendar.style.cssText = "margin-top:22px;padding:22px;border:1px solid var(--border,#343944);border-radius:16px;background:var(--surface,#171a21);";
+      const calendarTitle = document.createElement("h2");
+      calendarTitle.textContent = "Operations Calendar";
+      const calendarText = document.createElement("p");
+      calendarText.textContent = "Admin-assigned operations, deadlines and your team's schedule will appear here. Calendar views, filters and assignment history will be connected in the next stage.";
+      calendarText.style.cssText = "max-width:760px;line-height:1.65;opacity:.82;";
+      calendar.append(calendarTitle, calendarText);
+      const shortcuts = document.createElement("div");
+      shortcuts.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;";
+      [["Operations","operations"],["Review Queue","reviews"],["Personnel","personnel"]].forEach(function(item) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button button-secondary";
+        button.textContent = item[0];
+        button.addEventListener("click", function(){ navigation.setActivePage(item[1]); });
+        shortcuts.appendChild(button);
+      });
+      pageContent.append(heading, intro, calendar, shortcuts);
+      return;
+    }
+
+    if (String(user?.role || "").toLowerCase() === "supervisor" &&
+        ["personnel", "teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
+      const descriptions = {
+        personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
+        teams: ["Teams", "Manage your own team and view other organization teams in read-only mode. Other teams' employee records and private operations remain inaccessible."],
+        reviews: ["Review Queue", "Inspect submitted work and completion evidence, then approve or reject submissions with a recorded reason."],
+        sites: ["Sites & Zones", "View the locations, floors and zones assigned to your team. Management actions will follow your permissions."],
+        performance: ["Performance Arena", "View your team's position, an overall team ranking and separate rankings by performance measure. Comparisons will account for workload and operation difficulty."],
+        reports: ["Reports", "Generate and access reports limited to your own team's authorized data."]
+      };
+      const details = descriptions[pageId];
+      const heading = document.createElement("h1");
+      heading.textContent = details[0];
+      const description = document.createElement("p");
+      description.textContent = details[1];
+      description.style.cssText = "max-width:780px;line-height:1.7;opacity:.84;";
+      const notice = document.createElement("section");
+      notice.style.cssText = "margin-top:22px;padding:20px 22px;border:1px solid var(--border,#343944);border-radius:15px;background:var(--surface,#171a21);max-width:900px;";
+      const noticeTitle = document.createElement("h2");
+      noticeTitle.textContent = "Page structure added";
+      const noticeText = document.createElement("p");
+      noticeText.textContent = "The page is in the Supervisor workspace. Its data, controls and workflows will be implemented in the next feature stage.";
+      noticeText.style.cssText = "line-height:1.65;opacity:.82;";
+      notice.append(noticeTitle, noticeText);
+      pageContent.append(heading, description, notice);
+      return;
+    }
+
     if (pageId === "billing") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
         pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Billing is available to organization Admins only." }));
