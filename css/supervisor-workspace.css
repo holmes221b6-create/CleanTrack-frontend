@@ -49,3 +49,5 @@
 .mw-announcement-severity.critical,.mw-announcement-severity.high{background:#4a202b;color:#ff9eaa}
 .mw-announcement-severity.warning{background:#49391d;color:#f7d38d}
 @media(max-width:700px){.mw-announcement-list{grid-template-columns:1fr}}
+
+.mw-calendar-grid.day{grid-template-columns:1fr}.mw-calendar-grid.day .mw-day-cell{min-height:220px}
