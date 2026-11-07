@@ -199,7 +199,7 @@
         return '<div class="mw-day-cell ' + (d.getMonth() !== anchor.getMonth() && view === "month" ? "outside" : "") + (sameDay(d,new Date()) ? " today" : "") + '"><div class="mw-day-label">' + (view === "month" ? d.getDate() : weekdays[(d.getDay()+6)%7] + " · " + d.getDate()) + '</div>' +
           (todays.length ? todays.slice(0,4).map(o => '<div class="mw-event ' + (o.overdue ? "overdue" : String(o.status||"").toLowerCase().replace(/\s+/g,"-")) + '" title="' + esc(o.title) + '">' + esc(o.title) + '</div>').join("") + (todays.length>4?'<small>+'+(todays.length-4)+' more</small>':'') : '<span class="mw-no-event">—</span>') + '</div>';
       }).join("");
-      container.innerHTML = '<div class="mw-calendar-grid ' + (view === "month" ? "month" : "") + '">' + (view === "month" ? weekdays.map(w=>'<div class="mw-weekday">'+w+'</div>').join("") : "") + cells + '</div>';
+      container.innerHTML = '<div class="mw-calendar-grid ' + (view === "month" ? "month" : view === "day" ? "day" : "") + '">' + (view === "month" ? weekdays.map(w=>'<div class="mw-weekday">'+w+'</div>').join("") : "") + cells + '</div>';
     }
     controls.querySelector("[data-mw-prev]").addEventListener("click",()=>{anchor=view==="month"?new Date(anchor.getFullYear(),anchor.getMonth()-1,1):addDays(anchor,view==="day"?-1:-7);render();});
     controls.querySelector("[data-mw-next]").addEventListener("click",()=>{anchor=view==="month"?new Date(anchor.getFullYear(),anchor.getMonth()+1,1):addDays(anchor,view==="day"?1:7);render();});
