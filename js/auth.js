@@ -131,7 +131,14 @@ function normalizeUser(user) {
       response.user || response.data?.user
     );
 
-    currentUser.first_login = Boolean(response.first_login ?? response.data?.first_login);\n    try {\n      const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();\n      if (currentUser.first_login) window.sessionStorage.setItem(firstKey, "1");\n      else window.sessionStorage.removeItem(firstKey);\n    } catch (_) {}\n\n    if (!currentUser) {
+    currentUser.first_login = Boolean(response.first_login ?? response.data?.first_login);
+    try {
+      const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
+      if (currentUser.first_login) window.sessionStorage.setItem(firstKey, "1");
+      else window.sessionStorage.removeItem(firstKey);
+    } catch (_) {}
+
+    if (!currentUser) {
       throw new Error(
         "The server response did not include a valid user."
       );
@@ -211,7 +218,10 @@ function normalizeUser(user) {
 
     if (token) {
       persistToken(token);
-      currentUser = normalizeUser(user);\n      if (currentUser) {\n        const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();\n        try { currentUser.first_login = window.sessionStorage.getItem(firstKey) === "1"; } catch (_) { currentUser.first_login = false; }\n      }
+      currentUser = normalizeUser(user);\n      if (currentUser) {
+        const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
+        try { currentUser.first_login = window.sessionStorage.getItem(firstKey) === "1"; } catch (_) { currentUser.first_login = false; }
+      }
       emitAuthEvent("cleantrack:register", currentUser);
     } else {
       // Supervisors and employees stay signed out until their membership is approved.
