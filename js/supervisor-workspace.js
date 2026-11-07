@@ -30,8 +30,12 @@
   async function render(root) {
     root.innerHTML = '<div class="mw-loading" role="status">Loading your workspace from MECHNAR…</div>';
     try {
-      const data = await api.get("supervisor/workspace");
+      const results = await Promise.all([api.get("supervisor/workspace"), api.get("announcements").catch(() => ({ announcements: [], unavailable: true }))]);
+      const data = results[0];
+      const announcementResponse = results[1];
       if (!data || !data.team || !data.metrics) throw new Error("The workspace response was incomplete.");
+      data.announcements = Array.isArray(announcementResponse.announcements) ? announcementResponse.announcements : [];
+      data.announcementsUnavailable = Boolean(announcementResponse.unavailable);
       paint(root, data);
     } catch (error) {
       root.innerHTML = '<section class="mw-error"><h2>Workspace data unavailable</h2><p>' +
@@ -52,6 +56,8 @@
     const operations = Array.isArray(data.operations) ? data.operations : [];
     const members = Array.isArray(data.members) ? data.members : [];
     const activity = Array.isArray(data.activity) ? data.activity : [];
+    const announcements = Array.isArray(data.announcements) ? data.announcements : [];
+    const announcementCard = card("Announcements & Alerts", data.announcementsUnavailable ? empty("Announcements could not be loaded. Use Team Channel to retry.") : announcements.length ? '<div class="mw-announcement-list">' + announcements.filter(a => a.status === "published").slice(0,5).map(function(a) { return '<article class="mw-announcement"><div class="mw-announcement-top"><span class="mw-announcement-severity ' + esc(a.severity || "info") + '">' + esc(a.severity || "info") + '</span><small>' + esc(a.audience_scope === "organization" ? "Organization" : a.audience_scope === "supervisors" ? "Supervisors" : "Team") + '</small></div><strong>' + esc(a.title) + '</strong><p>' + esc(a.message) + '</p><small>' + esc(dateLabel(a.created_at, {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})) + " · " + esc(a.my_receipt?.state || "unread") + '</small></article>'; }).join("") + '</div><button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>' : empty("No published announcements or alerts."), "mw-announcements");
     const reviewItems = operations.filter(o => ["submitted", "pending_review", "awaiting_review"].includes(String(o.status || "").toLowerCase().replace(/\s+/g, "_")));
     const attention = operations.filter(o => o.overdue || ["blocked", "rejected"].includes(String(o.status || "").toLowerCase()));
     const completion = metrics.completion_rate == null ? "—" : metrics.completion_rate + "%";
@@ -124,6 +130,8 @@
             <p class="mw-footnote">This is a descriptive team metric, not a comparative ranking. Performance Arena handles organization-wide team comparisons.</p>
           `, "mw-performance")}
         </div>
+
+        ${announcementCard}
 
         <div class="mw-quick-actions"><button class="button button-primary" data-mw-page="operations">Manage Operations</button><button class="button button-secondary" data-mw-page="reviews">Review Submissions</button><button class="button button-secondary" data-mw-page="personnel">View Personnel</button><button class="button button-secondary" data-mw-page="team-channel">Team Channel</button></div>
       </div>`;
