@@ -218,7 +218,8 @@ function normalizeUser(user) {
 
     if (token) {
       persistToken(token);
-      currentUser = normalizeUser(user);\n      if (currentUser) {
+      currentUser = normalizeUser(user);
+      if (currentUser) {
         const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
         try { currentUser.first_login = window.sessionStorage.getItem(firstKey) === "1"; } catch (_) { currentUser.first_login = false; }
       }
