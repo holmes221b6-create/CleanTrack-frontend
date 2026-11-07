@@ -160,7 +160,7 @@
       const items = visibleItems();
       if (view === "agenda") {
         period.textContent = "Upcoming schedule";
-        container.innerHTML = items.slice().sort((a,b) => (dateValue(a.due_at)?.getTime() || Infinity) - (dateValue(b.due_at)?.getTime() || Infinity)).map(o => recordRow(o, o.overdue ? "Overdue" : o.status)).join("") || empty("No operations match these filters.");
+        container.innerHTML = items.filter(o => dateValue(o.due_at)).slice().sort((a,b) => dateValue(a.due_at).getTime() - dateValue(b.due_at).getTime()).map(o => recordRow(o, o.overdue ? "Overdue" : o.status)).join("") || empty("No scheduled operations match these filters.");
         return;
       }
       let from, to;
@@ -182,12 +182,12 @@
         while(days.length%7) days.push(addDays(days[days.length-1],1));
       }
       const events = items.filter(o => {
-        const d = dateValue(o.due_at || o.created_at);
+        const d = dateValue(o.due_at);
         return d && d >= from && d < to;
       });
       const weekdays = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
       const cells = days.map(d => {
-        const todays = events.filter(o => { const dt=dateValue(o.due_at || o.created_at); return dt && sameDay(dt,d); });
+        const todays = events.filter(o => { const dt=dateValue(o.due_at); return dt && sameDay(dt,d); });
         return '<div class="mw-day-cell ' + (d.getMonth() !== anchor.getMonth() && view === "month" ? "outside" : "") + (sameDay(d,new Date()) ? " today" : "") + '"><div class="mw-day-label">' + (view === "month" ? d.getDate() : weekdays[(d.getDay()+6)%7] + " · " + d.getDate()) + '</div>' +
           (todays.length ? todays.slice(0,4).map(o => '<div class="mw-event ' + (o.overdue ? "overdue" : String(o.status||"").toLowerCase().replace(/\s+/g,"-")) + '" title="' + esc(o.title) + '">' + esc(o.title) + '</div>').join("") + (todays.length>4?'<small>+'+(todays.length-4)+' more</small>':'') : '<span class="mw-no-event">—</span>') + '</div>';
       }).join("");
