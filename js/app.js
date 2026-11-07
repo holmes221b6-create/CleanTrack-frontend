@@ -876,7 +876,8 @@
       }
       return;
     }
-    // Supervisor My Workspace is rendered from the live, team-scoped backend endpoint.\n    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {\n      if (window.MechnarSupervisorWorkspace && typeof window.MechnarSupervisorWorkspace.render === "function") {\n        await window.MechnarSupervisorWorkspace.render(pageContent);\n      } else {\n        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Supervisor workspace could not load. Refresh and try again." }));\n      }\n      return;\n    }\n\n    if (String(user?.role || "").toLowerCase() === "supervisor" &&
+    // Supervisor My Workspace is rendered from the live, team-scoped backend endpoint.
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {\n      if (window.MechnarSupervisorWorkspace && typeof window.MechnarSupervisorWorkspace.render === "function") {\n        await window.MechnarSupervisorWorkspace.render(pageContent);\n      } else {\n        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Supervisor workspace could not load. Refresh and try again." }));\n      }\n      return;\n    }\n\n    if (String(user?.role || "").toLowerCase() === "supervisor" &&
         ["personnel", "teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
       const descriptions = {
         personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
