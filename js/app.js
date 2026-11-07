@@ -876,39 +876,7 @@
       }
       return;
     }
-
-    // Supervisor pages are deliberately role-specific. This first pass establishes
-    // the approved page structure without inventing records or exposing Admin views.
-    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {
-      const heading = document.createElement("h1");
-      heading.textContent = "My Workspace";
-      const intro = document.createElement("p");
-      intro.textContent = "Your team's operational overview and the work assigned to you by Admin.";
-      intro.style.cssText = "max-width:760px;line-height:1.6;opacity:.82;";
-      const calendar = document.createElement("section");
-      calendar.className = "content-card";
-      calendar.style.cssText = "margin-top:22px;padding:22px;border:1px solid var(--border,#343944);border-radius:16px;background:var(--surface,#171a21);";
-      const calendarTitle = document.createElement("h2");
-      calendarTitle.textContent = "Operations Calendar";
-      const calendarText = document.createElement("p");
-      calendarText.textContent = "Admin-assigned operations, deadlines and your team's schedule will appear here. Calendar views, filters and assignment history will be connected in the next stage.";
-      calendarText.style.cssText = "max-width:760px;line-height:1.65;opacity:.82;";
-      calendar.append(calendarTitle, calendarText);
-      const shortcuts = document.createElement("div");
-      shortcuts.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;";
-      [["Operations","operations"],["Review Queue","reviews"],["Personnel","personnel"]].forEach(function(item) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "button button-secondary";
-        button.textContent = item[0];
-        button.addEventListener("click", function(){ navigation.setActivePage(item[1]); });
-        shortcuts.appendChild(button);
-      });
-      pageContent.append(heading, intro, calendar, shortcuts);
-      return;
-    }
-
-    if (String(user?.role || "").toLowerCase() === "supervisor" &&
+    // Supervisor My Workspace is rendered from the live, team-scoped backend endpoint.\n    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {\n      if (window.MechnarSupervisorWorkspace && typeof window.MechnarSupervisorWorkspace.render === "function") {\n        await window.MechnarSupervisorWorkspace.render(pageContent);\n      } else {\n        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Supervisor workspace could not load. Refresh and try again." }));\n      }\n      return;\n    }\n\n    if (String(user?.role || "").toLowerCase() === "supervisor" &&
         ["personnel", "teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
       const descriptions = {
         personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
