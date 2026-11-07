@@ -140,7 +140,7 @@
   }
 
   function recordRow(o, label) {
-    return `<div class="mw-record"><div><strong>${esc(o.title)}</strong><small>${esc(o.location_name || "Location not assigned")} · ${esc(o.zone_name || "Zone not assigned")}</small></div><span class="mw-status ${o.overdue ? "danger" : ""}">${esc(label)}</span><time>${esc(dateLabel(o.due_at))}</time></div>`;
+    return `<div class="mw-record"><div><strong>${esc(o.title)}</strong><small>${esc(o.location_name || "Location not assigned")} · ${esc(o.zone_name || "Zone not assigned")} · ${esc(o.created_by_role === "Admin" ? "Assigned by Admin" : o.created_by_role === "Supervisor" ? "Created by Supervisor" : "Organization operation")}</small></div><span class="mw-status ${o.overdue ? "danger" : ""}">${esc(label)}</span><time>${esc(dateLabel(o.due_at))}</time></div>`;
   }
   function activityVerb(action) {
     return String(action || "updated").replace(/[._]/g, " ").replace(/\b\w/g, x => x.toUpperCase());
