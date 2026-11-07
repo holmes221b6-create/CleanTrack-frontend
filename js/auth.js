@@ -131,12 +131,14 @@ function normalizeUser(user) {
       response.user || response.data?.user
     );
 
-    currentUser.first_login = Boolean(response.first_login ?? response.data?.first_login);
-    try {
-      const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
-      if (currentUser.first_login) window.sessionStorage.setItem(firstKey, "1");
-      else window.sessionStorage.removeItem(firstKey);
-    } catch (_) {}
+    if (currentUser) {
+      currentUser.first_login = Boolean(response.first_login ?? response.data?.first_login);
+      try {
+        const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
+        if (currentUser.first_login) window.sessionStorage.setItem(firstKey, "1");
+        else window.sessionStorage.removeItem(firstKey);
+      } catch (_) {}
+    }
 
     if (!currentUser) {
       throw new Error(
