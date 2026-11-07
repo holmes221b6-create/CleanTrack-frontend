@@ -18,7 +18,7 @@
 
     const brand = document.createElement("div");
     brand.className = "ct-sidebar-brand";
-    brand.innerHTML = "<span>Omnix</span>";
+    brand.innerHTML = "<span>MECHNAR</span>";
 
     const navLabel = document.createElement("div");
     navLabel.className = "ct-sidebar-label";
