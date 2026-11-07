@@ -38,3 +38,14 @@
 .mw-quick-actions{display:flex;gap:9px;flex-wrap:wrap}.mw-loading,.mw-error{padding:28px;border:1px solid var(--border,#30303d);border-radius:14px;background:var(--surface,#15151d)}.mw-error h2{margin-top:0}.mw-error p{color:var(--text-secondary,#aaa)}
 @media(max-width:1000px){.mw-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.mw-calendar-toolbar{flex-direction:column}.mw-calendar-controls{flex-wrap:wrap}}
 @media(max-width:700px){.mw-main-grid{grid-template-columns:1fr}.mw-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mw-welcome{align-items:flex-start;flex-direction:column}.mw-updated{text-align:left}.mw-calendar-grid{grid-template-columns:repeat(7,minmax(90px,1fr));overflow-x:auto}.mw-calendar-body{overflow-x:auto}.mw-calendar-grid.month{min-width:630px}.mw-record{grid-template-columns:1fr auto}.mw-record time{grid-column:1/-1}.mw-calendar-controls{align-items:flex-start;flex-direction:column}.mw-view-switch{max-width:100%;overflow:auto}.mw-workload-rows{grid-template-columns:1fr 1fr}}
+
+.mw-announcement-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mw-announcement{padding:13px;border:1px solid var(--border,#30303d);border-radius:11px;background:var(--surface-raised,#20202a);min-width:0}
+.mw-announcement-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.mw-announcement-top small,.mw-announcement>small{font-size:10px;color:var(--text-secondary,#999)}
+.mw-announcement>strong{font-size:13px}
+.mw-announcement p{font-size:11px;line-height:1.55;color:var(--text-secondary,#b0afbb);margin:7px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.mw-announcement-severity{font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:4px 7px;border-radius:20px;background:#29263b;color:#c8b6ff}
+.mw-announcement-severity.critical,.mw-announcement-severity.high{background:#4a202b;color:#ff9eaa}
+.mw-announcement-severity.warning{background:#49391d;color:#f7d38d}
+@media(max-width:700px){.mw-announcement-list{grid-template-columns:1fr}}
