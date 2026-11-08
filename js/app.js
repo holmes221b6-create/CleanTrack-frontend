@@ -876,6 +876,15 @@
       }
       return;
     }
+    if (String(user?.role || "").toLowerCase() === "supervisor" && ["incidents", "inspections", "handovers"].includes(pageId)) {
+      if (window.MechnarSupervisorRecords && typeof window.MechnarSupervisorRecords.render === "function") {
+        await window.MechnarSupervisorRecords.render(pageContent, pageId);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "This Supervisor module could not load. Refresh the page and try again." }));
+      }
+      return;
+    }
+
     // Supervisor My Workspace is rendered from the live, team-scoped backend endpoint.
     if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "workspace") {
       if (window.MechnarSupervisorWorkspace && typeof window.MechnarSupervisorWorkspace.render === "function") {
