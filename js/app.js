@@ -1677,12 +1677,22 @@ function bindNavigation() {
       });
     }
 
+    if (form.dataset.loginBound === "true") return;
+    form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
-      clearMessage();
-      setLoading(true);
-
+      const message = getElement("login-message");
+      const submit = getElement("login-submit");
       const formData = new FormData(form);
+      if (message) {
+        message.textContent = "";
+        message.className = "form-message";
+      }
+      if (submit) {
+        submit.disabled = true;
+        submit.textContent = "Signing in…";
+      }
+      setLoading(true);
 
       try {
         const user = await auth.login({
@@ -1692,15 +1702,27 @@ function bindNavigation() {
 
         state.started = true;
         showAuthenticatedLayout(user);
-        showMessage("You are now signed in.", "success");
+        if (message) {
+          message.textContent = "You are now signed in.";
+          message.className = "form-message success";
+        }
         maybeShowFirstSetup(user);
       } catch (error) {
-        showMessage(
-          error.message || "Unable to sign in. Please try again.",
-          "error"
-        );
+        const text = error && error.message
+          ? error.message
+          : "Unable to sign in. Please try again.";
+        if (message) {
+          message.textContent = text;
+          message.className = "form-message error";
+        } else {
+          console.error("MECHNAR sign-in failed:", error);
+        }
       } finally {
         setLoading(false);
+        if (submit) {
+          submit.disabled = false;
+          submit.textContent = "Sign in";
+        }
       }
     });
   }
