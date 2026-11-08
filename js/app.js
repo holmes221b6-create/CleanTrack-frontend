@@ -1729,7 +1729,7 @@ function bindNavigation() {
       const splash = document.getElementById("cleantrack-launch-splash");
       if (splash) {
         const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
-        const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : 720;
+        const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1180 : 1720;
         const waitFor = Math.max(0, minimumVisible - elapsed);
         window.setTimeout(async function () {
           const mark = splash.querySelector(".ct-splash-logo");
