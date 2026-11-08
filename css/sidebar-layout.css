@@ -660,3 +660,29 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 .ct-profile-edit-overlay .ct-profile-edit-input{min-height:46px}
 .ct-profile-edit-overlay .ct-profile-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
 @media(max-width:560px){.ct-profile-edit-overlay{padding:12px}.ct-profile-edit-overlay .ct-profile-edit-panel{width:100%;padding:20px;border-radius:16px}}
+
+
+/* Compact LinkedIn-style profile skills and qualification editor. */
+.ct-profile-extras{display:grid;gap:18px;margin:18px 0}
+.ct-profile-extra-section{min-width:0;padding:16px;border:1px solid rgba(145,130,185,.2);border-radius:14px;background:rgba(125,105,175,.045)}
+.ct-profile-extra-section h4{margin:0 0 5px;font-size:1rem;font-weight:750}
+.ct-profile-extra-hint{margin:0 0 12px;font-size:.78rem;line-height:1.45;opacity:.68}
+.ct-profile-skill-entry{display:flex;gap:8px}
+.ct-profile-skill-entry input{flex:1;min-width:0}
+.ct-profile-add-button{flex:0 0 auto;padding:9px 13px;border:1px solid rgba(145,112,235,.4);border-radius:9px;background:rgba(128,96,220,.17);color:inherit;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.ct-profile-skill-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.ct-profile-skill-tag{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid rgba(145,130,185,.25);border-radius:999px;background:rgba(128,96,220,.11);font-size:.78rem;line-height:1.2}
+.ct-profile-skill-tag button{display:grid;width:17px;height:17px;padding:0;place-items:center;border:0;border-radius:50%;background:transparent;color:inherit;opacity:.65;cursor:pointer}
+.ct-profile-skill-tag button:hover{background:rgba(255,255,255,.12);opacity:1}
+.ct-profile-empty{display:block;padding:8px 0;font-size:.78rem;opacity:.58}
+.ct-profile-qualification-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ct-profile-qualification-form input{min-width:0;box-sizing:border-box;width:100%;min-height:42px;padding:9px 10px;border:1px solid var(--border-color,rgba(140,140,160,.3));border-radius:9px;background:var(--surface-color,transparent);color:var(--text-color,inherit);font:inherit;font-size:.8rem}
+.ct-profile-qualification-form input[type=file]{grid-column:1/-1}
+.ct-profile-qualification-form button{grid-column:1/-1;justify-self:start}
+.ct-profile-qualification-list{display:grid;gap:8px;margin-top:12px}
+.ct-profile-qualification-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(145,130,185,.16)}
+.ct-profile-qualification-item>div{display:grid;gap:3px;min-width:0}
+.ct-profile-qualification-item strong{font-size:.82rem;overflow-wrap:anywhere}
+.ct-profile-qualification-item small{font-size:.72rem;opacity:.65;overflow-wrap:anywhere}
+.ct-profile-qualification-item button{flex:0 0 auto;padding:6px 9px;border:1px solid rgba(220,100,120,.25);border-radius:8px;background:transparent;color:inherit;font-size:.72rem;cursor:pointer}
+@media(max-width:560px){.ct-profile-qualification-form{grid-template-columns:1fr}.ct-profile-qualification-form input[type=file],.ct-profile-qualification-form button{grid-column:auto}.ct-profile-extra-section{padding:13px}}
