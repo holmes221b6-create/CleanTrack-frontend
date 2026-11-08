@@ -298,6 +298,11 @@
     );
   }
 
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest("#global-back-button");
+    if (button) { event.preventDefault(); goBack(); }
+  });
+
   window.addEventListener("cleantrack:navigate", function (event) {
     activePage = event.detail.page;
     updateActiveItem();
