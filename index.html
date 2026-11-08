@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/light-mode-white-workspace.css?v=20261103-omnix-light-logo-v2">
 
     <script src="js/config.js" defer></script>
-    <script src="js/api.js?v=20261108-attachment-download-v1" defer></script>
+    <script src="js/api.js?v=20261108-auth-timeout-v2" defer></script>
     <script src="js/auth.js?v=20261108-first-login-v1" defer></script>
     <script src="js/navigation.js?v=20261108-page-local-v4" defer></script>
     <script src="js/admin-dashboard.js?v=20261022-pdf-direct-download-v6" defer></script>
@@ -95,7 +95,7 @@
     <script src="js/supervisor-workspace.js?v=20261108-v5" defer></script>
     <script src="js/supervisor-records.js?v=20261108-inpage-history-v3" defer></script>
     <script src="js/supervisor-personnel.js?v=20261108-three-chat-attachments-v1" defer></script>
-    <script src="js/app.js?v=20261108-supervisor-workspace-v1" defer></script>
+    <script src="js/app.js?v=20261108-login-splash-failsafe-v2" defer></script>
     <script src="js/teams.js?v=20261016-team-zone-guard-v4" defer></script>
     <script src="js/sidebar-layout.js?v=omnix-plain-text-v7" defer></script>
 <style id="cleantrack-launch-splash-style">
@@ -239,6 +239,7 @@ html[data-theme="light"] body .ct-splash-logo {
 <body>
     <script>window.__MECHNAR_SPLASH_STARTED_AT__ = Date.now();</script>
     <div id="cleantrack-launch-splash" role="status" aria-label="Starting MECHNAR"><div class="ct-splash-mark" aria-hidden="true"><img class="ct-splash-logo" src="assets/omnix-mark.svg?v=3" alt="" decoding="sync" fetchpriority="high"></div><div class="ct-splash-wordmark" aria-hidden="true">MECHNAR</div><div class="ct-splash-owner">INTELLIGENCE · OPERATIONS · SYSTEMS</div></div>
+    <script>(function(){var splash=document.getElementById("cleantrack-launch-splash");if(splash){window.setTimeout(function(){splash.classList.add("is-hidden");window.setTimeout(function(){if(splash.isConnected)splash.remove();},450);},3200);}})();</script>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div id="app" class="app-shell">
