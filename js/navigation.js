@@ -65,6 +65,7 @@
 
   let activePage = null;
   const pageHistory = [];
+  const viewHistory = [];
 
   function getMenu(role) {
     const normalizedRole = String(role || "").toLowerCase();
@@ -95,6 +96,7 @@
       if (pageHistory.length > 100) pageHistory.shift();
     }
     activePage = pageId;
+    if (!(options && options.fromHistory)) viewHistory.length = 0;
 
     window.dispatchEvent(
       new CustomEvent("cleantrack:navigate", {
@@ -113,16 +115,37 @@
   }
 
   function canGoBack() {
-    return pageHistory.length > 0;
+    return viewHistory.length > 0 || pageHistory.length > 0;
+  }
+
+  function pushViewBack(callback) {
+    if (typeof callback !== "function") return;
+    viewHistory.push(callback);
+    if (viewHistory.length > 100) viewHistory.shift();
+    updateBackButton();
+  }
+
+  function updateBackButton() {
+    const button = document.getElementById("global-back-button");
+    if (!button) return;
+    button.hidden = !canGoBack();
   }
 
   function goBack() {
+    if (viewHistory.length) {
+      const restore = viewHistory.pop();
+      try { restore(); } finally { updateBackButton(); }
+      return true;
+    }
     while (pageHistory.length) {
       const previousPage = pageHistory.pop();
       if (previousPage && previousPage !== activePage) {
-        return setActivePage(previousPage, { fromHistory: true });
+        const result = setActivePage(previousPage, { fromHistory: true });
+        updateBackButton();
+        return result;
       }
     }
+    updateBackButton();
     return false;
   }
 
@@ -278,6 +301,7 @@
   window.addEventListener("cleantrack:navigate", function (event) {
     activePage = event.detail.page;
     updateActiveItem();
+    updateBackButton();
   });
 
   window.CleanTrackNavigation = Object.freeze({
@@ -286,6 +310,8 @@
     getActivePage: getActivePage,
     canGoBack: canGoBack,
     goBack: goBack,
+    pushViewBack: pushViewBack,
+    updateBackButton: updateBackButton,
     getDefaultPage: getDefaultPage,
     renderMenu: renderMenu,
     setAnnouncementUnreadCount: function (count) {
