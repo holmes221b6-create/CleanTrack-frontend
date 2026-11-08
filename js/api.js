@@ -59,7 +59,7 @@
     const timeoutMs = Number(options.timeoutMs) > 0
       ? Number(options.timeoutMs)
       : (slowAuthPaths.has(requestPath)
-          ? Math.max(config.requestTimeoutMs, 35000)
+          ? Math.min(Math.max(config.requestTimeoutMs, 8000), 10000)
           : config.requestTimeoutMs);
 
     let timedOut = false;
