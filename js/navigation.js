@@ -125,10 +125,35 @@
     updateBackButton();
   }
 
-  function updateBackButton() {
-    const button = document.getElementById("global-back-button");
-    if (!button) return;
+  function ensureBackButton() {
+    let button = document.getElementById("global-back-button");
+    if (!button) {
+      button = document.createElement("button");
+      button.id = "global-back-button";
+      button.type = "button";
+      button.setAttribute("aria-label", "Go back to the previous view");
+      button.title = "Back to previous view";
+      button.innerHTML = '<span aria-hidden="true">×</span>';
+    }
+    if (button.parentElement !== document.body) document.body.appendChild(button);
+    Object.assign(button.style, {
+      position: "fixed", top: "calc(env(safe-area-inset-top, 0px) + 86px)",
+      right: "22px", zIndex: "2147483000", width: "46px", height: "46px",
+      minWidth: "46px", minHeight: "46px", borderRadius: "50%",
+      display: canGoBack() ? "grid" : "none", placeItems: "center",
+      fontSize: "30px", lineHeight: "1", cursor: "pointer",
+      background: "var(--ct-card, #171923)", color: "var(--ct-text, #fff)",
+      border: "1px solid var(--ct-border, #454052)",
+      boxShadow: "0 8px 28px rgba(0,0,0,.28)", padding: "0"
+    });
     button.hidden = !canGoBack();
+    return button;
+  }
+
+  function updateBackButton() {
+    const button = ensureBackButton();
+    button.hidden = !canGoBack();
+    button.style.display = canGoBack() ? "grid" : "none";
   }
 
   function goBack() {
@@ -297,6 +322,9 @@
       }
     );
   }
+
+  document.addEventListener("DOMContentLoaded", ensureBackButton);
+  if (document.readyState !== "loading") ensureBackButton();
 
   document.addEventListener("click", function (event) {
     const button = event.target.closest("#global-back-button");
