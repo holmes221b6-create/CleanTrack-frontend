@@ -899,6 +899,8 @@ if (identity) {
       const modal = document.getElementById("app-modal");
       openWorkspaceDialog("Account", content => {
         const wrap = appendText(content, "div", "", "ct-help-dialog ct-profile-dialog ct-profile-dialog-v2");
+        const accountView = document.createElement("div");
+        accountView.className = "ct-profile-account-view";
         const summary = document.createElement("section");
         summary.className = "ct-profile-hero";
         const savedAvatar = user && user.id != null ? readAccountAvatar(user.id) : "";
@@ -917,7 +919,7 @@ if (identity) {
         const roleLabel = user && user.role ? String(user.role).replace(/[_-]+/g," ").replace(/\b\w/g,letter=>letter.toUpperCase()) : "Member";
         appendText(identity, "span", roleLabel, "ct-profile-role-pill");
         summary.appendChild(identity);
-        wrap.appendChild(summary);
+        accountView.appendChild(summary);
         const avatarControls = document.createElement("div");
         avatarControls.className = "ct-profile-avatar-controls";
         const avatarInput = document.createElement("input");
@@ -960,7 +962,7 @@ if (identity) {
           reader.onerror = () => { avatarHint.textContent = "Unable to read this image."; };
           reader.readAsDataURL(file);
         });
-        wrap.appendChild(avatarControls);
+        accountView.appendChild(avatarControls);
 
         const section = document.createElement("section");
         section.className = "ct-profile-section";
@@ -994,38 +996,19 @@ if (identity) {
           data.appendChild(item);
         });
         section.appendChild(data);
-        wrap.appendChild(section);
+        accountView.appendChild(section);
 
 
         const actionsRow = document.createElement("div");
         actionsRow.className = "ct-help-dialog-actions ct-profile-actions ct-profile-actions-v2";
         const settingsPage = menu.find(item => item.id === "settings");
 
-        // Every signed-in role (Admin, Supervisor and Staff/Employee) has
-        // Settings in its route map. Put Edit Profile in this actual account
-        // dialog, not the separate global header dropdown.
+        // Edit Profile opens an editor panel inside this same account dialog.
+        // This action is available to every signed-in role.
         addDialogButton(actionsRow, "Edit Profile", () => {
-          if (modal && modal.open) modal.close();
-          try { window.history.replaceState(null, "", "#settings-account"); }
-          catch (_) { window.location.hash = "settings-account"; }
-          const opened = window.CleanTrackNavigation.setActivePage("settings");
-          if (!opened) {
-            window.location.hash = "settings-account";
-            return;
-          }
-          window.setTimeout(() => {
-            const settings = document.querySelector(".ct-settings-page");
-            const accountPanel = settings && settings.querySelector('[data-settings-panel="account"]');
-            if (!accountPanel) return;
-            settings.querySelectorAll("[data-settings-panel]").forEach(panel => {
-              panel.hidden = panel !== accountPanel;
-            });
-            settings.querySelectorAll("[data-settings-nav]").forEach(item => {
-              const active = item.dataset.settingsNav === "account";
-              item.classList.toggle("is-active", active);
-              item.setAttribute("aria-current", active ? "page" : "false");
-            });
-          }, 0);
+          accountView.hidden = true;
+          editPanel.hidden = false;
+          editName.focus();
         }, "ct-profile-settings-button");
 
         const profilePage = menu.find(item => item.id === "profile");
@@ -1058,7 +1041,121 @@ if (identity) {
             window.location.reload();
           }
         }, "ct-profile-logout-button");
-        wrap.appendChild(actionsRow);
+        accountView.appendChild(actionsRow);
+
+        const editPanel = document.createElement("section");
+        editPanel.className = "ct-profile-edit-panel";
+        editPanel.hidden = true;
+        appendText(editPanel, "p", "ACCOUNT SETTINGS", "ct-profile-eyebrow");
+        appendText(editPanel, "h3", "Edit profile", "ct-profile-edit-title");
+        appendText(editPanel, "p", "Update the personal details shown on your account.", "ct-profile-edit-description");
+
+        const editForm = document.createElement("form");
+        editForm.className = "ct-profile-edit-form";
+        const makeField = (labelText, type, value, name) => {
+          const label = document.createElement("label");
+          label.className = "ct-profile-edit-field";
+          appendText(label, "span", labelText);
+          const input = document.createElement("input");
+          input.type = type;
+          input.name = name;
+          input.value = value || "";
+          input.className = "ct-profile-edit-input";
+          label.appendChild(input);
+          return { label, input };
+        };
+        const editNameField = makeField("Full name", "text", user && (user.full_name || user.name), "full_name");
+        editNameField.input.required = true;
+        editNameField.input.minLength = 2;
+        editNameField.input.maxLength = 120;
+        const editPhoneField = makeField("Phone number", "tel", user && (user.phone || user.phone_number || user.mobile), "phone");
+        editPhoneField.input.maxLength = 30;
+        const editEmailField = makeField("Email address", "email", user && user.email, "email");
+        editEmailField.input.readOnly = true;
+        editEmailField.input.setAttribute("aria-describedby", "ct-profile-email-note");
+        const emailNote = appendText(editPanel, "small", "Email address cannot be changed here.", "ct-profile-edit-note");
+        emailNote.id = "ct-profile-email-note";
+        const avatarField = makeField("Profile picture URL (optional)", "url", user && user.avatar_url, "avatar_url");
+        avatarField.input.placeholder = "https://…";
+        const photoLabel = document.createElement("label");
+        photoLabel.className = "ct-profile-edit-field";
+        appendText(photoLabel, "span", "Or upload a profile picture");
+        const photoInput = document.createElement("input");
+        photoInput.type = "file";
+        photoInput.accept = "image/png,image/jpeg,image/webp,image/gif";
+        photoInput.className = "ct-profile-edit-input";
+        photoLabel.appendChild(photoInput);
+        const status = appendText(editPanel, "p", "", "ct-profile-edit-status");
+        status.setAttribute("role", "status");
+        const editActions = document.createElement("div");
+        editActions.className = "ct-help-dialog-actions ct-profile-actions";
+        const backButton = addDialogButton(editActions, "Back to account", () => {
+          editPanel.hidden = true;
+          accountView.hidden = false;
+        }, "ct-profile-settings-button");
+        const saveButton = addDialogButton(editActions, "Save changes", async () => {
+          const name = editNameField.input.value.trim();
+          const phoneValue = editPhoneField.input.value.trim();
+          const avatarUrl = avatarField.input.value.trim();
+          if (name.length < 2) {
+            status.textContent = "Enter a name with at least 2 characters.";
+            editNameField.input.focus();
+            return;
+          }
+          saveButton.disabled = true;
+          saveButton.textContent = "Saving…";
+          status.textContent = "";
+          try {
+            let uploadedAvatar = "";
+            const file = photoInput.files && photoInput.files[0];
+            if (file) {
+              if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type || "")) throw new Error("Choose a PNG, JPG, WEBP, or GIF image.");
+              if (file.size > 2 * 1024 * 1024) throw new Error("Choose an image smaller than 2 MB.");
+              uploadedAvatar = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ""));
+                reader.onerror = () => reject(new Error("Unable to read this image."));
+                reader.readAsDataURL(file);
+              });
+            }
+            const api = window.CleanTrackApi;
+            if (!api || typeof api.patch !== "function") throw new Error("Profile service is unavailable. Please try again.");
+            const response = await api.patch("auth/me", {
+              full_name: name,
+              phone: phoneValue,
+              avatar_url: avatarUrl
+            });
+            const updated = response && response.user || {};
+            const finalName = updated.full_name || updated.name || name;
+            Object.assign(user, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue, avatar_url: updated.avatar_url || avatarUrl });
+            const current = window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser && window.CleanTrackAuth.getCurrentUser();
+            if (current) Object.assign(current, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue });
+            if (uploadedAvatar) {
+              try { localStorage.setItem("cleantrack.avatar." + user.id, uploadedAvatar); }
+              catch (_) { throw new Error("Your details were saved, but this image could not be stored in this browser. Try a smaller picture."); }
+            } else if (avatarUrl) {
+              try { localStorage.setItem("cleantrack.avatar." + user.id, avatarUrl); } catch (_) {}
+            }
+            updateProfileTrigger();
+            window.dispatchEvent(new CustomEvent("cleantrack:avatar-updated", { detail: { userId: user.id } }));
+            const nameNode = identity.querySelector(".ct-profile-name");
+            const emailNode = identity.querySelector(".ct-profile-email");
+            if (nameNode) nameNode.textContent = finalName;
+            if (emailNode) emailNode.textContent = user.email || "";
+            status.textContent = "Profile updated successfully.";
+            editPanel.hidden = true;
+            accountView.hidden = false;
+          } catch (error) {
+            status.textContent = error && error.message || "Unable to save profile changes.";
+          } finally {
+            saveButton.disabled = false;
+            saveButton.textContent = "Save changes";
+          }
+        }, "ct-profile-settings-button ct-profile-save-button");
+        saveButton.type = "button";
+        editForm.append(editNameField.label, editPhoneField.label, editEmailField.label, avatarField.label, photoLabel);
+        editPanel.append(editForm, editActions);
+        wrap.append(accountView, editPanel);
       });
     }
     feedbackButton.addEventListener("click", openFeedbackPanel);
