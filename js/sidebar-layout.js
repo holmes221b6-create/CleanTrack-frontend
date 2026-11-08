@@ -1322,7 +1322,10 @@ if (identity) {
             editOverlay.setAttribute("aria-hidden", "true");
           }
         });
-        document.body.appendChild(editOverlay);
+        // Keep the editor inside the native modal dialog's top layer.
+        // Elements appended to document.body are inert while a <dialog> is open,
+        // which made the fields appear but prevented typing and clicking.
+        (modal || wrap).appendChild(editOverlay);
         wrap.appendChild(accountView);
       });
     }
