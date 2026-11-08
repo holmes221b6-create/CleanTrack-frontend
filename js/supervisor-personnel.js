@@ -42,7 +42,7 @@ async function render(root){
   const img=m.avatar_url?document.createElement("img"):el("div","mp-photo-fallback",initials(m.name));
   if(m.avatar_url){img.src=m.avatar_url;img.alt=m.name+" profile photo";}
   overlay.append(close,img);main.append(overlay);
-  const dismiss=()=>overlay.remove();close.onclick=dismiss;overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});document.addEventListener("keydown,function",()=>{});
+  const dismiss=()=>{overlay.remove();document.removeEventListener("keydown",onKey)};const onKey=e=>{if(e.key==="Escape")dismiss()};close.onclick=dismiss;overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});document.addEventListener("keydown",onKey);
  }
  function openProfileDetail(key){
   profileTab=key;const m=selected;const p=m.profile||{};
