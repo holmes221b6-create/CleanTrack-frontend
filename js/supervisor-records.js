@@ -30,7 +30,7 @@ async function render(container,page){
   body.replaceChildren(grid);
   const foot=el("div","sr-directory-foot");foot.append(el("span","",items.length+" records currently available to this team"),el("span","","Data is loaded from your team workspace."));body.append(foot);
  }
- function openView(key){view=key==="directory"?"records":key;filter="";draw();}
+ function openView(key){const previous=view;window.CleanTrackNavigation?.pushViewBack(()=>{view=previous;draw();});view=key==="directory"?"records":key;filter="";draw();}
  function workspace(title,subtitle){const top=el("div","sr-workspace-top"),left=el("div");const backBtn=el("button","sr-back","← Back to "+cfg.title);backBtn.type="button";backBtn.onclick=back;left.append(backBtn,el("h2","",title),el("p","",subtitle));top.append(left);return top;}
  function listView(key){
   const titles={directory:"Record directory",history:"Record history",critical:"Critical incidents",failed:"Failed inspections",pending:"Pending acknowledgements",outstanding:"Outstanding matters"};
@@ -57,6 +57,7 @@ async function render(container,page){
   c.append(actions);return c;
  }
  function openDetail(x){
+  const previous=view;window.CleanTrackNavigation?.pushViewBack(()=>{view=previous;draw();});
   view="detail";const wrap=el("div","sr-workspace");wrap.append(workspace(getTitle(x),"Record details and available actions."));
   const p=panel("Record details","Information recorded for this item.");
   if(page==="incidents"){p.append(el("p","sr-record-copy",x.description||""),el("p","sr-meta",[x.severity,x.category,x.operation_title,x.location_name,x.zone_name,date(x.created_at)].filter(Boolean).join(" · ")));if(x.resolution)p.append(el("p","sr-resolution","Resolution: "+x.resolution));if(!["resolved","closed"].includes(x.status)){const f=document.createElement("form");f.className="sr-form";f.innerHTML='<label class="sr-field"><span>Status</span><select name="status"><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></label><label class="sr-field"><span>Resolution note</span><textarea name="resolution" rows="3"></textarea></label><button class="sr-primary">Save update</button>';f.elements.status.value=x.status;f.addEventListener("submit",e=>{e.preventDefault();update(cfg.endpoint+"/"+x.id,{status:f.elements.status.value,resolution:f.elements.resolution.value});});p.append(f);}}
