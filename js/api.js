@@ -117,7 +117,7 @@
         data = await response.json();
       } else {
         const responseText = await response.text();
-        const looksLikeHtml = /<\\s*!doctype\\s+html|<\\s*html[\\s>]|<\\s*body[\\s>]/i.test(responseText || "");
+        const looksLikeHtml = /<\s*!doctype\s+html|<\s*html[\s>]|<\s*body[\s>]/i.test(responseText || "");
         // Never print a proxy/server HTML error page into the sign-in form.
         // Preserve plain-text API errors, but replace HTML with a concise diagnostic.
         data = responseText
