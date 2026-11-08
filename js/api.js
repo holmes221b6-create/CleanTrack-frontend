@@ -218,11 +218,24 @@
     return request(path, { ...options, method: "DELETE" });
   }
 
-  async function download(path) {
-    const headers = new Headers();
+  async function download(path, retried = false) {
+    const headers = new Headers({ Accept: "*/*" });
     const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : window.sessionStorage.getItem("cleantrack_token");
     if (token) headers.set("Authorization", "Bearer " + token);
-    const response = await fetch(config.apiBaseUrl + normalizePath(path), { method: "GET", headers, credentials: "include" });
+    const response = await fetch(config.apiBaseUrl + normalizePath(path), { method: "GET", headers, credentials: "include", cache: "no-store" });
+    if (response.status === 401 && !retried) {
+      try {
+        const refreshHeaders = new Headers({ Accept: "application/json" });
+        const refreshToken = window.CleanTrackAuth?.getRefreshToken?.();
+        if (refreshToken) refreshHeaders.set("Authorization", "Bearer " + refreshToken);
+        const refreshed = await fetch(config.apiBaseUrl + normalizePath("auth/refresh"), { method: "GET", headers: refreshHeaders, credentials: "include", cache: "no-store" });
+        if (refreshed.ok) {
+          const data = await refreshed.json().catch(() => ({}));
+          if (data.token && window.CleanTrackAuth?.setAuthToken) window.CleanTrackAuth.setAuthToken(data.token);
+          return await download(path, true);
+        }
+      } catch (_) {}
+    }
     if (!response.ok) { let message = "The attachment could not be downloaded."; try { const data = await response.json(); message = data.message || data.error || message; } catch (_) {} throw new ApiError(message, response.status, null); }
     return URL.createObjectURL(await response.blob());
   }
