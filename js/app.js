@@ -1380,16 +1380,46 @@
 function bindAvatarEditProfile() {
   if (window.__cleanTrackAvatarEditProfileBound) return;
   window.__cleanTrackAvatarEditProfileBound = true;
-  document.addEventListener("click", function(event) {
-    const button = event.target.closest('[data-action="edit-profile"]');
-    if (!button) return;
+
+  const menu = getElement("profile-menu");
+  const menuButton = getElement("profile-menu-button");
+  if (!menu || !menuButton) return;
+
+  function closeMenu() {
+    menu.hidden = true;
+    menuButton.setAttribute("aria-expanded", "false");
+  }
+  function toggleMenu(event) {
     event.preventDefault();
-    const menu = getElement("profile-menu");
-    const menuButton = getElement("profile-menu-button");
-    if (menu) menu.hidden = true;
-    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
-    try { window.history.replaceState(null, "", "#settings-account"); } catch (_) {}
-    navigation.setActivePage("settings");
+    event.stopPropagation();
+    const opening = menu.hidden;
+    menu.hidden = !opening;
+    menuButton.setAttribute("aria-expanded", opening ? "true" : "false");
+  }
+
+  menuButton.addEventListener("click", toggleMenu);
+  document.addEventListener("click", function(event) {
+    if (!menu.contains(event.target) && !menuButton.contains(event.target)) closeMenu();
+  });
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") closeMenu();
+  });
+
+  menu.addEventListener("click", function(event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const action = button.dataset.action;
+    if (action === "edit-profile") {
+      event.preventDefault();
+      closeMenu();
+      navigation.setActivePage("settings");
+      window.setTimeout(function() {
+        const accountTab = document.querySelector('[data-settings-tab="account"], [data-tab="account"], #settings-account');
+        if (accountTab) accountTab.click();
+      }, 0);
+    } else if (action === "open-settings" || action === "logout") {
+      closeMenu();
+    }
   });
 }
 
