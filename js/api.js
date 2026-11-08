@@ -117,7 +117,16 @@
         data = await response.json();
       } else {
         const responseText = await response.text();
-        data = responseText ? { message: responseText } : null;
+        const looksLikeHtml = /<\\s*!doctype\\s+html|<\\s*html[\\s>]|<\\s*body[\\s>]/i.test(responseText || "");
+        // Never print a proxy/server HTML error page into the sign-in form.
+        // Preserve plain-text API errors, but replace HTML with a concise diagnostic.
+        data = responseText
+          ? {
+              message: looksLikeHtml
+                ? "The server returned an HTML page instead of an API response (HTTP " + response.status + "). Check the backend URL and deployment."
+                : responseText.slice(0, 500)
+            }
+          : null;
       }
 
       if (!response.ok) {
