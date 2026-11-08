@@ -1727,3 +1727,12 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
 }
 #profile-menu.profile-menu button:hover,
 #profile-menu.profile-menu button:focus-visible { background: rgba(128,110,190,.20); outline: none; }
+
+
+/* Account panel: keep Edit Profile prominent inside the avatar's own menu. */
+#profile-menu.profile-menu .profile-menu-account{padding:7px 10px 9px;border-bottom:1px solid var(--border-color,rgba(140,140,160,.22));margin-bottom:4px}
+#profile-menu.profile-menu .profile-menu-account-label{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;opacity:.58;margin-bottom:5px}
+#profile-menu.profile-menu .profile-menu-account p{margin:0!important;font-size:12px;overflow-wrap:anywhere}
+#profile-menu.profile-menu #profile-menu-edit-profile{display:flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:10px;min-height:44px;padding:11px 12px;background:rgba(128,96,220,.14);color:var(--text-color,inherit);font-weight:750;border:1px solid rgba(145,112,235,.28)}
+#profile-menu.profile-menu #profile-menu-edit-profile:hover,#profile-menu.profile-menu #profile-menu-edit-profile:focus-visible{background:rgba(128,96,220,.25);border-color:rgba(145,112,235,.55)}
+#profile-menu.profile-menu #profile-menu-edit-profile span:first-child{font-size:17px;color:#a98aff}
