@@ -282,22 +282,24 @@ html[data-theme="light"] body .ct-splash-logo {
                     <span id="notification-count" class="notification-count" hidden>0</span>
                 </button>
 
-                <button
-                    id="profile-menu-button"
-                    class="profile-button"
-                    type="button"
-                    aria-expanded="false"
-                    aria-controls="profile-menu"
-                >
-                    <span id="header-avatar" class="avatar" aria-hidden="true">U</span>
-                    <span id="header-user-name">Account</span>
-                    <span aria-hidden="true">▾</span>
-                </button>
-                <div id="profile-menu" class="profile-menu" hidden>
-                    <p id="profile-menu-email"></p>
-                    <button type="button" data-action="edit-profile">Edit Profile</button>
-                    <button type="button" data-action="open-settings">Settings</button>
-                    <button type="button" data-action="logout">Log out</button>
+                <div class="profile-menu-wrap">
+                    <button
+                        id="profile-menu-button"
+                        class="profile-button"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="profile-menu"
+                    >
+                        <span id="header-avatar" class="avatar" aria-hidden="true">U</span>
+                        <span id="header-user-name">Account</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <div id="profile-menu" class="profile-menu" role="menu" aria-label="User account" hidden>
+                        <p id="profile-menu-email"></p>
+                        <button type="button" role="menuitem" data-action="edit-profile">Edit Profile</button>
+                        <button type="button" role="menuitem" data-action="open-settings">Settings</button>
+                        <button type="button" role="menuitem" data-action="logout">Log out</button>
+                    </div>
                 </div>
             </div>
         </header>
