@@ -1679,15 +1679,29 @@ function bindNavigation() {
 
     if (form.dataset.loginBound === "true") return;
     form.dataset.loginBound = "true";
+    if (form.dataset.loginBound === "true") return;
+    form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       const message = getElement("login-message");
       const submit = getElement("login-submit");
-      const formData = new FormData(form);
-      if (message) {
-        message.textContent = "";
-        message.className = "form-message";
+      const emailInput = getElement("login-email");
+      const passwordInput = getElement("login-password");
+      const email = String(emailInput?.value || "").trim().toLowerCase();
+      const password = String(passwordInput?.value || "");
+      const setLoginMessage = function (text, kind) {
+        if (!message) return;
+        message.textContent = text;
+        message.className = "form-message " + (kind || "");
+        message.hidden = false;
+      };
+
+      if (!email || !password) {
+        setLoginMessage("Enter your email address and password.", "error");
+        return;
       }
+
+      setLoginMessage("Connecting securely to MECHNAR…", "info");
       if (submit) {
         submit.disabled = true;
         submit.textContent = "Signing in…";
@@ -1695,28 +1709,21 @@ function bindNavigation() {
       setLoading(true);
 
       try {
-        const user = await auth.login({
-          email: formData.get("email"),
-          password: formData.get("password")
-        });
-
+        if (!window.CleanTrackAuth || typeof window.CleanTrackAuth.login !== "function") {
+          throw new Error("The sign-in service did not load. Refresh the page and try again.");
+        }
+        const user = await window.CleanTrackAuth.login({ email, password });
+        if (!user) throw new Error("The server did not return an account. Please try again.");
         state.started = true;
         showAuthenticatedLayout(user);
-        if (message) {
-          message.textContent = "You are now signed in.";
-          message.className = "form-message success";
-        }
+        setLoginMessage("Signed in successfully.", "success");
         maybeShowFirstSetup(user);
       } catch (error) {
-        const text = error && error.message
+        console.error("MECHNAR sign-in request failed:", error);
+        const detail = error && error.message
           ? error.message
-          : "Unable to sign in. Please try again.";
-        if (message) {
-          message.textContent = text;
-          message.className = "form-message error";
-        } else {
-          console.error("MECHNAR sign-in failed:", error);
-        }
+          : "Sign-in failed unexpectedly. Please try again.";
+        setLoginMessage(detail, "error");
       } finally {
         setLoading(false);
         if (submit) {
@@ -1725,8 +1732,6 @@ function bindNavigation() {
         }
       }
     });
-  }
-
 
 
   async function start() {
