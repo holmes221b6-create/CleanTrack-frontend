@@ -686,3 +686,7 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 .ct-profile-qualification-item small{font-size:.72rem;opacity:.65;overflow-wrap:anywhere}
 .ct-profile-qualification-item button{flex:0 0 auto;padding:6px 9px;border:1px solid rgba(220,100,120,.25);border-radius:8px;background:transparent;color:inherit;font-size:.72rem;cursor:pointer}
 @media(max-width:560px){.ct-profile-qualification-form{grid-template-columns:1fr}.ct-profile-qualification-form input[type=file],.ct-profile-qualification-form button{grid-column:auto}.ct-profile-extra-section{padding:13px}}
+
+.ct-profile-qualification-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.ct-profile-qualification-download{padding:6px 9px;border:1px solid rgba(145,112,235,.3);border-radius:8px;color:inherit;text-decoration:none;font-size:.72rem}
+.ct-profile-qualification-download:hover{background:rgba(128,96,220,.13)}
