@@ -56,11 +56,15 @@
     // remain in "Signing in…" indefinitely. Render cold starts get extra time,
     // while all other requests retain the configured normal timeout.
     const slowAuthPaths = new Set(["auth/me", "auth/login", "auth/refresh", "auth/csrf"]);
+    const authTimeouts = {
+      "auth/login": 60000,
+      "auth/me": 60000,
+      "auth/refresh": 30000,
+      "auth/csrf": 15000
+    };
     const timeoutMs = Number(options.timeoutMs) > 0
       ? Number(options.timeoutMs)
-      : (slowAuthPaths.has(requestPath)
-          ? Math.min(Math.max(config.requestTimeoutMs, 8000), 10000)
-          : config.requestTimeoutMs);
+      : (authTimeouts[requestPath] || config.requestTimeoutMs);
 
     let timedOut = false;
     const timeoutId = window.setTimeout(() => {
@@ -261,4 +265,27 @@
     download,
     ApiError
   });
+
+  // Wake the Render API as soon as the frontend loads, not when the user
+  // presses Sign in. This lets the backend finish any cold start while the
+  // login screen is already visible and the user is entering credentials.
+  let backendWarmupStarted = false;
+  function warmupBackend() {
+    if (backendWarmupStarted) return;
+    backendWarmupStarted = true;
+    fetch(config.apiBaseUrl + normalizePath("health"), {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      mode: "cors"
+    }).catch(error => {
+      console.info("MECHNAR API warm-up is still pending:", error.message);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", warmupBackend, { once: true });
+  } else {
+    warmupBackend();
+  }
 })();
