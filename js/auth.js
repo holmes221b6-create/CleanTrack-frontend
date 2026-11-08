@@ -16,8 +16,6 @@
   }
 
   let currentUser = null;
-  // Prevent a slow startup session check from overwriting a newer login/logout.
-  let authStateVersion = 0;
   let authToken = "";
   let refreshToken = "";
 
@@ -120,8 +118,6 @@ function normalizeUser(user) {
 }
 
   async function login(credentials) {
-    const loginVersion = ++authStateVersion;
-    currentUser = null;
     validateCredentials(credentials);
 
     const response = await api.post("auth/login", {
@@ -246,8 +242,6 @@ function normalizeUser(user) {
   }
 
   async function logout() {
-    ++authStateVersion;
-    currentUser = null;
     try {
       await api.post("auth/logout", {});
     } finally {
@@ -280,7 +274,6 @@ function normalizeUser(user) {
   });
 
   async function restoreSession() {
-    const restoreVersion = authStateVersion;
     try {
       const token = getAuthToken();
       let lastActive = 0;
@@ -294,8 +287,6 @@ function normalizeUser(user) {
         return null;
       }
       const response = await api.get("auth/me");
-      // A login or logout started while /auth/me was pending. Its result is stale.
-      if (restoreVersion !== authStateVersion) return currentUser;
       const user = response.user || response.data?.user || null;
 
       currentUser = normalizeUser(user);
@@ -308,8 +299,6 @@ function normalizeUser(user) {
       emitAuthEvent("cleantrack:session-restored", currentUser);
       return currentUser;
     } catch (error) {
-      // Do not let an older startup request erase a newer successful login.
-      if (restoreVersion !== authStateVersion) return currentUser;
       currentUser = null;
       if (error.status === 401 || error.status === 403) persistToken("");
 
