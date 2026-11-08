@@ -1679,8 +1679,6 @@ function bindNavigation() {
 
     if (form.dataset.loginBound === "true") return;
     form.dataset.loginBound = "true";
-    if (form.dataset.loginBound === "true") return;
-    form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       const message = getElement("login-message");
