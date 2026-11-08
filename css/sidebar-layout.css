@@ -696,3 +696,24 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 .ct-profile-skill-recommendations button{position:relative;z-index:3;pointer-events:auto;display:inline-flex;align-items:center;min-height:32px;padding:6px 10px;border:1px solid rgba(145,112,235,.3);border-radius:999px;background:rgba(128,96,220,.1);color:inherit;font:inherit;font-size:.75rem;cursor:pointer;touch-action:manipulation}
 .ct-profile-skill-recommendations button:hover,.ct-profile-skill-recommendations button:focus-visible{background:rgba(128,96,220,.24);border-color:rgba(145,112,235,.7);outline:none}
 .ct-profile-skill-entry .ct-profile-add-button{position:relative;z-index:2;pointer-events:auto;cursor:pointer}
+
+
+/* Force the skills controls to render and behave as interactive controls in the modal. */
+.ct-profile-edit-overlay .ct-profile-extras,
+.ct-profile-edit-overlay .ct-profile-extra-section,
+.ct-profile-edit-overlay .ct-profile-skill-entry,
+.ct-profile-edit-overlay .ct-profile-skill-recommendations,
+.ct-profile-edit-overlay .ct-profile-skill-tags{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+.ct-profile-edit-overlay .ct-profile-extras{display:grid!important;flex-direction:column;position:relative;z-index:4}
+.ct-profile-edit-overlay .ct-profile-extra-section{display:block!important;position:relative;z-index:4}
+.ct-profile-edit-overlay .ct-profile-skill-entry{display:flex!important;align-items:stretch;gap:9px}
+.ct-profile-edit-overlay .ct-profile-skill-entry input{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative;z-index:6;flex:1 1 auto;min-width:0;cursor:text}
+.ct-profile-edit-overlay .ct-profile-skill-recommendations{display:flex!important;flex-wrap:wrap;align-items:center;gap:8px;min-height:34px;margin-top:12px;position:relative;z-index:7}
+.ct-profile-edit-overlay .ct-profile-recommendation-label{display:block!important;flex:0 0 100%;visibility:visible!important;opacity:.72!important}
+.ct-profile-edit-overlay .ct-profile-skill-recommendations button{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative;z-index:8;min-height:34px;padding:7px 12px;border:1px solid rgba(145,112,235,.48)!important;border-radius:999px;background:rgba(128,96,220,.18)!important;color:var(--text-color,#f5f3fb)!important;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer!important;transition:background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
+.ct-profile-edit-overlay .ct-profile-skill-recommendations button:hover{background:rgba(128,96,220,.38)!important;border-color:rgba(170,145,255,.9)!important;transform:translateY(-1px);box-shadow:0 4px 14px rgba(80,55,150,.2)}
+.ct-profile-edit-overlay .ct-profile-skill-recommendations button:active{transform:translateY(0) scale(.97)}
+.ct-profile-edit-overlay .ct-profile-skill-recommendations button:focus-visible{outline:2px solid rgba(170,145,255,.9);outline-offset:2px}
+.ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative;z-index:9;align-items:center;justify-content:center;min-width:64px;padding:9px 16px;border:1px solid rgba(170,145,255,.75)!important;border-radius:10px;background:rgba(128,96,220,.3)!important;color:var(--text-color,#f5f3fb)!important;font:inherit;font-weight:750;cursor:pointer!important;transition:background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
+.ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button:hover{background:rgba(128,96,220,.5)!important;border-color:rgba(190,170,255,1)!important;transform:translateY(-1px);box-shadow:0 5px 16px rgba(80,55,150,.25)}
+.ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button:active{transform:translateY(0) scale(.97)}
