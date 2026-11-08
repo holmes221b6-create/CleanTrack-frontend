@@ -1099,6 +1099,21 @@ if (identity) {
         addSkillButton.className = "ct-profile-add-button";
         addSkillButton.textContent = "Add";
         skillEntry.append(skillInput, addSkillButton);
+        const skillRecommendations = document.createElement("div");
+        skillRecommendations.className = "ct-profile-skill-recommendations";
+        appendText(skillRecommendations, "span", "Suggested", "ct-profile-recommendation-label");
+        ["Communication","Leadership","Problem solving","Project management","Teamwork","Data analysis","Microsoft Excel","SQL","Python","Operations management","Quality assurance","Time management"].forEach(suggestion => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.textContent = suggestion;
+          chip.addEventListener("click", () => {
+            if (skills.some(item => item.toLocaleLowerCase() === suggestion.toLocaleLowerCase())) return;
+            if (skills.length >= 40) { status.textContent = "You can add up to 40 skills."; return; }
+            skills.push(suggestion);
+            renderSkills();
+          });
+          skillRecommendations.appendChild(chip);
+        });
         const skillTags = document.createElement("div");
         skillTags.className = "ct-profile-skill-tags";
         const skills = Array.isArray(user && user.skills) ? user.skills.slice(0,40) : [];
@@ -1135,7 +1150,7 @@ if (identity) {
         };
         addSkillButton.addEventListener("click", addSkill);
         skillInput.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addSkill(); } });
-        skillsSection.append(skillEntry, skillTags);
+        skillsSection.append(skillEntry, skillRecommendations, skillTags);
 
         const qualificationSection = document.createElement("div");
         qualificationSection.className = "ct-profile-extra-section";
