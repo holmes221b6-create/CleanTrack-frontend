@@ -218,6 +218,15 @@
     return request(path, { ...options, method: "DELETE" });
   }
 
+  async function download(path) {
+    const headers = new Headers();
+    const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : window.sessionStorage.getItem("cleantrack_token");
+    if (token) headers.set("Authorization", "Bearer " + token);
+    const response = await fetch(config.apiBaseUrl + normalizePath(path), { method: "GET", headers, credentials: "include" });
+    if (!response.ok) { let message = "The attachment could not be downloaded."; try { const data = await response.json(); message = data.message || data.error || message; } catch (_) {} throw new ApiError(message, response.status, null); }
+    return URL.createObjectURL(await response.blob());
+  }
+
   window.CleanTrackApi = Object.freeze({
     request,
     get,
@@ -225,6 +234,7 @@
     put,
     patch,
     delete: del,
+    download,
     ApiError
   });
 })();
