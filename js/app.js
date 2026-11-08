@@ -1728,10 +1728,21 @@ function bindNavigation() {
       setLoading(false);
       const splash = document.getElementById("cleantrack-launch-splash");
       if (splash) {
-        window.setTimeout(function () {
+        const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
+        const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : 720;
+        const waitFor = Math.max(0, minimumVisible - elapsed);
+        window.setTimeout(async function () {
+          const mark = splash.querySelector(".ct-splash-logo");
+          if (mark && !mark.complete) {
+            await new Promise(resolve => {
+              mark.addEventListener("load", resolve, { once: true });
+              mark.addEventListener("error", resolve, { once: true });
+            });
+          }
+          if (mark && mark.decode) { try { await mark.decode(); } catch (_) {} }
           splash.classList.add("is-hidden");
-          window.setTimeout(function () { splash.remove(); }, 260);
-        }, 450);
+          window.setTimeout(function () { splash.remove(); }, 420);
+        }, waitFor);
       }
     }
   }
