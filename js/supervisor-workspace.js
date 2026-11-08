@@ -185,7 +185,7 @@
       '<label>Location<select data-filter="location"><option value="">All locations</option></select></label>'+
       '<label>Zone<select data-filter="zone"><option value="">All zones</option></select></label></div>'+
       '<div class="mw-calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>'+
-      '<div class="mw-calendar-dates" data-mw-dates></div><section class="mw-calendar-selected"><h3 data-mw-selected-title></h3><div data-mw-selected-events></div></section>';
+      '<div class="mw-calendar-dates" data-mw-dates></div><section class="mw-calendar-selected" data-mw-selected><h3 data-mw-selected-title></h3><div data-mw-selected-events></div></section>';
     root.appendChild(panel);
     const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
     const dayEvents=d=>filtered().filter(o=>{const dt=dateValue(o.due_at);return dt&&key(dt)===key(d);}).sort((a,b)=>dateValue(a.due_at)-dateValue(b.due_at));
