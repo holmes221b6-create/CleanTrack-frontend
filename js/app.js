@@ -1729,39 +1729,29 @@ function bindNavigation() {
     bindLogoutButton();
     bindNavigation();
 
-    setLoading(true);
+    // Render the sign-in interface immediately. Session restoration can take
+    // longer when the hosted API is waking up; it must never hold the launch
+    // splash over the entire application or prevent a fresh login.
+    showUnauthenticatedLayout();
+    const splash = document.getElementById("cleantrack-launch-splash");
+    if (splash) {
+      const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
+      const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1180 : 1720;
+      const waitFor = Math.max(0, minimumVisible - elapsed);
+      window.setTimeout(function () {
+        splash.classList.add("is-hidden");
+        window.setTimeout(function () { splash.remove(); }, 420);
+      }, waitFor);
+    }
 
+    setLoading(false);
     try {
       const user = await auth.restoreSession();
-
-      if (user) {
-        showAuthenticatedLayout(user);
-      } else {
-        showUnauthenticatedLayout();
-      }
+      if (user) showAuthenticatedLayout(user);
+      else showUnauthenticatedLayout();
     } catch (error) {
       state.error = error.message;
       showUnauthenticatedLayout();
-    } finally {
-      setLoading(false);
-      const splash = document.getElementById("cleantrack-launch-splash");
-      if (splash) {
-        const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
-        const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1180 : 1720;
-        const waitFor = Math.max(0, minimumVisible - elapsed);
-        window.setTimeout(async function () {
-          const mark = splash.querySelector(".ct-splash-logo");
-          if (mark && !mark.complete) {
-            await new Promise(resolve => {
-              mark.addEventListener("load", resolve, { once: true });
-              mark.addEventListener("error", resolve, { once: true });
-            });
-          }
-          if (mark && mark.decode) { try { await mark.decode(); } catch (_) {} }
-          splash.classList.add("is-hidden");
-          window.setTimeout(function () { splash.remove(); }, 420);
-        }, waitFor);
-      }
     }
   }
 
