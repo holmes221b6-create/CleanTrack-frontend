@@ -115,7 +115,7 @@
   }
 
   function canGoBack() {
-    return viewHistory.length > 0 || pageHistory.length > 0;
+    return viewHistory.length > 0;
   }
 
   function pushViewBack(callback) {
@@ -157,21 +157,13 @@
   }
 
   function goBack() {
-    if (viewHistory.length) {
-      const restore = viewHistory.pop();
-      try { restore(); } finally { updateBackButton(); }
-      return true;
+    if (!viewHistory.length) {
+      updateBackButton();
+      return false;
     }
-    while (pageHistory.length) {
-      const previousPage = pageHistory.pop();
-      if (previousPage && previousPage !== activePage) {
-        const result = setActivePage(previousPage, { fromHistory: true });
-        updateBackButton();
-        return result;
-      }
-    }
-    updateBackButton();
-    return false;
+    const restore = viewHistory.pop();
+    try { restore(); } finally { updateBackButton(); }
+    return true;
   }
 
   function getDefaultPage(role) {
