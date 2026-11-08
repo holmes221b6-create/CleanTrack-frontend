@@ -1156,8 +1156,14 @@ if (identity) {
           renderSkills();
           skillInput.focus();
         };
-        addSkillButton.addEventListener("click", addSkill);
-        skillInput.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addSkill(); } });
+        addSkillButton.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          addSkill();
+        });
+        skillInput.addEventListener("keydown", event => {
+          if (event.key === "Enter") { event.preventDefault(); event.stopPropagation(); addSkill(); }
+        });
         skillsSection.append(skillEntry, skillRecommendations, skillTags);
 
         const qualificationSection = document.createElement("div");
