@@ -19,7 +19,7 @@ async function render(container,page){
  const body=el("div","sr-body");root.append(header,notice,body);
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
  const getTitle=x=>x.title||x.shift_label||"Shift handover";
- const back=()=>{view="home";filter="";draw();};
+ const back=()=>{if(window.CleanTrackNavigation?.canGoBack()){window.CleanTrackNavigation.goBack();return;}view="home";filter="";draw();};
  const card=(key,title,desc,count)=>{const b=el("button","sr-directory-card");b.type="button";b.dataset.view=key;b.append(el("span","sr-card-icon",({report:"＋",schedule:"＋",create:"＋",directory:"▤",history:"◷",critical:"!",failed:"!",pending:"◷",outstanding:"↗",analytics:"▥",reports:"▥"}[key]||"›")),el("span","sr-card-copy"));const copy=b.lastChild;copy.append(el("strong","",title),el("small","",desc));if(count!==undefined)b.append(el("span","sr-card-count",String(count)));return b;};
  const panel=(title,subtitle)=>{const p=el("section","sr-panel");const h=el("div","sr-panel-heading");h.append(el("div","",title),el("p","",subtitle||""));p.append(h);return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
