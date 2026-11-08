@@ -1105,8 +1105,19 @@ if (identity) {
         skillTags.className = "ct-profile-skill-tags";
         const skillRecommendations = document.createElement("div");
         skillRecommendations.className = "ct-profile-skill-recommendations";
-        appendText(skillRecommendations, "span", "Suggested", "ct-profile-recommendation-label");
-        ["Communication","Leadership","Problem solving","Project management","Teamwork","Data analysis","Microsoft Excel","SQL","Python","Operations management","Quality assurance","Time management"].forEach(suggestion => {
+        appendText(skillRecommendations, "span", "Suggested facility & management skills", "ct-profile-recommendation-label");
+        [
+          "Facility management","Facilities operations","Work order management","Preventive maintenance",
+          "Corrective maintenance","Asset management","Building maintenance","Vendor management",
+          "Contractor coordination","Service level (SLA) management","Workforce scheduling","Team supervision",
+          "Operations planning","Task allocation","Workflow management","Site inspections","Quality assurance",
+          "Health & safety (HSE)","Regulatory compliance","Risk management","Incident management",
+          "Inventory management","Procurement coordination","Housekeeping operations","Cleaning operations",
+          "Security operations","Space management","Customer service","Service quality management",
+          "Budget & cost control","Performance monitoring","Operational reporting","Process improvement",
+          "Project management","Leadership","Communication","Problem solving","Teamwork","Time management",
+          "Data analysis","Microsoft Excel","Power BI","SQL","Python"
+        ].forEach(suggestion => {
           const chip = document.createElement("button");
           chip.type = "button";
           chip.textContent = suggestion;
