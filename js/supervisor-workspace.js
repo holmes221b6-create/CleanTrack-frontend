@@ -68,12 +68,24 @@
     const isToday = op => { const d=due(op); return d && d>=todayStart && d<tomorrow; };
     const reviewItems = operations.filter(o => ["submitted","pending_review","awaiting_review"].includes(norm(o.status)));
     const attention = operations.filter(o => isOverdue(o) || ["blocked","rejected"].includes(norm(o.status)));
-    const priorities = operations.filter(o => !closed.has(norm(o.status)) && (isToday(o) || isOverdue(o)))
-      .sort((a,b) => {
-        const rank = {urgent:0,high:1,normal:2,low:3};
-        const p = (rank[norm(a.priority)] ?? 4) - (rank[norm(b.priority)] ?? 4);
-        return p || ((due(a)?.getTime() || Infinity) - (due(b)?.getTime() || Infinity));
-      });
+    const isBlocked = op => ["blocked","rejected"].includes(norm(op.status));
+    const priorityRank = op => {
+      if (isOverdue(op)) return 0;
+      if (isBlocked(op)) return 1;
+      const rank = {urgent:2,high:3,normal:4,low:5};
+      return rank[norm(op.priority)] ?? 6;
+    };
+    // Include urgent/high work due within seven days, not only work due today.
+    const priorities = operations.filter(o => {
+      const d = due(o);
+      return !closed.has(norm(o.status)) && (
+        isOverdue(o) || isBlocked(o) ||
+        (d && d >= todayStart && d < weekEnd && ["urgent","high"].includes(norm(o.priority)))
+      );
+    }).sort((a,b) => {
+      const rankDiff = priorityRank(a) - priorityRank(b);
+      return rankDiff || ((due(a)?.getTime() || Infinity) - (due(b)?.getTime() || Infinity));
+    });
     const upcoming = operations.filter(o => {
       const d=due(o); return d && d>=tomorrow && d<weekEnd && !closed.has(norm(o.status));
     }).sort((a,b)=>due(a)-due(b));
@@ -86,7 +98,7 @@
     const shortRow = (o, badge) => {
       const d=due(o);
       return '<article class="mw-focus-row"><div class="mw-focus-main"><strong>'+esc(o.title||"Untitled operation")+'</strong><small>'+
-        esc(o.assigned_to_name ? "Assigned to "+o.assigned_to_name : "Awaiting staff assignment")+' · '+
+        esc(o.assigned_to_name ? "Assigned to "+o.assigned_to_name : o.assigned_supervisor_name ? "With Supervisor "+o.assigned_supervisor_name : "Awaiting assignment")+' · '+
         esc(o.location_name||"Location not assigned")+' · '+esc(d?dateLabel(d,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):"No deadline")+
         '</small></div><span class="mw-focus-badge '+esc(badge.toLowerCase().replace(/\s+/g,"-"))+'">'+esc(badge)+'</span></article>';
     };
@@ -120,6 +132,7 @@
           '<article class="mw-stat"><span>Total operations</span><strong>'+metrics.total_operations+'</strong></article>'+
           '<article class="mw-stat"><span>In progress</span><strong>'+metrics.in_progress+'</strong></article>'+
           '<article class="mw-stat"><span>Awaiting review</span><strong>'+metrics.submitted+'</strong></article>'+
+          '<article class="mw-stat"><span>Due in 24 hours</span><strong>'+Number(metrics.due_soon||0)+'</strong></article>'+
           '<article class="mw-stat mw-stat-alert"><span>Overdue</span><strong>'+metrics.overdue+'</strong></article></section>'+
         '<div class="mw-main-grid mw-primary-grid">'+
           card("Team Pulse",'<div class="mw-pulse-summary"><strong>'+members.length+'</strong><span>active staff in your assigned team</span></div>'+
@@ -132,7 +145,7 @@
         '</div>'+
         '<div class="mw-main-grid mw-focus-grid">'+
           card("Today's Priorities",priorities.length?'<div class="mw-focus-list">'+priorities.slice(0,5).map(o=>shortRow(o,isOverdue(o)?"Overdue":priorityLabel(o.priority))).join("")+'</div>'+
-            '<button class="mw-link-button" data-mw-page="operations">Open Operations →</button>':empty("No priority operations are due today or overdue."),"mw-priorities")+
+            '<button class="mw-link-button" data-mw-page="operations">Open Operations →</button>':empty("No overdue, blocked or high-priority operations are due within the next seven days."),"mw-priorities")+
           card("Upcoming Operations",upcoming.length?'<div class="mw-focus-list">'+upcoming.slice(0,5).map(o=>shortRow(o,priorityLabel(o.priority))).join("")+'</div>'+
             '<button class="mw-link-button" data-mw-page="operations">View all scheduled work →</button>':empty("No operations are scheduled for the next seven days."),"mw-upcoming")+
         '</div>'+
@@ -145,7 +158,7 @@
         '<div class="mw-main-grid mw-secondary-grid">'+
           card("Recent Activity",activity.length?'<div class="mw-activity-list">'+activity.slice(0,6).map(a=>
             '<div class="mw-activity"><span class="mw-activity-dot"></span><div><strong>'+esc(a.actor_name)+'</strong> <span>'+esc(activityVerb(a.action))+'</span><b>'+esc(a.operation_title)+'</b><small>'+
-            esc(a.actor_role||"Member")+' · '+esc(dateLabel(a.created_at,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))+'</small></div></div>').join("")+'</div>':
+            esc(a.actor_role||"Member")+' · '+esc(dateLabel(a.created_at,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))+'</small>'+(a.message?'<p class="mw-activity-message">'+esc(a.message)+'</p>':'')+'</div></div>').join("")+'</div>':
             empty("No operation activity has been recorded."),"mw-activity-card")+
           card("Announcements & Alerts",announcementContent+(announcements.length?'<button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>':""),"mw-announcements")+
         '</div>'+
