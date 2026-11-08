@@ -1144,15 +1144,20 @@ if (identity) {
         };
         const addSkill = () => {
           const value = skillInput.value.trim();
-          if (!value) return;
+          if (!value) {
+            status.textContent = "Type a skill first, then select Add.";
+            skillInput.focus();
+            return;
+          }
           if (skills.some(item => item.toLocaleLowerCase() === value.toLocaleLowerCase())) {
             status.textContent = "That skill is already on your list.";
+            skillInput.select();
             return;
           }
           if (skills.length >= 40) { status.textContent = "You can add up to 40 skills."; return; }
           skills.push(value);
           skillInput.value = "";
-          status.textContent = "";
+          status.textContent = value + " added. Select Save Changes to keep it.";
           renderSkills();
           skillInput.focus();
         };
