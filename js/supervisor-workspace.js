@@ -56,41 +56,53 @@
     const operations = Array.isArray(data.operations) ? data.operations : [];
     const members = Array.isArray(data.members) ? data.members : [];
     const activity = Array.isArray(data.activity) ? data.activity : [];
-    const announcements = Array.isArray(data.announcements) ? data.announcements : [];
-    const announcementCard = card("Announcements & Alerts", data.announcementsUnavailable ? empty("Announcements could not be loaded. Use Team Channel to retry.") : announcements.length ? '<div class="mw-announcement-list">' + announcements.filter(a => a.status === "published").slice(0,5).map(function(a) { return '<article class="mw-announcement"><div class="mw-announcement-top"><span class="mw-announcement-severity ' + esc(a.severity || "info") + '">' + esc(a.severity || "info") + '</span><small>' + esc(a.audience_scope === "organization" ? "Organization" : a.audience_scope === "supervisors" ? "Supervisors" : "Team") + '</small></div><strong>' + esc(a.title) + '</strong><p>' + esc(a.message) + '</p><small>' + esc(dateLabel(a.created_at, {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})) + " · " + esc(a.my_receipt?.state || "unread") + '</small></article>'; }).join("") + '</div><button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>' : empty("No published announcements or alerts."), "mw-announcements");
-    const reviewItems = operations.filter(o => ["submitted", "pending_review", "awaiting_review"].includes(String(o.status || "").toLowerCase().replace(/\s+/g, "_")));
+    const announcements = (Array.isArray(data.announcements) ? data.announcements : []).filter(a => a.status === "published");
+    const reviewItems = operations.filter(o => ["submitted", "pending_review", "awaiting_review"].includes(String(o.status || "").toLowerCase().replace(/\\s+/g, "_")));
     const attention = operations.filter(o => o.overdue || ["blocked", "rejected"].includes(String(o.status || "").toLowerCase()));
     const completion = metrics.completion_rate == null ? "—" : metrics.completion_rate + "%";
+    const announcementContent = data.announcementsUnavailable
+      ? empty("Announcements could not be loaded.")
+      : announcements.length
+        ? announcements.slice(0, 4).map(a => `
+          <article class="mw-announcement">
+            <div class="mw-announcement-top"><span class="mw-announcement-severity ${esc(a.severity || "info")}">${esc(a.severity || "info")}</span><small>${esc(a.audience_scope === "organization" ? "Organization" : a.audience_scope === "supervisors" ? "Supervisors" : "Team")}</small></div>
+            <strong>${esc(a.title)}</strong><p>${esc(a.message)}</p>
+            <small>${esc(dateLabel(a.created_at, {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))}</small>
+          </article>`).join("")
+        : empty("No published announcements.");
 
     root.innerHTML = `
       <div class="mw-shell">
         <header class="mw-welcome">
-          <div><div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>
-          <h1>${esc(greeting)}, ${esc(name)}.</h1>
-          <p>${esc(data.team.name)} · Your operational overview, team activity and assigned schedule.</p></div>
-          <div class="mw-updated">Live records<br><span>As of ${esc(dateLabel(metrics.data_as_of, {hour:"2-digit",minute:"2-digit"}))}</span></div>
+          <div class="mw-welcome-copy">
+            <div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>
+            <h1>${esc(greeting)}, ${esc(name)}.</h1>
+            <p>${esc(data.team.name)} <span class="mw-header-separator">/</span> Team operations overview</p>
+          </div>
+          <div class="mw-header-actions">
+            <button type="button" class="mw-calendar-launch" data-mw-calendar-trigger aria-haspopup="dialog" aria-expanded="false">▦ <span>Operations calendar</span></button>
+            <div class="mw-updated">Live records <span>Updated ${esc(dateLabel(metrics.data_as_of, {hour:"2-digit",minute:"2-digit"}))}</span></div>
+          </div>
         </header>
 
-        <section class="mw-stat-grid">
-          <article class="mw-stat"><span>Operations</span><strong>${metrics.total_operations}</strong><small>Visible to your team</small></article>
-          <article class="mw-stat"><span>In progress</span><strong>${metrics.in_progress}</strong><small>Currently underway</small></article>
-          <article class="mw-stat"><span>Awaiting review</span><strong>${metrics.submitted}</strong><small>Submitted by staff</small></article>
-          <article class="mw-stat mw-stat-alert"><span>Overdue</span><strong>${metrics.overdue}</strong><small>Calculated from deadlines</small></article>
-          <article class="mw-stat"><span>Completion rate</span><strong>${completion}</strong><small>Completed / visible operations</small></article>
+        <section class="mw-stat-grid" aria-label="Team operations summary">
+          <article class="mw-stat"><span>Total operations</span><strong>${metrics.total_operations}</strong></article>
+          <article class="mw-stat"><span>In progress</span><strong>${metrics.in_progress}</strong></article>
+          <article class="mw-stat"><span>Awaiting review</span><strong>${metrics.submitted}</strong></article>
+          <article class="mw-stat mw-stat-alert"><span>Overdue</span><strong>${metrics.overdue}</strong></article>
         </section>
 
-        <div class="mw-main-grid">
+        <div class="mw-main-grid mw-primary-grid">
           ${card("Team Pulse", `
-            <div class="mw-pulse-summary"><strong>${members.length}</strong><span>active staff members in your assigned team</span></div>
+            <div class="mw-pulse-summary"><strong>${members.length}</strong><span>active staff in your assigned team</span></div>
             <div class="mw-member-list">${members.length ? members.map(m => `
               <div class="mw-member"><div class="mw-avatar">${esc((m.name || "?").trim().charAt(0).toUpperCase())}</div>
                 <div class="mw-member-name"><strong>${esc(m.name)}</strong><small>${m.workload} open operation${m.workload === 1 ? "" : "s"}</small></div>
-                <span class="mw-status muted">${m.availability === "not_recorded" ? "Availability not recorded" : esc(m.availability)}</span>
-              </div>`).join("") : empty("No active staff members are currently assigned to this team.")}</div>
-            <p class="mw-footnote">Availability is not yet captured by the system. MECHNAR will not infer online, on-shift or absent status.</p>
+                <span class="mw-status muted">${m.availability === "not_recorded" ? "Not recorded" : esc(m.availability)}</span>
+              </div>`).join("") : empty("No active staff members are assigned to this team.")}</div>
+            <p class="mw-footnote">Staff availability is not yet recorded by MECHNAR.</p>
           `, "mw-pulse")}
-
-          ${card("Workload snapshot", `
+          ${card("Workload", `
             <div class="mw-workload-rows">
               <div><span>Pending</span><strong>${metrics.pending}</strong></div>
               <div><span>In progress</span><strong>${metrics.in_progress}</strong></div>
@@ -98,45 +110,32 @@
               <div><span>Completed</span><strong>${metrics.completed}</strong></div>
               <div><span>Overdue</span><strong class="mw-danger-text">${metrics.overdue}</strong></div>
             </div>
+            <div class="mw-completion-summary"><div><span>Completion rate</span><strong>${completion}</strong></div>
+              <div class="mw-progress-track"><span style="width:${metrics.completion_rate == null ? 0 : Math.max(0, Math.min(100, metrics.completion_rate))}%"></span></div>
+            </div>
           `, "mw-workload")}
         </div>
 
-        ${card("Operations Calendar", `
-          <div class="mw-calendar-toolbar">
-            <div class="mw-calendar-nav"><button type="button" data-mw-prev aria-label="Previous period">‹</button><button type="button" data-mw-today>Today</button><button type="button" data-mw-next aria-label="Next period">›</button><strong data-mw-period></strong></div>
-            <div class="mw-calendar-controls">
-              <select data-mw-status aria-label="Filter by status"><option value="">All statuses</option><option>Pending</option><option>In Progress</option><option>Submitted</option><option>Completed</option></select>
-              <select data-mw-priority aria-label="Filter by priority"><option value="">All priorities</option><option>Urgent</option><option>High</option><option>Normal</option><option>Low</option></select>
-              <div class="mw-view-switch"><button type="button" data-mw-view="day">Day</button><button type="button" data-mw-view="week" class="active">Week</button><button type="button" data-mw-view="month">Month</button><button type="button" data-mw-view="agenda">Agenda</button></div>
-            </div>
-          </div>
-          <div class="mw-calendar-body" data-mw-calendar></div>
-          <div class="mw-calendar-legend"><span><i class="pending"></i> Pending</span><span><i class="progress"></i> In progress</span><span><i class="submitted"></i> Submitted</span><span><i class="done"></i> Completed</span><span><i class="overdue"></i> Overdue</span></div>
-          <p class="mw-footnote">Schedule entries are taken from Admin-assigned and team operations. Original assignment and due-date history remain attached to each operation.</p>
-        `, "mw-calendar-card")}
-
         <div class="mw-main-grid">
-          ${card("Review Queue", reviewItems.length ? '<div class="mw-record-list">' + reviewItems.slice(0,5).map(o => recordRow(o, "Submitted for review")) .join("") + '</div><button class="mw-link-button" data-mw-page="reviews">Open Review Queue →</button>' : empty("No submissions are awaiting review."), "mw-review")}
-          ${card("Attention Required", attention.length ? '<div class="mw-record-list">' + attention.slice(0,5).map(o => recordRow(o, o.overdue ? "Overdue" : o.status)).join("") + '</div>' : empty("No overdue or blocked operations in the current records."), "mw-attention")}
+          ${card("Review Queue", reviewItems.length ? '<div class="mw-record-list">' + reviewItems.slice(0,4).map(o => recordRow(o, "Awaiting review")).join("") + '</div><button class="mw-link-button" data-mw-page="reviews">Open Review Queue →</button>' : empty("No submissions are awaiting review."), "mw-review")}
+          ${card("Attention Required", attention.length ? '<div class="mw-record-list">' + attention.slice(0,4).map(o => recordRow(o, o.overdue ? "Overdue" : o.status)).join("") + '</div><button class="mw-link-button" data-mw-page="operations">View Operations →</button>' : empty("No overdue or blocked operations."), "mw-attention")}
         </div>
 
-        <div class="mw-main-grid">
-          ${card("Recent Activity", activity.length ? '<div class="mw-activity-list">' + activity.map(a => `
-            <div class="mw-activity"><span class="mw-activity-dot"></span><div><strong>${esc(a.actor_name)}</strong> <span>${esc(activityVerb(a.action))}</span><b>${esc(a.operation_title)}</b><small>${esc(a.actor_role || "Member")} · ${esc(dateLabel(a.created_at, {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))}</small></div></div>`).join("") + '</div>' : empty("No operation activity has been recorded yet."), "mw-activity-card")}
-          ${card("Team Snapshot", `
-            <div class="mw-performance-value">${completion}</div><p>Recorded completion rate</p>
-            <div class="mw-progress-track"><span style="width:${metrics.completion_rate == null ? 0 : Math.max(0, Math.min(100, metrics.completion_rate))}%"></span></div>
-            <div class="mw-performance-meta"><span>${metrics.completed} completed</span><span>${metrics.total_operations} total</span></div>
-            <p class="mw-footnote">This is a descriptive team metric, not a comparative ranking. Performance Arena handles organization-wide team comparisons.</p>
-          `, "mw-performance")}
+        <div class="mw-main-grid mw-secondary-grid">
+          ${card("Recent Activity", activity.length ? '<div class="mw-activity-list">' + activity.slice(0,6).map(a => `
+            <div class="mw-activity"><span class="mw-activity-dot"></span><div><strong>${esc(a.actor_name)}</strong> <span>${esc(activityVerb(a.action))}</span><b>${esc(a.operation_title)}</b><small>${esc(a.actor_role || "Member")} · ${esc(dateLabel(a.created_at, {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))}</small></div></div>`).join("") + '</div>' : empty("No operation activity has been recorded."), "mw-activity-card")}
+          ${card("Announcements & Alerts", announcementContent + (announcements.length ? '<button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>' : ""), "mw-announcements")}
         </div>
 
-        ${announcementCard}
-
-        <div class="mw-quick-actions"><button class="button button-primary" data-mw-page="operations">Manage Operations</button><button class="button button-secondary" data-mw-page="reviews">Review Submissions</button><button class="button button-secondary" data-mw-page="personnel">View Personnel</button><button class="button button-secondary" data-mw-page="team-channel">Team Channel</button></div>
+        <nav class="mw-quick-actions" aria-label="Supervisor shortcuts">
+          <button class="button button-primary" data-mw-page="operations">Operations</button>
+          <button class="button button-secondary" data-mw-page="reviews">Review Queue</button>
+          <button class="button button-secondary" data-mw-page="personnel">Personnel</button>
+          <button class="button button-secondary" data-mw-page="team-channel">Team Channel</button>
+        </nav>
       </div>`;
     root.querySelectorAll("[data-mw-page]").forEach(btn => btn.addEventListener("click", () => nav?.setActivePage(btn.dataset.mwPage)));
-    setupCalendar(root.querySelector("[data-mw-calendar]"), operations, root);
+    setupCalendar(root, operations);
   }
 
   function recordRow(o, label) {
@@ -146,67 +145,110 @@
     return String(action || "updated").replace(/[._]/g, " ").replace(/\b\w/g, x => x.toUpperCase());
   }
 
-  function setupCalendar(container, operations, root) {
-    if (!container) return;
-    let anchor = startOfDay(new Date());
-    let view = "week";
-    const status = root.querySelector("[data-mw-status]");
-    const priority = root.querySelector("[data-mw-priority]");
-    const period = root.querySelector("[data-mw-period]");
-    const controls = root.querySelector(".mw-calendar-nav");
-    const buttons = root.querySelectorAll("[data-mw-view]");
+  function setupCalendar(root, operations) {
+    const trigger = root.querySelector("[data-mw-calendar-trigger]");
+    if (!trigger) return;
+    const today = startOfDay(new Date());
+    let cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selected = today;
+    const panel = document.createElement("section");
+    panel.className = "mw-calendar-popover";
+    panel.hidden = true;
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-label", "Operations calendar");
+    panel.innerHTML = `
+      <header class="mw-calendar-popover-head">
+        <strong data-mw-month></strong>
+        <div class="mw-calendar-popover-actions">
+          <button type="button" data-mw-today>Today</button>
+          <button type="button" data-mw-prev aria-label="Previous month">‹</button>
+          <button type="button" data-mw-next aria-label="Next month">›</button>
+          <button type="button" data-mw-close aria-label="Close calendar">×</button>
+        </div>
+      </header>
+      <div class="mw-calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div class="mw-calendar-dates" data-mw-dates></div>
+      <section class="mw-calendar-selected">
+        <h3 data-mw-selected-title></h3>
+        <div data-mw-selected-events></div>
+      </section>`;
+    root.appendChild(panel);
 
-    function visibleItems() {
-      return operations.filter(o => {
-        if (status.value && String(o.status).toLowerCase() !== status.value.toLowerCase()) return false;
-        if (priority.value && String(o.priority).toLowerCase() !== priority.value.toLowerCase()) return false;
-        return true;
-      });
+    const dayKey = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+    const eventsOn = d => operations.filter(o => {
+      const due = dateValue(o.due_at);
+      return due && dayKey(due) === dayKey(d);
+    }).sort((a,b) => dateValue(a.due_at) - dateValue(b.due_at));
+
+    function position() {
+      panel.hidden = false;
+      panel.style.visibility = "hidden";
+      const r = trigger.getBoundingClientRect();
+      const w = Math.min(340, window.innerWidth - 20);
+      panel.style.width = w + "px";
+      const h = panel.offsetHeight || 390;
+      let left = Math.min(window.innerWidth - w - 10, Math.max(10, r.right - w));
+      let top = r.bottom + 9;
+      if (top + h > window.innerHeight - 10) top = Math.max(10, r.top - h - 9);
+      panel.style.left = left + "px";
+      panel.style.top = top + "px";
+      panel.style.visibility = "visible";
     }
+
     function render() {
-      buttons.forEach(b => b.classList.toggle("active", b.dataset.mwView === view));
-      const items = visibleItems();
-      if (view === "agenda") {
-        period.textContent = "Upcoming schedule";
-        container.innerHTML = items.filter(o => dateValue(o.due_at)).slice().sort((a,b) => dateValue(a.due_at).getTime() - dateValue(b.due_at).getTime()).map(o => recordRow(o, o.overdue ? "Overdue" : o.status)).join("") || empty("No scheduled operations match these filters.");
-        return;
+      panel.querySelector("[data-mw-month]").textContent =
+        new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(cursor);
+      const first = new Date(cursor.getFullYear(),cursor.getMonth(),1);
+      const offset = (first.getDay()+6)%7;
+      const gridStart = addDays(first,-offset);
+      const dates = panel.querySelector("[data-mw-dates]");
+      dates.replaceChildren();
+      for (let i=0;i<42;i++) {
+        const d=addDays(gridStart,i), key=dayKey(d), count=eventsOn(d).length;
+        const b=document.createElement("button");
+        b.type="button";
+        b.className="mw-calendar-date" + (d.getMonth()!==cursor.getMonth()?" outside":"") +
+          (key===dayKey(today)?" today":"") + (key===dayKey(selected)?" selected":"");
+        b.textContent=String(d.getDate());
+        b.setAttribute("aria-label",new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(d)+(count?", "+count+" scheduled operations":""));
+        if(count){const dot=document.createElement("i");dot.className="mw-calendar-count";dot.setAttribute("aria-hidden","true");b.appendChild(dot);}
+        b.addEventListener("click",()=>{selected=new Date(d.getFullYear(),d.getMonth(),d.getDate());if(d.getMonth()!==cursor.getMonth())cursor=new Date(d.getFullYear(),d.getMonth(),1);render();});
+        dates.appendChild(b);
       }
-      let from, to;
-      if (view === "day") { from = anchor; to = addDays(anchor, 1); period.textContent = dateLabel(anchor); }
-      else if (view === "month") {
-        from = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
-        to = new Date(anchor.getFullYear(), anchor.getMonth()+1, 1);
-        period.textContent = new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(anchor);
+      panel.querySelector("[data-mw-selected-title]").textContent =
+        "Operations · " + new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",year:"numeric"}).format(selected);
+      const list=panel.querySelector("[data-mw-selected-events]");
+      list.replaceChildren();
+      const selectedEvents=eventsOn(selected);
+      if(!selectedEvents.length){
+        const p=document.createElement("p");p.className="mw-calendar-empty";p.textContent="No operations due on this date.";list.appendChild(p);
       } else {
-        const offset = (anchor.getDay()+6)%7;
-        from = addDays(anchor, -offset); to = addDays(from, 7);
-        period.textContent = dateLabel(from) + " — " + dateLabel(addDays(to,-1));
+        selectedEvents.slice(0,6).forEach(o=>{
+          const item=document.createElement("article");item.className="mw-calendar-event";
+          const title=document.createElement("strong");title.textContent=o.title||"Untitled operation";
+          const meta=document.createElement("small");
+          meta.textContent=[dateLabel(o.due_at,{hour:"2-digit",minute:"2-digit"}),o.overdue?"Overdue":String(o.status||"").replace(/_/g," ")].join(" · ");
+          item.append(title,meta);list.appendChild(item);
+        });
+        if(selectedEvents.length>6){const more=document.createElement("p");more.className="mw-calendar-empty";more.textContent=(selectedEvents.length-6)+" more operations on this date.";list.appendChild(more);}
       }
-      const days = [];
-      for (let d = new Date(from); d < to; d = addDays(d,1)) days.push(new Date(d));
-      if (view === "month") {
-        const offset=(from.getDay()+6)%7;
-        for(let i=0;i<offset;i++) days.unshift(addDays(from,-(offset-i)));
-        while(days.length%7) days.push(addDays(days[days.length-1],1));
-      }
-      const events = items.filter(o => {
-        const d = dateValue(o.due_at);
-        return d && d >= from && d < to;
-      });
-      const weekdays = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      const cells = days.map(d => {
-        const todays = events.filter(o => { const dt=dateValue(o.due_at); return dt && sameDay(dt,d); });
-        return '<div class="mw-day-cell ' + (d.getMonth() !== anchor.getMonth() && view === "month" ? "outside" : "") + (sameDay(d,new Date()) ? " today" : "") + '"><div class="mw-day-label">' + (view === "month" ? d.getDate() : weekdays[(d.getDay()+6)%7] + " · " + d.getDate()) + '</div>' +
-          (todays.length ? todays.slice(0,4).map(o => '<div class="mw-event ' + (o.overdue ? "overdue" : String(o.status||"").toLowerCase().replace(/\s+/g,"-")) + '" title="' + esc(o.title) + '">' + esc(o.title) + '</div>').join("") + (todays.length>4?'<small>+'+(todays.length-4)+' more</small>':'') : '<span class="mw-no-event">—</span>') + '</div>';
-      }).join("");
-      container.innerHTML = '<div class="mw-calendar-grid ' + (view === "month" ? "month" : view === "day" ? "day" : "") + '">' + (view === "month" ? weekdays.map(w=>'<div class="mw-weekday">'+w+'</div>').join("") : "") + cells + '</div>';
     }
-    controls.querySelector("[data-mw-prev]").addEventListener("click",()=>{anchor=view==="month"?new Date(anchor.getFullYear(),anchor.getMonth()-1,1):addDays(anchor,view==="day"?-1:-7);render();});
-    controls.querySelector("[data-mw-next]").addEventListener("click",()=>{anchor=view==="month"?new Date(anchor.getFullYear(),anchor.getMonth()+1,1):addDays(anchor,view==="day"?1:7);render();});
-    controls.querySelector("[data-mw-today]").addEventListener("click",()=>{anchor=startOfDay(new Date());render();});
-    buttons.forEach(b=>b.addEventListener("click",()=>{view=b.dataset.mwView;render();}));
-    status.addEventListener("change",render); priority.addEventListener("change",render);
-    render();
+
+    trigger.addEventListener("click",()=>{
+      const opening=panel.hidden;
+      if(opening){render();position();trigger.setAttribute("aria-expanded","true");panel.querySelector("[data-mw-close]").focus();}
+      else{panel.hidden=true;trigger.setAttribute("aria-expanded","false");}
+    });
+    panel.querySelector("[data-mw-prev]").addEventListener("click",()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);render();});
+    panel.querySelector("[data-mw-next]").addEventListener("click",()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render();});
+    panel.querySelector("[data-mw-today]").addEventListener("click",()=>{cursor=new Date(today.getFullYear(),today.getMonth(),1);selected=new Date(today);render();});
+    panel.querySelector("[data-mw-close]").addEventListener("click",()=>{panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();});
+    root.addEventListener("pointerdown",event=>{
+      if(!panel.hidden&&!panel.contains(event.target)&&!trigger.contains(event.target)){panel.hidden=true;trigger.setAttribute("aria-expanded","false");}
+    });
+    panel.addEventListener("keydown",event=>{if(event.key==="Escape"){panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();}});
+    window.addEventListener("resize",()=>{if(!panel.hidden)position();});
+    window.addEventListener("scroll",()=>{if(!panel.hidden)position();},true);
   }
 
   window.MechnarSupervisorWorkspace = Object.freeze({ render });
