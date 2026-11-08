@@ -1099,6 +1099,10 @@ if (identity) {
         addSkillButton.className = "ct-profile-add-button";
         addSkillButton.textContent = "Add";
         skillEntry.append(skillInput, addSkillButton);
+        // Keep the profile's editable skill state initialized before wiring any controls.
+        const skills = Array.isArray(user && user.skills) ? user.skills.slice(0,40) : [];
+        const skillTags = document.createElement("div");
+        skillTags.className = "ct-profile-skill-tags";
         const skillRecommendations = document.createElement("div");
         skillRecommendations.className = "ct-profile-skill-recommendations";
         appendText(skillRecommendations, "span", "Suggested", "ct-profile-recommendation-label");
@@ -1106,17 +1110,21 @@ if (identity) {
           const chip = document.createElement("button");
           chip.type = "button";
           chip.textContent = suggestion;
-          chip.addEventListener("click", () => {
-            if (skills.some(item => item.toLocaleLowerCase() === suggestion.toLocaleLowerCase())) return;
+          chip.setAttribute("aria-label", "Add skill: " + suggestion);
+          chip.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (skills.some(item => item.toLocaleLowerCase() === suggestion.toLocaleLowerCase())) {
+              status.textContent = suggestion + " is already on your skills list.";
+              return;
+            }
             if (skills.length >= 40) { status.textContent = "You can add up to 40 skills."; return; }
             skills.push(suggestion);
+            status.textContent = suggestion + " added. Save changes to keep it.";
             renderSkills();
           });
           skillRecommendations.appendChild(chip);
         });
-        const skillTags = document.createElement("div");
-        skillTags.className = "ct-profile-skill-tags";
-        const skills = Array.isArray(user && user.skills) ? user.skills.slice(0,40) : [];
         const renderSkills = () => {
           skillTags.replaceChildren();
           if (!skills.length) appendText(skillTags, "span", "Your skills will appear here.", "ct-profile-empty");
