@@ -209,8 +209,29 @@
     return request(path, { ...options, method: "DELETE" });
   }
 
+
+  async function download(path) {
+    const headers = new Headers({ Accept: "*/*" });
+    try {
+      const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken
+        ? window.CleanTrackAuth.getAuthToken()
+        : window.sessionStorage.getItem("cleantrack_token");
+      if (token) headers.set("Authorization", "Bearer " + token);
+    } catch (_) {}
+    const response = await fetch(config.apiBaseUrl + normalizePath(path), {
+      method: "GET", headers, credentials: "include", cache: "no-store"
+    });
+    if (!response.ok) {
+      let message = "The file could not be loaded.";
+      try { const data = await response.json(); message = data.error || data.message || message; } catch (_) {}
+      throw new ApiError(message, response.status, null);
+    }
+    return URL.createObjectURL(await response.blob());
+  }
+
   window.CleanTrackApi = Object.freeze({
     request,
+    download,
     get,
     post,
     put,
