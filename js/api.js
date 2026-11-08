@@ -51,26 +51,12 @@
 
   async function request(path, options = {}) {
     const controller = new AbortController();
-    const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
-    // Bound the complete authentication request so the sign-in UI can never
-    // remain in "Signing in…" indefinitely. Render cold starts get extra time,
-    // while all other requests retain the configured normal timeout.
-    const slowAuthPaths = new Set(["auth/me", "auth/login", "auth/refresh", "auth/csrf"]);
-    const authTimeouts = {
-      "auth/login": 60000,
-      "auth/me": 60000,
-      "auth/refresh": 30000,
-      "auth/csrf": 15000
-    };
-    const timeoutMs = Number(options.timeoutMs) > 0
-      ? Number(options.timeoutMs)
-      : (authTimeouts[requestPath] || config.requestTimeoutMs);
+    const timeoutMs = options.timeoutMs || config.requestTimeoutMs;
 
-    let timedOut = false;
-    const timeoutId = window.setTimeout(() => {
-      timedOut = true;
-      controller.abort();
-    }, timeoutMs);
+    const timeoutId = window.setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
 
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
@@ -78,6 +64,7 @@
     // The active backend stores JWTs in HttpOnly cookies and protects mutating
     // requests with Flask-JWT-Extended's readable CSRF cookie.
     const method = String(options.method || "GET").toUpperCase();
+    const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
     const csrfExemptPaths = new Set(["auth/login", "auth/register"]);
     if (["POST", "PUT", "PATCH", "DELETE"].includes(method) &&
         !headers.has("X-CSRF-TOKEN") &&
@@ -130,16 +117,7 @@
         data = await response.json();
       } else {
         const responseText = await response.text();
-        const looksLikeHtml = /<\s*!doctype\s+html|<\s*html[\s>]|<\s*body[\s>]/i.test(responseText || "");
-        // Never print a proxy/server HTML error page into the sign-in form.
-        // Preserve plain-text API errors, but replace HTML with a concise diagnostic.
-        data = responseText
-          ? {
-              message: looksLikeHtml
-                ? "The server returned an HTML page instead of an API response (HTTP " + response.status + "). Check the backend URL and deployment."
-                : responseText.slice(0, 500)
-            }
-          : null;
+        data = responseText ? { message: responseText } : null;
       }
 
       if (!response.ok) {
@@ -185,11 +163,9 @@
 
       return data;
     } catch (error) {
-      if (error.name === "AbortError" || timedOut) {
+      if (error.name === "AbortError") {
         throw new ApiError(
-          slowAuthPaths.has(requestPath)
-            ? "Sign-in timed out while waiting for MECHNAR's server. The request has been stopped; please try again."
-            : "The request timed out. Check your connection and try again.",
+          "The request timed out. Check your connection and try again.",
           0,
           null
         );
@@ -233,28 +209,6 @@
     return request(path, { ...options, method: "DELETE" });
   }
 
-  async function download(path, retried = false) {
-    const headers = new Headers({ Accept: "*/*" });
-    const token = window.CleanTrackAuth && window.CleanTrackAuth.getAuthToken ? window.CleanTrackAuth.getAuthToken() : window.sessionStorage.getItem("cleantrack_token");
-    if (token) headers.set("Authorization", "Bearer " + token);
-    const response = await fetch(config.apiBaseUrl + normalizePath(path), { method: "GET", headers, credentials: "include", cache: "no-store" });
-    if (response.status === 401 && !retried) {
-      try {
-        const refreshHeaders = new Headers({ Accept: "application/json" });
-        const refreshToken = window.CleanTrackAuth?.getRefreshToken?.();
-        if (refreshToken) refreshHeaders.set("Authorization", "Bearer " + refreshToken);
-        const refreshed = await fetch(config.apiBaseUrl + normalizePath("auth/refresh"), { method: "GET", headers: refreshHeaders, credentials: "include", cache: "no-store" });
-        if (refreshed.ok) {
-          const data = await refreshed.json().catch(() => ({}));
-          if (data.token && window.CleanTrackAuth?.setAuthToken) window.CleanTrackAuth.setAuthToken(data.token);
-          return await download(path, true);
-        }
-      } catch (_) {}
-    }
-    if (!response.ok) { let message = "The attachment could not be downloaded."; try { const data = await response.json(); message = data.message || data.error || message; } catch (_) {} throw new ApiError(message, response.status, null); }
-    return URL.createObjectURL(await response.blob());
-  }
-
   window.CleanTrackApi = Object.freeze({
     request,
     get,
@@ -262,30 +216,6 @@
     put,
     patch,
     delete: del,
-    download,
     ApiError
   });
-
-  // Wake the Render API as soon as the frontend loads, not when the user
-  // presses Sign in. This lets the backend finish any cold start while the
-  // login screen is already visible and the user is entering credentials.
-  let backendWarmupStarted = false;
-  function warmupBackend() {
-    if (backendWarmupStarted) return;
-    backendWarmupStarted = true;
-    fetch(config.apiBaseUrl + normalizePath("health"), {
-      method: "GET",
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-      mode: "cors"
-    }).catch(error => {
-      console.info("MECHNAR API warm-up is still pending:", error.message);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", warmupBackend, { once: true });
-  } else {
-    warmupBackend();
-  }
 })();
