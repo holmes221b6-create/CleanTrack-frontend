@@ -895,8 +895,17 @@
       return;
     }
 
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "personnel") {
+      if (window.MechnarPersonnel && typeof window.MechnarPersonnel.render === "function") {
+        await window.MechnarPersonnel.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Personnel could not load. Refresh and try again." }));
+      }
+      return;
+    }
+
     if (String(user?.role || "").toLowerCase() === "supervisor" &&
-        ["personnel", "teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
+        ["teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
       const descriptions = {
         personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
         teams: ["Teams", "Manage your own team and view other organization teams in read-only mode. Other teams' employee records and private operations remain inaccessible."],
