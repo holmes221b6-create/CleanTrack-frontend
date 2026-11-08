@@ -1679,68 +1679,32 @@ function bindNavigation() {
 
     if (form.dataset.loginBound === "true") return;
     form.dataset.loginBound = "true";
-
-    let loginInProgress = false;
-    async function handleLogin(event) {
-      if (event) event.preventDefault();
-      if (loginInProgress) return;
-      const email = String(getElement("login-email")?.value || "").trim().toLowerCase();
-      const password = String(getElement("login-password")?.value || "");
-      const submit = getElement("login-submit");
-      const message = getElement("login-message");
-      if (!email || !password) {
-        if (message) {
-          message.textContent = "Enter your email address and password.";
-          message.className = "form-message error";
-          message.hidden = false;
-        }
-        return;
-      }
-
-      loginInProgress = true;
-      if (submit) {
-        submit.disabled = true;
-        submit.textContent = "Signing in…";
-      }
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearMessage();
       setLoading(true);
+
+      const formData = new FormData(form);
+
       try {
-        if (!window.CleanTrackAuth || typeof window.CleanTrackAuth.login !== "function") {
-          throw new Error("The sign-in service did not load. Refresh the page and try again.");
-        }
-        const user = await window.CleanTrackAuth.login({ email, password });
-        if (!user) throw new Error("The server did not return an account. Please try again.");
+        const user = await auth.login({
+          email: formData.get("email"),
+          password: formData.get("password")
+        });
+
         state.started = true;
         showAuthenticatedLayout(user);
-        if (message) {
-          message.textContent = "Signed in successfully.";
-          message.className = "form-message success";
-          message.hidden = false;
-        }
+        showMessage("You are now signed in.", "success");
         maybeShowFirstSetup(user);
       } catch (error) {
-        console.error("MECHNAR sign-in failed:", error);
-        if (message) {
-          message.textContent = error?.message || "Unable to sign in. Please try again.";
-          message.className = "form-message error";
-          message.hidden = false;
-        }
+        showMessage(
+          error.message || "Unable to sign in. Please try again.",
+          "error"
+        );
       } finally {
-        loginInProgress = false;
         setLoading(false);
-        if (submit) {
-          submit.disabled = false;
-          submit.textContent = "Sign in";
-        }
       }
-    }
-
-    // Support both mouse/touch clicks and Enter-key form submission.
-    form.addEventListener("submit", handleLogin);
-    const loginButton = getElement("login-submit");
-    if (loginButton) {
-      loginButton.type = "button";
-      loginButton.addEventListener("click", handleLogin);
-    }
+    });
   }
 
 
