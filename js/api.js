@@ -51,7 +51,15 @@
 
   async function request(path, options = {}) {
     const controller = new AbortController();
-    const timeoutMs = options.timeoutMs || config.requestTimeoutMs;
+    const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
+    // Render's free web services can sleep between visits. The first auth/me
+    // or login request may need time for the service and database to wake up.
+    // Keep normal API calls on the standard timeout, but allow auth startup
+    // and sign-in requests up to 90 seconds.
+    const slowAuthPaths = new Set(["auth/me", "auth/login", "auth/refresh", "auth/csrf"]);
+    const timeoutMs = options.timeoutMs || (slowAuthPaths.has(requestPath)
+      ? Math.max(config.requestTimeoutMs, 90000)
+      : config.requestTimeoutMs);
 
     const timeoutId = window.setTimeout(
       () => controller.abort(),
@@ -64,7 +72,6 @@
     // The active backend stores JWTs in HttpOnly cookies and protects mutating
     // requests with Flask-JWT-Extended's readable CSRF cookie.
     const method = String(options.method || "GET").toUpperCase();
-    const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
     const csrfExemptPaths = new Set(["auth/login", "auth/register"]);
     if (["POST", "PUT", "PATCH", "DELETE"].includes(method) &&
         !headers.has("X-CSRF-TOKEN") &&
@@ -174,7 +181,9 @@
     } catch (error) {
       if (error.name === "AbortError") {
         throw new ApiError(
-          "The request timed out. Check your connection and try again.",
+          slowAuthPaths.has(requestPath)
+            ? "MECHNAR's server is taking longer than expected to respond. It may be waking up; please wait and try again."
+            : "The request timed out. Check your connection and try again.",
           0,
           null
         );
