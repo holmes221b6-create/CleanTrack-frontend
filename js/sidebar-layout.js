@@ -1080,6 +1080,151 @@ if (identity) {
         editEmailField.input.setAttribute("aria-describedby", "ct-profile-email-note");
         const emailNote = appendText(editPanel, "small", "Email address cannot be changed here.", "ct-profile-edit-note");
         emailNote.id = "ct-profile-email-note";
+        const profileExtras = document.createElement("section");
+        profileExtras.className = "ct-profile-extras";
+        const skillsSection = document.createElement("div");
+        skillsSection.className = "ct-profile-extra-section";
+        appendText(skillsSection, "h4", "Skills");
+        appendText(skillsSection, "p", "Add skills one at a time. They appear as compact tags below.", "ct-profile-extra-hint");
+        const skillEntry = document.createElement("div");
+        skillEntry.className = "ct-profile-skill-entry";
+        const skillInput = document.createElement("input");
+        skillInput.type = "text";
+        skillInput.maxLength = 60;
+        skillInput.placeholder = "e.g. Project management";
+        skillInput.className = "ct-profile-edit-input";
+        skillInput.setAttribute("aria-label", "Add a skill");
+        const addSkillButton = document.createElement("button");
+        addSkillButton.type = "button";
+        addSkillButton.className = "ct-profile-add-button";
+        addSkillButton.textContent = "Add";
+        skillEntry.append(skillInput, addSkillButton);
+        const skillTags = document.createElement("div");
+        skillTags.className = "ct-profile-skill-tags";
+        const skills = Array.isArray(user && user.skills) ? user.skills.slice(0,40) : [];
+        const renderSkills = () => {
+          skillTags.replaceChildren();
+          if (!skills.length) appendText(skillTags, "span", "Your skills will appear here.", "ct-profile-empty");
+          skills.forEach((skill, index) => {
+            const tag = document.createElement("span");
+            tag.className = "ct-profile-skill-tag";
+            const label = document.createElement("span");
+            label.textContent = skill;
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.setAttribute("aria-label", "Remove " + skill);
+            remove.addEventListener("click", () => { skills.splice(index,1); renderSkills(); });
+            tag.append(label, remove);
+            skillTags.appendChild(tag);
+          });
+        };
+        const addSkill = () => {
+          const value = skillInput.value.trim();
+          if (!value) return;
+          if (skills.some(item => item.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+            status.textContent = "That skill is already on your list.";
+            return;
+          }
+          if (skills.length >= 40) { status.textContent = "You can add up to 40 skills."; return; }
+          skills.push(value);
+          skillInput.value = "";
+          status.textContent = "";
+          renderSkills();
+          skillInput.focus();
+        };
+        addSkillButton.addEventListener("click", addSkill);
+        skillInput.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addSkill(); } });
+        skillsSection.append(skillEntry, skillTags);
+
+        const qualificationSection = document.createElement("div");
+        qualificationSection.className = "ct-profile-extra-section";
+        appendText(qualificationSection, "h4", "Qualifications");
+        appendText(qualificationSection, "p", "Upload certificates, diplomas or other qualification documents (PDF, JPG or PNG; max 5 MB each).", "ct-profile-extra-hint");
+        const qualificationForm = document.createElement("div");
+        qualificationForm.className = "ct-profile-qualification-form";
+        const qualificationTitle = document.createElement("input");
+        qualificationTitle.className = "ct-profile-edit-input";
+        qualificationTitle.placeholder = "Qualification or certificate name";
+        qualificationTitle.maxLength = 180;
+        qualificationTitle.setAttribute("aria-label", "Qualification name");
+        const qualificationIssuer = document.createElement("input");
+        qualificationIssuer.className = "ct-profile-edit-input";
+        qualificationIssuer.placeholder = "Issuing institution (optional)";
+        qualificationIssuer.maxLength = 180;
+        qualificationIssuer.setAttribute("aria-label", "Issuing institution");
+        const qualificationDate = document.createElement("input");
+        qualificationDate.className = "ct-profile-edit-input";
+        qualificationDate.type = "month";
+        qualificationDate.setAttribute("aria-label", "Issue month");
+        const qualificationFile = document.createElement("input");
+        qualificationFile.type = "file";
+        qualificationFile.accept = ".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png";
+        qualificationFile.className = "ct-profile-qualification-file";
+        qualificationFile.setAttribute("aria-label", "Qualification document");
+        const uploadQualification = document.createElement("button");
+        uploadQualification.type = "button";
+        uploadQualification.className = "ct-profile-add-button";
+        uploadQualification.textContent = "Upload qualification";
+        const qualificationList = document.createElement("div");
+        qualificationList.className = "ct-profile-qualification-list";
+        const loadQualifications = async () => {
+          qualificationList.replaceChildren();
+          try {
+            const result = await window.CleanTrackApi.get("auth/me/qualifications");
+            const items = result && result.qualifications || [];
+            if (!items.length) appendText(qualificationList, "span", "No qualifications uploaded yet.", "ct-profile-empty");
+            items.forEach(item => {
+              const row = document.createElement("div");
+              row.className = "ct-profile-qualification-item";
+              const info = document.createElement("div");
+              appendText(info, "strong", item.title);
+              appendText(info, "small", [item.issuer, item.issue_date].filter(Boolean).join(" · ") || item.file_name);
+              const remove = document.createElement("button");
+              remove.type = "button";
+              remove.textContent = "Remove";
+              remove.addEventListener("click", async () => {
+                remove.disabled = true;
+                try { await window.CleanTrackApi.delete("auth/me/qualifications/" + item.id); await loadQualifications(); }
+                catch (error) { status.textContent = error.message || "Unable to remove qualification."; remove.disabled = false; }
+              });
+              row.append(info, remove);
+              qualificationList.appendChild(row);
+            });
+          } catch (error) {
+            appendText(qualificationList, "span", error.message || "Unable to load qualifications.", "ct-profile-empty");
+          }
+        };
+        uploadQualification.addEventListener("click", async () => {
+          const file = qualificationFile.files && qualificationFile.files[0];
+          if (!qualificationTitle.value.trim() || !file) { status.textContent = "Enter a qualification name and choose its document."; return; }
+          const allowed = ["application/pdf","image/jpeg","image/png"];
+          if (!allowed.includes(file.type)) { status.textContent = "Choose a PDF, JPG or PNG document."; return; }
+          if (file.size > 5 * 1024 * 1024) { status.textContent = "The document must be 5 MB or smaller."; return; }
+          uploadQualification.disabled = true;
+          uploadQualification.textContent = "Uploading…";
+          try {
+            const encoded = await new Promise((resolve,reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+              reader.onerror = () => reject(new Error("Unable to read this document."));
+              reader.readAsDataURL(file);
+            });
+            await window.CleanTrackApi.post("auth/me/qualifications", {
+              title: qualificationTitle.value.trim(), issuer: qualificationIssuer.value.trim(),
+              issue_date: qualificationDate.value, file_name: file.name, mime_type: file.type, file_data: encoded
+            });
+            qualificationTitle.value = ""; qualificationIssuer.value = ""; qualificationDate.value = ""; qualificationFile.value = "";
+            status.textContent = "Qualification uploaded.";
+            await loadQualifications();
+          } catch (error) { status.textContent = error.message || "Unable to upload qualification."; }
+          finally { uploadQualification.disabled = false; uploadQualification.textContent = "Upload qualification"; }
+        });
+        qualificationForm.append(qualificationTitle, qualificationIssuer, qualificationDate, qualificationFile, uploadQualification);
+        qualificationSection.append(qualificationForm, qualificationList);
+        profileExtras.append(skillsSection, qualificationSection);
+        renderSkills();
+        loadQualifications();
         const status = appendText(editPanel, "p", "", "ct-profile-edit-status");
         status.setAttribute("role", "status");
         const editActions = document.createElement("div");
@@ -1104,11 +1249,12 @@ if (identity) {
             if (!api || typeof api.patch !== "function") throw new Error("Profile service is unavailable. Please try again.");
             const response = await api.patch("auth/me", {
               full_name: name,
-              phone: phoneValue
+              phone: phoneValue,
+              skills: skills
             });
             const updated = response && response.user || {};
             const finalName = updated.full_name || updated.name || name;
-            Object.assign(user, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue, avatar_url: updated.avatar_url || avatarUrl });
+            Object.assign(user, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue, skills: updated.skills || skills.slice() });
             const current = window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser && window.CleanTrackAuth.getCurrentUser();
             if (current) Object.assign(current, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue });
             updateProfileTrigger();
@@ -1118,8 +1264,8 @@ if (identity) {
             if (nameNode) nameNode.textContent = finalName;
             if (emailNode) emailNode.textContent = user.email || "";
             status.textContent = "Profile updated successfully.";
-            editPanel.hidden = true;
-            accountView.hidden = false;
+            editOverlay.hidden = true;
+            editOverlay.setAttribute("aria-hidden", "true");
           } catch (error) {
             status.textContent = error && error.message || "Unable to save profile changes.";
           } finally {
@@ -1129,7 +1275,7 @@ if (identity) {
         }, "ct-profile-settings-button ct-profile-save-button");
         saveButton.type = "button";
         editForm.append(editNameField.label, editPhoneField.label, editEmailField.label);
-        editPanel.append(editForm, editActions);
+        editPanel.append(editForm, profileExtras, editActions);
         editOverlay.appendChild(editPanel);
         editOverlay.addEventListener("click", event => {
           if (event.target === editOverlay) {
