@@ -222,7 +222,10 @@
       const title=document.createElement("strong");title.textContent=o.title||"Untitled operation";
       const meta=document.createElement("small");
       const dt=dateValue(o.due_at);
-      meta.textContent=[dt?dateLabel(dt,{hour:"2-digit",minute:"2-digit"}):"No deadline",o.overdue?"Overdue":String(o.status||"").replace(/_/g," "),o.priority||"Normal",o.assigned_to_name||"Unassigned",o.location_name||"Location not assigned",o.zone_name||"Zone not assigned"].join(" · ");
+      const assignment=o.original_assigned_to_name&&o.assigned_to_name&&o.original_assigned_to_name!==o.assigned_to_name
+        ?"Admin origin: "+o.original_assigned_to_name+" → Current: "+o.assigned_to_name
+        :o.assigned_to_name?"Assigned to "+o.assigned_to_name:o.assigned_supervisor_name?"Supervisor: "+o.assigned_supervisor_name:"Unassigned";
+      meta.textContent=[dt?dateLabel(dt,{hour:"2-digit",minute:"2-digit"}):"No deadline",o.overdue?"Overdue":String(o.status||"").replace(/_/g," "),o.priority||"Normal",assignment,o.location_name||"Location not assigned",o.zone_name||"Zone not assigned"].join(" · ");
       item.append(title,meta);parent.appendChild(item);
     }
     function renderEventsForDate(d){
@@ -282,7 +285,7 @@
     }
     trigger.addEventListener("click",()=>{if(panel.hidden){render();position();trigger.setAttribute("aria-expanded","true");panel.querySelector("[data-mw-close]").focus();}
       else{panel.hidden=true;trigger.setAttribute("aria-expanded","false");}});
-    panel.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;render();}));
+    panel.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;if(view==="week")cursor=new Date(selected);if(view==="day")cursor=new Date(selected);render();}));
     panel.querySelector("[data-mw-prev]").addEventListener("click",()=>{if(view==="day")selected=addDays(selected,-1);else if(view==="week")cursor=addDays(cursor,-7);else cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);render();});
     panel.querySelector("[data-mw-next]").addEventListener("click",()=>{if(view==="day")selected=addDays(selected,1);else if(view==="week")cursor=addDays(cursor,7);else cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render();});
     panel.querySelector("[data-mw-today]").addEventListener("click",()=>{selected=new Date(today);cursor=new Date(today.getFullYear(),today.getMonth(),1);render();});
