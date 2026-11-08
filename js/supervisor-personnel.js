@@ -28,37 +28,42 @@ async function render(root){
  function setActive(m,which){selected=m;mode=which;paintList();}
  function openProfile(m){setActive(m,"profile");profileTab="overview";drawProfile();}
  async function drawProfile(){
-  const m=selected;main.innerHTML='<div class="mp-profile"><header class="mp-profile-head"><button class="mp-mobile-back" type="button">‹ Contacts</button><button class="mp-profile-avatar" type="button" aria-label="Profile">'+(m.avatar_url?'<img src="'+esc(m.avatar_url)+'" alt="">':esc(initials(m.name)))+'</button><div class="mp-profile-title"><h2>'+esc(m.name)+'</h2><p>Staff · '+esc(m.email||"")+'</p></div><button class="mp-options" type="button" aria-label="Profile options">⋮</button></header><nav class="mp-tabs"><button data-tab="overview">Overview</button><button data-tab="skills">Skills & qualifications</button><button data-tab="workload">Workload</button><button data-tab="performance">Performance</button></nav><div class="mp-profile-body"><p class="mp-loading">Loading profile…</p></div><footer class="mp-profile-actions"><button class="mp-secondary" data-chat>Message</button><button class="mp-primary" data-invite-placeholder disabled>Staff member</button></footer></div>';
-  main.querySelector(".mp-mobile-back").onclick=()=>{selected=null;mode="empty";paintList();main.innerHTML='<div class="mp-empty"><div class="mp-empty-mark">M</div><h2>Your team, connected.</h2><p>Select a contact to view their details, or open their name to start a conversation.</p></div>'};
-  main.querySelector(".mp-profile-avatar").onclick=()=>showProfileOptions();
+  const m=selected;main.innerHTML='<section class="mp-contact-info-panel"><header class="mp-info-topbar"><button class="mp-info-back" type="button" aria-label="Back">‹</button><strong>Contact info</strong><button class="mp-options" type="button" aria-label="More options">⋮</button></header><div class="mp-info-scroll"><div class="mp-contact-hero"><button class="mp-photo-trigger" type="button" aria-label="View profile photo">'+(m.avatar_url?'<img src="'+esc(m.avatar_url)+'" alt="">':esc(initials(m.name)))+'</button><h2>'+esc(m.name)+'</h2><p>Staff · '+esc(m.email||"")+'</p></div><div class="mp-contact-actions"><button data-action="message"><span>▣</span><small>Message</small></button><button data-action="skills"><span>✧</span><small>Skills</small></button><button data-action="workload"><span>◷</span><small>Workload</small></button><button data-action="performance"><span>↗</span><small>Performance</small></button></div><section class="mp-info-section"><h3>Contact details</h3><div class="mp-contact-detail"><span>Email</span><strong>'+esc(m.email||"Not provided")+'</strong></div><div class="mp-contact-detail"><span>Phone</span><strong>'+esc(m.phone||"Not provided")+'</strong></div><div class="mp-contact-detail"><span>Joined</span><strong>'+esc(date(m.joined_at))+'</strong></div><div class="mp-contact-detail"><span>Account status</span><strong>'+esc(m.account_status||"—")+'</strong></div></section><section class="mp-info-section mp-info-options"><h3>Personnel information</h3><button data-open="skills"><span>Skills & qualifications</span><b>›</b></button><button data-open="workload"><span>Workload & availability</span><b>›</b></button><button data-open="performance"><span>Performance records</span><b>›</b></button></section></div></section>';
+  main.querySelector(".mp-info-back").onclick=()=>{selected=null;mode="empty";paintList();main.innerHTML='<div class="mp-empty"><div class="mp-empty-mark">M</div><h2>Your team, connected.</h2><p>Select a contact to view their details, or open their name to start a conversation.</p></div>'};
+  main.querySelector(".mp-photo-trigger").onclick=()=>openPhoto(m);
   main.querySelector(".mp-options").onclick=()=>showProfileOptions();
-  main.querySelectorAll("[data-tab]").forEach(b=>{b.classList.toggle("active",b.dataset.tab===profileTab);b.onclick=()=>{profileTab=b.dataset.tab;drawProfileBody()}});
-  main.querySelector("[data-chat]").onclick=()=>openChat(m);
+  main.querySelector('[data-action="message"]').onclick=()=>openChat(m);
+  ["skills","workload","performance"].forEach(key=>main.querySelector('[data-action="'+key+'"]').onclick=()=>openProfileDetail(key));
+  main.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openProfileDetail(b.dataset.open));
   try{const data=await API.get("supervisor/personnel/"+m.id+"/profile");m.profile=data.profile||{};}catch(e){m.profile={error:e.message};}
-  drawProfileBody();
  }
- function drawProfileBody(){
-  const host=main.querySelector(".mp-profile-body");if(!host)return;host.replaceChildren();
-  main.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===profileTab));
-  const p=selected.profile||{};
-  if(profileTab==="overview"){
-   const rows=[["Email",p.email||selected.email],["Phone",p.phone||selected.phone||"Not provided"],["Joined",date(p.joined_at||selected.joined_at)],["Account status",p.account_status||selected.account_status],["Availability",p.availability==="not_recorded"?"Not recorded":p.availability]];
-   host.append(el("h3","mp-section-title","Contact information"));const grid=el("div","mp-info-grid");rows.forEach(([k,v])=>{const item=el("div","mp-info");item.append(el("span","",k),el("strong","",v||"—"));grid.append(item)});host.append(grid);
-  }else if(profileTab==="skills"){
-   host.append(el("h3","mp-section-title","Skills & qualifications"));
-   const groups=[["Skills",p.skills],["Qualifications",p.qualifications],["Certifications",p.certifications]];
-   groups.forEach(([title,items])=>{const sec=el("section","mp-detail-group");sec.append(el("h4","",title));if(!items||!items.length)sec.append(el("p","mp-muted","No "+title.toLowerCase()+" have been recorded."));else items.forEach(x=>sec.append(el("span","mp-chip",typeof x==="string"?x:x.name||x.title||"Recorded item")));host.append(sec)});
-  }else if(profileTab==="workload"){
-   host.append(el("h3","mp-section-title","Current workload"));const grid=el("div","mp-info-grid");[["Active operations",selected.workload??"—"],["Availability",selected.availability==="not_recorded"?"Not recorded":selected.availability]].forEach(([k,v])=>{const n=el("div","mp-info");n.append(el("span","",k),el("strong","",v));grid.append(n)});host.append(grid);
+ function openPhoto(m){
+  const overlay=el("div","mp-photo-viewer");const close=el("button","mp-photo-close","×");close.type="button";close.setAttribute("aria-label","Close photo");
+  const img=m.avatar_url?document.createElement("img"):el("div","mp-photo-fallback",initials(m.name));
+  if(m.avatar_url){img.src=m.avatar_url;img.alt=m.name+" profile photo";}
+  overlay.append(close,img);main.append(overlay);
+  const dismiss=()=>overlay.remove();close.onclick=dismiss;overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});document.addEventListener("keydown,function",()=>{});
+ }
+ function openProfileDetail(key){
+  profileTab=key;const m=selected;const p=m.profile||{};
+  const labels={skills:"Skills & qualifications",workload:"Workload & availability",performance:"Performance records"};
+  const panel=el("section","mp-profile-detail-panel");
+  const top=el("header","mp-info-topbar");const back=el("button","mp-info-back","‹");back.type="button";const title=el("strong","",labels[key]);top.append(back,title);panel.append(top);
+  const body=el("div","mp-info-scroll");panel.append(body);
+  if(key==="skills"){
+   [["Skills",p.skills],["Qualifications",p.qualifications],["Certifications",p.certifications]].forEach(([label,items])=>{const sec=el("section","mp-info-section");sec.append(el("h3","",label));if(!items||!items.length)sec.append(el("p","mp-muted","No "+label.toLowerCase()+" have been recorded."));else items.forEach(item=>sec.append(el("span","mp-chip",typeof item==="string"?item:item.name||item.title||"Recorded item")));body.append(sec)});
+  }else if(key==="workload"){
+   const sec=el("section","mp-info-section");sec.append(el("h3","","Current workload"));[["Active operations",m.workload??"—"],["Overdue operations",m.overdue_operations??0],["Availability",m.availability==="not_recorded"?"Not recorded":m.availability]].forEach(([label,value])=>{const row=el("div","mp-contact-detail");row.append(el("span","",label),el("strong","",value));sec.append(row)});body.append(sec);
   }else{
-   host.append(el("h3","mp-section-title","Performance"));const grid=el("div","mp-info-grid");[["Completed operations",selected.completed_operations??0],["Overdue operations",selected.overdue_operations??0]].forEach(([k,v])=>{const n=el("div","mp-info");n.append(el("span","",k),el("strong","",v));grid.append(n)});host.append(grid,el("p","mp-muted","Based on available operation records. No rating or score is fabricated."));
+   const sec=el("section","mp-info-section");sec.append(el("h3","","Performance summary"));[["Completed operations",m.completed_operations??0],["Overdue operations",m.overdue_operations??0]].forEach(([label,value])=>{const row=el("div","mp-contact-detail");row.append(el("span","",label),el("strong","",value));sec.append(row)});sec.append(el("p","mp-muted","Based on recorded operations. No rating or score is fabricated."));body.append(sec);
   }
+  main.append(panel);back.onclick=()=>{panel.remove();drawProfile()};
  }
  function showProfileOptions(){
   const old=main.querySelector(".mp-options-menu");if(old){old.remove();return}
   const menu=el("div","mp-options-menu");
-  [["Contact details","overview"],["Skills & qualifications","skills"],["Workload & availability","workload"],["Performance","performance"],["Open chat","chat"]].forEach(([label,key])=>{const b=el("button","",label);b.onclick=()=>{menu.remove();if(key==="chat")openChat(selected);else{profileTab=key;drawProfileBody()}};menu.append(b)});
-  main.querySelector(".mp-profile-head").append(menu);
+  [["Message","chat"],["Contact details","overview"],["Skills & qualifications","skills"],["Workload & availability","workload"],["Performance","performance"]].forEach(([label,key])=>{const b=el("button","",label);b.onclick=()=>{menu.remove();if(key==="chat")openChat(selected);else if(key==="overview")drawProfile();else openProfileDetail(key)};menu.append(b)});
+  main.querySelector(".mp-info-topbar").append(menu);
  }
  async function openChat(m){
   setActive(m,"chat");main.innerHTML='<section class="mp-chat"><header class="mp-chat-head"><button class="mp-mobile-back" type="button">‹ Contacts</button><button class="mp-chat-person" type="button"><span class="mp-chat-avatar">'+esc(initials(m.name))+'</span><span><strong>'+esc(m.name)+'</strong><small>Staff · '+esc(m.email||"")+'</small></span></button><button class="mp-chat-menu" type="button">⋮</button></header><div class="mp-chat-menu-pop" hidden><button data-clear>Clear chat</button><button data-delete>Delete chat</button><button data-profile>View profile</button></div><div class="mp-messages"><p class="mp-loading">Loading conversation…</p></div><form class="mp-composer"><textarea name="body" rows="1" maxlength="5000" placeholder="Message…" required></textarea><button type="submit" aria-label="Send message">➤</button></form></section>';
