@@ -1400,11 +1400,31 @@ function bindAvatarEditProfile() {
     event.preventDefault();
     event.stopPropagation();
     closeMenu();
-    navigation.setActivePage("settings");
-    window.setTimeout(function() {
-      const accountTab = document.querySelector('[data-settings-tab="account"], [data-tab="account"], #settings-account');
-      if (accountTab) accountTab.click();
-    }, 100);
+    // Settings renders the Account panel by default; set the explicit hash before
+    // navigating so the account owner lands directly on their editable profile.
+    try { window.history.replaceState(null, "", "#settings-account"); } catch (_) {
+      window.location.hash = "settings-account";
+    }
+    const nav = window.CleanTrackNavigation || navigation;
+    if (!nav || typeof nav.setActivePage !== "function" || !nav.setActivePage("settings")) {
+      window.location.hash = "settings-account";
+      return;
+    }
+    window.setTimeout(function () {
+      const settings = document.querySelector(".ct-settings-page");
+      const accountPanel = settings && settings.querySelector('[data-settings-panel="account"]');
+      if (accountPanel) {
+        accountPanel.hidden = false;
+        settings.querySelectorAll("[data-settings-panel]").forEach(function (panel) {
+          if (panel !== accountPanel) panel.hidden = true;
+        });
+        settings.querySelectorAll("[data-settings-nav]").forEach(function (item) {
+          const active = item.dataset.settingsNav === "account";
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-current", active ? "page" : "false");
+        });
+      }
+    }, 0);
   }
 
   if (menuButton) menuButton.addEventListener("click", openOrCloseMenu);
