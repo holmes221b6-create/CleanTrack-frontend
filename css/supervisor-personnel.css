@@ -62,3 +62,10 @@ html[data-theme="light"] .mp-contact-hero p,html[data-theme="light"] .mp-contact
 html[data-theme="light"] .mp-media-visibility{background:#fff;color:#222}
 html[data-theme="light"] .mp-media-item{background:#fff;border-color:#e7e3eb}
 @media(max-width:760px){.mp-media-visibility{inset:54px 0 0}.mp-media-visibility-content{padding:12px;grid-template-columns:repeat(auto-fill,minmax(145px,1fr))}}
+
+
+/* Ensure hidden chat menus stay hidden despite the shared flex-menu rule. */
+.mp-chat-head{position:relative}
+.mp-chat-menu-pop[hidden],.mp-options-menu[hidden]{display:none!important}
+.mp-chat-menu-pop{top:calc(100% - 2px);right:12px;z-index:30}
+.mp-chat-menu-pop button[data-media-visibility]{font-weight:750;color:#d6b6f4}
