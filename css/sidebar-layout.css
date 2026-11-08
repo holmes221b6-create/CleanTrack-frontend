@@ -633,3 +633,17 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 #workspace-view .ct-sidebar-brand > span {
   font-size: 18px;
 }
+
+
+/* Account dialog's in-place Edit Profile sub-panel */
+.ct-profile-edit-panel{padding:4px 2px 2px}
+.ct-profile-edit-panel[hidden]{display:none!important}
+.ct-profile-edit-title{margin:5px 0 4px;font-size:1.35rem}
+.ct-profile-edit-description,.ct-profile-edit-note{display:block;margin:0 0 14px;opacity:.72;font-size:.88rem}
+.ct-profile-edit-form{display:grid;gap:13px}
+.ct-profile-edit-field{display:grid;gap:6px;font-size:.86rem;font-weight:650}
+.ct-profile-edit-input{box-sizing:border-box;width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--border-color,rgba(140,140,160,.3));border-radius:10px;background:var(--surface-color,transparent);color:var(--text-color,inherit);font:inherit}
+.ct-profile-edit-input:focus{outline:2px solid rgba(145,112,235,.45);outline-offset:1px}
+.ct-profile-edit-input[readonly]{opacity:.65;cursor:not-allowed}
+.ct-profile-edit-status{min-height:1.3em;margin:12px 0 0;font-size:.88rem}
+.ct-profile-save-button{background:rgba(128,96,220,.2)!important;border-color:rgba(145,112,235,.45)!important;font-weight:750}
