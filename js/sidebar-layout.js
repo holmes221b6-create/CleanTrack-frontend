@@ -1180,6 +1180,13 @@ if (identity) {
               const info = document.createElement("div");
               appendText(info, "strong", item.title);
               appendText(info, "small", [item.issuer, item.issue_date].filter(Boolean).join(" · ") || item.file_name);
+              const download = document.createElement("a");
+              const apiBase = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
+              download.href = apiBase.replace(/\/$/, "") + "/auth/me/qualifications/" + item.id + "/file";
+              download.textContent = "View file";
+              download.target = "_blank";
+              download.rel = "noopener";
+              download.className = "ct-profile-qualification-download";
               const remove = document.createElement("button");
               remove.type = "button";
               remove.textContent = "Remove";
@@ -1188,7 +1195,10 @@ if (identity) {
                 try { await window.CleanTrackApi.delete("auth/me/qualifications/" + item.id); await loadQualifications(); }
                 catch (error) { status.textContent = error.message || "Unable to remove qualification."; remove.disabled = false; }
               });
-              row.append(info, remove);
+              const actions = document.createElement("div");
+              actions.className = "ct-profile-qualification-actions";
+              actions.append(download, remove);
+              row.append(info, actions);
               qualificationList.appendChild(row);
             });
           } catch (error) {
@@ -1256,7 +1266,7 @@ if (identity) {
             const finalName = updated.full_name || updated.name || name;
             Object.assign(user, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue, skills: updated.skills || skills.slice() });
             const current = window.CleanTrackAuth && window.CleanTrackAuth.getCurrentUser && window.CleanTrackAuth.getCurrentUser();
-            if (current) Object.assign(current, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue });
+            if (current) Object.assign(current, updated, { name: finalName, full_name: finalName, phone: updated.phone || phoneValue, skills: updated.skills || skills.slice() });
             updateProfileTrigger();
             window.dispatchEvent(new CustomEvent("cleantrack:avatar-updated", { detail: { userId: user.id } }));
             const nameNode = identity.querySelector(".ct-profile-name");
