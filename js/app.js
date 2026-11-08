@@ -1681,56 +1681,33 @@ function bindNavigation() {
     form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
-      const message = getElement("login-message");
-      const submit = getElement("login-submit");
-      const emailInput = getElement("login-email");
-      const passwordInput = getElement("login-password");
-      const email = String(emailInput?.value || "").trim().toLowerCase();
-      const password = String(passwordInput?.value || "");
-      const setLoginMessage = function (text, kind) {
-        if (!message) return;
-        message.textContent = text;
-        message.className = "form-message " + (kind || "");
-        message.hidden = false;
-      };
-
-      if (!email || !password) {
-        setLoginMessage("Enter your email address and password.", "error");
-        return;
-      }
-
-      setLoginMessage("Connecting securely to MECHNAR…", "info");
-      if (submit) {
-        submit.disabled = true;
-        submit.textContent = "Signing in…";
-      }
+      clearMessage();
       setLoading(true);
 
+      const formData = new FormData(form);
+
       try {
-        if (!window.CleanTrackAuth || typeof window.CleanTrackAuth.login !== "function") {
-          throw new Error("The sign-in service did not load. Refresh the page and try again.");
-        }
-        const user = await window.CleanTrackAuth.login({ email, password });
-        if (!user) throw new Error("The server did not return an account. Please try again.");
+        const user = await auth.login({
+          email: formData.get("email"),
+          password: formData.get("password")
+        });
+
         state.started = true;
         showAuthenticatedLayout(user);
-        setLoginMessage("Signed in successfully.", "success");
+        showMessage("You are now signed in.", "success");
         maybeShowFirstSetup(user);
       } catch (error) {
-        console.error("MECHNAR sign-in request failed:", error);
-        const detail = error && error.message
-          ? error.message
-          : "Sign-in failed unexpectedly. Please try again.";
-        setLoginMessage(detail, "error");
+        showMessage(
+          error.message || "Unable to sign in. Please try again.",
+          "error"
+        );
       } finally {
         setLoading(false);
-        if (submit) {
-          submit.disabled = false;
-          submit.textContent = "Sign in";
-        }
       }
     });
   }
+
+
 
   async function start() {
     if (state.started) {
