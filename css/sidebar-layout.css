@@ -647,3 +647,16 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 .ct-profile-edit-input[readonly]{opacity:.65;cursor:not-allowed}
 .ct-profile-edit-status{min-height:1.3em;margin:12px 0 0;font-size:.88rem}
 .ct-profile-save-button{background:rgba(128,96,220,.2)!important;border-color:rgba(145,112,235,.45)!important;font-weight:750}
+
+
+/* Dedicated modal popup for editing account details. */
+.ct-profile-edit-overlay{position:fixed;inset:0;z-index:1000008;display:grid;place-items:center;padding:24px;background:rgba(4,5,12,.72);backdrop-filter:blur(7px)}
+.ct-profile-edit-overlay[hidden]{display:none!important}
+.ct-profile-edit-overlay .ct-profile-edit-panel{box-sizing:border-box;width:min(520px,calc(100vw - 32px));max-height:min(82vh,760px);overflow:auto;padding:26px;border:1px solid rgba(150,130,205,.32);border-radius:20px;background:var(--surface-color,#151521);color:var(--text-color,#f5f3fb);box-shadow:0 28px 100px rgba(0,0,0,.55);}
+.ct-profile-edit-overlay .ct-profile-edit-title{margin:5px 0 6px;font-size:1.5rem}
+.ct-profile-edit-overlay .ct-profile-edit-description{margin:0 0 20px;opacity:.72}
+.ct-profile-edit-overlay .ct-profile-edit-form{gap:16px}
+.ct-profile-edit-overlay .ct-profile-edit-field{gap:8px}
+.ct-profile-edit-overlay .ct-profile-edit-input{min-height:46px}
+.ct-profile-edit-overlay .ct-profile-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+@media(max-width:560px){.ct-profile-edit-overlay{padding:12px}.ct-profile-edit-overlay .ct-profile-edit-panel{width:100%;padding:20px;border-radius:16px}}
