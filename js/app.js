@@ -1377,6 +1377,22 @@
     });
   }
 
+function bindAvatarEditProfile() {
+  if (window.__cleanTrackAvatarEditProfileBound) return;
+  window.__cleanTrackAvatarEditProfileBound = true;
+  document.addEventListener("click", function(event) {
+    const button = event.target.closest('[data-action="edit-profile"]');
+    if (!button) return;
+    event.preventDefault();
+    const menu = getElement("profile-menu");
+    const menuButton = getElement("profile-menu-button");
+    if (menu) menu.hidden = true;
+    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
+    try { window.history.replaceState(null, "", "#settings-account"); } catch (_) {}
+    navigation.setActivePage("settings");
+  });
+}
+
 function bindNavigation() {
   // App startup can run again after authentication transitions. Bind navigation
   // handlers only once so a single Settings click cannot trigger duplicate renders.
@@ -1730,6 +1746,7 @@ function bindNavigation() {
 }
     bindLogoutButton();
     bindNavigation();
+    bindAvatarEditProfile();
 
     // Render the sign-in interface immediately. Session restoration can take
     // longer when the hosted API is waking up; it must never hold the launch
