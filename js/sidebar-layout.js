@@ -999,8 +999,36 @@ if (identity) {
 
         const actionsRow = document.createElement("div");
         actionsRow.className = "ct-help-dialog-actions ct-profile-actions ct-profile-actions-v2";
-        const profilePage = menu.find(item => item.id === "profile");
         const settingsPage = menu.find(item => item.id === "settings");
+
+        // Every signed-in role (Admin, Supervisor and Staff/Employee) has
+        // Settings in its route map. Put Edit Profile in this actual account
+        // dialog, not the separate global header dropdown.
+        addDialogButton(actionsRow, "Edit Profile", () => {
+          if (modal && modal.open) modal.close();
+          try { window.history.replaceState(null, "", "#settings-account"); }
+          catch (_) { window.location.hash = "settings-account"; }
+          const opened = window.CleanTrackNavigation.setActivePage("settings");
+          if (!opened) {
+            window.location.hash = "settings-account";
+            return;
+          }
+          window.setTimeout(() => {
+            const settings = document.querySelector(".ct-settings-page");
+            const accountPanel = settings && settings.querySelector('[data-settings-panel="account"]');
+            if (!accountPanel) return;
+            settings.querySelectorAll("[data-settings-panel]").forEach(panel => {
+              panel.hidden = panel !== accountPanel;
+            });
+            settings.querySelectorAll("[data-settings-nav]").forEach(item => {
+              const active = item.dataset.settingsNav === "account";
+              item.classList.toggle("is-active", active);
+              item.setAttribute("aria-current", active ? "page" : "false");
+            });
+          }, 0);
+        }, "ct-profile-settings-button");
+
+        const profilePage = menu.find(item => item.id === "profile");
         if (profilePage) {
           addDialogButton(actionsRow, "View profile", () => {
             if (modal && modal.open) modal.close();
