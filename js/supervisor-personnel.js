@@ -102,7 +102,7 @@ async function render(root){
   const categories=[["all","All"],["photo","Photos"],["video","Videos"],["voice","Voice"],["file","Files"]];
   categories.forEach(([key,label])=>{const b=el("button",key==="all"?"active":"",label);b.type="button";b.onclick=()=>{active=key;tabs.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));paint();};tabs.append(b)});
   content.append(el("p","mp-loading","Loading shared media…"));
-  try{const data=await API.get("supervisor/personnel/"+m.id+"/messages");items=(data.messages||[]).filter(msg=>msg.attachment).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));paint();}
+  try{const data=await API.get("supervisor/personnel/"+m.id+"/attachments");items=data.attachments||[];paint();}
   catch(err){content.replaceChildren(el("p","mp-error",err.message));}
   function paint(){
    content.replaceChildren();
