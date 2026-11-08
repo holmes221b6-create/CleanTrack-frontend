@@ -1383,43 +1383,41 @@ function bindAvatarEditProfile() {
 
   const menu = getElement("profile-menu");
   const menuButton = getElement("profile-menu-button");
-  if (!menu || !menuButton) return;
 
   function closeMenu() {
-    menu.hidden = true;
-    menuButton.setAttribute("aria-expanded", "false");
+    if (menu) menu.hidden = true;
+    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
   }
-  function toggleMenu(event) {
+  function openOrCloseMenu(event) {
+    if (!menu || !menuButton) return;
     event.preventDefault();
     event.stopPropagation();
     const opening = menu.hidden;
     menu.hidden = !opening;
     menuButton.setAttribute("aria-expanded", opening ? "true" : "false");
   }
+  async function openEditProfile(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeMenu();
+    navigation.setActivePage("settings");
+    window.setTimeout(function() {
+      const accountTab = document.querySelector('[data-settings-tab="account"], [data-tab="account"], #settings-account');
+      if (accountTab) accountTab.click();
+    }, 100);
+  }
 
-  menuButton.addEventListener("click", toggleMenu);
+  if (menuButton) menuButton.addEventListener("click", openOrCloseMenu);
   document.addEventListener("click", function(event) {
-    if (!menu.contains(event.target) && !menuButton.contains(event.target)) closeMenu();
+    const editButton = event.target.closest('[data-action="edit-profile"]');
+    if (editButton) {
+      openEditProfile(event);
+      return;
+    }
+    if (menu && menuButton && !menu.contains(event.target) && !menuButton.contains(event.target)) closeMenu();
   });
   document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") closeMenu();
-  });
-
-  menu.addEventListener("click", function(event) {
-    const button = event.target.closest("button[data-action]");
-    if (!button) return;
-    const action = button.dataset.action;
-    if (action === "edit-profile") {
-      event.preventDefault();
-      closeMenu();
-      navigation.setActivePage("settings");
-      window.setTimeout(function() {
-        const accountTab = document.querySelector('[data-settings-tab="account"], [data-tab="account"], #settings-account');
-        if (accountTab) accountTab.click();
-      }, 0);
-    } else if (action === "open-settings" || action === "logout") {
-      closeMenu();
-    }
   });
 }
 
