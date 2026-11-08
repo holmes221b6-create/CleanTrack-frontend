@@ -1720,3 +1720,31 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
   cursor: pointer;
 }
 #profile-menu.profile-menu button:hover { background: rgba(128,110,190,.16); }
+
+
+/* Always-visible profile edit action beside the shared top-right avatar. */
+.header-actions { position: relative; overflow: visible !important; }
+.profile-edit-shortcut {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--border, rgba(150,150,170,.35));
+  border-radius: 9px;
+  background: var(--surface, #171827);
+  color: var(--text, #f2f2f6);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.profile-edit-shortcut:hover { border-color: #9272d6; background: rgba(128,110,190,.16); }
+#profile-menu.profile-menu { display: none; }
+#profile-menu.profile-menu:not([hidden]) { display: grid !important; }
+#profile-menu.profile-menu[hidden] { display: none !important; }
+@media (max-width: 620px) {
+  .profile-edit-shortcut { min-height: 34px; padding: 0 9px; font-size: 12px; }
+}
