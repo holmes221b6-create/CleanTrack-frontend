@@ -1692,24 +1692,29 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
 @media(max-width:540px){.brand-mark.omnix-brand-mark{width:170px;height:42px;}}
 
 
-/* Top-right account avatar dropdown */
+/* Account actions are anchored directly to the avatar control. */
+.header-actions { overflow: visible !important; }
+.profile-menu-wrap { position: relative; display: inline-flex; align-items: center; }
 #profile-menu.profile-menu {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
   z-index: 1200;
-  min-width: 220px;
+  min-width: 230px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(140,140,160,.28));
   border-radius: 12px;
   background: var(--surface-color, #171827);
-  box-shadow: 0 14px 36px rgba(0,0,0,.24);
+  color: var(--text-color, inherit);
+  box-shadow: 0 14px 36px rgba(0,0,0,.28);
 }
 #profile-menu.profile-menu[hidden] { display: none !important; }
-#profile-menu.profile-menu:not([hidden]) { display: grid; gap: 4px; }
+#profile-menu.profile-menu:not([hidden]) { display: grid !important; gap: 4px; }
+#profile-menu.profile-menu p { margin: 4px 10px 8px; overflow-wrap: anywhere; opacity: .72; font-size: 12px; }
 #profile-menu.profile-menu button {
-  display: flex;
+  display: flex !important;
   width: 100%;
+  min-height: 40px;
   align-items: center;
   padding: 11px 12px;
   border: 0;
@@ -1717,34 +1722,8 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
   background: transparent;
   color: inherit;
   text-align: left;
-  cursor: pointer;
-}
-#profile-menu.profile-menu button:hover { background: rgba(128,110,190,.16); }
-
-
-/* Always-visible profile edit action beside the shared top-right avatar. */
-.header-actions { position: relative; overflow: visible !important; }
-.profile-edit-shortcut {
-  display: inline-flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 0 13px;
-  border: 1px solid var(--border, rgba(150,150,170,.35));
-  border-radius: 9px;
-  background: var(--surface, #171827);
-  color: var(--text, #f2f2f6);
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
 }
-.profile-edit-shortcut:hover { border-color: #9272d6; background: rgba(128,110,190,.16); }
-#profile-menu.profile-menu { display: none; }
-#profile-menu.profile-menu:not([hidden]) { display: grid !important; }
-#profile-menu.profile-menu[hidden] { display: none !important; }
-@media (max-width: 620px) {
-  .profile-edit-shortcut { min-height: 34px; padding: 0 9px; font-size: 12px; }
-}
+#profile-menu.profile-menu button:hover,
+#profile-menu.profile-menu button:focus-visible { background: rgba(128,110,190,.20); outline: none; }
