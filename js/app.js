@@ -1732,7 +1732,7 @@ function bindNavigation() {
         }
       }
     });
-
+  }
 
   async function start() {
     if (state.started) {
