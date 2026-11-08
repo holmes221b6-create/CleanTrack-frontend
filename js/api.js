@@ -52,19 +52,21 @@
   async function request(path, options = {}) {
     const controller = new AbortController();
     const requestPath = String(path || "").split("?")[0].split("/").filter(Boolean).join("/");
-    // Render's free web services can sleep between visits. The first auth/me
-    // or login request may need time for the service and database to wake up.
-    // Keep normal API calls on the standard timeout, but allow auth startup
-    // and sign-in requests up to 90 seconds.
+    // Bound the complete authentication request so the sign-in UI can never
+    // remain in "Signing in…" indefinitely. Render cold starts get extra time,
+    // while all other requests retain the configured normal timeout.
     const slowAuthPaths = new Set(["auth/me", "auth/login", "auth/refresh", "auth/csrf"]);
-    const timeoutMs = options.timeoutMs || (slowAuthPaths.has(requestPath)
-      ? Math.max(config.requestTimeoutMs, 90000)
-      : config.requestTimeoutMs);
+    const timeoutMs = Number(options.timeoutMs) > 0
+      ? Number(options.timeoutMs)
+      : (slowAuthPaths.has(requestPath)
+          ? Math.max(config.requestTimeoutMs, 35000)
+          : config.requestTimeoutMs);
 
-    const timeoutId = window.setTimeout(
-      () => controller.abort(),
-      timeoutMs
-    );
+    let timedOut = false;
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
 
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
@@ -179,10 +181,10 @@
 
       return data;
     } catch (error) {
-      if (error.name === "AbortError") {
+      if (error.name === "AbortError" || timedOut) {
         throw new ApiError(
           slowAuthPaths.has(requestPath)
-            ? "MECHNAR's server is taking longer than expected to respond. It may be waking up; please wait and try again."
+            ? "Sign-in timed out while waiting for MECHNAR's server. The request has been stopped; please try again."
             : "The request timed out. Check your connection and try again.",
           0,
           null
