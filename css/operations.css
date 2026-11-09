@@ -1055,3 +1055,47 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
 @media(max-width:640px){.ct-op-blocker-form,.ct-op-blocker-summary{grid-template-columns:minmax(0,1fr)}.ct-op-blocker-form .ct-op-field:nth-child(2){grid-column:auto}}
 
 .ct-op-blockers-view[hidden]{display:none!important}
+
+
+/* Supervisor Operations: compact, readable information density.
+   Keep all controls and content; reduce decorative whitespace only. */
+.ct-op-supervisor-page{padding-top:2px;padding-bottom:20px}
+.ct-op-supervisor-page .ct-op-header{gap:14px;margin-bottom:14px}
+.ct-op-supervisor-page .ct-op-header h1{font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:5px}
+.ct-op-supervisor-page .ct-op-eyebrow{margin-bottom:5px}
+.ct-op-supervisor-page .ct-op-stats{gap:8px;margin-bottom:13px}
+.ct-op-supervisor-page .ct-op-stat{padding:10px 12px;border-radius:11px}
+.ct-op-supervisor-page .ct-op-stat-label{font-size:.75rem;margin-bottom:3px}
+.ct-op-supervisor-page .ct-op-stat-number{font-size:1.4rem}
+.ct-op-supervisor-page .ct-op-supervisor-queues{gap:7px;margin:11px 0 6px;padding:8px}
+.ct-op-supervisor-page .ct-op-supervisor-queues .ct-op-button{min-height:34px;padding:7px 11px}
+.ct-op-supervisor-page .ct-op-supervisor-scope-note{margin-bottom:10px}
+.ct-op-supervisor-page .ct-op-viewbar{gap:7px;margin-bottom:10px}
+.ct-op-supervisor-page .ct-op-button{padding:8px 11px}
+.ct-op-supervisor-page .ct-op-card{padding:14px;margin-bottom:11px;border-radius:13px}
+.ct-op-supervisor-page .ct-op-card-head{margin-bottom:10px}
+.ct-op-supervisor-page .ct-op-card-head h2{margin-bottom:3px}
+.ct-op-supervisor-page .ct-op-filters{gap:9px}
+.ct-op-supervisor-page .ct-op-input{padding:8px 10px}
+.ct-op-supervisor-page .ct-op-list-toolbar{margin:0 0 7px}
+.ct-op-supervisor-page .ct-op-rows{gap:7px}
+.ct-op-supervisor-page .ct-op-row{gap:10px;padding:10px 11px;border-radius:10px}
+.ct-op-supervisor-page .ct-op-empty{padding:16px}
+.ct-op-supervisor-page .ct-op-blockers-view{gap:11px}
+.ct-op-supervisor-page .ct-op-blocker-form{gap:10px}
+.ct-op-supervisor-page .ct-op-blocker-summary{gap:8px}
+.ct-op-supervisor-page .ct-op-blocker-row{padding:12px}
+.ct-op-supervisor-page .ct-op-calendar-toolbar{margin-bottom:10px}
+.ct-op-supervisor-page .ct-op-calendar-cell{min-height:88px;padding:6px}
+.ct-op-supervisor-page .ct-op-calendar-week-grid{gap:6px}
+.ct-op-supervisor-page .ct-op-agenda-row{gap:9px;padding:9px 0}
+.ct-op-supervisor-page .ct-op-form-grid{gap:10px}
+.ct-op-supervisor-page .ct-op-check-row{gap:12px;margin:12px 0}
+.ct-op-supervisor-page .ct-op-completion-requirements{gap:9px;padding:12px;margin:12px 0}
+.ct-op-supervisor-page .ct-op-detail-panel{padding:16px!important}
+.ct-op-supervisor-page .ct-op-detail-panel .ct-op-card{padding:13px!important}
+@media(max-width:740px){
+ .ct-op-supervisor-page .ct-op-card{padding:12px}
+ .ct-op-supervisor-page .ct-op-row{padding:9px}
+ .ct-op-supervisor-page .ct-op-stats{gap:7px}
+}
