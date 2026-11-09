@@ -867,3 +867,40 @@ html:not([data-theme="light"]):not([data-theme="black"]) body #page-content:has(
     max-width: 252px !important;
   }
 }
+
+
+/* MECHNAR compact workspace density: preserve readability while removing
+   oversized padding, tall empty states and unnecessary vertical gaps. */
+#workspace-view #page-content,
+#workspace-view .page-content,
+#page-content {
+  padding-top: clamp(14px, 1.5vw, 22px) !important;
+  padding-bottom: 24px !important;
+}
+#page-content :is(.section, section.section, .dashboard-section) { margin-bottom: 20px !important; }
+#page-content :is(.section-heading, .section-header, .panel-header, .card-header) { margin-bottom: 10px !important; }
+#page-content :is(.card, .panel, .stat-card, .metric-card, .dashboard-card,
+  .form-card, .content-card, .section-card, .report-card, .analytics-card,
+  .settings-card, .ct-card, .ct-panel, .chart-card, .widget, .widget-card) {
+  padding: clamp(11px, 1vw, 16px) !important;
+}
+#page-content :is(.card-body, .panel-body, .modal-body) { padding: 14px !important; }
+#page-content :is(.empty-state, .no-results, .empty-placeholder) {
+  min-height: 112px !important;
+  padding: 16px !important;
+}
+#page-content :is(.stats-grid, .stat-grid, .metrics-grid, .dashboard-stats,
+  .dashboard-metrics, .summary-grid, .kpi-grid) { gap: 10px !important; }
+#page-content :is(.dashboard-grid, .dashboard-layout, .analytics-grid,
+  .reports-grid, .overview-grid, .content-grid, .workspace-grid) { gap: 12px !important; }
+#page-content :is(.metric-value, .stat-value, .kpi-value) { font-size: clamp(20px, 2vw, 27px) !important; }
+#page-content :is(.field, .form-group, .form-field) { margin-bottom: 12px !important; }
+#page-content :is(.divider, hr) { margin-block: 12px !important; }
+#page-content :is(.table-wrap, .table-container) { margin-block: 8px !important; }
+@media (max-width: 800px) {
+  #page-content :is(.card, .panel, .stat-card, .metric-card, .dashboard-card,
+    .form-card, .content-card, .section-card, .report-card, .analytics-card,
+    .settings-card, .ct-card, .ct-panel, .chart-card, .widget, .widget-card) {
+    padding: 12px !important;
+  }
+}
