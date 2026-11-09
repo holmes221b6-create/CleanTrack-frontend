@@ -13,7 +13,7 @@
     appName: "CleanTrack",
     appVersion: "1.0.0",
     apiBaseUrl: apiBaseUrl,
-    requestTimeoutMs: 20000,
+    requestTimeoutMs: 60000,
     defaultLanguage: "en",
     supportedLanguages: ["en", "es", "ar", "hi", "ur", "zh"],
     roles: {
