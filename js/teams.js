@@ -444,8 +444,12 @@ async function renderSupervisorTeams(container){
   const addTool=button("▥ New visual","ct-bi-ribbon-tool",()=>addVisual.click());
   const saveTool=button("▣ Save report","ct-bi-ribbon-tool",()=>save.click());
   const exportTool=button("⇩ Export CSV","ct-bi-ribbon-tool",()=>exportData.click());
-  ribbonTools.append(getDataTool,transformTool,refreshTool,addTool,saveTool,exportTool);
-  const getDataWrap=el("div","ct-bi-getdata-wrap");getDataWrap.append(getDataTool,dataMenu);ribbonTools.replaceChild(getDataWrap,getDataTool);
+  // Build the wrapper before attaching Get data to the toolbar. Moving an
+  // already-attached child into the wrapper detaches it, so replaceChild then
+  // throws NotFoundError and aborts the entire Supervisor workspace render.
+  const getDataWrap=el("div","ct-bi-getdata-wrap");
+  getDataWrap.append(getDataTool,dataMenu);
+  ribbonTools.append(getDataWrap,transformTool,refreshTool,addTool,saveTool,exportTool);
   ribbon.append(ribbonTabs,ribbonTools);perf.insertBefore(ribbon,biStatus);
   const appRail=el("nav","ct-bi-app-rail");[[ "▥","Report"],["▦","Data"]].forEach(([ico,label],i)=>{const b=button(ico,"ct-bi-rail-button"+(i===0?" is-active":""),()=>{appRail.querySelectorAll("button").forEach(x=>x.classList.remove("is-active"));b.classList.add("is-active");togglePane(label.toLowerCase()==="data"?"data":"visuals")});b.title=label;appRail.append(b)});
   let presenting=false;const exitPresentation=button("Exit presentation","ct-team-btn","");exitPresentation.hidden=true;
