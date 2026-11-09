@@ -1053,3 +1053,5 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
 .ct-op-blocker-row>p{margin:10px 0;line-height:1.55}
 .ct-op-blocker-row>small{display:block;line-height:1.5}
 @media(max-width:640px){.ct-op-blocker-form,.ct-op-blocker-summary{grid-template-columns:minmax(0,1fr)}.ct-op-blocker-form .ct-op-field:nth-child(2){grid-column:auto}}
+
+.ct-op-blockers-view[hidden]{display:none!important}
