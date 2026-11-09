@@ -213,3 +213,19 @@
 .ct-team-supervisor-score{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border,#29374d);border-radius:9px;max-width:260px}
 .ct-team-supervisor-score strong{font-size:1.2rem}
 @media(max-width:640px){.ct-team-supervisor{padding:10px}.ct-team-supervisor-areas{grid-template-columns:1fr}.ct-team-supervisor-week{align-items:flex-start}.ct-team-supervisor-week strong{flex-basis:100%}}
+
+
+/* Supervisor Teams: compact roster and activity panels */
+.ct-team-supervisor-roster,.ct-team-supervisor-activity{margin-top:14px;padding-top:12px;border-top:1px solid var(--border,#29374d)}
+.ct-team-supervisor-sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.ct-team-supervisor-sectionhead h3,.ct-team-supervisor-activity h3{margin:0;font-size:.94rem}
+.ct-team-supervisor-memberlist,.ct-team-supervisor-activitylist{display:grid;gap:0}
+.ct-team-supervisor-member,.ct-team-supervisor-activityrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid var(--border,#29374d)}
+.ct-team-supervisor-member:last-child,.ct-team-supervisor-activityrow:last-child{border-bottom:0}
+.ct-team-supervisor-memberidentity{display:grid;gap:2px;min-width:0}
+.ct-team-supervisor-memberidentity strong,.ct-team-supervisor-activityrow strong{font-size:.84rem}
+.ct-team-supervisor-member small,.ct-team-supervisor-activityrow small{font-size:.74rem}
+.ct-team-supervisor-activity>p{margin:4px 0 8px}
+.ct-team-supervisor-activityrow>div{min-width:0}
+.ct-team-supervisor-activityrow p{margin:3px 0 0;font-size:.8rem}
+@media(max-width:640px){.ct-team-supervisor-member,.ct-team-supervisor-activityrow{align-items:flex-start;flex-direction:column;gap:3px}}
