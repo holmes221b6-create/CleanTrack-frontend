@@ -284,7 +284,7 @@ function renderBlockers(root,items){
  const escalationCard=card("Automatic overdue escalations","These operations crossed their configured escalation threshold and were escalated by the scheduler.");
  const escalationList=el("div","ct-op-blocker-list");
  if(!escalated.length)escalationList.appendChild(el("p","ct-op-empty","No operations have triggered an Admin escalation."));
- escalated.forEach(op=>{const row=el("article","ct-op-blocker-row"),head=el("div","ct-op-blocker-head");head.append(el("strong","",op.title),el("span","ct-op-pill","ESCALATED"));row.append(head,el("p","", "Assigned to "+(op.assigned_to_name||"Unassigned")+" · Due "+date(op.due_at)),el("small","ct-op-muted","Escalated "+date(op.escalated_at)));row.appendChild(button("Open operation","ct-op-button ct-op-button-secondary",()=>openDetail(op.id)));escalationList.appendChild(row);});
+ escalated.forEach(op=>{const row=el("article","ct-op-blocker-row"),head=el("div","ct-op-blocker-head");head.append(el("strong","",op.title),el("span","ct-op-pill","ESCALATED"));row.append(head,el("p","", "Assigned to "+(op.assigned_to_name||"Unassigned")+" · Due "+date(op.due_at)),el("small","ct-op-muted","Escalated "+date(op.escalated_at)));row.appendChild(button("Open operation","ct-op-button ct-op-button-secondary",()=>{setView(root,"directory");openDetail(op.id);}));escalationList.appendChild(row);});
  escalationCard.appendChild(escalationList);
  const listCard=card("Blockers & escalations","Issues recorded for your authorized teams. Add a resolution note before closing a blocker.");
  const list=el("div","ct-op-blocker-list");
@@ -411,7 +411,7 @@ notice(context,"Supervisor schedule"+(sup?": "+sup.name:"")+" — showing operat
 setView(root,"calendar");
 }
 if(window.location.hash.startsWith("#operation-"))await openDetail(window.location.hash.slice("#operation-".length));}catch(err){root.querySelector("[data-op-rows]")?.replaceChildren(el("p","ct-op-error",err.message||"Could not load operations."));actionNotice("No sample operations are shown or inserted. Check your connection and permissions.",true);}}
-async function refresh(){if(!host)return;await loadData();const root=host.querySelector(".ct-operations-page");if(root){renderStats(root);makeFilters(root);renderRows(root);}}
+async function refresh(){if(!host)return;await loadData();const root=host.querySelector(".ct-operations-page");if(root){renderStats(root);makeFilters(root);renderRows(root);if(!root.querySelector("[data-op-blockers]")?.hidden)loadBlockers(root);}}
 function stopSupervisorAutoRefresh(){if(supervisorRefreshTimer){window.clearInterval(supervisorRefreshTimer);supervisorRefreshTimer=null;}supervisorRefreshHost=null;}
 function startSupervisorAutoRefresh(root){
  stopSupervisorAutoRefresh();
@@ -425,7 +425,7 @@ function startSupervisorAutoRefresh(root){
    await loadData();
    if(!supervisorRefreshHost||!supervisorRefreshHost.isConnected)return;
    const page=supervisorRefreshHost.querySelector(".ct-operations-page");
-   if(page){renderStats(page);makeFilters(page);renderRows(page);}
+   if(page){renderStats(page);makeFilters(page);renderRows(page);if(!page.querySelector("[data-op-blockers]")?.hidden)loadBlockers(page);}
   }catch(error){
    const page=supervisorRefreshHost?.querySelector(".ct-operations-page");
    if(page)actionNotice("Automatic refresh paused after a connection error. Use Refresh to retry.",true);
