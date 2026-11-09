@@ -226,9 +226,10 @@ async function renderSupervisorTeams(container){
  const topbar=el("header","ct-team-fullscreen-topbar");
  const brand=el("div","ct-team-fullscreen-brand");brand.append(el("span","ct-team-fullscreen-brandmark","M"),el("strong","","MECHNAR"),el("span","ct-team-fullscreen-divider","/"),el("span","","Teams"));
  const topActions=el("div","ct-team-fullscreen-topactions");
- const back=button("← Back to workspace","ct-team-btn ct-team-btn--quiet",()=>{window.CleanTrackNavigation?.setActivePage("workspace")});
  const who=el("span","ct-team-fullscreen-user",user?.name||user?.email||"Supervisor");
- topActions.append(who,back);topbar.append(brand,topActions);
+ const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{shell.remove();document.documentElement.classList.remove("ct-team-workspace-open");document.body.classList.remove("ct-team-workspace-open");window.CleanTrackNavigation?.setActivePage("workspace")});
+ closeWorkspace.type="button";closeWorkspace.setAttribute("aria-label","Close Teams workspace");closeWorkspace.title="Close Teams workspace";
+ topActions.append(who,closeWorkspace);topbar.append(brand,topActions);
  const sidebar=el("aside","ct-team-fullscreen-sidebar");sidebar.append(el("p","ct-team-fullscreen-side-label","TEAM SPACE"));
  const pageHost=el("main","ct-team-fullscreen-main");
  const pageHeading=el("header","ct-team-fullscreen-pagehead");
@@ -269,7 +270,10 @@ async function renderSupervisorTeams(container){
  const suggestions=el("div","ct-team-supervisor-suggestions");suggestions.hidden=true;suggestions.setAttribute("role","listbox");searchBox.append(searchInput,suggestions);searchSection.append(searchBox);wrap.append(searchSection);
  const other=el("section","ct-team-supervisor-other");other.hidden=true;wrap.append(other);
  pageViews.get("overview").append(wrap);
- container.replaceChildren(shell);
+ container.replaceChildren();
+ document.querySelectorAll(".ct-team-fullscreen-shell").forEach(node=>node.remove());
+ document.documentElement.classList.add("ct-team-workspace-open");document.body.classList.add("ct-team-workspace-open");
+ document.body.append(shell);
  function openSupervisorPanel(kind,data){
   const isActivity=kind==="activity";
   const panel=document.createElement("dialog");
