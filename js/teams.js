@@ -261,6 +261,99 @@ async function renderSupervisorTeams(container){
  const intro=el("div","");
  intro.append(el("p","ct-team-eyebrow","TEAM OVERVIEW"),el("h1","","Teams"),el("p","ct-team-muted","Your team at a glance. Search the organisation when you need to look up another team."));
  header.append(intro);wrap.append(header);
+ function metricSmall(label,value){
+  const card=el("div","ct-team-supervisor-metric");
+  card.append(el("span","ct-team-muted",label),el("strong","",value===null||value===undefined||value===""?"—":String(value)));
+  return card;
+ }
+ function renderOwn(data){
+  const t=data.team||{};
+  const overview=pageViews.get("overview"),membersPage=pageViews.get("members"),operationsPage=pageViews.get("operations"),locationsPage=pageViews.get("locations"),performancePage=pageViews.get("performance"),activityPage=pageViews.get("activity");
+  [overview,membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
+  const teamHead=el("section","ct-team-supervisor-teamhead"),identity=el("div","");
+  identity.append(el("p","ct-team-eyebrow","YOUR TEAM"),el("h2","",t.name||"Your team"),el("p","ct-team-muted",t.description||"Your assigned team."));
+  teamHead.append(identity,el("span","ct-team-status",t.status||"Active"));overview.append(teamHead);
+  const summary=el("section","ct-team-supervisor-overview-summary");
+  summary.append(el("h2","","Team at a glance"),el("p","ct-team-muted","A concise snapshot of your team's composition, capacity and current operational position."));
+  const metrics=el("div","ct-team-supervisor-metrics");
+  [["Team members",t.member_count],["Staff",t.staff_count],["Supervisors",t.supervisor_count],["Active operations",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue operations",t.overdue_operation_count],["Completed operations",t.completed_operation_count],["Total operations",t.total_operation_count],["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],["Team capacity",t.capacity===null||t.capacity===undefined?"Not set":String(t.member_count||0)+" / "+String(t.capacity)]].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
+  summary.append(metrics);overview.append(summary);
+  const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
+  const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
+  const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
+  statusGrid.append(metricSmall("Capacity status",capacityLabel),metricSmall("Team status",t.status||"Unknown"),metricSmall("Tracked activity events",(data.activity||[]).length));
+  status.append(statusGrid);overview.append(status);
+
+  const roster=el("section","ct-team-supervisor-roster");
+  roster.append(el("p","ct-team-eyebrow","TEAM DIRECTORY"),el("h2","","Team members"),el("p","ct-team-muted",(data.members||[]).length+" people assigned to your team."));
+  const members=data.members||[];
+  if(!members.length)roster.append(el("p","ct-team-muted","No active team members are recorded."));
+  else{
+   const list=el("div","ct-team-supervisor-memberlist");
+   members.forEach(member=>{
+    const row=el("div","ct-team-supervisor-member"),identity=el("div","ct-team-supervisor-memberidentity");
+    identity.append(el("strong","",member.name||"Unnamed member"),el("small","ct-team-muted",String(member.role||"Staff")+" · "+(member.account_status||"Unknown status")));
+    row.append(identity,el("small","ct-team-muted",member.assigned_at?"Joined team "+date(member.assigned_at):"Team assignment date unavailable"));list.append(row);
+   });roster.append(list);
+  }
+  membersPage.append(roster);
+
+  const operations=data.operations||[];
+  const opSection=el("section","ct-team-supervisor-page-section");
+  opSection.append(el("p","ct-team-eyebrow","TEAM WORKLOAD"),el("h2","","Operations"),el("p","ct-team-muted",operations.length+" recorded operations associated with your team."));
+  const opMetrics=el("div","ct-team-supervisor-metrics");
+  [["Active",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue",t.overdue_operation_count],["Completed",t.completed_operation_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
+  opSection.append(opMetrics);
+  if(!operations.length)opSection.append(el("p","ct-team-muted","No operations are currently recorded for this team."));
+  else{
+   const list=el("div","ct-team-supervisor-operationlist");
+   operations.forEach(op=>{
+    const row=el("article","ct-team-supervisor-operation"),copy=el("div","");
+    copy.append(el("strong","",op.title||"Untitled operation"));
+    if(op.description)copy.append(el("p","ct-team-muted",op.description));
+    const meta=el("div","ct-team-supervisor-operationmeta");
+    meta.append(el("span","ct-team-supervisor-chip",op.status||"Unknown status"));
+    if(op.due_at)meta.append(el("span","ct-team-muted","Due "+dateTime(op.due_at)));
+    if(op.overdue_calculated)meta.append(el("span","ct-team-error","Overdue"));
+    row.append(copy,meta);list.append(row);
+   });opSection.append(list);
+  }
+  operationsPage.append(opSection);
+
+  const areas=el("section","ct-team-supervisor-page-section");
+  areas.append(el("p","ct-team-eyebrow","ASSIGNED WORK AREAS"),el("h2","","Locations & zones"));
+  const areaGrid=el("div","ct-team-supervisor-areas");
+  const loc=el("div","ct-team-supervisor-area");loc.append(el("h3","","Assigned locations"));
+  const locList=el("div","ct-team-supervisor-chips");
+  (data.locations||[]).forEach(x=>locList.append(el("span","ct-team-supervisor-chip",x.name)));
+  if(!data.locations?.length)locList.append(el("span","ct-team-muted","No locations assigned."));
+  loc.append(locList);
+  const zones=el("div","ct-team-supervisor-area");zones.append(el("h3","","Assigned zones"));
+  const zoneList=el("div","ct-team-supervisor-chips");
+  (data.zones||[]).forEach(x=>zoneList.append(el("span","ct-team-supervisor-chip",x.name)));
+  if(!data.zones?.length)zoneList.append(el("span","ct-team-muted","No zones assigned."));
+  zones.append(zoneList);areaGrid.append(loc,zones);areas.append(areaGrid);locationsPage.append(areas);
+
+  const perf=el("section","ct-team-supervisor-page-section"),perfHead=el("div","ct-team-supervisor-sectionhead");
+  const perfTitle=el("div","");perfTitle.append(el("p","ct-team-eyebrow","TEAM INSIGHTS"),el("h2","","Recent performance"));
+  perfHead.append(perfTitle,button("View team performance →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("performance",data)));
+  perf.append(perfHead,el("p","ct-team-muted","Your team's three most recent recorded performance weeks."));
+  const perfMetrics=el("div","ct-team-supervisor-metrics");
+  perfMetrics.append(metricSmall("Overall completion",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"),metricSmall("Completed operations",t.completed_operation_count));perf.append(perfMetrics);
+  const trend=(data.performance||[]).filter(x=>Number(x.tasks_created||0)||Number(x.tasks_completed||0));
+  if(!trend.length)perf.append(el("p","ct-team-muted","No operation history is available yet."));
+  else{const list=el("div","ct-team-supervisor-weeks");trend.slice(-3).forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",date(x.week_start)),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"));list.append(row)});perf.append(list)}
+  performancePage.append(perf);
+
+  const activity=el("section","ct-team-supervisor-page-section"),activityHead=el("div","ct-team-supervisor-sectionhead"),activityTitle=el("div","");
+  activityTitle.append(el("p","ct-team-eyebrow","TEAM HISTORY"),el("h2","","Recent team activity"));
+  activityHead.append(activityTitle,button("View team activity →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("activity",data)));
+  activity.append(activityHead,el("p","ct-team-muted","The three most recent recorded team events."));
+  const events=data.activity||[];
+  if(!events.length)activity.append(el("p","ct-team-muted","No recent team activity recorded."));
+  else{const list=el("div","ct-team-supervisor-activitylist");events.slice(0,3).forEach(event=>{const row=el("article","ct-team-supervisor-activityrow"),copy=el("div","");copy.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));const message=event.message||event.details?.message||event.details?.task_title;if(message)copy.append(el("p","ct-team-muted",message));row.append(copy,el("small","ct-team-muted",(event.actor_name||"System")+" · "+dateTime(event.created_at)));list.append(row)});activity.append(list)}
+  activityPage.append(activity);
+ }
  const noticeNode=el("div","ct-team-notice");noticeNode.hidden=true;wrap.append(noticeNode);
  const own=el("section","ct-team-supervisor-own");own.append(el("p","ct-team-muted","Loading your team…"));wrap.append(own);
  function renderOther(data,target,inputNode,suggestionNode){
@@ -319,7 +412,7 @@ async function renderSupervisorTeams(container){
  pageViews.get("overview").append(wrap);
  pageViews.get("overview").querySelector(".ct-team-supervisor-own")?.after(overviewSearch);
  pageViews.get("members").append(membersSearch);
- try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));showNotice(e.message||"Unable to load your team.")}
+ try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));}
 }
 
 async function render(container){
