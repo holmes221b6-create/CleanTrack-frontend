@@ -281,3 +281,30 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-team-supervisor-metric .ct-team-supervisor-progress{height:4px;margin-top:7px;overflow:hidden;border-radius:99px;background:var(--border,#29374d)}
 .ct-team-supervisor-metric .ct-team-supervisor-progress-fill{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8060c8,#b39ae8);transition:width 850ms cubic-bezier(.2,.75,.25,1)}
 @media(prefers-reduced-motion:reduce){.ct-team-supervisor-metric .ct-team-supervisor-progress-fill{transition:none}}
+
+
+/* Supervisor Teams: management, fair member ranking and visual comparisons */
+.ct-team-supervisor-management{margin-top:18px}
+.ct-team-supervisor-management h2{margin:4px 0 8px}
+.ct-team-supervisor-management h3{margin:18px 0 8px}
+.ct-team-supervisor-management-grid,.ct-team-supervisor-performance-filters,.ct-team-supervisor-chart-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.ct-team-supervisor-management-field{display:grid;gap:6px;min-width:0}
+.ct-team-supervisor-management-field>span{font-size:.78rem;color:var(--muted,#9aa8bd);font-weight:650}
+.ct-team-supervisor-management-field .ct-team-input{width:100%;min-width:0}
+.ct-team-supervisor-filter-actions{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0}
+.ct-team-supervisor-rankbadge{display:grid;gap:2px;text-align:right;min-width:130px}
+.ct-team-supervisor-rankbadge strong{font-size:.9rem}
+.ct-team-supervisor-rankbadge small{font-size:.72rem}
+.ct-team-supervisor-chart{width:100%;min-height:220px;margin:14px 0;padding:12px;border:1px solid var(--border,#29374d);border-radius:12px;background:var(--surface,#141e31);overflow:hidden}
+.ct-team-supervisor-chart svg{display:block;width:100%;height:auto;max-height:420px}
+.ct-team-supervisor-chart-grid{stroke:var(--border,#39465a);stroke-width:1}
+.ct-team-supervisor-chart-label{fill:var(--muted,#9aa8bd);font-size:12px}
+.ct-team-supervisor-chart-bar{fill:#8060c8}
+.ct-team-supervisor-chart-dot{fill:#b39ae8;stroke:#8060c8;stroke-width:2}
+.ct-team-supervisor-chart-line{fill:none;stroke:#a88ae8;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ct-team-supervisor-donut-slice{stroke:var(--surface,#141e31);stroke-width:2}
+.ct-team-supervisor-donut-centre{fill:var(--text,#edf3fc);font-size:23px;font-weight:750}
+.ct-team-supervisor-ranking{display:grid;gap:0;margin-top:12px}
+.ct-team-supervisor-ranking-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(100px,.8fr) minmax(100px,.8fr);gap:12px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--border,#29374d)}
+.ct-team-supervisor-ranking-row strong{font-size:.86rem}
+@media(max-width:620px){.ct-team-supervisor-ranking-row{grid-template-columns:1fr 1fr}.ct-team-supervisor-ranking-row strong{grid-column:1/-1}.ct-team-supervisor-rankbadge{text-align:left}}
