@@ -232,9 +232,9 @@
 
 
 /* Supervisor Teams: notification-style detail drawers for activity and performance */
-.ct-team-supervisor-drawer{position:fixed;inset:0 0 0 auto;margin:0 0 0 auto;width:min(560px,100vw);height:100dvh;max-height:100dvh;padding:0;border:0;border-left:1px solid var(--border-strong,#3a4c66);background:var(--bg-elevated,#10182a);color:var(--text,#edf3fc);box-shadow:-18px 0 55px rgb(0 0 0 / 28%);overflow:hidden;}
+.ct-team-supervisor-drawer{position:fixed;inset:0;margin:auto;width:min(760px,calc(100vw - 40px));height:min(78dvh,760px);max-width:none;max-height:calc(100dvh - 40px);padding:0;border:1px solid var(--border-strong,#3a4c66);border-radius:16px;background:var(--bg-elevated,#10182a);color:var(--text,#edf3fc);box-shadow:0 24px 80px rgb(0 0 0 / 38%);overflow:hidden;}
 .ct-team-supervisor-drawer::backdrop{background:rgb(3 5 12 / 58%);backdrop-filter:blur(3px)}
-.ct-team-supervisor-drawer[open]{display:block;animation:ct-team-drawer-in .2s ease-out}
+.ct-team-supervisor-drawer[open]{display:block;animation:ct-team-modal-in .2s ease-out}
 .ct-team-supervisor-drawer__shell{height:100%;display:flex;flex-direction:column;min-height:0}
 .ct-team-supervisor-drawer__header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px;border-bottom:1px solid var(--border,#29374d)}
 .ct-team-supervisor-drawer__header h2{margin:0;font-size:1.25rem}
@@ -244,5 +244,5 @@
 .ct-team-supervisor-drawer__event p{margin:5px 0}
 .ct-team-supervisor-drawer__event small{display:block;margin-top:6px}
 .ct-team-supervisor-drawer__metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
-@keyframes ct-team-drawer-in{from{transform:translateX(24px);opacity:.7}to{transform:translateX(0);opacity:1}}
-@media(max-width:520px){.ct-team-supervisor-drawer__header,.ct-team-supervisor-drawer__body{padding-left:14px;padding-right:14px}.ct-team-supervisor-drawer__metrics{grid-template-columns:1fr 1fr}}
+@keyframes ct-team-modal-in{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
+@media(max-width:520px){.ct-team-supervisor-drawer{width:calc(100vw - 24px);height:min(82dvh,760px);max-height:calc(100dvh - 24px);border-radius:13px}.ct-team-supervisor-drawer__header,.ct-team-supervisor-drawer__body{padding-left:14px;padding-right:14px}.ct-team-supervisor-drawer__metrics{grid-template-columns:1fr 1fr}}
