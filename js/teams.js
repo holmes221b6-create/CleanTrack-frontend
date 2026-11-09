@@ -263,6 +263,21 @@ async function renderSupervisorTeams(container){
  header.append(intro);wrap.append(header);
  const noticeNode=el("div","ct-team-notice");noticeNode.hidden=true;wrap.append(noticeNode);
  const own=el("section","ct-team-supervisor-own");own.append(el("p","ct-team-muted","Loading your team…"));wrap.append(own);
+ function renderOther(data,target,inputNode,suggestionNode){
+  const t=data.team||{};target.hidden=false;target.replaceChildren();
+  const head=el("div","ct-team-supervisor-other-head");
+  const title=el("div","");title.append(el("p","ct-team-eyebrow","ORGANISATION DIRECTORY"),el("h2","",t.name||"Team"));
+  head.append(title,button("Close","ct-team-btn ct-team-btn--quiet",()=>{
+   target.hidden=true;target.replaceChildren();inputNode.value="";suggestionNode.hidden=true;inputNode.focus();
+  }));target.append(head);
+  if(t.description)target.append(el("p","ct-team-muted",t.description));
+  target.append(el("p","ct-team-supervisor-readonly","View-only team information. Staff records, personal details, operations and operational controls are not available."));
+  if(t.team_performance_score!==null&&t.team_performance_score!==undefined){
+   const score=el("div","ct-team-supervisor-score");
+   score.append(el("span","ct-team-muted","Team completion score"),el("strong","",t.team_performance_score+"%"));
+   target.append(score);
+  }
+ }
  function buildTeamSearch(label){
   const section=el("section","ct-team-supervisor-search");
   section.append(el("h2","",label),el("p","ct-team-muted","Search by team name. Results are limited to your organisation and are view-only."));
