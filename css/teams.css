@@ -308,3 +308,8 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-team-supervisor-ranking-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(100px,.8fr) minmax(100px,.8fr);gap:12px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--border,#29374d)}
 .ct-team-supervisor-ranking-row strong{font-size:.86rem}
 @media(max-width:620px){.ct-team-supervisor-ranking-row{grid-template-columns:1fr 1fr}.ct-team-supervisor-ranking-row strong{grid-column:1/-1}.ct-team-supervisor-rankbadge{text-align:left}}
+
+.ct-team-supervisor-chart-area{fill:rgba(128,96,200,.16);stroke:none}
+.ct-team-supervisor-donut-hole{fill:var(--surface,#141e31)}
+.ct-team-supervisor-donut-slice.slice-0{fill:#8060c8}.ct-team-supervisor-donut-slice.slice-1{fill:#4c9bba}.ct-team-supervisor-donut-slice.slice-2{fill:#c58b54}.ct-team-supervisor-donut-slice.slice-3{fill:#6da58a}.ct-team-supervisor-donut-slice.slice-4{fill:#a66d91}.ct-team-supervisor-donut-slice.slice-5{fill:#a5a15c}
+.ct-team-supervisor-chart-bar.slice-0{fill:#8060c8}.ct-team-supervisor-chart-bar.slice-1{fill:#4c9bba}.ct-team-supervisor-chart-bar.slice-2{fill:#c58b54}.ct-team-supervisor-chart-bar.slice-3{fill:#6da58a}.ct-team-supervisor-chart-bar.slice-4{fill:#a66d91}.ct-team-supervisor-chart-bar.slice-5{fill:#a5a15c}
