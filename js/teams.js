@@ -218,8 +218,75 @@ async function download(id,format){
  if(!response.ok){let b={};try{b=await response.json()}catch(_){}throw Error(b.error||"Export failed.")}
  const blob=await response.blob(),url=URL.createObjectURL(blob),cd=response.headers.get("content-disposition")||"",m=cd.match(/filename="?([^";]+)"?/i),a=el("a");a.href=url;a.download=m?m[1]:"team-report."+format;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
+
+async function renderSupervisorTeams(container){
+ const user=AUTH?.getCurrentUser?.();
+ const wrap=el("section","ct-team-supervisor");
+ const header=el("header","ct-team-supervisor-head");
+ const intro=el("div","");
+ intro.append(el("p","ct-team-eyebrow","TEAM OVERVIEW"),el("h1","","Teams"),el("p","ct-team-muted","Your team at a glance. Search the organisation when you need to look up another team."));
+ header.append(intro);wrap.append(header);
+ const noticeNode=el("div","ct-team-notice");noticeNode.hidden=true;wrap.append(noticeNode);
+ const own=el("section","ct-team-supervisor-own");own.append(el("p","ct-team-muted","Loading your team…"));wrap.append(own);
+ const searchSection=el("section","ct-team-supervisor-search");
+ searchSection.append(el("h2","","Find another team"),el("p","ct-team-muted","Search by team name. Results are limited to your organisation and are view-only."));
+ const searchBox=el("div","ct-team-supervisor-searchbox"),searchInput=el("input","ct-team-input");searchInput.type="search";searchInput.placeholder="Type at least 2 letters…";searchInput.setAttribute("aria-label","Search other teams");
+ const suggestions=el("div","ct-team-supervisor-suggestions");suggestions.hidden=true;suggestions.setAttribute("role","listbox");searchBox.append(searchInput,suggestions);searchSection.append(searchBox);wrap.append(searchSection);
+ const other=el("section","ct-team-supervisor-other");other.hidden=true;wrap.append(other);container.replaceChildren(wrap);
+ function showNotice(message){noticeNode.textContent=message||"";noticeNode.hidden=!message}
+ function metricSmall(label,value){const node=el("div","ct-team-supervisor-metric");node.append(el("span","ct-team-muted",label),el("strong","",value===null||value===undefined?"—":String(value)));return node}
+ function renderOwn(data){
+  own.replaceChildren();const t=data.team;
+  const top=el("div","ct-team-supervisor-teamhead");const name=el("div","");name.append(el("h2","",t.name),el("p","ct-team-muted",t.description||"Your assigned team."));top.append(name,el("span","ct-team-status","Active"));own.append(top);
+  const metrics=el("div","ct-team-supervisor-metrics");
+  [["Team members",t.member_count],["Supervisors",t.supervisor_count],["Staff",t.staff_count],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],["Active operations",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue operations",t.overdue_operation_count],["Completion rate",t.completion_rate===null?"—":t.completion_rate+"%"]].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
+  own.append(metrics);
+  const areas=el("div","ct-team-supervisor-areas"),loc=el("div","ct-team-supervisor-area");loc.append(el("h3","","Assigned locations"));
+  const locList=el("div","ct-team-supervisor-chips");
+  (data.locations||[]).forEach(x=>locList.append(el("span","ct-team-supervisor-chip",x.name)));
+  if(!data.locations?.length)locList.append(el("span","ct-team-muted","No locations assigned."));
+  loc.append(locList);
+  const zones=el("div","ct-team-supervisor-area");zones.append(el("h3","","Assigned zones"));const zoneList=el("div","ct-team-supervisor-chips");
+  (data.zones||[]).forEach(x=>zoneList.append(el("span","ct-team-supervisor-chip",x.name)));
+  if(!data.zones?.length)zoneList.append(el("span","ct-team-muted","No zones assigned."));
+  zones.append(zoneList);areas.append(loc,zones);own.append(areas);
+  const perf=el("div","ct-team-supervisor-performance");perf.append(el("h3","","Recent team performance"),el("p","ct-team-muted","Weekly figures are calculated from recorded operations. On-time compliance is unavailable when no completed operations have a due date."));
+  const rows=(data.performance||[]).filter(x=>Number(x.tasks_created||0)||Number(x.tasks_completed||0));
+  if(!rows.length)perf.append(el("p","ct-team-muted","No operation history is available yet."));
+  else {const list=el("div","ct-team-supervisor-weeks");rows.slice(-4).forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"),el("span","",x.compliance_rate===null?"Compliance —":"On time "+x.compliance_rate+"%"));list.append(row)});perf.append(list)}
+  own.append(perf);
+ }
+ function renderOther(data){
+  const t=data.team;other.hidden=false;other.replaceChildren();
+  const head=el("div","ct-team-supervisor-other-head");head.append(el("div",""));head.firstChild.append(el("p","ct-team-eyebrow","ORGANISATION DIRECTORY"),el("h2","",t.name));
+  head.append(button("Close","ct-team-btn ct-team-btn--quiet",()=>{other.hidden=true;other.replaceChildren();searchInput.value="";suggestions.hidden=true;searchInput.focus()}));other.append(head);
+  if(t.description)other.append(el("p","ct-team-muted",t.description));
+  const status=el("p","ct-team-supervisor-readonly","View-only team information · Staff records and operations are not available here.");other.append(status);
+  if(t.team_performance_score!==null&&t.team_performance_score!==undefined){const score=el("div","ct-team-supervisor-score");score.append(el("span","ct-team-muted","Team completion score"),el("strong","",t.team_performance_score+"%"));other.append(score)}
+ }
+ let timer=null,requestSeq=0;
+ async function search(){
+  const q=searchInput.value.trim();const seq=++requestSeq;suggestions.replaceChildren();
+  if(q.length<2){suggestions.hidden=true;return}
+  const loading=el("div","ct-team-supervisor-suggestion","Searching…");suggestions.append(loading);suggestions.hidden=false;
+  try{
+   const result=await API.get("teams/supervisor/search?q="+encodeURIComponent(q));
+   if(seq!==requestSeq)return;
+   suggestions.replaceChildren();
+   const matches=Array.isArray(result.teams)?result.teams:[];
+   if(!matches.length){suggestions.append(el("div","ct-team-supervisor-suggestion ct-team-muted","No matching teams found."));return}
+   matches.forEach(t=>{const item=button("","ct-team-supervisor-suggestion",async()=>{suggestions.hidden=true;searchInput.value=t.name;other.hidden=false;other.replaceChildren(el("p","ct-team-muted","Loading team information…"));try{const detail=await API.get("teams/supervisor/"+encodeURIComponent(t.id));renderOther(detail)}catch(e){other.replaceChildren(el("p","ct-team-error",e.message||"Could not load this team."))}});item.setAttribute("role","option");item.append(el("strong","",t.name));if(t.description)item.append(el("small","ct-team-muted",t.description));suggestions.append(item)});
+  }catch(e){if(seq!==requestSeq)return;suggestions.replaceChildren(el("div","ct-team-supervisor-suggestion ct-team-error",e.message||"Team search failed."));suggestions.hidden=false}
+ }
+ searchInput.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(search,220)});
+ searchInput.addEventListener("keydown",e=>{if(e.key==="Escape"){suggestions.hidden=true;other.hidden=true;other.replaceChildren()}});
+ document.addEventListener("click",e=>{if(!searchSection.contains(e.target))suggestions.hidden=true},{once:true});
+ try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));showNotice(e.message||"Unable to load your team.")}
+}
+
 async function render(container){
  const user=AUTH?.getCurrentUser?.();container.replaceChildren();
+ if(String(user?.role||"").toLowerCase()==="supervisor"){await renderSupervisorTeams(container);return}
  if(String(user?.role||"").toLowerCase()!=="admin"){container.append(el("p","ct-team-error","Team management is available to Admin users only."));return}
  root=el("section","ct-team-manager");const header=el("header","ct-team-manager-header"),copy=el("div");copy.append(el("p","ct-team-eyebrow","ORGANIZATION MANAGEMENT"),el("h1","","Teams"),el("p","ct-team-muted","Create and manage teams, assignments, workload, reports, and historical records."));header.append(copy,button("+ Create Team","ct-team-btn ct-team-btn--primary",()=>{createOpen(true);root.querySelector("[data-team-create]")?.scrollIntoView({behavior:"smooth",block:"center"})}));root.append(header);
  const note=el("div","ct-team-notice");note.dataset.teamNotice="1";note.hidden=true;root.append(note);const recentNode=el("div");recentNode.dataset.teamRecent="1";root.append(recentNode);
