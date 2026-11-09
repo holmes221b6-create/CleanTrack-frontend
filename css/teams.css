@@ -453,3 +453,99 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
   --surface:#10141c;--bg-elevated:#10141c;--border:#292c36;--border-strong:#383246;
   color:#eeebf7;
 }
+
+
+/* Final BI workspace dark-surface sweep. These rules deliberately target the workspace itself,
+   not the app page wrapper, so every nested BI panel follows the active MECHNAR theme. */
+body .ct-bi-workspace{
+  --bi-bg:#0f1016;--bi-panel:#14131e;--bi-panel-2:#191725;
+  --bi-border:#302b3b;--bi-text:#eeebf7;--bi-muted:#a29caf;--bi-accent:#a995d6;
+  background:var(--bi-bg)!important;color:var(--bi-text)!important;color-scheme:dark;
+}
+body .ct-bi-workspace .ct-bi-topbar,
+body .ct-bi-workspace .ct-bi-ribbon,
+body .ct-bi-workspace .ct-bi-status,
+body .ct-bi-workspace .ct-bi-app-rail,
+body .ct-bi-workspace .ct-bi-layout,
+body .ct-bi-workspace .ct-bi-canvas-area,
+body .ct-bi-workspace .ct-bi-canvas-head,
+body .ct-bi-workspace .ct-bi-kpis,
+body .ct-bi-workspace .ct-bi-kpi,
+body .ct-bi-workspace .ct-bi-canvas,
+body .ct-bi-workspace .ct-bi-visual-card,
+body .ct-bi-workspace .ct-bi-dock,
+body .ct-bi-workspace .ct-bi-filter-rail,
+body .ct-bi-workspace .ct-bi-pane,
+body .ct-bi-workspace .ct-bi-side-section,
+body .ct-bi-workspace .ct-bi-gallery-item,
+body .ct-bi-workspace .ct-bi-trend-strip,
+body .ct-bi-workspace .ct-bi-trend-chip,
+body .ct-bi-workspace .ct-bi-pagebar,
+body .ct-bi-workspace .ct-bi-transform-panel,
+body .ct-bi-workspace .ct-bi-data-table,
+body .ct-bi-workspace .ct-bi-data-table thead,
+body .ct-bi-workspace .ct-bi-data-table tbody,
+body .ct-bi-workspace .ct-bi-data-table tr,
+body .ct-bi-workspace .ct-bi-data-table th,
+body .ct-bi-workspace .ct-bi-data-table td{
+  background-color:var(--bi-panel)!important;color:var(--bi-text)!important;border-color:var(--bi-border)!important;
+}
+body .ct-bi-workspace .ct-bi-canvas,
+body .ct-bi-workspace .ct-bi-layout{background-color:var(--bi-bg)!important}
+body .ct-bi-workspace .ct-bi-ribbon-tabs,
+body .ct-bi-workspace .ct-bi-ribbon-tools,
+body .ct-bi-workspace .ct-bi-canvas-head,
+body .ct-bi-workspace .ct-bi-dock-title{background-color:var(--bi-panel-2)!important;color:var(--bi-text)!important;border-color:var(--bi-border)!important}
+body .ct-bi-workspace button,
+body .ct-bi-workspace .ct-team-btn,
+body .ct-bi-workspace .ct-bi-ribbon-tab,
+body .ct-bi-workspace .ct-bi-ribbon-tool,
+body .ct-bi-workspace .ct-bi-rail-button,
+body .ct-bi-workspace .ct-bi-vertical-tab,
+body .ct-bi-workspace .ct-bi-pane-tab,
+body .ct-bi-workspace .ct-bi-gallery-item,
+body .ct-bi-workspace .ct-bi-remove,
+body .ct-bi-workspace .ct-bi-clear{
+  color:var(--bi-text)!important;border-color:var(--bi-border)!important;
+}
+body .ct-bi-workspace .ct-bi-ribbon-tab,
+body .ct-bi-workspace .ct-bi-ribbon-tool,
+body .ct-bi-workspace .ct-bi-rail-button,
+body .ct-bi-workspace .ct-bi-vertical-tab,
+body .ct-bi-workspace .ct-bi-pane-tab,
+body .ct-bi-workspace .ct-bi-remove,
+body .ct-bi-workspace .ct-bi-clear{background:transparent!important}
+body .ct-bi-workspace .ct-bi-ribbon-tab.is-active,
+body .ct-bi-workspace .ct-bi-rail-button.is-active,
+body .ct-bi-workspace .ct-bi-vertical-tab.is-active,
+body .ct-bi-workspace .ct-bi-pane-tab.is-active,
+body .ct-bi-workspace .ct-bi-gallery-item.is-active,
+body .ct-bi-workspace .ct-bi-visual-card.is-selected{
+  background:rgba(169,149,214,.14)!important;color:var(--bi-accent)!important;border-color:var(--bi-accent)!important;
+}
+body .ct-bi-workspace .ct-bi-ribbon-tool:hover,
+body .ct-bi-workspace .ct-bi-gallery-item:hover{background:rgba(169,149,214,.12)!important}
+body .ct-bi-workspace input,
+body .ct-bi-workspace select,
+body .ct-bi-workspace textarea,
+body .ct-bi-workspace option{
+  background-color:#100f17!important;color:var(--bi-text)!important;border-color:var(--bi-border)!important;color-scheme:dark;
+}
+body .ct-bi-workspace input::placeholder,
+body .ct-bi-workspace textarea::placeholder{color:var(--bi-muted)!important}
+body .ct-bi-workspace .ct-team-muted,
+body .ct-bi-workspace .ct-bi-kpi small,
+body .ct-bi-workspace .ct-bi-trend-chip small,
+body .ct-bi-workspace .ct-bi-field-row small,
+body .ct-bi-workspace .ct-bi-status{color:var(--bi-muted)!important}
+body .ct-bi-workspace .ct-bi-axis{fill:var(--bi-muted)!important}
+body .ct-bi-workspace .ct-bi-grid{stroke:rgba(169,149,214,.2)!important}
+body .ct-bi-workspace .ct-bi-dot{stroke:#14131e!important}
+body .ct-bi-workspace .ct-bi-donut-hole,
+body .ct-bi-workspace .ct-bi-icon-hole{fill:#14131e!important}
+body .ct-bi-workspace .ct-bi-icon-ring{stroke:var(--bi-text)!important}
+body .ct-bi-workspace .ct-bi-visual-card svg{background:transparent!important}
+body .ct-bi-workspace .ct-bi-transform-panel{background:#14131e!important;color:var(--bi-text)!important;box-shadow:0 12px 40px rgba(0,0,0,.48)!important}
+body .ct-bi-workspace .ct-bi-pagebar,
+body .ct-bi-workspace .ct-bi-canvas-head,
+body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
