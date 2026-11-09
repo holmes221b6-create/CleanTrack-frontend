@@ -443,7 +443,8 @@ async function renderSupervisorTeams(container){
   refresh.addEventListener("click",loadLive);save.addEventListener("click",()=>{const key="mechnar.bi."+userKey();let list=[];try{list=JSON.parse(localStorage.getItem(key)||"[]")}catch(_){}const item={name:reportName.value||"Team performance",visuals:state.visuals,filters:state.filters};list=[item,...list.filter(x=>x.name!==item.name)].slice(0,25);localStorage.setItem(key,JSON.stringify(list));biStatus.textContent="Report layout saved in this browser."});
   exportData.addEventListener("click",()=>{const rows=visible(),cols=state.columns.filter(k=>!state.hidden.has(k)),q=v=>'"'+String(v??"").replaceAll('"','""')+'"',content=[cols.map(q).join(","),...rows.map(r=>cols.map(k=>q(r[k])).join(","))].join("\r\n"),blob=new Blob([content],{type:"text/csv"}),url=URL.createObjectURL(blob),a=el("a");a.href=url;a.download=(reportName.value||"team-performance")+".csv";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)});
   renderSide();loadLive();
-const activity=el("section","ct-team-supervisor-page-section"),activityHead=el("div","ct-team-supervisor-sectionhead"),activityTitle=el("div","");
+performancePage.append(perf);
+  const activity=el("section","ct-team-supervisor-page-section"),activityHead=el("div","ct-team-supervisor-sectionhead"),activityTitle=el("div","");
   activityTitle.append(el("p","ct-team-eyebrow","TEAM HISTORY"),el("h2","","Recent team activity"));
   activityHead.append(activityTitle,button("View team activity →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("activity",data)));
   activity.append(activityHead,el("p","ct-team-muted","The three most recent recorded team events."));
