@@ -233,6 +233,45 @@ async function renderSupervisorTeams(container){
  const searchBox=el("div","ct-team-supervisor-searchbox"),searchInput=el("input","ct-team-input");searchInput.type="search";searchInput.placeholder="Type at least 2 letters…";searchInput.setAttribute("aria-label","Search other teams");
  const suggestions=el("div","ct-team-supervisor-suggestions");suggestions.hidden=true;suggestions.setAttribute("role","listbox");searchBox.append(searchInput,suggestions);searchSection.append(searchBox);wrap.append(searchSection);
  const other=el("section","ct-team-supervisor-other");other.hidden=true;wrap.append(other);container.replaceChildren(wrap);
+ function openSupervisorPanel(kind,data){
+  const isActivity=kind==="activity";
+  const panel=document.createElement("dialog");
+  panel.className="ct-team-supervisor-drawer";
+  panel.setAttribute("aria-label",isActivity?"Recent team activity":"Team performance");
+  const shell=el("div","ct-team-supervisor-drawer__shell");
+  const header=el("header","ct-team-supervisor-drawer__header");
+  const title=el("div","");
+  title.append(el("p","ct-team-eyebrow",isActivity?"TEAM HISTORY":"PERFORMANCE ARENA"),el("h2","",isActivity?"Recent team activity":"Team performance"));
+  header.append(title,button("×","ct-team-btn ct-team-btn--quiet",()=>panel.close()));
+  shell.append(header);
+  const body=el("div","ct-team-supervisor-drawer__body");
+  if(isActivity){
+   const events=data.activity||[];
+   if(!events.length)body.append(el("p","ct-team-muted","No recent team activity recorded."));
+   events.forEach(event=>{
+    const row=el("article","ct-team-supervisor-drawer__event");
+    row.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));
+    if(event.message)row.append(el("p","ct-team-muted",event.message));
+    row.append(el("small","ct-team-muted",(event.actor_name||"System")+" · "+dateTime(event.created_at)));
+    body.append(row);
+   });
+  }else{
+   const rows=(data.performance||[]).filter(x=>Number(x.tasks_created||0)||Number(x.tasks_completed||0));
+   body.append(el("p","ct-team-muted","Weekly figures are calculated from recorded operations. Compliance is shown only where due-dated completions exist."));
+   if(!rows.length)body.append(el("p","ct-team-muted","No operation history is available yet."));
+   rows.forEach(x=>{
+    const row=el("article","ct-team-supervisor-drawer__week");
+    row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start));
+    const metrics=el("div","ct-team-supervisor-drawer__metrics");
+    metrics.append(metricSmall("Created",x.tasks_created),metricSmall("Completed",x.tasks_completed),metricSmall("On-time compliance",x.compliance_rate===null||x.compliance_rate===undefined?"—":x.compliance_rate+"%"));
+    row.append(metrics);body.append(row);
+   });
+  }
+  shell.append(body);panel.append(shell);document.body.append(panel);
+  panel.addEventListener("click",e=>{if(e.target===panel)panel.close()});
+  panel.addEventListener("close",()=>panel.remove(),{once:true});
+  panel.showModal();
+ }
  function showNotice(message){noticeNode.textContent=message||"";noticeNode.hidden=!message}
  function metricSmall(label,value){const node=el("div","ct-team-supervisor-metric");node.append(el("span","ct-team-muted",label),el("strong","",value===null||value===undefined?"—":String(value)));return node}
  function renderOwn(data){
@@ -250,10 +289,13 @@ async function renderSupervisorTeams(container){
   (data.zones||[]).forEach(x=>zoneList.append(el("span","ct-team-supervisor-chip",x.name)));
   if(!data.zones?.length)zoneList.append(el("span","ct-team-muted","No zones assigned."));
   zones.append(zoneList);areas.append(loc,zones);own.append(areas);
-  const perf=el("div","ct-team-supervisor-performance");perf.append(el("h3","","Recent team performance"),el("p","ct-team-muted","Weekly figures are calculated from recorded operations. On-time compliance is unavailable when no completed operations have a due date."));
+  const perf=el("section","ct-team-supervisor-performance");
+  const perfHead=el("div","ct-team-supervisor-sectionhead");
+  perfHead.append(el("h3","","Team performance"),button("View performance →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("performance",data)));
+  perf.append(perfHead,el("p","ct-team-muted","Weekly operation creation, completion and on-time compliance. Open the panel for the full recorded trend."));
   const rows=(data.performance||[]).filter(x=>Number(x.tasks_created||0)||Number(x.tasks_completed||0));
   if(!rows.length)perf.append(el("p","ct-team-muted","No operation history is available yet."));
-  else {const list=el("div","ct-team-supervisor-weeks");rows.slice(-4).forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"),el("span","",x.compliance_rate===null?"Compliance —":"On time "+x.compliance_rate+"%"));list.append(row)});perf.append(list)}
+  else {const list=el("div","ct-team-supervisor-weeks");rows.slice(-3).forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"));list.append(row)});perf.append(list)}
   own.append(perf);
 
   const roster=el("section","ct-team-supervisor-roster");
@@ -276,12 +318,14 @@ async function renderSupervisorTeams(container){
   own.append(roster);
 
   const activity=el("section","ct-team-supervisor-activity");
-  activity.append(el("h3","","Recent team activity"),el("p","ct-team-muted","Recent recorded changes and operation events for your team."));
+  const activityHead=el("div","ct-team-supervisor-sectionhead");
+  activityHead.append(el("h3","","Recent team activity"),button("View activity →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("activity",data)));
+  activity.append(activityHead,el("p","ct-team-muted","Latest recorded changes and operation events for your team."));
   const events=data.activity||[];
   if(!events.length)activity.append(el("p","ct-team-muted","No recent team activity recorded."));
   else{
    const list=el("div","ct-team-supervisor-activitylist");
-   events.slice(0,8).forEach(event=>{
+   events.slice(0,3).forEach(event=>{
     const row=el("div","ct-team-supervisor-activityrow");
     const copy=el("div","");
     copy.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));
