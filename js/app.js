@@ -1515,7 +1515,7 @@ function bindNavigation() {
       const role = selected ? selected.value : "";
       const hasInvitation = Boolean(invitationTokenInput && invitationTokenInput.value);
       const isAdmin = role === "admin";
-      const isJoining = role === "supervisor" || role === "employee";
+      const isJoining = role === "supervisor" || role === "staff" || role === "employee";
       if (nameGroup) nameGroup.hidden = !isAdmin;
       if (codeGroup) codeGroup.hidden = !isJoining || hasInvitation;
       if (membershipMessageGroup) membershipMessageGroup.hidden = !isJoining;
@@ -1546,9 +1546,9 @@ function bindNavigation() {
         const joinCode = params.get("join");
         if (!joinCode || !organizationCode) return;
         organizationCode.value = joinCode;
-        const requestedRole = ["supervisor", "employee"].includes(String(params.get("role") || "").toLowerCase())
-          ? String(params.get("role")).toLowerCase()
-          : "supervisor";
+        const requestedRoleRaw = String(params.get("role") || "").toLowerCase();
+        const requestedRole = requestedRoleRaw === "employee" ? "staff" :
+          (["supervisor", "staff"].includes(requestedRoleRaw) ? requestedRoleRaw : "supervisor");
         roleInputs.forEach(input => { input.checked = input.value === requestedRole; input.disabled = false; });
         if (invitationNotice) {
           invitationNotice.hidden = false;
