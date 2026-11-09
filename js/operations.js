@@ -256,11 +256,55 @@ function makeCalendarPanel(root){
  return panel;
 }
 function closeDetail(root){const detail=root?._opDetailPanel||root?.querySelector("[data-op-detail]"),backdrop=root?._opDetailBackdrop||root?.querySelector("[data-op-detail-backdrop]");if(detail)detail.hidden=true;if(backdrop)backdrop.hidden=true;if(root&&detail&&detail.parentNode===document.body)root.appendChild(detail);if(root&&backdrop&&backdrop.parentNode===document.body)root.appendChild(backdrop);}
+
+async function loadBlockers(root){
+ const panel=root.querySelector("[data-op-blockers]");if(!panel)return;
+ panel.replaceChildren(el("p","ct-op-muted","Loading blockers…"));
+ try{const response=await API.get("operations/blockers");renderBlockers(root,Array.isArray(response.items)?response.items:[]);}
+ catch(error){panel.replaceChildren(el("p","ct-op-error",error.message||"Could not load blockers."));}
+}
+function renderBlockers(root,items){
+ const panel=root.querySelector("[data-op-blockers]");if(!panel)return;panel.replaceChildren();
+ const open=items.filter(x=>!["resolved","closed"].includes(norm(x.status)));
+ const formCard=card("Record a blocker","Record an issue affecting your team or an operation. High and critical blockers notify organization Admins.");
+ const form=el("form","ct-op-form ct-op-blocker-form");
+ const title=input("text","","title","e.g. Equipment unavailable");title.required=true;title.maxLength=180;
+ const description=textarea("","description","Describe the impact and what is needed to unblock the work.",3);description.required=true;
+ const team=select(opts.teams.map(t=>[t.id,t.name]),opts.teams.length===1?opts.teams[0].id:"","team_id","Choose team");team.required=true;
+ const operation=select(rows.map(o=>[o.id,o.title+" · #"+o.id]),"","operation_id","No linked operation");
+ const category=select([["equipment","Equipment"],["safety","Safety"],["staffing","Staffing"],["resource","Resource"],["facility","Facility"],["other","Other"]],"other","category","Category");
+ const severity=select([["low","Low"],["medium","Medium"],["high","High"],["critical","Critical"]],"medium","severity","Severity");
+ const note=el("p","ct-op-notice");note.hidden=true;const submit=el("button","ct-op-button ct-op-button-primary","Record blocker");submit.type="submit";
+ form.append(field("Blocker title",title),field("Description",description),field("Team",team),field("Related operation (optional)",operation),field("Category",category),field("Severity",severity),submit,note);
+ form.addEventListener("submit",async e=>{e.preventDefault();submit.disabled=true;try{const result=await API.post("operations/blockers",{title:title.value.trim(),description:description.value.trim(),team_id:Number(team.value),operation_id:operation.value?Number(operation.value):null,category:category.value,severity:severity.value});notice(note,result.message||"Blocker recorded.");await loadBlockers(root);}catch(error){notice(note,error.message||"Could not record blocker.",true);}finally{submit.disabled=false;}});
+ formCard.appendChild(form);
+ const summary=el("div","ct-op-blocker-summary");
+ [["Open",open.length],["Critical",open.filter(x=>norm(x.severity)==="critical").length],["High",open.filter(x=>norm(x.severity)==="high").length],["Resolved",items.length-open.length]].forEach(([label,value])=>{const item=el("article","ct-op-stat");item.append(el("span","ct-op-stat-label",label),el("strong","ct-op-stat-number",value));summary.appendChild(item);});
+ const listCard=card("Blockers & escalations","Issues recorded for your authorized teams. Add a resolution note before closing a blocker.");
+ const list=el("div","ct-op-blocker-list");
+ if(!items.length)list.appendChild(el("p","ct-op-empty","No blockers have been recorded for your teams."));
+ items.forEach(item=>{
+  const row=el("article","ct-op-blocker-row"),head=el("div","ct-op-blocker-head");
+  head.append(el("strong","",item.title),el("span","ct-op-pill",String(item.severity||"medium").toUpperCase()+" · "+String(item.status||"open").replace(/_/g," ")));
+  row.append(head,el("p","",item.description||""),el("small","ct-op-muted",(item.operation_title?"Operation: "+item.operation_title+" · ":"")+(item.location_name||"")+(item.zone_name?" / "+item.zone_name:"")+" · Reported by "+(item.reported_by||"Supervisor")+" · "+date(item.created_at)));
+  if(!["resolved","closed"].includes(norm(item.status))){
+   const actions=el("div","ct-op-row-actions");
+   if(norm(item.status)==="open")actions.appendChild(button("Mark in progress","ct-op-button ct-op-button-secondary",async()=>{try{await API.patch("operations/blockers/"+item.id,{status:"in_progress"});await loadBlockers(root);}catch(e){actionNotice(e.message,true);}}));
+   actions.appendChild(button("Resolve","ct-op-button ct-op-button-primary",async()=>{const resolution=prompt("Describe how this blocker was resolved.");if(resolution===null)return;if(!resolution.trim()){alert("A resolution note is required.");return;}try{await API.patch("operations/blockers/"+item.id,{status:"resolved",resolution:resolution.trim()});await loadBlockers(root);}catch(e){actionNotice(e.message,true);}}));
+   row.appendChild(actions);
+  }else if(item.resolution)row.append(el("strong","","Resolution"),el("p","",item.resolution));
+  list.appendChild(row);
+ });
+ listCard.appendChild(list);panel.append(formCard,summary,listCard);
+}
 function setView(root,view){
  const directory=root.querySelector("[data-op-directory]");
  const calendar=root.querySelector("[data-op-calendar]");
  const detail=root._opDetailPanel||root.querySelector("[data-op-detail]");
  const detailBackdrop=root._opDetailBackdrop||root.querySelector("[data-op-detail-backdrop]");
+ const blockers=root.querySelector("[data-op-blockers]");
+ if(view==="blockers"){if(directory)directory.hidden=true;if(calendar)calendar.hidden=true;if(detail)detail.hidden=true;if(detailBackdrop)detailBackdrop.hidden=true;if(blockers)blockers.hidden=false;root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="blockers"));loadBlockers(root);return;}
+ if(blockers)blockers.hidden=true;
  if(view==="calendar"){
   if(directory)directory.hidden=false;
   if(detail)detail.hidden=true;
