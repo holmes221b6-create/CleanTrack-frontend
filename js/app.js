@@ -175,11 +175,6 @@
       title: "You control promotional emails now",
       message: "A new option has been added in Settings → Notifications: “Promotional emails and product updates.” Turn it on if you want CleanTrack feature news, product updates and offers. Turn it off whenever you prefer not to receive promotional email. Save your notification settings to keep your choice."
     },
-    {
-      id: "feedback-toolbar-2026-10-v1",
-      title: "Report bugs and suggest improvements",
-      message: "Use the feedback icon beside the notification bell to report a bug or suggest an improvement. Describe what happened, choose the screen or area, and attach screenshots. This release explains the feedback feature; delivery to the developer inbox depends on the feedback email integration being configured."
-    }
   ];
 
   function showShadowFeatureAnnouncement(user) {
