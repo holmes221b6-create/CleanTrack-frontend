@@ -900,7 +900,7 @@
     }
 
     if (String(user?.role || "").toLowerCase() === "supervisor" &&
-        ["teams", "reviews", "sites", "performance", "reports"].includes(pageId)) {
+        ["reviews", "sites", "performance", "reports"].includes(pageId)) {
       const descriptions = {
         personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
         teams: ["Teams", "Manage your own team and view other organization teams in read-only mode. Other teams' employee records and private operations remain inaccessible."],
