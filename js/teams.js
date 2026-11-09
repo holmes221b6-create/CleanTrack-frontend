@@ -273,6 +273,37 @@ async function renderSupervisorTeams(container){
   card.append(el("span","ct-team-muted",label),el("strong","",value===null||value===undefined||value===""?"—":String(value)));
   return card;
  }
+ function animateOverviewMetrics(grid,completionRate){
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const duration=850;
+  grid.querySelectorAll(".ct-team-supervisor-metric").forEach(card=>{
+   const value=card.querySelector("strong");if(!value)return;
+   const raw=value.textContent.trim(),match=raw.match(/^(\d+(?:\.\d+)?)(%)?$/);
+   if(!match)return;
+   const target=Number(match[1]),suffix=match[2]||"";
+   if(!Number.isFinite(target))return;
+   if(reduceMotion){value.textContent=raw;return}
+   value.textContent="0"+suffix;
+   const start=performance.now();
+   const tick=now=>{
+    const progress=Math.min(1,(now-start)/duration),eased=1-Math.pow(1-progress,3);
+    const current=target*eased;
+    value.textContent=(Number.isInteger(target)?Math.round(current):current.toFixed(1))+suffix;
+    if(progress<1)requestAnimationFrame(tick);else value.textContent=raw;
+   };
+   requestAnimationFrame(tick);
+  });
+  const rate=Number(completionRate);
+  if(Number.isFinite(rate)&&rate>=0&&rate<=100){
+   const card=[...grid.querySelectorAll(".ct-team-supervisor-metric")].find(node=>node.querySelector("span")?.textContent==="Completion rate");
+   if(card){
+    const track=el("div","ct-team-supervisor-progress"),fill=el("span","ct-team-supervisor-progress-fill");
+    track.setAttribute("role","progressbar");track.setAttribute("aria-label","Team completion rate");track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");track.setAttribute("aria-valuenow",String(rate));
+    fill.style.width=reduceMotion?rate+"%":"0%";track.append(fill);card.append(track);
+    if(!reduceMotion)requestAnimationFrame(()=>requestAnimationFrame(()=>{fill.style.width=rate+"%"}));
+   }
+  }
+ }
  function openSupervisorPanel(kind,data){
   const isActivity=kind==="activity",overlay=el("div","ct-team-history-overlay");
   const panel=el("section","ct-team-history-panel");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label",isActivity?"Full team activity":"Full team performance");
@@ -298,7 +329,7 @@ async function renderSupervisorTeams(container){
   summary.append(el("h2","","Team at a glance"),el("p","ct-team-muted","A concise snapshot of your team's composition, capacity and current operational position."));
   const metrics=el("div","ct-team-supervisor-metrics");
   [["Team members",t.member_count],["Staff",t.staff_count],["Supervisors",t.supervisor_count],["Active operations",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue operations",t.overdue_operation_count],["Completed operations",t.completed_operation_count],["Total operations",t.total_operation_count],["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],["Team capacity",t.capacity===null||t.capacity===undefined?"Not set":String(t.member_count||0)+" / "+String(t.capacity)]].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
-  summary.append(metrics);own.append(summary);
+  summary.append(metrics);animateOverviewMetrics(metrics,t.completion_rate);own.append(summary);
   const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
   const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
   const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
