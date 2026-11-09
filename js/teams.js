@@ -266,23 +266,37 @@ async function renderSupervisorTeams(container){
   card.append(el("span","ct-team-muted",label),el("strong","",value===null||value===undefined||value===""?"—":String(value)));
   return card;
  }
+ function openSupervisorPanel(kind,data){
+  const isActivity=kind==="activity",overlay=el("div","ct-team-history-overlay");
+  const panel=el("section","ct-team-history-panel");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label",isActivity?"Full team activity":"Full team performance");
+  const head=el("header","ct-team-history-panel-head"),title=el("div","");
+  title.append(el("p","ct-team-eyebrow",isActivity?"TEAM HISTORY":"TEAM INSIGHTS"),el("h2","",isActivity?"Team activity":"Team performance"));
+  const close=button("×","ct-team-fullscreen-close",()=>{overlay.remove();document.removeEventListener("keydown",onKey)});close.setAttribute("aria-label","Close panel");head.append(title,close);panel.append(head);
+  const body=el("div","ct-team-history-panel-body");
+  if(isActivity){const events=data.activity||[];if(!events.length)body.append(el("p","ct-team-muted","No team activity has been recorded."));else{const list=el("div","ct-team-supervisor-activitylist");events.forEach(event=>{const row=el("article","ct-team-supervisor-activityrow"),copy=el("div","");copy.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));const message=event.message||event.details?.message||event.details?.task_title;if(message)copy.append(el("p","ct-team-muted",message));row.append(copy,el("small","ct-team-muted",(event.actor_name||"System")+" · "+dateTime(event.created_at)));list.append(row)});body.append(list)}}
+  else{const trend=data.performance||[];if(!trend.length)body.append(el("p","ct-team-muted","No performance history is available."));else{const list=el("div","ct-team-supervisor-weeks");trend.forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",date(x.week_start)),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"),el("span","",x.compliance_rate===null||x.compliance_rate===undefined?"Compliance —":"On time "+x.compliance_rate+"%"));list.append(row)});body.append(list)}}
+  panel.append(body);overlay.append(panel);overlay.addEventListener("click",event=>{if(event.target===overlay){overlay.remove();document.removeEventListener("keydown",onKey)}});
+  const onKey=event=>{if(event.key==="Escape"){overlay.remove();document.removeEventListener("keydown",onKey)}};
+  document.addEventListener("keydown",onKey);document.body.append(overlay);close.focus();
+ }
  function renderOwn(data){
   const t=data.team||{};
   const overview=pageViews.get("overview"),membersPage=pageViews.get("members"),operationsPage=pageViews.get("operations"),locationsPage=pageViews.get("locations"),performancePage=pageViews.get("performance"),activityPage=pageViews.get("activity");
-  [overview,membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
+  [membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
+  own.replaceChildren();
   const teamHead=el("section","ct-team-supervisor-teamhead"),identity=el("div","");
   identity.append(el("p","ct-team-eyebrow","YOUR TEAM"),el("h2","",t.name||"Your team"),el("p","ct-team-muted",t.description||"Your assigned team."));
-  teamHead.append(identity,el("span","ct-team-status",t.status||"Active"));overview.append(teamHead);
+  teamHead.append(identity,el("span","ct-team-status",t.status||"Active"));own.append(teamHead);
   const summary=el("section","ct-team-supervisor-overview-summary");
   summary.append(el("h2","","Team at a glance"),el("p","ct-team-muted","A concise snapshot of your team's composition, capacity and current operational position."));
   const metrics=el("div","ct-team-supervisor-metrics");
   [["Team members",t.member_count],["Staff",t.staff_count],["Supervisors",t.supervisor_count],["Active operations",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue operations",t.overdue_operation_count],["Completed operations",t.completed_operation_count],["Total operations",t.total_operation_count],["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"],["Assigned locations",t.location_count],["Assigned zones",t.zone_count],["Team capacity",t.capacity===null||t.capacity===undefined?"Not set":String(t.member_count||0)+" / "+String(t.capacity)]].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
-  summary.append(metrics);overview.append(summary);
+  summary.append(metrics);own.append(summary);
   const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
   const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
   const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
   statusGrid.append(metricSmall("Capacity status",capacityLabel),metricSmall("Team status",t.status||"Unknown"),metricSmall("Tracked activity events",(data.activity||[]).length));
-  status.append(statusGrid);overview.append(status);
+  status.append(statusGrid);own.append(status);
 
   const roster=el("section","ct-team-supervisor-roster");
   roster.append(el("p","ct-team-eyebrow","TEAM DIRECTORY"),el("h2","","Team members"),el("p","ct-team-muted",(data.members||[]).length+" people assigned to your team."));
@@ -410,9 +424,9 @@ async function renderSupervisorTeams(container){
  const overviewSearch=buildTeamSearch("Find another team");
  const membersSearch=buildTeamSearch("Find another team");
  pageViews.get("overview").append(wrap);
- pageViews.get("overview").querySelector(".ct-team-supervisor-own")?.after(overviewSearch);
- pageViews.get("members").append(membersSearch);
  try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));}
+ pageViews.get("overview").append(overviewSearch);
+ pageViews.get("members").append(membersSearch);
 }
 
 async function render(container){
