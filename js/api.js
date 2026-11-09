@@ -176,7 +176,7 @@
       }
 
       throw new ApiError(
-        "Unable to reach CleanTrack. Check your connection and backend status.",
+        "MECHNAR is temporarily unavailable. Check your internet connection and try again.",
         0,
         null
       );
