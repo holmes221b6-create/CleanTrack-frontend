@@ -84,7 +84,7 @@ function normalizeUser(user) {
     "";
 
   return {
-    id: user.id ?? null,
+    id: user.id ?? user.user_id ?? user.userId ?? null,
     name: user.name || user.full_name || "",
     email: user.email || "",
     phone: user.phone || "",
