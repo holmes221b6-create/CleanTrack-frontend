@@ -542,9 +542,39 @@ performancePage.append(perf);
  const overviewSearch=buildTeamSearch("Find another team");
  const membersSearch=buildTeamSearch("Find another team");
  pageViews.get("overview").append(wrap);
- try{const data=await API.get("teams/supervisor/mine");await renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));}
  pageViews.get("overview").append(overviewSearch);
  pageViews.get("members").append(membersSearch);
+
+ // Every workspace page gets an explicit state immediately. A failure while
+ // loading/rendering Overview must never leave Performance or Activity blank.
+ const pageError=(id,error,retry)=>{
+  const view=pageViews.get(id);
+  if(!view)return;
+  view.replaceChildren();
+  const box=el("section","ct-team-fullscreen-placeholder");
+  box.append(el("h2","",id==="performance"?"Performance couldn't load":id==="activity"?"Activity couldn't load":"Team overview couldn't load"));
+  box.append(el("p","ct-team-muted",error?.message||"The team data request failed."));
+  box.append(button("Retry","ct-team-btn ct-team-btn--primary",retry));
+  view.append(box);
+ };
+ const loadOwn=async()=>{
+  own.replaceChildren(el("p","ct-team-muted","Loading your team…"));
+  for(const id of ["performance","activity"]){
+   const view=pageViews.get(id);
+   if(!view.childElementCount)view.append(el("p","ct-team-muted","Loading "+id+"…"));
+  }
+  try{
+   const data=await API.get("teams/supervisor/mine");
+   await renderOwn(data);
+  }catch(e){
+   own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));
+   pageError("overview",e,loadOwn);
+   pageError("performance",e,loadOwn);
+   pageError("activity",e,loadOwn);
+   console.error("[Teams] Supervisor workspace load failed:",e);
+  }
+ };
+ loadOwn();
 }
 
 async function render(container){
