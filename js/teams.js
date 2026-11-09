@@ -359,8 +359,8 @@ async function renderSupervisorTeams(container){
   if(!members.length)roster.append(el("p","ct-team-muted","No active team members are recorded."));
   else{
    const list=el("div","ct-team-supervisor-memberlist");
-   let rankingById={};
-   try{const rankData=await API.get("teams/supervisor/performance");rankingById=Object.fromEntries((rankData.members||[]).map(x=>[String(x.id),x]));}catch(_){}
+   // Ranking is optional enrichment; it must not block the other Team pages.
+   const rankingById={};
    members.forEach(member=>{
     const row=el("div","ct-team-supervisor-member"),identity=el("div","ct-team-supervisor-memberidentity"),rank=rankingById[String(member.id)];
     identity.append(el("strong","",member.name||"Unnamed member"),el("small","ct-team-muted",String(member.role||"Staff")+" · "+(member.account_status||"Unknown status")));
@@ -372,6 +372,16 @@ async function renderSupervisorTeams(container){
    roster.append(el("p","ct-team-muted","Scores use workload- and priority-weighted completion, punctuality and overdue avoidance. Rankings require at least three assigned operations; insufficient records are not scored."));
   }
   membersPage.append(roster);
+  API.get("teams/supervisor/performance").then(rankData=>{
+   const ranks=Object.fromEntries((rankData.members||[]).map(x=>[String(x.id),x]));
+   roster.querySelectorAll(".ct-team-supervisor-member").forEach((row,index)=>{
+    const member=members[index],rank=member&&ranks[String(member.id)];
+    if(!rank||String(member.role).toLowerCase()!=="staff")return;
+    const badge=el("div","ct-team-supervisor-rankbadge");
+    badge.append(el("strong","",rank.score===null?"—":Number(rank.score).toFixed(1)+" / 100"),el("small","ct-team-muted",rank.team_rank?"Team #"+rank.team_rank+" · Org #"+(rank.organization_rank||"—"):"Insufficient data"));
+    row.append(badge);
+   });
+  }).catch(()=>{});
 
   const operations=data.operations||[];
   const opSection=el("section","ct-team-supervisor-page-section");
