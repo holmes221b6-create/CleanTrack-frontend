@@ -975,3 +975,7 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
 
 /* Maintenance is a first-class operational category, using the existing assignment, evidence and verification workflow. */
 .ct-op-viewbar button:nth-child(2){border-color:rgba(80,150,230,.38)}
+
+
+/* Supervisor-only operations workspace. Other roles retain the shared operations UI unchanged. */
+.ct-op-supervisor-queues{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px;padding:10px;border:1px solid var(--ct-op-border,rgba(148,163,184,.2));border-radius:14px;background:var(--ct-op-panel,rgba(255,255,255,.025))}.ct-op-supervisor-queues .ct-op-button{min-height:38px}.ct-op-supervisor-queues .ct-op-button.is-active{border-color:var(--ct-op-accent,#8b5cf6);background:rgba(139,92,246,.16);color:var(--ct-op-text,#fff);box-shadow:inset 0 0 0 1px rgba(139,92,246,.22)}.ct-op-supervisor-scope-note{margin:0 0 16px;color:var(--ct-op-muted,#9296a3);font-size:12px;line-height:1.5}.ct-op-supervisor-queues button:focus-visible{outline:2px solid var(--ct-op-accent,#8b5cf6);outline-offset:2px}@media(max-width:640px){.ct-op-supervisor-queues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ct-op-supervisor-queues .ct-op-button{width:100%;white-space:normal}}
