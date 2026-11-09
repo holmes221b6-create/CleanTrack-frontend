@@ -269,3 +269,10 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-team-fullscreen-topactions{margin-left:auto}
 .ct-team-fullscreen-close{display:grid;place-items:center;width:42px;height:42px;min-width:42px;padding:0;border:1px solid var(--border-strong,#3a4c66);border-radius:11px;background:transparent;color:var(--text,#edf3fc);font-size:30px;font-weight:300;line-height:1;cursor:pointer}
 .ct-team-fullscreen-close:hover{background:var(--surface-hover,#1b2940);border-color:#9b79e9}
+
+/* Supervisor Teams history details: centered modal panels */
+.ct-team-history-overlay{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,7,18,.72);backdrop-filter:blur(5px)}
+.ct-team-history-panel{width:min(900px,100%);max-height:min(82dvh,900px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border-strong,#3a4c66);border-radius:18px;background:var(--surface,var(--bg-elevated,#10182a));color:var(--text,var(--ct-text,#edf3fc));box-shadow:0 28px 90px rgba(0,0,0,.45)}
+.ct-team-history-panel-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px;border-bottom:1px solid var(--border,#29374d)}
+.ct-team-history-panel-head h2{margin:3px 0 0;font-size:1.3rem}.ct-team-history-panel-body{padding:22px 24px;overflow:auto}
+@media(max-width:600px){.ct-team-history-overlay{padding:10px}.ct-team-history-panel{max-height:90dvh;border-radius:13px}.ct-team-history-panel-head,.ct-team-history-panel-body{padding:16px}}
