@@ -338,3 +338,54 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-bi-transform-panel{position:absolute;z-index:8;right:315px;top:65px;max-height:75%;overflow:auto;padding:12px;border:1px solid var(--border,#ddd);border-radius:9px;background:var(--surface,#fff);box-shadow:0 12px 40px rgba(0,0,0,.18)}
 @media(max-width:1000px){.ct-bi-layout{grid-template-columns:minmax(0,1fr) 260px}.ct-bi-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.ct-bi-workspace{height:auto;overflow:visible}.ct-bi-topbar{flex-wrap:wrap}.ct-bi-actions{margin-left:0}.ct-bi-layout{grid-template-columns:1fr;overflow:visible}.ct-bi-canvas{min-height:360px}.ct-bi-dock{max-height:440px}.ct-bi-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-bi-trend-strip{flex-wrap:wrap}}
+
+
+/* Power BI-style report authoring shell: ribbon, report rail, canvas and docked panes */
+.ct-bi-workspace{height:calc(100vh - 178px);min-height:480px;display:flex;flex-direction:column;gap:0;overflow:hidden;background:var(--bg,#f4f4f4);color:var(--text,#202020)}
+.ct-team-fullscreen-pagebody:has(.ct-bi-workspace){height:calc(100vh - 142px);min-height:0;overflow:hidden;padding:8px 10px 10px}
+.ct-team-fullscreen-main:has(.ct-bi-workspace){overflow:hidden}
+.ct-team-fullscreen-pagehead:has(+.ct-team-fullscreen-pagebody .ct-bi-workspace){padding:7px 14px 6px}
+.ct-team-fullscreen-pagehead:has(+.ct-team-fullscreen-pagebody .ct-bi-workspace) h1{font-size:16px;margin:0}
+.ct-team-fullscreen-pagehead:has(+.ct-team-fullscreen-pagebody .ct-bi-workspace) p{display:none}
+.ct-bi-topbar{min-height:38px;border-radius:0;border:0;border-bottom:1px solid #d6d6d6;padding:3px 8px;gap:8px;background:#fff;color:#222}
+.ct-bi-brand{min-width:145px}.ct-bi-brand h2{font-size:14px;margin:0}.ct-bi-brand .ct-team-eyebrow{font-size:8px}
+.ct-bi-topbar>input{height:27px;font-size:11px}.ct-bi-actions .ct-team-btn{padding:5px 7px;font-size:10px}
+.ct-bi-ribbon{flex:none;background:#fff;color:#222;border-bottom:1px solid #cfcfcf}
+.ct-bi-ribbon-tabs{height:27px;display:flex;gap:2px;padding:0 8px;border-bottom:1px solid #e4e4e4}
+.ct-bi-ribbon-tab{border:0;border-bottom:2px solid transparent;background:transparent;padding:4px 12px;font-size:11px;color:#333;cursor:pointer}
+.ct-bi-ribbon-tab.is-active{border-bottom-color:#8057cf;font-weight:700}
+.ct-bi-ribbon-tools{height:58px;display:flex;align-items:stretch;gap:4px;padding:4px 8px;overflow-x:auto}
+.ct-bi-ribbon-tool{min-width:66px;border:1px solid transparent;border-radius:4px;background:#fff;color:#333;font-size:10px;cursor:pointer}
+.ct-bi-ribbon-tool:hover{background:#f2eff8;border-color:#d8cbed}
+.ct-bi-status{flex:none;min-height:20px;padding:3px 8px;font-size:9px;background:#f8f8f8;color:#555;border:0;border-bottom:1px solid #ddd}
+.ct-bi-app-rail{width:36px;flex:none;display:flex;flex-direction:column;gap:4px;padding:8px 3px;background:#f3f3f3;border-right:1px solid #d4d4d4}
+.ct-bi-rail-button{height:34px;border:0;border-left:3px solid transparent;background:transparent;color:#555;font-size:18px;cursor:pointer}
+.ct-bi-rail-button.is-active{border-left-color:#8057cf;color:#8057cf;background:#eae4f5}
+.ct-bi-layout{display:flex;flex:1;min-height:0;overflow:hidden;gap:0;background:#eee}
+.ct-bi-canvas-area{flex:1;min-width:0;border:0;border-radius:0;background:#fff;margin:10px 0 10px 10px;box-shadow:0 0 0 1px #d8d8d8;overflow:hidden}
+.ct-bi-canvas-head{min-height:29px;padding:4px 9px;background:#fff;border-bottom:1px solid #e5e5e5;color:#333}
+.ct-bi-kpis{padding:5px 7px;gap:5px}
+.ct-bi-kpi{padding:4px 6px;border-radius:3px;background:#fff}.ct-bi-kpi small{font-size:8px}.ct-bi-kpi strong{font-size:14px}
+.ct-bi-canvas{background:#fff;background-image:none;padding:8px;gap:8px;grid-auto-rows:minmax(160px,1fr)}
+.ct-bi-visual-card{border-radius:2px;box-shadow:none;min-height:160px}.ct-bi-visual-card.is-selected{outline:1px solid #8057cf}
+.ct-bi-dock{width:310px;min-width:310px;flex:none;display:grid;grid-template-columns:32px minmax(0,1fr);gap:0;margin:10px 0 10px 8px;padding:0;border:0;border-radius:0;background:#fff;color:#222;overflow:hidden;box-shadow:0 0 0 1px #d8d8d8}
+.ct-bi-filter-rail{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:5px 2px;border-right:1px solid #ddd;background:#fafafa}
+.ct-bi-vertical-tab{writing-mode:vertical-rl;transform:rotate(180deg);height:90px;border:0;border-left:2px solid transparent;background:transparent;color:#333;font-size:10px;cursor:pointer}
+.ct-bi-vertical-tab.is-active{border-left-color:#8057cf;color:#8057cf;font-weight:700}
+.ct-bi-pane-tab{height:29px;border:0;border-bottom:1px solid #ddd;background:#fff;color:#333;font-size:10px;cursor:pointer}
+.ct-bi-pane-tab.is-active{border-bottom:2px solid #8057cf;color:#8057cf;font-weight:700}
+.ct-bi-pane{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:auto;padding:6px 8px;background:#fff}
+.ct-bi-dock-title{font-size:12px;color:#222;padding:3px 2px 7px;border-bottom:1px solid #ddd}
+.ct-bi-side-section{gap:5px;padding:7px 0;border-color:#e5e5e5}
+.ct-bi-side-section h3{font-size:10px;color:#333}
+.ct-bi-side-field{grid-template-columns:68px minmax(0,1fr);font-size:9px}
+.ct-bi-side-field .ct-team-input{font-size:9px;padding:4px}
+.ct-bi-gallery{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.ct-bi-gallery-item{min-height:43px;border-radius:2px;font-size:8px;background:#fff}
+.ct-bi-gallery-item svg{height:19px;width:25px}
+.ct-bi-field-row{font-size:9px;color:#333}
+.ct-bi-trend-strip{flex:none;min-height:27px;margin:0 0 0 46px;border-radius:0;background:#fff;border:0;border-top:1px solid #ddd;color:#333}
+.ct-bi-pagebar{color:#333;background:#fafafa}
+.ct-bi-transform-panel{right:320px;top:150px}
+@media(max-width:900px){.ct-bi-dock{width:260px;min-width:260px}.ct-bi-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.ct-team-fullscreen-pagebody:has(.ct-bi-workspace){height:auto;overflow:auto}.ct-team-fullscreen-main:has(.ct-bi-workspace){overflow:auto}.ct-bi-workspace{height:auto;min-height:850px;overflow:visible}.ct-bi-layout{min-height:650px;flex-direction:column}.ct-bi-dock{width:auto;min-width:0;min-height:280px;margin:8px;grid-template-columns:32px minmax(0,1fr)}.ct-bi-canvas-area{margin:8px}.ct-bi-app-rail{flex-direction:row;width:auto}.ct-bi-trend-strip{margin-left:0}}
