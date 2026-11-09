@@ -258,7 +258,9 @@ async function renderSupervisorTeams(container){
  const workspace=el("div","ct-team-fullscreen-workspace");workspace.append(sidebar,pageHost);shell.append(topbar,workspace);
  // Mount the full-screen shell into the actual Teams route container before loading data.
  // Without this, every page view is built while detached and the user sees a blank route.
- container.replaceChildren(shell);
+ // Mount directly under <body> so transformed/overflowing app containers cannot
+ // constrain position:fixed; the Teams shell must cover the global sidebar and header.
+ document.body.append(shell);
  document.documentElement.classList.add("ct-team-workspace-open");
  document.body.classList.add("ct-team-workspace-open");
  const wrap=el("section","ct-team-supervisor");
