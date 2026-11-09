@@ -1162,14 +1162,17 @@
     }
 
     if (pageId === "teams") {
-      if (String(user?.role || "").toLowerCase() !== "admin") {
+      const role = String(user?.role || "").toLowerCase();
+      if (role !== "admin" && role !== "supervisor") {
         const message = document.createElement("p");
-        message.textContent = "Team management is available to Admin users.";
+        message.textContent = "Teams is available to Admin and Supervisor users.";
         pageContent.appendChild(message);
         return;
       }
 
-      // The existing Teams module will render this page.
+      // The Teams module renders the role-specific page:
+      // Admin receives organization-wide team management; Supervisor receives
+      // the restricted own-team overview and searchable, read-only team lookup.
       if (window.CleanTrackTeams &&
           typeof window.CleanTrackTeams.render === "function") {
         await window.CleanTrackTeams.render(pageContent);
