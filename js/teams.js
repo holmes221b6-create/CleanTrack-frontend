@@ -327,13 +327,13 @@ async function renderSupervisorTeams(container){
   const metrics=el("div","ct-team-supervisor-metrics");
   [
    ["Team members",t.member_count],
-   ["Staff",t.employee_count],
+   ["Staff",t.staff_count],
    ["Supervisors",t.supervisor_count],
-   ["Active operations",t.active_task_count],
-   ["Pending review",t.pending_task_count],
-   ["Overdue operations",t.overdue_task_count],
-   ["Completed operations",t.completed_task_count],
-   ["Total operations",t.task_count],
+   ["Active operations",t.active_operation_count],
+   ["Pending review",t.pending_operation_count],
+   ["Overdue operations",t.overdue_operation_count],
+   ["Completed operations",t.completed_operation_count],
+   ["Total operations",t.total_operation_count],
    ["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"],
    ["Assigned locations",t.location_count],
    ["Assigned zones",t.zone_count],
@@ -365,7 +365,7 @@ async function renderSupervisorTeams(container){
   const opHead=el("section","ct-team-supervisor-page-section");
   opHead.append(el("p","ct-team-eyebrow","TEAM WORKLOAD"),el("h2","","Operations"),el("p","ct-team-muted",operations.length+" recorded operations associated with your team."));
   const opMetrics=el("div","ct-team-supervisor-metrics");
-  [["Active",t.active_task_count],["Pending review",t.pending_task_count],["Overdue",t.overdue_task_count],["Completed",t.completed_task_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
+  [["Active",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue",t.overdue_operation_count],["Completed",t.completed_operation_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
   opHead.append(opMetrics);
   if(!operations.length)opHead.append(el("p","ct-team-muted","No operations are currently recorded for this team."));
   else{
