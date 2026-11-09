@@ -247,13 +247,21 @@ async function renderSupervisorTeams(container){
  const pageViews=new Map();
  pages.forEach(([id,label,description],index)=>{
   const nav=button(label,"ct-team-fullscreen-nav"+(index===0?" is-active":""),()=>{
-   sidebar.querySelectorAll(".ct-team-fullscreen-nav").forEach(n=>n.classList.toggle("is-active",n.dataset.page===id));
-   pageViews.forEach((node,key)=>node.hidden=key!==id);
+   sidebar.querySelectorAll(".ct-team-fullscreen-nav").forEach(n=>{
+    const active=n.dataset.page===id;
+    n.classList.toggle("is-active",active);
+    n.setAttribute("aria-current",active?"page":"false");
+   });
+   pageViews.forEach((node,key)=>{
+    const active=key===id;
+    node.hidden=!active;
+    node.style.display=active?"block":"none";
+   });
    pageBody.classList.toggle("is-performance-view",id==="performance");
    pageTitle.textContent=label;pageSubtitle.textContent=description;
   });
   nav.dataset.page=id;nav.setAttribute("aria-current",index===0?"page":"false");sidebar.append(nav);
-  const view=el("section","ct-team-fullscreen-view");view.dataset.view=id;view.hidden=index!==0;
+  const view=el("section","ct-team-fullscreen-view");view.dataset.view=id;view.hidden=index!==0;view.style.display=index===0?"block":"none";
   pageViews.set(id,view);pageBody.append(view);
  });
  const workspace=el("div","ct-team-fullscreen-workspace");workspace.append(sidebar,pageHost);shell.append(topbar,workspace);
