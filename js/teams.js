@@ -317,7 +317,7 @@ async function renderSupervisorTeams(container){
   const onKey=event=>{if(event.key==="Escape"){overlay.remove();document.removeEventListener("keydown",onKey)}};
   document.addEventListener("keydown",onKey);document.body.append(overlay);close.focus();
  }
- function renderOwn(data){
+ async function renderOwn(data){
   const t=data.team||{};
   const overview=pageViews.get("overview"),membersPage=pageViews.get("members"),operationsPage=pageViews.get("operations"),locationsPage=pageViews.get("locations"),performancePage=pageViews.get("performance"),activityPage=pageViews.get("activity");
   [membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
@@ -344,7 +344,7 @@ async function renderSupervisorTeams(container){
   addChoice(opSelect,"","Select an open operation");(data.operations||[]).filter(op=>!["completed","approved","cancelled","canceled"].includes(String(op.status||"").toLowerCase())).forEach(op=>addChoice(opSelect,String(op.id),op.title+" · "+(op.status||"")));
   addChoice(staffSelect,"","Select a Staff member");(data.members||[]).filter(m=>String(m.role).toLowerCase()==="staff"&&String(m.account_status).toLowerCase()==="active").forEach(m=>addChoice(staffSelect,String(m.id),m.name));
   const assignGrid=el("div","ct-team-supervisor-management-grid"),opField=el("label","ct-team-supervisor-management-field"),staffField=el("label","ct-team-supervisor-management-field");opField.append(el("span","","Operation"),opSelect);staffField.append(el("span","","Assign to Staff"),staffSelect);assignGrid.append(opField,staffField);
-  const assignBtn=button("Assign / reassign","ct-team-btn ct-team-btn--primary",async()=>{if(!opSelect.value||!staffSelect.value){noticeNode.hidden=false;noticeNode.textContent="Choose an operation and a Staff member.";return}assignBtn.disabled=true;try{await API.patch("operations/"+encodeURIComponent(opSelect.value),{assigned_to_id:Number(staffSelect.value)});noticeNode.hidden=false;noticeNode.textContent="Assignment updated and recorded. Refreshing team data…";const refreshed=await API.get("teams/supervisor/mine");renderOwn(refreshed);}catch(e){noticeNode.hidden=false;noticeNode.textContent=e.message||"Assignment could not be updated.";}finally{assignBtn.disabled=false;}});
+  const assignBtn=button("Assign / reassign","ct-team-btn ct-team-btn--primary",async()=>{if(!opSelect.value||!staffSelect.value){noticeNode.hidden=false;noticeNode.textContent="Choose an operation and a Staff member.";return}assignBtn.disabled=true;try{await API.patch("operations/"+encodeURIComponent(opSelect.value),{assigned_to_id:Number(staffSelect.value)});noticeNode.hidden=false;noticeNode.textContent="Assignment updated and recorded. Refreshing team data…";const refreshed=await API.get("teams/supervisor/mine");await renderOwn(refreshed);}catch(e){noticeNode.hidden=false;noticeNode.textContent=e.message||"Assignment could not be updated.";}finally{assignBtn.disabled=false;}});
   management.append(el("p","ct-team-muted","Only active Staff in this team are selectable. Assignment changes are recorded in operation history."),assignGrid,assignBtn);own.append(management);
   const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
   const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
@@ -500,7 +500,7 @@ async function renderSupervisorTeams(container){
  const overviewSearch=buildTeamSearch("Find another team");
  const membersSearch=buildTeamSearch("Find another team");
  pageViews.get("overview").append(wrap);
- try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));}
+ try{const data=await API.get("teams/supervisor/mine");await renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));}
  pageViews.get("overview").append(overviewSearch);
  pageViews.get("members").append(membersSearch);
 }
