@@ -323,13 +323,29 @@ async function renderSupervisorTeams(container){
   identity.append(el("p","ct-team-eyebrow","YOUR TEAM"),el("h2","",t.name||"Your team"),el("p","ct-team-muted",t.description||"Your assigned team."));
   teamHead.append(identity,el("span","ct-team-status",t.status||"Active"));overview.append(teamHead);
   const summary=el("section","ct-team-supervisor-overview-summary");
-  summary.append(el("h2","","Team at a glance"));
+  summary.append(el("h2","","Team at a glance"),el("p","ct-team-muted","A concise snapshot of your team's composition, capacity and current operational position."));
   const metrics=el("div","ct-team-supervisor-metrics");
-  [["Team members",t.member_count],["Active operations",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue operations",t.overdue_operation_count],["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"]].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
+  [
+   ["Team members",t.member_count],
+   ["Staff",t.employee_count],
+   ["Supervisors",t.supervisor_count],
+   ["Active operations",t.active_task_count],
+   ["Pending review",t.pending_task_count],
+   ["Overdue operations",t.overdue_task_count],
+   ["Completed operations",t.completed_task_count],
+   ["Total operations",t.task_count],
+   ["Completion rate",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"],
+   ["Assigned locations",t.location_count],
+   ["Assigned zones",t.zone_count],
+   ["Team capacity",t.capacity===null||t.capacity===undefined?"Not set":String(t.member_count||0)+" / "+String(t.capacity)]
+  ].forEach(x=>metrics.append(metricSmall(x[0],x[1])));
   summary.append(metrics);overview.append(summary);
-  const quick=el("div","ct-team-supervisor-quicklinks");
-  [["members","View team members"],["operations","View operations"],["locations","View locations & zones"],["performance","View performance"],["activity","View recent activity"]].forEach(([id,label])=>quick.append(button(label+" →","ct-team-btn ct-team-btn--quiet",()=>sidebar.querySelector('[data-page="'+id+'"]')?.click())));
-  overview.append(quick);
+  const status=el("section","ct-team-supervisor-overview-status");
+  status.append(el("h3","","Team status"));
+  const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
+  const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
+  statusGrid.append(metricSmall("Capacity status",capacityLabel),metricSmall("Team status",t.status||"Unknown"),metricSmall("Tracked activity events",(data.activity||[]).length));
+  status.append(statusGrid);overview.append(status);
 
   const roster=el("section","ct-team-supervisor-roster");
   roster.append(el("p","ct-team-eyebrow","TEAM DIRECTORY"),el("h2","","Team members"),el("p","ct-team-muted",(data.members||[]).length+" people assigned to your team."));
@@ -349,7 +365,7 @@ async function renderSupervisorTeams(container){
   const opHead=el("section","ct-team-supervisor-page-section");
   opHead.append(el("p","ct-team-eyebrow","TEAM WORKLOAD"),el("h2","","Operations"),el("p","ct-team-muted",operations.length+" recorded operations associated with your team."));
   const opMetrics=el("div","ct-team-supervisor-metrics");
-  [["Active",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue",t.overdue_operation_count],["Completed",t.completed_operation_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
+  [["Active",t.active_task_count],["Pending review",t.pending_task_count],["Overdue",t.overdue_task_count],["Completed",t.completed_task_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
   opHead.append(opMetrics);
   if(!operations.length)opHead.append(el("p","ct-team-muted","No operations are currently recorded for this team."));
   else{
