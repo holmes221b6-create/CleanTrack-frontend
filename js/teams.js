@@ -255,6 +255,43 @@ async function renderSupervisorTeams(container){
   if(!rows.length)perf.append(el("p","ct-team-muted","No operation history is available yet."));
   else {const list=el("div","ct-team-supervisor-weeks");rows.slice(-4).forEach(x=>{const row=el("div","ct-team-supervisor-week");row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"),el("span","",x.compliance_rate===null?"Compliance —":"On time "+x.compliance_rate+"%"));list.append(row)});perf.append(list)}
   own.append(perf);
+
+  const roster=el("section","ct-team-supervisor-roster");
+  const rosterHead=el("div","ct-team-supervisor-sectionhead");
+  rosterHead.append(el("h3","","Team members"),el("span","ct-team-muted",(data.members||[]).length+" assigned"));
+  roster.append(rosterHead);
+  const members=data.members||[];
+  if(!members.length)roster.append(el("p","ct-team-muted","No active team members are recorded."));
+  else{
+   const list=el("div","ct-team-supervisor-memberlist");
+   members.forEach(member=>{
+    const row=el("div","ct-team-supervisor-member");
+    const identity=el("div","ct-team-supervisor-memberidentity");
+    identity.append(el("strong","",member.name||"Unnamed member"),el("small","ct-team-muted",String(member.role||"Staff")+" · "+(member.account_status||"Unknown status")));
+    row.append(identity,el("small","ct-team-muted",member.assigned_at?"Joined team "+date(member.assigned_at):"Team assignment date unavailable"));
+    list.append(row);
+   });
+   roster.append(list);
+  }
+  own.append(roster);
+
+  const activity=el("section","ct-team-supervisor-activity");
+  activity.append(el("h3","","Recent team activity"),el("p","ct-team-muted","Recent recorded changes and operation events for your team."));
+  const events=data.activity||[];
+  if(!events.length)activity.append(el("p","ct-team-muted","No recent team activity recorded."));
+  else{
+   const list=el("div","ct-team-supervisor-activitylist");
+   events.slice(0,8).forEach(event=>{
+    const row=el("div","ct-team-supervisor-activityrow");
+    const copy=el("div","");
+    copy.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));
+    if(event.message)copy.append(el("p","ct-team-muted",event.message));
+    row.append(copy,el("small","ct-team-muted",(event.actor_name||"System")+" · "+dateTime(event.created_at)));
+    list.append(row);
+   });
+   activity.append(list);
+  }
+  own.append(activity);
  }
  function renderOther(data){
   const t=data.team;other.hidden=false;other.replaceChildren();
@@ -280,7 +317,7 @@ async function renderSupervisorTeams(container){
  }
  searchInput.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(search,220)});
  searchInput.addEventListener("keydown",e=>{if(e.key==="Escape"){suggestions.hidden=true;other.hidden=true;other.replaceChildren()}});
- document.addEventListener("click",e=>{if(!searchSection.contains(e.target))suggestions.hidden=true},{once:true});
+ document.addEventListener("click",e=>{if(!searchSection.contains(e.target))suggestions.hidden=true});
  try{const data=await API.get("teams/supervisor/mine");renderOwn(data)}catch(e){own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));showNotice(e.message||"Unable to load your team.")}
 }
 
