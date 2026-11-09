@@ -382,7 +382,11 @@ async function renderSupervisorTeams(container){
   zones.append(zoneList);areaGrid.append(loc,zones);areas.append(areaGrid);locationsPage.append(areas);
 
   const perf=el("section","ct-team-supervisor-page-section");
-  perf.append(el("p","ct-team-eyebrow","TEAM INSIGHTS"),el("h2","","Performance"),el("p","ct-team-muted","Eight-week performance history calculated from recorded operations."));
+  const perfHead=el("div","ct-team-supervisor-sectionhead");
+  perfHead.append(el("div","",""));
+  perfHead.firstChild.append(el("p","ct-team-eyebrow","TEAM INSIGHTS"),el("h2","","Performance"));
+  perfHead.append(button("View team performance →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("performance",data)));
+  perf.append(perfHead,el("p","ct-team-muted","A snapshot of your team's recent performance. Open the full performance history for the complete trend."));
   const perfMetrics=el("div","ct-team-supervisor-metrics");
   perfMetrics.append(metricSmall("Overall completion",t.completion_rate===null||t.completion_rate===undefined?"—":t.completion_rate+"%"),metricSmall("Completed operations",t.completed_operation_count));
   perf.append(perfMetrics);
@@ -390,21 +394,24 @@ async function renderSupervisorTeams(container){
   if(!trend.length)perf.append(el("p","ct-team-muted","No operation history is available yet."));
   else{
    const list=el("div","ct-team-supervisor-weeks");
-   trend.forEach(x=>{
+   trend.slice(-3).forEach(x=>{
     const row=el("div","ct-team-supervisor-week");
-    row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"),el("span","",x.compliance_rate===null||x.compliance_rate===undefined?"Compliance —":"On time "+x.compliance_rate+"%"));
+    row.append(el("strong","",window.CleanTrackPreferences?.formatDate?window.CleanTrackPreferences.formatDate(x.week_start):x.week_start),el("span","",Number(x.tasks_created||0)+" created"),el("span","",Number(x.tasks_completed||0)+" completed"));
     list.append(row);
    });perf.append(list);
   }
   performancePage.append(perf);
 
   const activity=el("section","ct-team-supervisor-page-section");
-  activity.append(el("p","ct-team-eyebrow","TEAM HISTORY"),el("h2","","Recent team activity"),el("p","ct-team-muted","Recorded team changes and operation events."));
+  const activityHead=el("div","ct-team-supervisor-sectionhead");
+  const activityTitle=el("div","");activityTitle.append(el("p","ct-team-eyebrow","TEAM HISTORY"),el("h2","","Recent team activity"));
+  activityHead.append(activityTitle,button("View team activity →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("activity",data)));
+  activity.append(activityHead,el("p","ct-team-muted","A snapshot of the latest activity. Open the full activity history to see all recorded events."));
   const events=data.activity||[];
   if(!events.length)activity.append(el("p","ct-team-muted","No recent team activity recorded."));
   else{
    const list=el("div","ct-team-supervisor-activitylist");
-   events.forEach(event=>{
+   events.slice(0,3).forEach(event=>{
     const row=el("article","ct-team-supervisor-activityrow"),copy=el("div","");
     copy.append(el("strong","",String(event.action||"Team activity").replaceAll("."," · ")));
     const message=event.message||event.details?.message||event.details?.task_title;
