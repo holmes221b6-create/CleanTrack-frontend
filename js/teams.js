@@ -256,6 +256,11 @@ async function renderSupervisorTeams(container){
   pageViews.set(id,view);pageBody.append(view);
  });
  const workspace=el("div","ct-team-fullscreen-workspace");workspace.append(sidebar,pageHost);shell.append(topbar,workspace);
+ // Mount the full-screen shell into the actual Teams route container before loading data.
+ // Without this, every page view is built while detached and the user sees a blank route.
+ container.replaceChildren(shell);
+ document.documentElement.classList.add("ct-team-workspace-open");
+ document.body.classList.add("ct-team-workspace-open");
  const wrap=el("section","ct-team-supervisor");
  const header=el("header","ct-team-supervisor-head");
  const intro=el("div","");
