@@ -249,6 +249,7 @@ async function renderSupervisorTeams(container){
   const nav=button(label,"ct-team-fullscreen-nav"+(index===0?" is-active":""),()=>{
    sidebar.querySelectorAll(".ct-team-fullscreen-nav").forEach(n=>n.classList.toggle("is-active",n.dataset.page===id));
    pageViews.forEach((node,key)=>node.hidden=key!==id);
+   pageBody.classList.toggle("is-performance-view",id==="performance");
    pageTitle.textContent=label;pageSubtitle.textContent=description;
   });
   nav.dataset.page=id;nav.setAttribute("aria-current",index===0?"page":"false");sidebar.append(nav);
