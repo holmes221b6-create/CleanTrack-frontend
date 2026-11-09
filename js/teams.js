@@ -221,6 +221,41 @@ async function download(id,format){
 
 async function renderSupervisorTeams(container){
  const user=AUTH?.getCurrentUser?.();
+ const shell=el("section","ct-team-fullscreen-shell");
+ shell.setAttribute("role","region");shell.setAttribute("aria-label","Teams workspace");
+ const topbar=el("header","ct-team-fullscreen-topbar");
+ const brand=el("div","ct-team-fullscreen-brand");brand.append(el("span","ct-team-fullscreen-brandmark","M"),el("strong","","MECHNAR"),el("span","ct-team-fullscreen-divider","/"),el("span","","Teams"));
+ const topActions=el("div","ct-team-fullscreen-topactions");
+ const back=button("← Back to workspace","ct-team-btn ct-team-btn--quiet",()=>{window.CleanTrackNavigation?.setActivePage("workspace")});
+ const who=el("span","ct-team-fullscreen-user",user?.name||user?.email||"Supervisor");
+ topActions.append(who,back);topbar.append(brand,topActions);
+ const sidebar=el("aside","ct-team-fullscreen-sidebar");sidebar.append(el("p","ct-team-fullscreen-side-label","TEAM SPACE"));
+ const pageHost=el("main","ct-team-fullscreen-main");
+ const pageHeading=el("header","ct-team-fullscreen-pagehead");
+ const pageTitle=el("h1","","Team overview"),pageSubtitle=el("p","ct-team-muted","Your team, its people and its operational performance.");
+ pageHeading.append(pageTitle,pageSubtitle);pageHost.append(pageHeading);
+ const pageBody=el("div","ct-team-fullscreen-pagebody");pageHost.append(pageBody);
+ const pages=[
+  ["overview","Overview","Your team at a glance."],
+  ["members","Team members","The people assigned to your team."],
+  ["operations","Operations","Your team's operational workload and progress."],
+  ["locations","Locations & zones","The work areas assigned to your team."],
+  ["performance","Performance","Your team's recorded performance."],
+  ["activity","Activity","A history of recorded team changes."]
+ ];
+ const pageViews=new Map();
+ pages.forEach(([id,label,description],index)=>{
+  const nav=button(label,"ct-team-fullscreen-nav"+(index===0?" is-active":""),()=>{
+   sidebar.querySelectorAll(".ct-team-fullscreen-nav").forEach(n=>n.classList.toggle("is-active",n.dataset.page===id));
+   pageViews.forEach((node,key)=>node.hidden=key!==id);
+   pageTitle.textContent=label;pageSubtitle.textContent=description;
+  });
+  nav.dataset.page=id;nav.setAttribute("aria-current",index===0?"page":"false");sidebar.append(nav);
+  const view=el("section","ct-team-fullscreen-view");view.dataset.view=id;view.hidden=index!==0;
+  if(index>0){const empty=el("div","ct-team-fullscreen-placeholder");empty.append(el("span","ct-team-fullscreen-placeholder-icon","◇"),el("h2","",label),el("p","ct-team-muted","This page has its own workspace. Its dedicated data and tools can be added here without changing the main MECHNAR workspace."));view.append(empty)}
+  pageViews.set(id,view);pageBody.append(view);
+ });
+ const workspace=el("div","ct-team-fullscreen-workspace");workspace.append(sidebar,pageHost);shell.append(topbar,workspace);
  const wrap=el("section","ct-team-supervisor");
  const header=el("header","ct-team-supervisor-head");
  const intro=el("div","");
@@ -232,7 +267,9 @@ async function renderSupervisorTeams(container){
  searchSection.append(el("h2","","Find another team"),el("p","ct-team-muted","Search by team name. Results are limited to your organisation and are view-only."));
  const searchBox=el("div","ct-team-supervisor-searchbox"),searchInput=el("input","ct-team-input");searchInput.type="search";searchInput.placeholder="Type at least 2 letters…";searchInput.setAttribute("aria-label","Search other teams");
  const suggestions=el("div","ct-team-supervisor-suggestions");suggestions.hidden=true;suggestions.setAttribute("role","listbox");searchBox.append(searchInput,suggestions);searchSection.append(searchBox);wrap.append(searchSection);
- const other=el("section","ct-team-supervisor-other");other.hidden=true;wrap.append(other);container.replaceChildren(wrap);
+ const other=el("section","ct-team-supervisor-other");other.hidden=true;wrap.append(other);
+ pageViews.get("overview").append(wrap);
+ container.replaceChildren(shell);
  function openSupervisorPanel(kind,data){
   const isActivity=kind==="activity";
   const panel=document.createElement("dialog");
