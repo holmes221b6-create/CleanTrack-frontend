@@ -82,3 +82,36 @@ html[data-theme="light"] .mw-calendar-popover{background:#fff;color:#202532;bord
 @media(max-width:980px){.mw-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:540px){.mw-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .mw-activity-message{margin:5px 0 0;font-size:11px;line-height:1.45;color:var(--text-secondary,#aaa);overflow-wrap:anywhere}
+
+/* Supervisor My Workspace: tighter, balanced information density. */
+.mw-shell { gap: 13px !important; }
+.mw-welcome { gap: 14px !important; padding: 2px 0 5px !important; }
+.mw-eyebrow { margin-bottom: 5px !important; }
+.mw-welcome h1 { margin-bottom: 4px !important; }
+.mw-stat-grid { gap: 10px !important; }
+.mw-stat { min-height: 78px !important; padding: 12px 14px !important; gap: 5px !important; }
+.mw-stat strong { font-size: 24px !important; }
+.mw-main-grid { gap: 11px !important; }
+.mw-card { padding: 14px !important; }
+.mw-card-head { margin-bottom: 9px !important; }
+.mw-pulse-summary { padding-bottom: 8px !important; }
+.mw-member { padding: 7px 0 !important; }
+.mw-workload-rows { gap: 7px !important; }
+.mw-workload-rows>div { padding: 8px 9px !important; }
+.mw-completion-summary { margin-top: 10px !important; padding-top: 9px !important; }
+.mw-record { padding: 8px 0 !important; }
+.mw-activity-list { gap: 9px !important; }
+.mw-announcements { gap: 7px !important; }
+.mw-announcement { padding: 9px 10px !important; }
+.mw-empty { padding: 12px 6px !important; }
+.mw-loading,.mw-error { padding: 16px !important; }
+@media(max-width:900px) {
+ .mw-stat-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+}
+@media(max-width:600px) {
+ .mw-shell { gap: 11px !important; }
+ .mw-welcome { align-items:flex-start !important; flex-direction:column !important; }
+ .mw-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+ .mw-main-grid { grid-template-columns:minmax(0,1fr) !important; }
+ .mw-card { padding:12px !important; }
+}
