@@ -276,3 +276,8 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-team-history-panel-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px;border-bottom:1px solid var(--border,#29374d)}
 .ct-team-history-panel-head h2{margin:3px 0 0;font-size:1.3rem}.ct-team-history-panel-body{padding:22px 24px;overflow:auto}
 @media(max-width:600px){.ct-team-history-overlay{padding:10px}.ct-team-history-panel{max-height:90dvh;border-radius:13px}.ct-team-history-panel-head,.ct-team-history-panel-body{padding:16px}}
+
+/* Supervisor Teams overview: restrained metric count-up and completion progress */
+.ct-team-supervisor-metric .ct-team-supervisor-progress{height:4px;margin-top:7px;overflow:hidden;border-radius:99px;background:var(--border,#29374d)}
+.ct-team-supervisor-metric .ct-team-supervisor-progress-fill{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8060c8,#b39ae8);transition:width 850ms cubic-bezier(.2,.75,.25,1)}
+@media(prefers-reduced-motion:reduce){.ct-team-supervisor-metric .ct-team-supervisor-progress-fill{transition:none}}
