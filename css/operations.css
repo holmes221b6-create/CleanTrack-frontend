@@ -981,28 +981,30 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-calendar-popov
 .ct-op-supervisor-queues{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px;padding:10px;border:1px solid var(--ct-op-border,rgba(148,163,184,.2));border-radius:14px;background:var(--ct-op-panel,rgba(255,255,255,.025))}.ct-op-supervisor-queues .ct-op-button{min-height:38px}.ct-op-supervisor-queues .ct-op-button.is-active{border-color:var(--ct-op-accent,#8b5cf6);background:rgba(139,92,246,.16);color:var(--ct-op-text,#fff);box-shadow:inset 0 0 0 1px rgba(139,92,246,.22)}.ct-op-supervisor-scope-note{margin:0 0 16px;color:var(--ct-op-muted,#9296a3);font-size:12px;line-height:1.5}.ct-op-supervisor-queues button:focus-visible{outline:2px solid var(--ct-op-accent,#8b5cf6);outline-offset:2px}@media(max-width:640px){.ct-op-supervisor-queues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ct-op-supervisor-queues .ct-op-button{width:100%;white-space:normal}}
 
 
-/* Operation details open as a separate slide-in workspace panel. */
+/* Compact notification-style operation detail drawer, anchored to the current viewport. */
 .ct-op-detail-backdrop{
- position:fixed;inset:0;z-index:10070;border:0;padding:0;margin:0;
- background:rgba(5,8,16,.62);backdrop-filter:blur(2px);cursor:default;
+ position:fixed!important;inset:0!important;z-index:10070!important;
+ border:0!important;padding:0!important;margin:0!important;
+ background:rgba(5,8,16,.18)!important;backdrop-filter:none!important;cursor:default;
 }
 .ct-op-detail-panel{
- position:fixed!important;z-index:10071;top:0;right:0;bottom:0;
- width:min(1080px,94vw);height:100dvh;max-height:100dvh;overflow-y:auto;
- box-sizing:border-box;padding:clamp(18px,2.4vw,32px);
- margin:0!important;border:1px solid var(--border,#354052);
- border-right:0;border-top:0;border-bottom:0;border-radius:18px 0 0 18px;
- background:var(--bg-secondary,#151923);color:var(--text-primary,#f4f5f7);
- box-shadow:-24px 0 70px rgba(0,0,0,.32);
- animation:ctOpDetailPanelIn .22s ease-out;
+ position:fixed!important;z-index:10071!important;
+ top:calc(var(--header-height, 64px) + 12px)!important;
+ right:16px!important;left:auto!important;bottom:16px!important;
+ width:min(540px,calc(100vw - 32px))!important;
+ height:auto!important;max-height:calc(100dvh - var(--header-height, 64px) - 44px)!important;
+ overflow-y:auto!important;box-sizing:border-box;
+ padding:20px!important;margin:0!important;
+ border:1px solid var(--border-strong,#354052)!important;
+ border-radius:18px!important;
+ background:var(--bg-secondary,#151923)!important;color:var(--text-primary,#f4f5f7)!important;
+ box-shadow:0 18px 60px rgba(0,0,0,.34)!important;
+ animation:ctOpDetailPanelIn .18s ease-out;
  overscroll-behavior:contain;
 }
-.ct-op-detail-panel[hidden],
-.ct-op-detail-backdrop[hidden]{display:none!important}
-@keyframes ctOpDetailPanelIn{from{transform:translateX(32px);opacity:.65}to{transform:translateX(0);opacity:1}}
+.ct-op-detail-panel[hidden],.ct-op-detail-backdrop[hidden]{display:none!important}
+@keyframes ctOpDetailPanelIn{from{transform:translateX(18px);opacity:.75}to{transform:translateX(0);opacity:1}}
 @media(max-width:700px){
- .ct-op-detail-panel{width:100vw;border-radius:0;border-left:0;padding:16px}
+ .ct-op-detail-panel{top:calc(var(--header-height, 56px) + 8px)!important;right:8px!important;bottom:8px!important;width:calc(100vw - 16px)!important;max-height:calc(100dvh - var(--header-height, 56px) - 24px)!important;padding:16px!important;border-radius:16px!important}
 }
-@media(prefers-reduced-motion:reduce){
- .ct-op-detail-panel{animation:none}
-}
+@media(prefers-reduced-motion:reduce){.ct-op-detail-panel{animation:none}}
