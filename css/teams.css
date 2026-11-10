@@ -356,13 +356,14 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-bi-ribbon-tab.is-active{border-bottom-color:#8057cf;font-weight:700}
 .ct-bi-ribbon-tools{height:58px;display:flex;align-items:stretch;gap:4px;padding:4px 8px;overflow-x:auto}
 .ct-bi-ribbon-tool{min-width:66px;border:1px solid transparent;border-radius:4px;background:#fff;color:#333;font-size:10px;cursor:pointer}
+.ct-bi-ribbon-tools .ct-bi-nav-tool{min-width:58px;flex:0 0 62px;margin-left:0;border:1px solid var(--ct-home-border,#393346);border-radius:6px;background:var(--ct-home-card-2,#211d2c);color:var(--ct-home-text,#e9e7ef);font-size:10px}
+.ct-bi-ribbon-tools .ct-bi-nav-tool:first-of-type{margin-left:auto}
+.ct-bi-ribbon-tools .ct-bi-nav-tool.is-active{border-color:var(--ct-home-accent,#a78be0);background:var(--ct-home-accent-soft,rgba(140,121,178,.18));color:var(--ct-home-accent,#b8a4e8)}
 .ct-bi-ribbon-tool:hover{background:#f2eff8;border-color:#d8cbed}
 .ct-bi-status{flex:none;min-height:20px;padding:3px 8px;font-size:9px;background:#f8f8f8;color:#555;border:0;border-bottom:1px solid #ddd}
 .ct-bi-app-rail{width:36px;flex:none;display:flex;flex-direction:column;gap:4px;padding:8px 3px;background:#f3f3f3;border-right:1px solid #d4d4d4}
 .ct-bi-rail-button{height:34px;border:0;border-left:3px solid transparent;background:transparent;color:#555;font-size:18px;cursor:pointer}
-.ct-bi-ribbon-tools .ct-bi-toolbar-nav{margin-left:auto;width:auto;flex:none;display:flex;flex-direction:row;align-items:center;gap:5px;padding:0 0 0 12px;background:transparent;border:0;border-left:1px solid var(--ct-home-border,#393346)}
-.ct-bi-ribbon-tools .ct-bi-toolbar-nav .ct-bi-rail-button{width:36px;height:34px;flex:none;border:1px solid var(--ct-home-border,#393346);border-radius:6px;color:var(--ct-home-text,#e9e7ef);background:var(--ct-home-card-2,#211d2c)}
-.ct-bi-ribbon-tools .ct-bi-toolbar-nav .ct-bi-rail-button.is-active{border-color:var(--ct-home-accent,#a78be0);color:var(--ct-home-accent,#b8a4e8);background:var(--ct-home-accent-soft,rgba(140,121,178,.18))}
+
 .ct-bi-rail-button.is-active{border-left-color:#8057cf;color:#8057cf;background:#eae4f5}
 .ct-bi-layout{display:flex;flex:1;min-height:0;overflow:hidden;gap:0;background:#eee}
 .ct-bi-canvas-area{flex:1;min-width:0;border:0;border-radius:0;background:#fff;margin:10px 0 10px 10px;box-shadow:0 0 0 1px #d8d8d8;overflow:hidden}
