@@ -456,7 +456,7 @@ async function renderSupervisorTeams(container){
    ribbonTools.append(reportNav,dataNav);
   let presenting=false;const exitPresentation=button("×","ct-bi-presentation-close",()=>setPresentation(false));exitPresentation.hidden=true;exitPresentation.setAttribute("aria-label","Exit presentation and return to Performance");exitPresentation.title="Exit presentation";
   function setPresentation(on){presenting=on;perf.classList.toggle("is-presentation",on);exitPresentation.hidden=!on;viewTab.classList.toggle("is-active",on);reportTab.classList.toggle("is-active",!on);if(on)biStatus.textContent="Presentation view · press Escape to exit";else biStatus.textContent="Report editing view"}
-  viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));head.append(exitPresentation);
+  viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));perf.append(exitPresentation);
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&presenting)setPresentation(false)});
 
   const endDate=new Date(),startDate=new Date(endDate);startDate.setDate(startDate.getDate()-55);const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
