@@ -451,7 +451,9 @@ async function renderSupervisorTeams(container){
   getDataWrap.append(getDataTool,dataMenu);
   ribbonTools.append(getDataWrap,transformTool,refreshTool,addTool,saveTool,exportTool);
   ribbon.append(ribbonTabs,ribbonTools);perf.insertBefore(ribbon,biStatus);
-  const appRail=el("nav","ct-bi-app-rail ct-bi-toolbar-nav");[[ "▥","Report"],["▦","Data"]].forEach(([ico,label],i)=>{const b=button(ico,"ct-bi-rail-button"+(i===0?" is-active":""),()=>{appRail.querySelectorAll("button").forEach(x=>x.classList.remove("is-active"));b.classList.add("is-active");togglePane(label.toLowerCase()==="data"?"data":"visuals")});b.title=label;b.setAttribute("aria-label",label);appRail.append(b)});ribbonTools.append(appRail);
+  const reportNav=button("▥ Report","ct-bi-ribbon-tool ct-bi-nav-tool is-active",()=>{reportNav.classList.add("is-active");dataNav.classList.remove("is-active");togglePane("visuals")});
+   const dataNav=button("▦ Data","ct-bi-ribbon-tool ct-bi-nav-tool",()=>{dataNav.classList.add("is-active");reportNav.classList.remove("is-active");togglePane("data")});
+   ribbonTools.append(reportNav,dataNav);
   let presenting=false;const exitPresentation=button("Exit presentation","ct-team-btn","");exitPresentation.hidden=true;
   function setPresentation(on){presenting=on;perf.classList.toggle("is-presentation",on);exitPresentation.hidden=!on;viewTab.classList.toggle("is-active",on);reportTab.classList.toggle("is-active",!on);if(on)biStatus.textContent="Presentation view · press Escape to exit";else biStatus.textContent="Report editing view"}
   viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));exitPresentation.addEventListener("click",()=>setPresentation(false));head.append(exitPresentation);
