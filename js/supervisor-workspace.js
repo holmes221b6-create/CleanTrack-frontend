@@ -155,9 +155,9 @@
             '<button class="mw-link-button" data-mw-page="operations">View Operations →</button>':empty("No overdue, blocked or rejected operations."),"mw-attention")+
         '</div>'+
         '<div class="mw-main-grid mw-secondary-grid">'+
-          card("Recent Activity",activity.length?'<div class="mw-activity-list">'+activity.slice(0,3).map(renderActivityItem).join("")+'</div>'+
-            '<button type="button" class="mw-link-button mw-activity-history-trigger" data-mw-activity-history>View activity history →</button>':
-            empty("No operation activity has been recorded."),"mw-activity-card")+
+          card("Recent Activity",(activity.length?'<div class="mw-activity-list">'+activity.slice(0,3).map(renderActivityItem).join("")+'</div>':
+            empty("No operation activity has been recorded."))+
+            '<button type="button" class="mw-link-button mw-activity-history-trigger" data-mw-activity-history>View activity history →</button>',"mw-activity-card")+
           card("Announcements & Alerts",announcementContent+(announcements.length?'<button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>':""),"mw-announcements")+
         '</div>'+
         '<nav class="mw-quick-actions" aria-label="Supervisor shortcuts"><button class="button button-primary" data-mw-page="operations">Operations</button>'+
