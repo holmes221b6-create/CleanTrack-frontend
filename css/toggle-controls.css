@@ -1,0 +1,50 @@
+/* Settings-style switches for native checkbox controls outside every Team page.
+   The underlying checkbox remains a real checkbox, preserving checked state,
+   keyboard operation, form submission, validation and existing event handlers. */
+input[type="checkbox"].ct-settings-toggle {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  box-sizing: border-box !important;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 42px;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin: 0 8px 0 0 !important;
+  padding: 0 !important;
+  vertical-align: middle;
+  border: 1px solid var(--toggle-track-border, rgba(148, 163, 184, .48)) !important;
+  border-radius: 999px !important;
+  outline-offset: 3px;
+  background-color: var(--toggle-track-off, #555b66) !important;
+  background-image: radial-gradient(circle at 11px 11px, #fff 0 8px, transparent 8.5px) !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+  cursor: pointer;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.18) !important;
+  transition: background-color .2s ease, border-color .2s ease, background-position .2s ease, box-shadow .2s ease !important;
+}
+input[type="checkbox"].ct-settings-toggle:checked {
+  background-color: var(--toggle-track-on, #7652e8) !important;
+  background-image: radial-gradient(circle at 30px 11px, #fff 0 8px, transparent 8.5px) !important;
+  border-color: var(--toggle-track-on, #7652e8) !important;
+}
+input[type="checkbox"].ct-settings-toggle:focus-visible {
+  outline: 2px solid var(--accent, #9b83ff) !important;
+  outline-offset: 3px;
+}
+input[type="checkbox"].ct-settings-toggle:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+html[data-theme="light"] input[type="checkbox"].ct-settings-toggle {
+  --toggle-track-off: #c6cbd4;
+  --toggle-track-border: #aeb5c1;
+  --toggle-track-on: #7652e8;
+}
+@media (prefers-reduced-motion: reduce) {
+  input[type="checkbox"].ct-settings-toggle { transition: none !important; }
+}
