@@ -100,9 +100,10 @@
       $("h1", "", "Team Channel"),
       $("p", "ct-tc-subtitle", "A focused space for your team’s instructions, updates and acknowledgements."));
     const headerActions = $("div", "ct-tc-header-actions");
+    const historyButton = button("Announcement history", "ct-tc-button ct-tc-secondary", () => openHistory());
     const newPost = button("+ New announcement", "ct-tc-button ct-tc-primary", () => openComposer());
     const refresh = button("↻ Refresh", "ct-tc-button ct-tc-secondary", () => load());
-    headerActions.append(newPost, refresh);
+    headerActions.append(historyButton, newPost, refresh);
     header.append(intro, headerActions);
     page.appendChild(header);
 
@@ -143,13 +144,8 @@
     const feedHead = $("div", "ct-tc-feed-head");
     const feedTitle = $("div", "");
     feedTitle.append($("h2", "", "Team updates"), $("p", "ct-tc-muted", "Announcements published for your assigned team."));
-    const filters = $("div", "ct-tc-filters");
-    const filter = select([["all","All updates"],["pinned","Pinned instructions"],["unread","Unread"],["ack","Needs acknowledgement"],["mine","Created by me"]], "all");
-    filter.setAttribute("aria-label", "Filter team updates");
-    const search = input("search", "", "Search team updates");
-    search.setAttribute("aria-label", "Search team updates");
-    filters.append(filter, search);
-    feedHead.append(feedTitle, filters);
+    feedTitle.appendChild($("p", "ct-tc-muted", "The latest announcement is displayed here. Earlier posts are kept in the 7-day history."));
+    feedHead.appendChild(feedTitle);
     const feed = $("div", "ct-tc-feed");
     main.append(feedHead, feed);
 
@@ -158,17 +154,17 @@
       $("p", "ct-tc-muted", "Important procedures and reminders kept within easy reach."));
     const pinnedList = $("div", "ct-tc-pinned-list");
     pinnedPanel.appendChild(pinnedList);
-    const whatsappPanel = $("section", "ct-tc-side-panel ct-tc-whatsapp");
-    whatsappPanel.append($("div", "ct-tc-side-heading", "Team chat"),
-      $("p", "ct-tc-muted", "Open your team’s WhatsApp group when one has been configured."));
-    const whatsappContent = $("div", "ct-tc-whatsapp-content");
-    whatsappPanel.appendChild(whatsappContent);
-    side.append(pinnedPanel, whatsappPanel);
+    const mediaPanel = $("section", "ct-tc-side-panel ct-tc-media-panel");
+    mediaPanel.append($("div", "ct-tc-side-heading", "Announcement media"),
+      $("p", "ct-tc-muted", "Photos and videos attached to the latest announcement appear here."));
+    const mediaContent = $("div", "ct-tc-media-content");
+    mediaPanel.appendChild(mediaContent);
+    side.append(pinnedPanel, mediaPanel);
     workspace.append(main, side);
     page.appendChild(workspace);
     container.appendChild(page);
 
-    const state = { items: [], teams: [], teamIds: new Set(), team: null, loading: false };
+    const state = { items: [], teams: [], teamIds: new Set(), team: null, loading: false, mediaUrls: [] };
     function notify(message, isError) {
       status.textContent = message;
       status.className = "ct-tc-status " + (isError ? "is-error" : "is-success");
@@ -185,27 +181,62 @@
     function receiptState(item) {
       return item.my_receipt && item.my_receipt.state || (isMine(item) ? "issued" : "unread");
     }
-    function renderWhatsApp() {
-      whatsappContent.replaceChildren();
-      const configured = state.teams.filter(team =>
-        typeof team.whatsapp_group_url === "string" &&
-        /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]+/.test(team.whatsapp_group_url)
-      );
-      if (!configured.length) {
-        whatsappContent.appendChild($("p", "ct-tc-muted", "No WhatsApp group is configured for your assigned team."));
-        return;
-      }
-      configured.forEach(team => {
-        const row = $("div", "ct-tc-whatsapp-row");
-        row.appendChild($("span", "", team.name || "Team group"));
-        const link = $("a", "ct-tc-button ct-tc-secondary", "Open WhatsApp ↗");
-        link.href = team.whatsapp_group_url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        row.appendChild(link);
-        whatsappContent.appendChild(row);
-      });
+    function currentAnnouncements() {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      return visibleItems().filter(item => {
+        if (item.status !== "published") return false;
+        const published = new Date(item.published_at || item.created_at || 0).getTime();
+        const expires = item.expires_at ? new Date(item.expires_at).getTime() : published + 7 * 24 * 60 * 60 * 1000;
+        return Number.isFinite(published) && published >= cutoff && expires > Date.now();
+      }).sort((a,b) => new Date(b.published_at || b.created_at || 0) - new Date(a.published_at || a.created_at || 0));
     }
+    async function fetchMedia(file) {
+      const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
+      const path = String(file.download_url || "").replace(/^\/api\//, "/");
+      const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
+      const response = await fetch(base.replace(/\/$/, "") + path, { headers: token ? { Authorization: "Bearer " + token } : {}, credentials: "include" });
+      if (!response.ok) throw new Error(response.status === 403 ? "You cannot access this media." : "Media could not be loaded.");
+      return URL.createObjectURL(await response.blob());
+    }
+    async function renderMedia(item) {
+      mediaContent.replaceChildren(); state.mediaUrls.forEach(url => URL.revokeObjectURL(url)); state.mediaUrls = [];
+      const media = (item && item.attachments || []).filter(file => file.category === "image" || /^video\//i.test(file.content_type || file.mime_type || ""));
+      if (!media.length) { mediaContent.appendChild($("div", "ct-tc-media-empty", "No photos or videos attached to the latest announcement.")); return; }
+      let index = 0;
+      const stage = $("div", "ct-tc-media-stage"), caption = $("div", "ct-tc-media-caption"), controls = $("div", "ct-tc-media-controls");
+      const previous = button("‹", "ct-tc-icon-button", () => show(index - 1)), counter = $("span", "ct-tc-media-counter"), next = button("›", "ct-tc-icon-button", () => show(index + 1));
+      controls.append(previous, counter, next); mediaContent.append(stage, caption, controls);
+      async function show(nextIndex) {
+        index = (nextIndex + media.length) % media.length; stage.replaceChildren($("div", "ct-tc-media-loading", "Loading media…"));
+        caption.textContent = media[index].filename || "Announcement attachment"; counter.textContent = (index + 1) + " / " + media.length;
+        previous.disabled = media.length < 2; next.disabled = media.length < 2;
+        try {
+          const url = await fetchMedia(media[index]); state.mediaUrls.push(url); stage.replaceChildren();
+          const type = String(media[index].content_type || media[index].mime_type || "");
+          if (type.startsWith("video/")) { const video = $("video", "ct-tc-media-player"); video.src = url; video.controls = true; video.playsInline = true; video.preload = "metadata"; stage.appendChild(video); }
+          else { const img = $("img", "ct-tc-media-image"); img.src = url; img.alt = media[index].filename || "Announcement image"; stage.appendChild(img); }
+        } catch (error) { stage.replaceChildren($("div", "ct-tc-media-empty", errorText(error))); }
+      }
+      await show(0);
+    }
+    function openHistory() {
+      const dialog = $("dialog", "ct-tc-dialog ct-tc-history-dialog"), head = $("div", "ct-tc-dialog-head"), title = $("div", "");
+      title.append($("p", "ct-tc-eyebrow", "TEAM CHANNEL · ARCHIVE"), $("h2", "", "Announcement history"), $("p", "ct-tc-muted", "Published announcements from the last 7 days. Older announcements expire automatically."));
+      head.append(title, button("×", "ct-tc-icon-button", () => dialog.close()));
+      const body = $("div", "ct-tc-history-list"), items = currentAnnouncements();
+      if (!items.length) body.appendChild($("div", "ct-tc-empty", "No announcements in the last 7 days."));
+      items.forEach(item => {
+        const row = $("article", "ct-tc-history-item"), meta = $("div", "ct-tc-history-meta");
+        meta.append($("span", "ct-tc-tag", prettyDate(item.published_at || item.created_at)), $("span", "ct-tc-history-expiry", "Expires " + prettyDate(item.expires_at || new Date(new Date(item.published_at || item.created_at).getTime() + 7*86400000).toISOString())));
+        row.append(meta, $("h3", "", item.title), $("p", "ct-tc-message", item.message));
+        const footer = $("div", "ct-tc-history-footer");
+        footer.append($("span", "ct-tc-muted", "Posted by " + (item.created_by_name || "Team supervisor")), button("View announcement", "ct-tc-button ct-tc-secondary", () => { dialog.close(); renderSelectedAnnouncement(item); }));
+        row.appendChild(footer); body.appendChild(row);
+      });
+      dialog.append(head, body); document.body.appendChild(dialog); dialog.addEventListener("close", () => dialog.remove(), { once: true }); dialog.showModal();
+    }
+    function renderSelectedAnnouncement(item) { feed.replaceChildren(renderCard(item)); renderMedia(item); }
+
     function renderPinned(items) {
       pinnedList.replaceChildren();
       const pinned = items.filter(item => item.is_pinned && item.status === "published");
@@ -241,7 +272,7 @@
 
       if (item.attachments && item.attachments.length) {
         const attachments = $("div", "ct-tc-attachments");
-        item.attachments.forEach(file => {
+        item.attachments.filter(file => file.category !== "image" && !/^video\//i.test(file.content_type || file.mime_type || "")).forEach(file => {
           const fetchAttachment = async () => {
             const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
             const path = String(file.download_url || "").replace(/^\/api\//, "/");
@@ -358,26 +389,14 @@
       }
       return card;
     }
-    function filtered() {
-      const q = search.value.trim().toLowerCase();
-      return visibleItems().filter(item => {
-        const match = filter.value === "pinned" ? item.is_pinned && item.status === "published" :
-          filter.value === "unread" ? !isMine(item) && !["read","acknowledged"].includes(receiptState(item)) :
-          filter.value === "ack" ? item.requires_acknowledgement && item.can_acknowledge && receiptState(item) !== "acknowledged" :
-          filter.value === "mine" ? isMine(item) : true;
-        return match && (!q || [item.title,item.message,item.created_by_name].some(v => String(v || "").toLowerCase().includes(q)));
-      }).sort((a,b) => new Date(b.published_at || b.scheduled_at || b.created_at || 0) - new Date(a.published_at || a.scheduled_at || a.created_at || 0));
-    }
     function renderFeed() {
-      const items = filtered();
-      feed.replaceChildren();
+      const items = currentAnnouncements(); feed.replaceChildren();
       if (!items.length) {
         const empty = $("div", "ct-tc-empty");
-        empty.append($("span", "ct-tc-empty-mark", "✦"),
-          $("h3", "", visibleItems().length ? "No matching updates" : "Your team channel is ready"),
-          $("p", "ct-tc-muted", visibleItems().length ? "Try another filter or search term." : "Publish the first team update or instruction when your team needs it."));
-        feed.appendChild(empty);
-      } else items.forEach(item => feed.appendChild(renderCard(item)));
+        empty.append($("span", "ct-tc-empty-mark", "✦"), $("h3", "", "No current announcement"), $("p", "ct-tc-muted", "New announcements will appear here and remain available for seven days."));
+        feed.appendChild(empty); renderMedia(null); return;
+      }
+      const latest = items[0]; feed.appendChild(renderCard(latest)); renderMedia(latest);
     }
     function renderAll() {
       const items = visibleItems();
@@ -389,7 +408,6 @@
       teamIdentity.querySelector(".ct-tc-team-name").textContent = names.length ? names.join(" · ") : "Assigned team";
       teamMeta.textContent = names.length ? names.length + (names.length === 1 ? " team assigned" : " teams assigned") : "No team assignment returned";
       renderPinned(items);
-      renderWhatsApp();
       renderFeed();
     }
     async function showReceipts(item) {
@@ -437,7 +455,7 @@
       const pinned = $("input"); pinned.type = "checkbox"; pinned.checked = Boolean(existing && existing.is_pinned);
       const ack = $("input"); ack.type = "checkbox"; ack.checked = Boolean(existing && existing.requires_acknowledgement);
       const files = $("input", "ct-tc-control"); files.type = "file"; files.multiple = true;
-      files.accept = ".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.txt,.csv";
+      files.accept = ".pdf,.png,.jpg,.jpeg,.webp,.gif,.mp4,.webm,.mov,.doc,.docx,.txt,.csv";
       const voice = $("input", "ct-tc-control"); voice.type = "file"; voice.accept = "audio/*,.m4a,.mp3,.wav,.ogg,.webm";
       const recordPanel = $("div", "ct-tc-record-panel");
       const recordStatus = $("p", "ct-tc-muted", "Record a voice note, or use a synthetic voice instead.");
@@ -582,6 +600,9 @@
             status: publication.value,
             scheduled_at: publication.value === "scheduled" ? new Date(schedule.value).toISOString() : null,
             is_pinned: pinned.checked, requires_acknowledgement: ack.checked,
+            expires_at: publication.value === "scheduled"
+              ? new Date(new Date(schedule.value).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+              : publication.value === "published" ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null,
             escalate_to_admin: false, escalation_after_minutes: null
           };
           const result = editing ? await API.patch("announcements/" + existing.id, payload) : await API.post("announcements", payload);
@@ -638,8 +659,6 @@
         refresh.disabled = false; refresh.textContent = "↻ Refresh";
       }
     }
-    filter.addEventListener("change", renderFeed);
-    search.addEventListener("input", renderFeed);
     await load();
   }
 
