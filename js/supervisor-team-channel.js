@@ -259,7 +259,7 @@
               try {
                 const response = await fetchAttachment();
                 const profile = await response.json();
-                speakTeamText(profile.text || item.message, profile);
+                speakTeamText(item.message, profile);
               } catch (error) { notify(errorText(error), true); }
               finally { play.disabled = false; }
             });
@@ -592,7 +592,6 @@
             else if (voice.files.length) uploads.push(...voice.files);
           } else if (voiceMode.value === "synthetic") {
             const profile = {
-              text: message.value.trim(),
               dialect: voiceDialect.value,
               style: voiceStyle.value,
               engine: "browser-speech-synthesis"
