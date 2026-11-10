@@ -1398,3 +1398,44 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 #page-content .ct-op-supervisor-page .ct-op-status-rejected .ct-op-status-sidebar-value{color:#d59a9a!important}
 @media(max-width:900px){#page-content .ct-op-supervisor-page .ct-op-supervisor-workspace{grid-template-columns:175px minmax(0,1fr)!important;gap:12px!important}}
 @media(max-width:680px){#page-content .ct-op-supervisor-page .ct-op-supervisor-workspace{grid-template-columns:minmax(0,1fr)!important}#page-content .ct-op-supervisor-page .ct-op-status-sidebar{position:static!important}#page-content .ct-op-supervisor-page .ct-op-status-sidebar-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}#page-content .ct-op-supervisor-page .ct-op-status-sidebar-row:nth-child(odd){border-right:1px solid rgba(166,157,191,.09)!important}}
+
+
+/* Supervisor status cards: right-hand rail beside the operations directory. */
+@media(min-width:901px){
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(230px,270px)!important;
+  align-items:start!important;
+  gap:16px!important;
+ }
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace>.ct-op-directory{order:1!important;min-width:0!important}
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace>.ct-op-status-sidebar{order:2!important;position:sticky!important;top:14px!important;min-width:0!important;width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-heading{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important;padding:0 2px 10px!important;border:0!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-heading span{font-size:.68rem!important;font-weight:800!important;letter-spacing:.12em!important;color:#e8e2f2!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-heading small{font-size:.55rem!important;font-weight:700!important;letter-spacing:.08em!important;color:#8e879d!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;padding:0!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;
+  min-height:67px!important;padding:14px 16px!important;border:1px solid rgba(166,157,191,.18)!important;
+  border-radius:11px!important;background:linear-gradient(115deg,rgba(154,128,223,.095),rgba(20,20,28,.96))!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.10)!important
+ }
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row:last-child{border-bottom:1px solid rgba(166,157,191,.18)!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-label{font-size:.76rem!important;font-weight:600!important;color:#c3bdce!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-value{min-width:30px!important;text-align:right!important;font-size:1.35rem!important;line-height:1!important;font-weight:780!important;color:#f0ebfa!important;font-variant-numeric:tabular-nums!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row.is-total{border-color:rgba(154,128,223,.38)!important;background:linear-gradient(115deg,rgba(145,112,211,.23),rgba(20,20,28,.98))!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row.is-total .ct-op-status-sidebar-label{font-weight:750!important;color:#e5dafa!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-pending .ct-op-status-sidebar-value{color:#d9c28b!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-progress .ct-op-status-sidebar-value{color:#9db9e8!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-completed .ct-op-status-sidebar-value{color:#91c9ad!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-overdue .ct-op-status-sidebar-value{color:#e58d91!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-rejected .ct-op-status-sidebar-value{color:#d59a9a!important}
+}
+@media(max-width:900px){
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace{grid-template-columns:minmax(0,1fr)!important}
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace>.ct-op-status-sidebar{order:1!important;position:static!important}
+ #page-content .ct-op-supervisor-page .ct-op-supervisor-workspace>.ct-op-directory{order:2!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;padding:0!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row{min-height:62px!important;padding:11px 13px!important;border:1px solid rgba(166,157,191,.18)!important;border-radius:10px!important;background:rgba(20,20,28,.9)!important}
+ #page-content .ct-op-supervisor-page .ct-op-status-sidebar-row:last-child{border-bottom:1px solid rgba(166,157,191,.18)!important}
+}
