@@ -940,19 +940,32 @@
       return;
     }
 
-    if (pageId === "announcements" || pageId === "team-channel") {
-      const role = String(user?.role || "").toLowerCase();
-      const pageAllowed = pageId === "announcements"
-        ? ["admin", "employee"].includes(role)
-        : ["supervisor", "employee"].includes(role);
-      if (!pageAllowed) {
+    if (pageId === "team-channel") {
+      if (String(user?.role || "").toLowerCase() !== "supervisor") {
         pageContent.appendChild(Object.assign(document.createElement("p"), {
-          textContent: "This announcements view is not available to your role."
+          textContent: "The Supervisor Team Channel is not available to this account."
+        }));
+        return;
+      }
+      if (window.MechnarSupervisorTeamChannel && typeof window.MechnarSupervisorTeamChannel.render === "function") {
+        await window.MechnarSupervisorTeamChannel.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Team Channel could not load. Refresh and try again."
+        }));
+      }
+      return;
+    }
+
+    if (pageId === "announcements") {
+      if (!["admin", "employee"].includes(String(user?.role || "").toLowerCase())) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Announcements are not available to this role."
         }));
         return;
       }
       if (window.CleanTrackAnnouncements && typeof window.CleanTrackAnnouncements.render === "function") {
-        await window.CleanTrackAnnouncements.render(pageContent, pageId);
+        await window.CleanTrackAnnouncements.render(pageContent, "announcements");
       } else {
         pageContent.appendChild(Object.assign(document.createElement("p"), {
           textContent: "Announcements could not load. Refresh and try again."
