@@ -250,9 +250,9 @@
               audio.pause();
               try {
                 const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
-                const path = String(file.download_url || "").replace(/^\\/api\\//, "/");
+                const path = String(file.download_url || "").replace(/^\/api\//, "/");
                 const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
-                const response = await fetch(base.replace(/\\/$/, "") + path, {
+                const response = await fetch(base.replace(/\/$/, "") + path, {
                   headers: token ? { Authorization: "Bearer " + token } : {},
                   credentials: "include"
                 });
