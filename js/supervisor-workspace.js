@@ -126,8 +126,7 @@
       '<div class="mw-shell">'+
         '<header class="mw-welcome"><div class="mw-welcome-copy"><div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>'+
           '<h1>'+esc(greeting)+', '+esc(name)+'.</h1><p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team operations overview</p></div>'+
-          '<div class="mw-header-actions"><button type="button" class="mw-calendar-launch" data-mw-calendar-trigger aria-haspopup="dialog" aria-expanded="false">▦ <span>Operations calendar</span></button>'+
-          '<div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
+          '<div class="mw-header-actions">'<div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
         '<section class="mw-stat-grid" aria-label="Team operations summary">'+
           '<article class="mw-stat"><span>Total operations</span><strong>'+metrics.total_operations+'</strong></article>'+
           '<article class="mw-stat"><span>In progress</span><strong>'+metrics.in_progress+'</strong></article>'+
@@ -166,7 +165,7 @@
           '<button class="button button-secondary" data-mw-page="reviews">Review Queue</button><button class="button button-secondary" data-mw-page="personnel">Personnel</button>'+
           '<button class="button button-secondary" data-mw-page="team-channel">Team Channel</button></nav></div>';
     root.querySelectorAll("[data-mw-page]").forEach(btn=>btn.addEventListener("click",()=>nav?.setActivePage(btn.dataset.mwPage)));
-    setupCalendar(root,operations);
+
   }
   function recordRow(o, label) {
     const lineage = o.original_assigned_to_name && o.assigned_to_name && o.original_assigned_to_name !== o.assigned_to_name
