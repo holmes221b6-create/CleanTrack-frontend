@@ -115,3 +115,6 @@ html[data-theme="light"] .mw-calendar-popover{background:#fff;color:#202532;bord
  .mw-main-grid { grid-template-columns:minmax(0,1fr) !important; }
  .mw-card { padding:12px !important; }
 }
+
+.mw-calendar-trigger{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:7px 11px;border:1px solid rgba(145,117,210,.5);border-radius:9px;background:rgba(125,92,190,.14);color:var(--text-primary,#eee);font:inherit;font-size:11px;font-weight:650;cursor:pointer}
+.mw-calendar-trigger:hover,.mw-calendar-trigger:focus-visible{background:rgba(145,117,210,.25);border-color:#a98add;outline:none}
