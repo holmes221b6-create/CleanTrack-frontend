@@ -55,3 +55,10 @@ html[data-theme="light"] .ct-team-channel .ct-tc-control{background:#fff;color:#
 @media(max-width:780px){.ct-tc-workspace{grid-template-columns:1fr}.ct-tc-side{grid-template-columns:1fr 1fr}.ct-tc-header{align-items:flex-start;flex-direction:column}.ct-tc-header-actions{width:100%}.ct-tc-header-actions .ct-tc-button{flex:1}}
 @media(max-width:560px){.ct-tc-summary{grid-template-columns:1fr}.ct-tc-summary-card{padding:10px 12px}.ct-tc-filters{flex-direction:column}.ct-tc-filters select,.ct-tc-filters input{width:100%}.ct-tc-side{grid-template-columns:1fr}.ct-tc-card{padding:14px}.ct-tc-card-top{align-items:flex-start;flex-direction:column}.ct-tc-form-grid{grid-template-columns:1fr}.ct-tc-form-grid>.ct-tc-field{grid-column:1!important}.ct-tc-receipt-row{align-items:flex-start}.ct-tc-receipt-status{white-space:normal}}
 @media(prefers-reduced-motion:reduce){.ct-team-channel *{transition:none!important;scroll-behavior:auto!important}}
+
+/* Voice composer controls */
+.ct-tc-record-panel[hidden],.ct-tc-compose-options [hidden]{display:none!important}
+.ct-tc-record-panel .ct-tc-field{min-width:150px;flex:1}
+.ct-tc-record-panel .ct-tc-field select{width:100%}
+.ct-tc-record-panel .ct-tc-hint{flex-basis:100%}
+.ct-tc-compose-options>.ct-tc-field{margin-bottom:3px}
