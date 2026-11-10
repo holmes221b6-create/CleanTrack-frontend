@@ -355,6 +355,8 @@ html.ct-team-workspace-open,body.ct-team-workspace-open{overflow:hidden!importan
 .ct-bi-ribbon-tab{border:0;border-bottom:2px solid transparent;background:transparent;padding:4px 12px;font-size:11px;color:#333;cursor:pointer}
 .ct-bi-ribbon-tab.is-active{border-bottom-color:#8057cf;font-weight:700}
 .ct-bi-ribbon-tools{height:58px;display:flex;align-items:stretch;gap:4px;padding:4px 8px;overflow-x:auto}
+.ct-bi-ribbon-tools .ct-bi-filter-tool{margin-left:auto;flex:0 0 78px;border-color:var(--ct-home-border,#393346);border-radius:6px;background:var(--ct-home-card-2,#211d2c);color:var(--ct-home-text,#e9e7ef);font-weight:700}
+.ct-bi-ribbon-tools .ct-bi-filter-tool.is-active{border-color:var(--ct-home-accent,#8c79b2);background:var(--ct-home-accent-soft,rgba(140,121,178,.18))}
 .ct-bi-ribbon-tool{min-width:66px;border:1px solid transparent;border-radius:4px;background:#fff;color:#333;font-size:10px;cursor:pointer}
 .ct-bi-ribbon-tool:hover{background:#f2eff8;border-color:#d8cbed}
 .ct-bi-status{flex:none;min-height:20px;padding:3px 8px;font-size:9px;background:#f8f8f8;color:#555;border:0;border-bottom:1px solid #ddd}
