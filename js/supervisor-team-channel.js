@@ -61,6 +61,29 @@
     return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+"T"+z(d.getHours())+":"+z(d.getMinutes());
   };
   const statusName = value => ({published:"Published",draft:"Draft",scheduled:"Scheduled"}[value] || value || "Update");
+  const speakTeamText = (text, profile) => {
+    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+      throw new Error("Speech playback is not supported by this browser.");
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(String(text || ""));
+    const dialect = profile && profile.dialect || "en-IN";
+    const style = profile && profile.style || "professional";
+    utterance.lang = dialect;
+    const settings = {
+      professional: { rate: 0.96, pitch: 1.0 },
+      warm: { rate: 0.91, pitch: 1.08 },
+      energetic: { rate: 1.06, pitch: 1.12 }
+    }[style] || { rate: 0.96, pitch: 1.0 };
+    utterance.rate = settings.rate;
+    utterance.pitch = settings.pitch;
+    const voices = window.speechSynthesis.getVoices();
+    const prefix = dialect.toLowerCase().split("-")[0];
+    const preferred = voices.find(v => v.lang && v.lang.toLowerCase() === dialect.toLowerCase()) ||
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix));
+    if (preferred) utterance.voice = preferred;
+    window.speechSynthesis.speak(utterance);
+  };
 
   async function render(container) {
     container.replaceChildren();
@@ -219,27 +242,44 @@
       if (item.attachments && item.attachments.length) {
         const attachments = $("div", "ct-tc-attachments");
         item.attachments.forEach(file => {
-          const link = $("a", "ct-tc-attachment", "↧ " + (file.filename || "Attachment"));
-          link.href = "#";
-          link.addEventListener("click", async event => {
-            event.preventDefault();
-            try {
-              const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
-              const path = String(file.download_url || "").replace(/^\/api\//, "/");
-              const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
-              const response = await fetch(base.replace(/\/$/, "") + path, {
-                headers: token ? { Authorization: "Bearer " + token } : {},
-                credentials: "include"
-              });
-              if (!response.ok) throw new Error(response.status === 403 ? "You cannot access this attachment." : "Attachment download failed.");
-              const url = URL.createObjectURL(await response.blob());
-              const download = $("a");
-              download.href = url; download.download = file.filename || "team-channel-file";
-              document.body.appendChild(download); download.click(); download.remove();
-              setTimeout(() => URL.revokeObjectURL(url), 1200);
-            } catch (error) { notify(errorText(error), true); }
-          });
-          attachments.appendChild(link);
+          const fetchAttachment = async () => {
+            const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
+            const path = String(file.download_url || "").replace(/^\/api\//, "/");
+            const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
+            const response = await fetch(base.replace(/\/$/, "") + path, {
+              headers: token ? { Authorization: "Bearer " + token } : {},
+              credentials: "include"
+            });
+            if (!response.ok) throw new Error(response.status === 403 ? "You cannot access this attachment." : "Attachment download failed.");
+            return response;
+          };
+          if (file.category === "voice_profile") {
+            const play = button("▶ Play synthetic voice", "ct-tc-button ct-tc-secondary", async () => {
+              play.disabled = true;
+              try {
+                const response = await fetchAttachment();
+                const profile = await response.json();
+                speakTeamText(profile.text || item.message, profile);
+              } catch (error) { notify(errorText(error), true); }
+              finally { play.disabled = false; }
+            });
+            attachments.appendChild(play);
+          } else {
+            const link = $("a", "ct-tc-attachment", "↧ " + (file.filename || "Attachment"));
+            link.href = "#";
+            link.addEventListener("click", async event => {
+              event.preventDefault();
+              try {
+                const response = await fetchAttachment();
+                const url = URL.createObjectURL(await response.blob());
+                const download = $("a");
+                download.href = url; download.download = file.filename || "team-channel-file";
+                document.body.appendChild(download); download.click(); download.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1200);
+              } catch (error) { notify(errorText(error), true); }
+            });
+            attachments.appendChild(link);
+          }
           if (file.category === "voice" || /^audio\//i.test(file.content_type || file.mime_type || "")) {
             const audio = $("audio", "ct-tc-audio");
             audio.controls = true; audio.preload = "none";
@@ -400,8 +440,22 @@
       files.accept = ".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.txt,.csv";
       const voice = $("input", "ct-tc-control"); voice.type = "file"; voice.accept = "audio/*,.m4a,.mp3,.wav,.ogg,.webm";
       const recordPanel = $("div", "ct-tc-record-panel");
-      const recordStatus = $("p", "ct-tc-muted", "Record a short voice announcement, or upload an existing audio file.");
+      const recordStatus = $("p", "ct-tc-muted", "Record a voice note, or use a synthetic voice instead.");
+      let recorder = null, stream = null, chunks = [], recordedBlob = null, recordedFile = null, recordedPreviewUrl = "";
+      const clearRecording = () => {
+        if (recorder && recorder.state !== "inactive") recorder.stop();
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        stream = null; recorder = null; chunks = []; recordedBlob = null; recordedFile = null;
+        if (recordedPreviewUrl) URL.revokeObjectURL(recordedPreviewUrl);
+        recordedPreviewUrl = "";
+        const preview = recordPanel.querySelector("audio");
+        if (preview) preview.remove();
+        recordStatus.textContent = "Recording removed. No voice recording will be attached.";
+        start.disabled = false; stop.disabled = true; removeVoice.disabled = true;
+        voice.value = "";
+      };
       const start = button("● Record voice note", "ct-tc-button ct-tc-secondary", async () => {
+        if (recordedFile) clearRecording();
         if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
           recordStatus.textContent = "Voice recording is unavailable in this browser. You can still upload an audio file.";
           return;
@@ -416,10 +470,12 @@
             recordedBlob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
             const ext = recordedBlob.type.includes("mp4") ? "m4a" : recordedBlob.type.includes("ogg") ? "ogg" : "webm";
             recordedFile = new File([recordedBlob], "team-voice-note-" + Date.now() + "." + ext, { type: recordedBlob.type });
-            const preview = $("audio", "ct-tc-audio"); preview.controls = true; preview.src = URL.createObjectURL(recordedBlob);
+            const preview = $("audio", "ct-tc-audio"); preview.controls = true;
+            recordedPreviewUrl = URL.createObjectURL(recordedBlob); preview.src = recordedPreviewUrl;
+            const oldPreview = recordPanel.querySelector("audio"); if (oldPreview) oldPreview.remove();
             recordPanel.appendChild(preview);
-            recordStatus.textContent = "Voice note ready to attach.";
-            start.disabled = false; stop.disabled = true;
+            recordStatus.textContent = "Voice recording ready. You can preview it or remove it before publishing.";
+            start.disabled = false; stop.disabled = true; removeVoice.disabled = false;
             if (stream) stream.getTracks().forEach(track => track.stop());
             stream = null;
           }, { once: true });
@@ -432,12 +488,13 @@
           stream = null;
         }
       });
-      let recorder = null, stream = null, chunks = [], recordedBlob = null, recordedFile = null;
       const stop = button("■ Stop recording", "ct-tc-button ct-tc-secondary", () => {
         if (recorder && recorder.state !== "inactive") recorder.stop();
       });
+      const removeVoice = button("× Remove voice", "ct-tc-button ct-tc-danger", clearRecording);
+      removeVoice.disabled = true;
       stop.disabled = true;
-      recordPanel.append(recordStatus, start, stop);
+      recordPanel.append(recordStatus, start, stop, removeVoice);
 
       const statusLine = $("p", "ct-tc-form-status");
       statusLine.hidden = true;
@@ -456,9 +513,36 @@
       formGrid.append(field("Title", title), field("Message", message), teamField, field("Publish", publication), scheduleWrap);
       const options = $("div", "ct-tc-compose-options");
       options.append(checkbox("Pin as an important instruction", pinned), checkbox("Require staff acknowledgement", ack));
+
+      const voiceMode = select([["none","No voice announcement"],["recorded","My recorded voice"],["synthetic","Synthetic voice"]], "none");
+      const voiceDialect = select([
+        ["en-IN","English · India"],["en-GB","English · UK"],["en-US","English · US"],
+        ["hi-IN","Hindi · India"],["ur-PK","Urdu"],["ar-SA","Arabic"]
+      ], "en-IN");
+      const voiceStyle = select([["professional","Professional"],["warm","Warm"],["energetic","Energetic"]], "professional");
+      const voicePreview = button("▶ Preview synthetic voice", "ct-tc-button ct-tc-secondary", () => {
+        try { speakTeamText(message.value.trim() || title.value.trim() || "This is a preview of your team announcement.", { dialect: voiceDialect.value, style: voiceStyle.value }); }
+        catch (error) { recordStatus.textContent = errorText(error); }
+      });
+      const syntheticPanel = $("div", "ct-tc-record-panel");
+      syntheticPanel.append(field("Dialect", voiceDialect), field("Style", voiceStyle), voicePreview,
+        $("small", "ct-tc-hint", "Uses the speech voices available on the listener’s device. Voice availability and accent vary by browser and operating system."));
+      const voiceOptions = $("div", "ct-tc-compose-options");
+      voiceOptions.append(field("Voice for this announcement", voiceMode),
+        field("Synthetic voice settings", syntheticPanel));
+      const refreshVoiceMode = () => {
+        const mode = voiceMode.value;
+        recordPanel.hidden = mode !== "recorded";
+        syntheticPanel.hidden = mode !== "synthetic";
+        voice.hidden = mode !== "recorded";
+        if (mode !== "recorded" && stream) clearRecording();
+        if (mode !== "synthetic") window.speechSynthesis && window.speechSynthesis.cancel();
+      };
+      voiceMode.addEventListener("change", refreshVoiceMode);
+      refreshVoiceMode();
       form.append(formGrid, options, field("Documents and images", files, "Attach supporting files to this team announcement."),
-        field("Voice note", voice, "Upload an audio file or record one below."), field("Record a voice announcement", recordPanel),
-        statusLine);
+        voiceOptions, field("Upload an audio recording", voice, "Optional: choose an existing audio file instead of recording."),
+        recordPanel, statusLine);
       const actions = $("div", "ct-tc-dialog-actions");
       actions.append(cancel, submit);
       form.appendChild(actions);
@@ -466,6 +550,8 @@
       document.body.appendChild(dialog);
       dialog.addEventListener("close", () => {
         if (stream) stream.getTracks().forEach(track => track.stop());
+        if (recordedPreviewUrl) URL.revokeObjectURL(recordedPreviewUrl);
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
         dialog.remove();
       }, { once: true });
       publication.addEventListener("change", () => { scheduleField.hidden = publication.value !== "scheduled"; });
@@ -499,8 +585,19 @@
           };
           const result = editing ? await API.patch("announcements/" + existing.id, payload) : await API.post("announcements", payload);
           const saved = result.announcement;
-          const uploads = [...files.files, ...voice.files];
-          if (recordedFile) uploads.push(recordedFile);
+          const uploads = [...files.files];
+          if (voiceMode.value === "recorded") {
+            if (recordedFile) uploads.push(recordedFile);
+            else if (voice.files.length) uploads.push(...voice.files);
+          } else if (voiceMode.value === "synthetic") {
+            const profile = {
+              text: message.value.trim(),
+              dialect: voiceDialect.value,
+              style: voiceStyle.value,
+              engine: "browser-speech-synthesis"
+            };
+            uploads.push(new File([JSON.stringify(profile)], "team-voice-profile.json", { type: "application/json" }));
+          }
           if (uploads.length) {
             const data = new FormData();
             uploads.forEach(file => data.append("files", file));
