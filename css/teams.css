@@ -644,3 +644,7 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
   .ct-team-fullscreen-pagebody.is-performance-view .ct-bi-workspace{height:auto;min-height:calc(100vh - 180px);overflow:visible}
   .ct-team-fullscreen-pagebody.is-performance-view .ct-bi-layout{min-height:520px;overflow:visible}
 }
+
+.ct-bi-presentation-close{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;min-width:34px;padding:0;margin-left:auto;border:1px solid var(--ct-home-border,#393346);border-radius:7px;background:var(--ct-home-card-2,#211d2c);color:var(--ct-home-text,#e9e7ef);font-size:25px;line-height:1;cursor:pointer}
+.ct-bi-presentation-close:hover{border-color:var(--ct-home-accent,#a78be0);color:var(--ct-home-accent,#b8a4e8)}
+.ct-bi-presentation-close:focus-visible{outline:2px solid var(--ct-home-accent,#a78be0);outline-offset:2px}
