@@ -243,14 +243,29 @@
           if (file.category === "voice" || /^audio\//i.test(file.content_type || file.mime_type || "")) {
             const audio = $("audio", "ct-tc-audio");
             audio.controls = true; audio.preload = "none";
-            const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
-            const path = String(file.download_url || "").replace(/^\/api\//, "/");
-            const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
-            audio.src = base.replace(/\/$/, "") + path;
-            if (token) audio.dataset.authRequired = "true";
-            audio.addEventListener("play", () => {
-              if (token) notify("If playback is blocked by authorization, use the download link to listen to the voice note.", false);
-            }, { once: true });
+            let audioUrl = "";
+            audio.addEventListener("play", async () => {
+              if (audioUrl || audio.dataset.loading === "true") return;
+              audio.dataset.loading = "true";
+              audio.pause();
+              try {
+                const base = window.CleanTrackConfig && window.CleanTrackConfig.apiBaseUrl || "";
+                const path = String(file.download_url || "").replace(/^\\/api\\//, "/");
+                const token = AUTH && AUTH.getAuthToken ? AUTH.getAuthToken() : "";
+                const response = await fetch(base.replace(/\\/$/, "") + path, {
+                  headers: token ? { Authorization: "Bearer " + token } : {},
+                  credentials: "include"
+                });
+                if (!response.ok) throw new Error(response.status === 403 ? "You cannot access this voice note." : "Voice note could not be loaded.");
+                audioUrl = URL.createObjectURL(await response.blob());
+                audio.src = audioUrl;
+                await audio.play();
+              } catch (error) { notify(errorText(error), true); }
+              finally { delete audio.dataset.loading; }
+            });
+            audio.addEventListener("ended", () => {
+              if (audioUrl) { URL.revokeObjectURL(audioUrl); audioUrl = ""; audio.removeAttribute("src"); audio.load(); }
+            });
             attachments.appendChild(audio);
           }
         });
