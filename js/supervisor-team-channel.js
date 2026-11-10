@@ -441,9 +441,9 @@
       const voice = $("input", "ct-tc-control"); voice.type = "file"; voice.accept = "audio/*,.m4a,.mp3,.wav,.ogg,.webm";
       const recordPanel = $("div", "ct-tc-record-panel");
       const recordStatus = $("p", "ct-tc-muted", "Record a voice note, or use a synthetic voice instead.");
-      let recorder = null, stream = null, chunks = [], recordedBlob = null, recordedFile = null, recordedPreviewUrl = "";
+      let recorder = null, stream = null, chunks = [], recordedBlob = null, recordedFile = null, recordedPreviewUrl = "", discardRecording = false;
       const clearRecording = () => {
-        if (recorder && recorder.state !== "inactive") recorder.stop();
+        if (recorder && recorder.state !== "inactive") { discardRecording = true; recorder.stop(); }
         if (stream) stream.getTracks().forEach(track => track.stop());
         stream = null; recorder = null; chunks = []; recordedBlob = null; recordedFile = null;
         if (recordedPreviewUrl) URL.revokeObjectURL(recordedPreviewUrl);
@@ -467,6 +467,7 @@
           chunks = [];
           recorder.addEventListener("dataavailable", event => { if (event.data && event.data.size) chunks.push(event.data); });
           recorder.addEventListener("stop", () => {
+            if (discardRecording) { discardRecording = false; return; }
             recordedBlob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
             const ext = recordedBlob.type.includes("mp4") ? "m4a" : recordedBlob.type.includes("ogg") ? "ogg" : "webm";
             recordedFile = new File([recordedBlob], "team-voice-note-" + Date.now() + "." + ext, { type: recordedBlob.type });
@@ -491,7 +492,7 @@
       const stop = button("■ Stop recording", "ct-tc-button ct-tc-secondary", () => {
         if (recorder && recorder.state !== "inactive") recorder.stop();
       });
-      const removeVoice = button("× Remove voice", "ct-tc-button ct-tc-danger", clearRecording);
+      const removeVoice = button("× Cancel voice", "ct-tc-button ct-tc-danger", clearRecording);
       removeVoice.disabled = true;
       stop.disabled = true;
       recordPanel.append(recordStatus, start, stop, removeVoice);
@@ -528,21 +529,21 @@
       syntheticPanel.append(field("Dialect", voiceDialect), field("Style", voiceStyle), voicePreview,
         $("small", "ct-tc-hint", "Uses the speech voices available on the listener’s device. Voice availability and accent vary by browser and operating system."));
       const voiceOptions = $("div", "ct-tc-compose-options");
+      const voiceUploadField = field("Upload an audio recording", voice, "Optional: choose an existing audio file instead of recording.");
       voiceOptions.append(field("Voice for this announcement", voiceMode),
         field("Synthetic voice settings", syntheticPanel));
       const refreshVoiceMode = () => {
         const mode = voiceMode.value;
         recordPanel.hidden = mode !== "recorded";
         syntheticPanel.hidden = mode !== "synthetic";
-        voice.hidden = mode !== "recorded";
+        voiceUploadField.hidden = mode !== "recorded";
         if (mode !== "recorded" && stream) clearRecording();
         if (mode !== "synthetic") window.speechSynthesis && window.speechSynthesis.cancel();
       };
       voiceMode.addEventListener("change", refreshVoiceMode);
       refreshVoiceMode();
       form.append(formGrid, options, field("Documents and images", files, "Attach supporting files to this team announcement."),
-        voiceOptions, field("Upload an audio recording", voice, "Optional: choose an existing audio file instead of recording."),
-        recordPanel, statusLine);
+        voiceOptions, voiceUploadField, recordPanel, statusLine);
       const actions = $("div", "ct-tc-dialog-actions");
       actions.append(cancel, submit);
       form.appendChild(actions);
