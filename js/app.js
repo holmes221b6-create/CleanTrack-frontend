@@ -941,17 +941,26 @@
     }
 
     if (pageId === "team-channel") {
-      if (String(user?.role || "").toLowerCase() !== "supervisor") {
-        pageContent.appendChild(Object.assign(document.createElement("p"), {
-          textContent: "The Supervisor Team Channel is not available to this account."
-        }));
-        return;
-      }
-      if (window.MechnarSupervisorTeamChannel && typeof window.MechnarSupervisorTeamChannel.render === "function") {
-        await window.MechnarSupervisorTeamChannel.render(pageContent);
+      const role = String(user?.role || "").toLowerCase();
+      if (role === "supervisor") {
+        if (window.MechnarSupervisorTeamChannel && typeof window.MechnarSupervisorTeamChannel.render === "function") {
+          await window.MechnarSupervisorTeamChannel.render(pageContent);
+        } else {
+          pageContent.appendChild(Object.assign(document.createElement("p"), {
+            textContent: "Team Channel could not load. Refresh and try again."
+          }));
+        }
+      } else if (role === "employee") {
+        if (window.CleanTrackAnnouncements && typeof window.CleanTrackAnnouncements.render === "function") {
+          await window.CleanTrackAnnouncements.render(pageContent, "team-channel");
+        } else {
+          pageContent.appendChild(Object.assign(document.createElement("p"), {
+            textContent: "Team Channel could not load. Refresh and try again."
+          }));
+        }
       } else {
         pageContent.appendChild(Object.assign(document.createElement("p"), {
-          textContent: "Team Channel could not load. Refresh and try again."
+          textContent: "The Team Channel is not available to this role."
         }));
       }
       return;
