@@ -1506,3 +1506,45 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 @media(max-width:900px){
  #page-content .ct-op-supervisor-page .ct-op-supervisor-queues>.ct-op-queue-group:last-child{margin-left:0!important}
 }
+
+
+/* All Operations status card: centered, clear and without dark shading. */
+#page-content .ct-op-supervisor-page .ct-op-status-sidebar-row.is-total{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:7px!important;
+ min-height:92px!important;
+ padding:14px 12px!important;
+ text-align:center!important;
+ border:1px solid rgba(167,139,233,.48)!important;
+ border-radius:12px!important;
+ background:rgba(111,78,170,.20)!important;
+ background-image:none!important;
+ box-shadow:none!important;
+}
+#page-content .ct-op-supervisor-page .ct-op-status-sidebar-row.is-total .ct-op-status-sidebar-label{
+ width:100%!important;
+ flex:0 0 auto!important;
+ margin:0!important;
+ padding:0!important;
+ color:#eee7ff!important;
+ font-size:.79rem!important;
+ font-weight:700!important;
+ line-height:1.25!important;
+ text-align:center!important;
+ white-space:normal!important;
+}
+#page-content .ct-op-supervisor-page .ct-op-status-sidebar-row.is-total .ct-op-status-sidebar-value{
+ flex:0 0 auto!important;
+ min-width:0!important;
+ margin:0!important;
+ padding:0!important;
+ color:#ffffff!important;
+ font-size:1.9rem!important;
+ font-weight:850!important;
+ line-height:1!important;
+ letter-spacing:-.035em!important;
+ text-align:center!important;
+}
