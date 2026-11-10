@@ -246,10 +246,8 @@
       }
       pinned.slice(0, 6).forEach(item => {
         const row = button("", "ct-tc-pinned-item", () => {
-          filter.value = "pinned";
-          renderFeed();
-          const card = feed.querySelector('[data-announcement-id="' + String(item.id).replace(/[^0-9]/g, "") + '"]');
-          if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+          renderSelectedAnnouncement(item);
+          feed.scrollIntoView({ behavior: "smooth", block: "center" });
         });
         row.append($("strong", "", item.title), $("small", "", prettyDate(item.published_at || item.created_at)));
         pinnedList.appendChild(row);
