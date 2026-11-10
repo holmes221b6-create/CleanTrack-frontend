@@ -1350,3 +1350,29 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
  #page-content .ct-op-supervisor-page .ct-op-blocker-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media(max-width:430px){#page-content .ct-op-supervisor-page .ct-op-filters{grid-template-columns:1fr!important}#page-content .ct-op-supervisor-page .ct-op-header-actions{width:100%!important}}
+
+
+/* Operations intelligence header — portfolio, execution and exception hierarchy. */
+#page-content .ct-op-supervisor-page .ct-op-stats.ct-op-status-overview{display:grid!important;grid-template-columns:minmax(145px,.72fr) minmax(0,1.5fr) minmax(0,1.5fr)!important;gap:0!important;width:100%!important;min-width:0!important;overflow:hidden!important;margin:0 0 17px!important;padding:0!important;border:1px solid rgba(166,157,191,.18)!important;border-radius:11px!important;background:#14141c!important}
+#page-content .ct-op-supervisor-page .ct-op-status-total{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;min-width:0!important;padding:17px 20px!important;border-right:1px solid rgba(166,157,191,.18)!important;background:linear-gradient(145deg,rgba(154,128,223,.13),rgba(154,128,223,.025))!important}
+#page-content .ct-op-supervisor-page .ct-op-status-kicker{color:#aa96dc!important;font-size:.59rem!important;font-weight:800!important;letter-spacing:.16em!important}
+#page-content .ct-op-supervisor-page .ct-op-status-total-value{margin:5px 0 1px!important;color:#f0ebfa!important;font-size:2.15rem!important;line-height:1!important;font-weight:760!important;letter-spacing:-.055em!important}
+#page-content .ct-op-supervisor-page .ct-op-status-total-label{font-size:.72rem!important;color:#aaa3b8!important}
+#page-content .ct-op-supervisor-page .ct-op-status-group{display:flex!important;flex-direction:column!important;justify-content:center!important;min-width:0!important;padding:13px 17px!important}
+#page-content .ct-op-supervisor-page .ct-op-status-exceptions{border-left:1px solid rgba(166,157,191,.18)!important}
+#page-content .ct-op-supervisor-page .ct-op-status-group-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:0 0 12px!important}
+#page-content .ct-op-supervisor-page .ct-op-status-group-head>span{color:#938ba3!important;font-size:.59rem!important;font-weight:800!important;letter-spacing:.14em!important}
+#page-content .ct-op-supervisor-page .ct-op-status-group-head>small{color:#777184!important;font-size:.61rem!important}
+#page-content .ct-op-supervisor-page .ct-op-status-metrics{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important}
+#page-content .ct-op-supervisor-page .ct-op-status-metric{display:flex!important;flex-direction:column!important;gap:5px!important;min-width:0!important;padding:0 12px!important;border-left:1px solid rgba(166,157,191,.13)!important}
+#page-content .ct-op-supervisor-page .ct-op-status-metric:first-child{padding-left:0!important;border-left:0!important}
+#page-content .ct-op-supervisor-page .ct-op-status-label{color:#aaa3b8!important;font-size:.68rem!important;line-height:1.25!important;white-space:nowrap!important}
+#page-content .ct-op-supervisor-page .ct-op-status-value{color:#e9e5f1!important;font-size:1.35rem!important;line-height:1!important;font-weight:740!important;letter-spacing:-.035em!important}
+#page-content .ct-op-supervisor-page .ct-op-status-pending .ct-op-status-value{color:#d9c28b!important}
+#page-content .ct-op-supervisor-page .ct-op-status-progress .ct-op-status-value{color:#9db9e8!important}
+#page-content .ct-op-supervisor-page .ct-op-status-completed .ct-op-status-value{color:#91c9ad!important}
+#page-content .ct-op-supervisor-page .ct-op-status-overdue .ct-op-status-value{color:#e58d91!important}
+#page-content .ct-op-supervisor-page .ct-op-status-rejected .ct-op-status-value{color:#d59a9a!important}
+#page-content .ct-op-supervisor-page .ct-op-status-cancelled .ct-op-status-value{color:#aaa3b8!important}
+@media(max-width:900px){#page-content .ct-op-supervisor-page .ct-op-stats.ct-op-status-overview{grid-template-columns:minmax(115px,.55fr) minmax(0,1fr)!important}#page-content .ct-op-supervisor-page .ct-op-status-total{grid-row:span 2!important}#page-content .ct-op-supervisor-page .ct-op-status-exceptions{border-left:0!important;border-top:1px solid rgba(166,157,191,.18)!important}}
+@media(max-width:560px){#page-content .ct-op-supervisor-page .ct-op-stats.ct-op-status-overview{grid-template-columns:1fr!important}#page-content .ct-op-supervisor-page .ct-op-status-total{grid-row:auto!important;border-right:0!important;border-bottom:1px solid rgba(166,157,191,.18)!important}#page-content .ct-op-supervisor-page .ct-op-status-group{padding:13px 15px!important}#page-content .ct-op-supervisor-page .ct-op-status-exceptions{border-top:1px solid rgba(166,157,191,.18)!important}}
