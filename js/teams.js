@@ -454,9 +454,9 @@ async function renderSupervisorTeams(container){
   const reportNav=button("▥ Report","ct-bi-ribbon-tool ct-bi-nav-tool is-active",()=>{reportNav.classList.add("is-active");dataNav.classList.remove("is-active");togglePane("visuals")});
    const dataNav=button("▦ Data","ct-bi-ribbon-tool ct-bi-nav-tool",()=>{dataNav.classList.add("is-active");reportNav.classList.remove("is-active");togglePane("data")});
    ribbonTools.append(reportNav,dataNav);
-  let presenting=false;const exitPresentation=button("Exit presentation","ct-team-btn","");exitPresentation.hidden=true;
+  let presenting=false;const exitPresentation=button("×","ct-bi-presentation-close",()=>setPresentation(false));exitPresentation.hidden=true;exitPresentation.setAttribute("aria-label","Exit presentation and return to Performance");exitPresentation.title="Exit presentation";
   function setPresentation(on){presenting=on;perf.classList.toggle("is-presentation",on);exitPresentation.hidden=!on;viewTab.classList.toggle("is-active",on);reportTab.classList.toggle("is-active",!on);if(on)biStatus.textContent="Presentation view · press Escape to exit";else biStatus.textContent="Report editing view"}
-  viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));exitPresentation.addEventListener("click",()=>setPresentation(false));head.append(exitPresentation);
+  viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));head.append(exitPresentation);
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&presenting)setPresentation(false)});
 
   const endDate=new Date(),startDate=new Date(endDate);startDate.setDate(startDate.getDate()-55);const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
