@@ -118,3 +118,25 @@ html[data-theme="light"] .mw-calendar-popover{background:#fff;color:#202532;bord
 
 .mw-calendar-trigger{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:7px 11px;border:1px solid rgba(145,117,210,.5);border-radius:9px;background:rgba(125,92,190,.14);color:var(--text-primary,#eee);font:inherit;font-size:11px;font-weight:650;cursor:pointer}
 .mw-calendar-trigger:hover,.mw-calendar-trigger:focus-visible{background:rgba(145,117,210,.25);border-color:#a98add;outline:none}
+
+
+/* Centered activity-history dialog. */
+.mw-activity-history-trigger{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 0!important;font-size:11px!important}
+.mw-activity-overlay[hidden]{display:none!important}
+.mw-activity-overlay{position:fixed;inset:0;z-index:15000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,8,13,.68);backdrop-filter:blur(5px)}
+.mw-activity-dialog{display:flex;flex-direction:column;width:min(680px,100%);max-height:min( min(78vh,760px), calc(100vh - 48px));overflow:hidden;border:1px solid var(--border,#393946);border-radius:16px;background:var(--surface,#171720);color:var(--text-primary,#f2f2f7);box-shadow:0 24px 80px rgba(0,0,0,.32)}
+.mw-activity-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 17px;border-bottom:1px solid var(--border,#30303d)}
+.mw-activity-dialog-head .mw-eyebrow{margin-bottom:6px}
+.mw-activity-dialog-head h2{margin:0;font-size:20px;font-weight:750;letter-spacing:-.025em}
+.mw-activity-dialog-head p{margin:6px 0 0;color:var(--text-secondary,#a7a7b5);font-size:12px;line-height:1.5}
+.mw-activity-close{display:grid;place-items:center;flex:none;width:32px;height:32px;border:1px solid var(--border,#393946);border-radius:8px;background:var(--surface-raised,#24242e);color:var(--text-primary,#eee);font-size:22px;line-height:1;cursor:pointer}
+.mw-activity-close:hover{border-color:#a78bfa;color:#cbb8ff}
+.mw-activity-dialog-body{padding:20px 24px 24px;overflow:auto;overscroll-behavior:contain}
+.mw-activity-dialog-body .mw-activity-list{gap:0}
+.mw-activity-dialog-body .mw-activity{padding:13px 0;border-bottom:1px solid var(--border,#30303d)}
+.mw-activity-dialog-body .mw-activity:first-child{padding-top:0}
+.mw-activity-dialog-body .mw-activity:last-child{border-bottom:0;padding-bottom:0}
+.mw-activity-dialog-body .mw-activity>div{font-size:12px;gap:5px}
+.mw-activity-dialog-body .mw-activity small{font-size:10px}
+.mw-activity-dialog-body .mw-activity-message{font-size:11px}
+@media(max-width:600px){.mw-activity-overlay{padding:12px}.mw-activity-dialog{max-height:calc(100vh - 24px);border-radius:13px}.mw-activity-dialog-head{padding:17px 17px 14px}.mw-activity-dialog-body{padding:15px 17px 18px}}
