@@ -155,9 +155,8 @@
             '<button class="mw-link-button" data-mw-page="operations">View Operations →</button>':empty("No overdue, blocked or rejected operations."),"mw-attention")+
         '</div>'+
         '<div class="mw-main-grid mw-secondary-grid">'+
-          card("Recent Activity",activity.length?'<div class="mw-activity-list">'+activity.slice(0,6).map(a=>
-            '<div class="mw-activity"><span class="mw-activity-dot"></span><div><strong>'+esc(a.actor_name)+'</strong> <span>'+esc(activityVerb(a.action))+'</span><b>'+esc(a.operation_title)+'</b><small>'+
-            esc(a.actor_role||"Member")+' · '+esc(dateLabel(a.created_at,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}))+'</small>'+(a.message?'<p class="mw-activity-message">'+esc(a.message)+'</p>':'')+'</div></div>').join("")+'</div>':
+          card("Recent Activity",activity.length?'<div class="mw-activity-list">'+activity.slice(0,3).map(renderActivityItem).join("")+'</div>'+
+            '<button type="button" class="mw-link-button mw-activity-history-trigger" data-mw-activity-history>View activity history →</button>':
             empty("No operation activity has been recorded."),"mw-activity-card")+
           card("Announcements & Alerts",announcementContent+(announcements.length?'<button class="mw-link-button" data-mw-page="team-channel">Open Team Channel →</button>':""),"mw-announcements")+
         '</div>'+
@@ -166,7 +165,26 @@
           '<button class="button button-secondary" data-mw-page="team-channel">Team Channel</button></nav></div>';
     root.querySelectorAll("[data-mw-page]").forEach(btn=>btn.addEventListener("click",()=>nav?.setActivePage(btn.dataset.mwPage)));
     setupCalendar(root, operations);
+    setupActivityHistory(root, activity);
 
+  }
+  function renderActivityItem(a) {
+    return '<div class="mw-activity"><span class="mw-activity-dot"></span><div><strong>'+esc(a.actor_name||"Member")+'</strong> <span>'+esc(activityVerb(a.action))+'</span><b>'+esc(a.operation_title||"Operation")+'</b><small>'+
+      esc(a.actor_role||"Member")+' · '+esc(dateLabel(a.created_at,{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"}))+'</small>'+(a.message?'<p class="mw-activity-message">'+esc(a.message)+'</p>':'')+'</div></div>';
+  }
+  function setupActivityHistory(root, activity) {
+    const trigger=root.querySelector("[data-mw-activity-history]");
+    if(!trigger)return;
+    const overlay=document.createElement("div");
+    overlay.className="mw-activity-overlay";
+    overlay.hidden=true;
+    overlay.innerHTML='<section class="mw-activity-dialog" role="dialog" aria-modal="true" aria-labelledby="mw-activity-dialog-title"><header class="mw-activity-dialog-head"><div><span class="mw-eyebrow">TEAM TIMELINE</span><h2 id="mw-activity-dialog-title">Activity History</h2><p>Recorded activity across your team operations.</p></div><button type="button" class="mw-activity-close" data-mw-activity-close aria-label="Close activity history">×</button></header><div class="mw-activity-dialog-body">'+(activity.length?'<div class="mw-activity-list">'+activity.map(renderActivityItem).join("")+'</div>':empty("No operation activity has been recorded."))+'</div></section>';
+    root.appendChild(overlay);
+    const close=()=>{overlay.hidden=true;trigger.focus();};
+    trigger.addEventListener("click",()=>{overlay.hidden=false;overlay.querySelector("[data-mw-activity-close]")?.focus();});
+    overlay.querySelector("[data-mw-activity-close]").addEventListener("click",close);
+    overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
+    overlay.querySelector(".mw-activity-dialog").addEventListener("keydown",event=>{if(event.key==="Escape"){event.stopPropagation();close();}});
   }
   function recordRow(o, label) {
     const lineage = o.original_assigned_to_name && o.assigned_to_name && o.original_assigned_to_name !== o.assigned_to_name
