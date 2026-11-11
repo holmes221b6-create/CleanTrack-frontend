@@ -68,7 +68,8 @@
   const viewHistory = [];
 
   function getMenu(role) {
-    const normalizedRole = String(role || "").toLowerCase();
+    const rawRole = String(role || "").trim().toLowerCase();
+    const normalizedRole = rawRole === "staff" ? "employee" : rawRole;
     return (routes[normalizedRole] || []).map(function (item) {
       return { ...item };
     });
@@ -173,7 +174,9 @@
       employee: "my-desk"
     };
 
-    return defaults[String(role || "").toLowerCase()] || null;
+    const rawRole = String(role || "").trim().toLowerCase();
+    const normalizedRole = rawRole === "staff" ? "employee" : rawRole;
+    return defaults[normalizedRole] || null;
   }
 
   function renderMenu(container) {
