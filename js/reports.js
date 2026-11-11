@@ -107,7 +107,9 @@ async function renderSupervisor(container){
  const dates=defaultDates(30),from=INPUT("date",dates[0]),to=INPUT("date",dates[1]);
  const employee=SELECT([["","All personnel"]]),location=SELECT([["","All locations"]]),zone=SELECT([["","All zones"]]),status=SELECT([["","All statuses"]]),opType=SELECT([["","All operation types"]]);
  const filterFields={employee:FIELD("Personnel",employee),location:FIELD("Location",location),zone:FIELD("Zone",zone),status:FIELD("Status",status),opType:FIELD("Operation type",opType)};
- grid.append(FIELD("Report name",name),FIELD("Report type",type),FIELD("File format",format),FIELD("From",from),FIELD("To",to),
+ const formatField=FIELD("File format",format);
+ formatField.append($("small","ct-sup-format-help","PDF: document · Excel: workbook · CSV: raw data · HTML: formatted table · SVG: image file"));
+ grid.append(FIELD("Report name",name),FIELD("Report type",type),formatField,FIELD("From",from),FIELD("To",to),
   filterFields.employee,filterFields.location,filterFields.zone,filterFields.status,filterFields.opType);
  builder.append(builderHead,grid);
  const filterHint=$("p","ct-reports-muted ct-sup-report-hint","Select a report type to see the relevant filters.");builder.append(filterHint);
