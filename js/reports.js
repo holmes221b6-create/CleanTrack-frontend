@@ -60,7 +60,7 @@ function render(container){
  async function loadOptions(){options=await API.get("reports/options");opts(team,options.teams,"All teams");opts(supervisor,options.staff.filter(x=>String(x.role).toLowerCase()==="supervisor"),"All supervisors");opts(employee,options.staff.filter(x=>String(x.role).toLowerCase()!=="admin"),"All employees");opts(location,options.locations,"All locations");opts(zone,options.zones,"All zones");opts(opType,options.operation_types||[],"All operation types");}
  function payload(){return {name:name.value.trim(),report_type:type.value,format:format.value,start_date:from.value,end_date:to.value,team_id:team.value||null,supervisor_id:supervisor.value||null,employee_id:employee.value||null,location_id:location.value||null,zone_id:zone.value||null,status:status.value||null,operation_type:opType.value||null,date_format:dateFormat};}
  function renderTable(data){tableWrap.replaceChildren();if(!data.headers?.length){tableWrap.appendChild($("p","ct-reports-empty","No columns are available for this report."));return;}const table=$("table","ct-reports-table"),thead=$("thead",""),hr=$("tr","");data.headers.forEach(h=>hr.appendChild($("th","",h)));thead.appendChild(hr);table.appendChild(thead);const body=$("tbody","");(data.rows||[]).forEach(row=>{const tr=$("tr","");row.forEach(v=>tr.appendChild($("td","",escText(v))));body.appendChild(tr);});table.appendChild(body);tableWrap.appendChild(table);if(!data.rows?.length)tableWrap.appendChild($("p","ct-reports-empty","No records match the selected filters."));}
- async function preview(){try{if(!from.value||!to.value)throw Error("Choose both dates.");if(!name.value.trim())throw Error("Enter a report name before previewing.");if(from.value>to.value)throw Error("The start date must be before the end date.");previewBtn.disabled=true;previewBtn.textContent="Loading preview…";const data=await API.post("reports/preview",payload());latestPreview=payload();generateBtn.disabled=false;previewPanel.classList.remove("ct-reports-hidden");kpis.replaceChildren();[[ "Matching records",data.row_count],[ "Date range",data.start_date+" → "+data.end_date],["Preview rows",Math.min(100,data.row_count)+(data.preview_truncated?"+":"")]].forEach(([l,v])=>{const k=$("div","ct-reports-kpi");k.append($("span","",l),$("strong","",v));kpis.appendChild(k);});renderTable(data);setStep(2);say("Preview ready. Check the rows and generate the report when you’re satisfied.","success");}catch(e){say(e.message||"Could not preview the report.","error");}finally{previewBtn.disabled=false;previewBtn.textContent="Preview report";}}
+ async function preview(){try{if(!from.value||!to.value)throw Error("Choose both dates.");if(!name.value.trim())throw Error("Enter a report name before previewing.");if(from.value>to.value)throw Error("The start date must be before the end date.");previewBtn.disabled=true;previewBtn.textContent="Loading preview…";const data=await API.post("reports/preview",payload());latestPreview=payload();generateBtn.disabled=false;previewPanel.classList.remove("ct-reports-hidden");kpis.replaceChildren();[[ "Matching records",data.row_count],[ "Date range",data.start_date+" → "+data.end_date],["Preview rows",Math.min(100,data.row_count)+(data.preview_truncated?"+":"")]].forEach(([l,v])=>{const k=$("div","ct-reports-kpi");k.append($("span","",l),$("strong","",v));kpis.appendChild(k);});renderTable(data);setStep(2);say("Preview ready. Check the rows and generate the report when you’re satisfied.","success");}catch(e){say(e.message||"Could not preview the report.","error");}finally{previewBtn.disabled=false;previewBtn.textContent="View report";}}
  async function generate(){try{if(!latestPreview||JSON.stringify(latestPreview)!==JSON.stringify(payload())){throw Error("Filters changed. Preview the report again before generating it.");}generateBtn.disabled=true;generateBtn.textContent="Generating…";const result=await API.post("reports/generate",payload());setStep(3);say("Report generated and saved to your private history ("+result.row_count+" records).","success");await loadHistory();const entry=historyList.querySelector('[data-report-id="'+result.report.id+'"]');if(entry)entry.scrollIntoView({block:"nearest",behavior:"smooth"});setStep(4);}catch(e){say(e.message||"Report generation failed.","error");}finally{generateBtn.disabled=!latestPreview;generateBtn.textContent="Generate report";}}
  async function download(id){try{const cfg=window.CleanTrackConfig;const token=AUTH?.getAuthToken?.()||sessionStorage.getItem("cleantrack_token");const response=await fetch(cfg.apiBaseUrl.replace(/\/$/,"")+"/reports/"+encodeURIComponent(id)+"/download",{headers:token?{Authorization:"Bearer "+token}:{},credentials:"include",cache:"no-store"});if(!response.ok){let m="Download failed.";try{m=(await response.json()).error||m;}catch(_){}throw Error(m);}const blob=await response.blob(),url=URL.createObjectURL(blob),a=$("a","");a.href=url;a.download="cleantrack-report";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);say("Download started.","success");await loadHistory();}catch(e){say(e.message||"Download failed.","error");}}
  async function share(id,method,reportName){
@@ -97,7 +97,7 @@ async function renderSupervisor(container){
  header.append(intro,teamBadge);root.append(header);
  const alert=$("div","ct-reports-alert ct-reports-hidden");alert.setAttribute("role","status");alert.setAttribute("aria-live","polite");root.append(alert);
  const steps=$("nav","ct-sup-report-steps");
- [["1","Select"],["2","Filter"],["3","Preview"],["4","Generate"]].forEach(([n,label],i)=>{const item=$("div","ct-sup-step"+(i===0?" active":""));item.dataset.step=String(i);item.append($("b","",n),$("span","",label));steps.append(item);});root.append(steps);
+ [["1","Select"],["2","Filter"],["3","View report"],["4","Generate"]].forEach(([n,label],i)=>{const item=$("div","ct-sup-step"+(i===0?" active":""));item.dataset.step=String(i);item.append($("b","",n),$("span","",label));steps.append(item);});root.append(steps);
  const builder=$("section","ct-reports-panel ct-sup-builder");
  const builderHead=$("div","ct-sup-section-head");builderHead.append($("div","",null));builderHead.firstChild.append($("h2","","Create a report"),$("p","ct-reports-muted","Choose the records and reporting period. Only your active team’s data is available."));
  const grid=$("div","ct-sup-report-grid");
@@ -111,7 +111,7 @@ async function renderSupervisor(container){
   filterFields.employee,filterFields.location,filterFields.zone,filterFields.status,filterFields.opType);
  builder.append(builderHead,grid);
  const filterHint=$("p","ct-reports-muted ct-sup-report-hint","Select a report type to see the relevant filters.");builder.append(filterHint);
- const actions=$("div","ct-reports-actions"),previewBtn=BTN("Preview report","primary",preview),generateBtn=BTN("Generate report","",generate);generateBtn.disabled=true;actions.append(previewBtn,generateBtn);builder.append(actions);root.append(builder);
+ const actions=$("div","ct-reports-actions"),previewBtn=BTN("View report","primary",preview),generateBtn=BTN("Generate report","",generate);generateBtn.disabled=true;actions.append(previewBtn,generateBtn);builder.append(actions);root.append(builder);
  const previewPanel=$("section","ct-reports-panel ct-sup-preview ct-reports-hidden");
  const previewHead=$("div","ct-sup-section-head");previewHead.append($("div","",null));previewHead.firstChild.append($("h2","","Preview"),$("p","ct-reports-muted","Review the returned records before generating the file."));previewPanel.append(previewHead);
  const previewSummary=$("div","ct-sup-preview-summary"),tableWrap=$("div","ct-reports-table-wrap");previewPanel.append(previewSummary,tableWrap);root.append(previewPanel);
@@ -149,10 +149,9 @@ async function renderSupervisor(container){
  }
  async function preview(){
   try{
-   if(!name.value.trim())throw Error("Enter a report name.");
    if(!from.value||!to.value)throw Error("Choose both dates.");
    if(from.value>to.value)throw Error("The start date must be on or before the end date.");
-   previewBtn.disabled=true;previewBtn.textContent="Preparing preview…";
+   previewBtn.disabled=true;previewBtn.textContent="Loading report…";
    const p=payload(),data=await API.post("reports/supervisor/preview",p);
    latestPayload=JSON.stringify(p);latest=p;renderPreview(data);previewPanel.classList.remove("ct-reports-hidden");
    generateBtn.disabled=false;step(2);notify("Preview ready. Check the records before generating the report.");
@@ -161,7 +160,8 @@ async function renderSupervisor(container){
  }
  async function generate(){
   try{
-   if(!latest||latestPayload!==JSON.stringify(payload()))throw Error("Your selections changed. Preview the report again.");
+   if(!name.value.trim())throw Error("Enter a report name before generating the file.");
+   if(!latest||latestPayload!==JSON.stringify(payload()))throw Error("Your selections changed. View the report again.");
    generateBtn.disabled=true;generateBtn.textContent="Generating…";
    const result=await API.post("reports/supervisor/generate",payload());
    step(3);notify("Report generated. "+result.row_count+" records included.");
