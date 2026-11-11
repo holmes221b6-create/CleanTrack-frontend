@@ -16,6 +16,8 @@
   }
 
   let currentUser = null;
+  // Prevent a slow startup session check from overwriting a newer sign-in.
+  let authStateVersion = 0;
   let authToken = "";
   let refreshToken = "";
 
@@ -119,11 +121,15 @@ function normalizeUser(user) {
 
   async function login(credentials) {
     validateCredentials(credentials);
+    const loginVersion = ++authStateVersion;
 
     const response = await api.post("auth/login", {
       email: credentials.email.trim().toLowerCase(),
       password: credentials.password
     });
+    if (loginVersion !== authStateVersion) {
+      throw new Error("This sign-in attempt was superseded. Please sign in again.");
+    }
 
     persistToken(response.token || response.data?.token || "");
     persistRefreshToken(response.refresh_token || response.data?.refresh_token || "");
@@ -154,6 +160,7 @@ function normalizeUser(user) {
   }
 
   async function register(details) {
+    const registerVersion = ++authStateVersion;
     if (!details || typeof details !== "object") {
       throw new Error("Registration details are required.");
     }
@@ -215,6 +222,9 @@ function normalizeUser(user) {
     }
 
     const response = await api.post("auth/register", payload);
+    if (registerVersion !== authStateVersion) {
+      throw new Error("This registration attempt was superseded. Please try again.");
+    }
     const user = response.user || response.data?.user || null;
     const token = response.token || response.data?.token || "";
 
@@ -242,6 +252,7 @@ function normalizeUser(user) {
   }
 
   async function logout() {
+    ++authStateVersion;
     try {
       await api.post("auth/logout", {});
     } finally {
@@ -274,6 +285,7 @@ function normalizeUser(user) {
   });
 
   async function restoreSession() {
+    const restoreVersion = authStateVersion;
     try {
       const token = getAuthToken();
       let lastActive = 0;
@@ -287,6 +299,9 @@ function normalizeUser(user) {
         return null;
       }
       const response = await api.get("auth/me");
+      // A login/register/logout started while this request was in flight.
+      // Its result is newer and must win over this stale startup response.
+      if (restoreVersion !== authStateVersion) return currentUser;
       const user = response.user || response.data?.user || null;
 
       currentUser = normalizeUser(user);
@@ -299,6 +314,8 @@ function normalizeUser(user) {
       emitAuthEvent("cleantrack:session-restored", currentUser);
       return currentUser;
     } catch (error) {
+      // Never let a stale restore failure clear a successful newer login.
+      if (restoreVersion !== authStateVersion) return currentUser;
       currentUser = null;
       if (error.status === 401 || error.status === 403) persistToken("");
 
