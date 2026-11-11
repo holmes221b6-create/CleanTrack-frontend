@@ -305,8 +305,17 @@
       if(view==="agenda")panel.querySelector("[data-mw-selected]").hidden=true;
       else panel.querySelector("[data-mw-selected]").hidden=false;
     }
+    let userPositioned=false;
+    function clampPanelPosition(){
+      const rect=panel.getBoundingClientRect();
+      const left=Math.max(8,Math.min(window.innerWidth-rect.width-8,rect.left));
+      const top=Math.max(8,Math.min(window.innerHeight-rect.height-8,rect.top));
+      panel.style.left=left+"px";panel.style.top=top+"px";
+    }
     function position(){
-      panel.hidden=false;panel.style.visibility="hidden";const r=trigger.getBoundingClientRect();
+      panel.hidden=false;panel.style.visibility="hidden";
+      if(userPositioned){clampPanelPosition();panel.style.visibility="visible";return;}
+      const r=trigger.getBoundingClientRect();
       const w=Math.min(440,window.innerWidth-20);panel.style.width=w+"px";
       panel.style.maxHeight=Math.max(300,window.innerHeight-20)+"px";
       const h=Math.min(panel.scrollHeight,window.innerHeight-20);
@@ -321,10 +330,37 @@
     panel.querySelector("[data-mw-next]").addEventListener("click",()=>{if(view==="day")selected=addDays(selected,1);else if(view==="week")cursor=addDays(cursor,7);else cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render();});
     panel.querySelector("[data-mw-today]").addEventListener("click",()=>{selected=new Date(today);cursor=new Date(today.getFullYear(),today.getMonth(),1);render();});
     panel.querySelector("[data-mw-close]").addEventListener("click",()=>{panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();});
+    const dragHandle=panel.querySelector(".mw-calendar-popover-head");
+    let dragState=null;
+    dragHandle.addEventListener("pointerdown",event=>{
+      if(event.button!==0||event.target.closest("button"))return;
+      const rect=panel.getBoundingClientRect();
+      dragState={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top};
+      dragHandle.setPointerCapture(event.pointerId);
+      dragHandle.classList.add("is-dragging");
+      event.preventDefault();
+    });
+    dragHandle.addEventListener("pointermove",event=>{
+      if(!dragState||event.pointerId!==dragState.pointerId)return;
+      const left=dragState.left+(event.clientX-dragState.startX);
+      const top=dragState.top+(event.clientY-dragState.startY);
+      const maxLeft=Math.max(8,window.innerWidth-panel.offsetWidth-8);
+      const maxTop=Math.max(8,window.innerHeight-panel.offsetHeight-8);
+      panel.style.left=Math.max(8,Math.min(maxLeft,left))+"px";
+      panel.style.top=Math.max(8,Math.min(maxTop,top))+"px";
+      userPositioned=true;
+    });
+    const endDrag=event=>{
+      if(!dragState||event.pointerId!==dragState.pointerId)return;
+      dragState=null;dragHandle.classList.remove("is-dragging");
+      if(dragHandle.hasPointerCapture(event.pointerId))dragHandle.releasePointerCapture(event.pointerId);
+    };
+    dragHandle.addEventListener("pointerup",endDrag);
+    dragHandle.addEventListener("pointercancel",endDrag);
     root.addEventListener("pointerdown",event=>{if(!panel.hidden&&!panel.contains(event.target)&&!trigger.contains(event.target)){panel.hidden=true;trigger.setAttribute("aria-expanded","false");}});
     panel.addEventListener("keydown",event=>{if(event.key==="Escape"){panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();}});
-    window.addEventListener("resize",()=>{if(!panel.hidden)position();});
-    window.addEventListener("scroll",()=>{if(!panel.hidden)position();},true);
+    window.addEventListener("resize",()=>{if(!panel.hidden){if(userPositioned)clampPanelPosition();else position();}});
+    window.addEventListener("scroll",()=>{if(!panel.hidden&&!userPositioned)position();},true);
   }
   window.MechnarSupervisorWorkspace = Object.freeze({ render });
 })();
