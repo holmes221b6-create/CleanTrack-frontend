@@ -103,7 +103,7 @@ async function renderSupervisor(container){
  const grid=$("div","ct-sup-report-grid");
  const name=INPUT("text","");name.placeholder="e.g. Weekly operations review";name.maxLength=180;
  const type=SELECT([["operations","Operations"],["reviews","Completion & reviews"],["personnel","Personnel"],["performance","Team performance"],["locations","Locations"],["zones","Zones"]]);
- const format=SELECT([["pdf","PDF"],["xlsx","Excel workbook"],["csv","CSV"]]);
+ const format=SELECT([["pdf","PDF document"],["xlsx","Excel workbook"],["csv","CSV data"],["html","HTML table"],["svg","SVG image"]]);
  const dates=defaultDates(30),from=INPUT("date",dates[0]),to=INPUT("date",dates[1]);
  const employee=SELECT([["","All personnel"]]),location=SELECT([["","All locations"]]),zone=SELECT([["","All zones"]]),status=SELECT([["","All statuses"]]),opType=SELECT([["","All operation types"]]);
  const filterFields={employee:FIELD("Personnel",employee),location:FIELD("Location",location),zone:FIELD("Zone",zone),status:FIELD("Status",status),opType:FIELD("Operation type",opType)};
@@ -175,7 +175,8 @@ async function renderSupervisor(container){
    if(!latest||latestPayload!==JSON.stringify(payload()))throw Error("Your selections changed. View the report again.");
    generateBtn.disabled=true;generateBtn.textContent="Generating…";
    const result=await API.post("reports/supervisor/generate",payload());
-   step(3);notify("Report generated. "+result.row_count+" records included.");
+   step(3);notify("Report generated. "+result.row_count+" records included. Download starting.");
+   await download(result.report.id);
    await loadHistory();const row=historyList.querySelector('[data-report-id="'+result.report.id+'"]');row?.scrollIntoView({behavior:"smooth",block:"nearest"});
   }catch(e){notify(e.message||"The report could not be generated.",true);}
   finally{generateBtn.disabled=false;generateBtn.textContent="Generate report";}
@@ -185,7 +186,12 @@ async function renderSupervisor(container){
    const cfg=window.CleanTrackConfig,token=AUTH?.getAuthToken?.()||sessionStorage.getItem("cleantrack_token");
    const response=await fetch(cfg.apiBaseUrl.replace(/\/$/,"")+"/reports/supervisor/"+encodeURIComponent(id)+"/download",{headers:token?{Authorization:"Bearer "+token}:{},credentials:"include",cache:"no-store"});
    if(!response.ok){let m="Download failed.";try{m=(await response.json()).error||m;}catch(_){}throw Error(m);}
-   const blob=await response.blob(),url=URL.createObjectURL(blob),a=$("a","");a.href=url;a.download="mechnar-report";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);notify("Download started.");
+   const blob=await response.blob(),url=URL.createObjectURL(blob),a=$("a","");
+   const disposition=response.headers.get("Content-Disposition")||"",match=disposition.match(/filename="?([^";]+)"?/i);
+   const ext={pdf:"pdf",xlsx:"xlsx",csv:"csv",svg:"svg",html:"html"};
+   const selectedFormat=history.find(item=>String(item.id)===String(id))?.file_format;
+   a.href=url;a.download=match?.[1]||("mechnar-report-"+id+"."+(ext[selectedFormat]||"pdf"));
+   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);notify("Download started.");
   }catch(e){notify(e.message||"Download failed.",true);}
  }
  function openShare(report){
