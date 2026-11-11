@@ -1765,8 +1765,17 @@ function bindNavigation() {
     form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
-      clearMessage();
+      const loginMessage = getElement("login-message");
+      const submitButton = getElement("login-submit");
+      if (loginMessage) {
+        loginMessage.textContent = "";
+        loginMessage.className = "form-message";
+      }
       setLoading(true);
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Signing in…";
+      }
 
       const formData = new FormData(form);
 
@@ -1778,15 +1787,28 @@ function bindNavigation() {
 
         state.started = true;
         showAuthenticatedLayout(user);
-        showMessage("You are now signed in.", "success");
+        if (loginMessage) {
+          loginMessage.textContent = "You are now signed in.";
+          loginMessage.className = "form-message success";
+        }
         maybeShowFirstSetup(user);
       } catch (error) {
-        showMessage(
-          error.message || "Unable to sign in. Please try again.",
-          "error"
-        );
+        // Keep authentication failures visible on the login form itself.
+        // Previously showMessage() targeted the workspace banner, which is
+        // hidden while signed out and made failed sign-ins look unresponsive.
+        if (loginMessage) {
+          loginMessage.textContent = error.message || "Unable to sign in. Please try again.";
+          loginMessage.className = "form-message error";
+          loginMessage.setAttribute("role", "alert");
+        } else {
+          showMessage(error.message || "Unable to sign in. Please try again.", "error");
+        }
       } finally {
         setLoading(false);
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Sign in";
+        }
       }
     });
   }
