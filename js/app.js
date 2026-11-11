@@ -1833,7 +1833,9 @@ function bindNavigation() {
 
     setLoading(false);
     try {
-      const user = await auth.restoreSession();
+      const restoredUser = await auth.restoreSession();
+      // Prefer current auth state if sign-in completed during startup restore.
+      const user = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser;
       if (user) showAuthenticatedLayout(user);
       else showUnauthenticatedLayout();
     } catch (error) {
