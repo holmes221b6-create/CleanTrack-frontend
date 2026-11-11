@@ -75,11 +75,6 @@ function normalizeUser(user) {
     user.data?.organization ??
     null;
 
-  const rawRole = String(user.role || "").trim().toLowerCase();
-  // The API stores this role as "Staff"; the frontend employee workspace
-  // is the corresponding route set. Normalize it once for login and restore.
-  const normalizedRole = rawRole === "staff" ? "employee" : rawRole;
-
   const organizationName =
     user.organization_name ||
     user.organizationName ||
@@ -97,7 +92,7 @@ function normalizeUser(user) {
     account_status: user.account_status || "",
     created_at: user.created_at || null,
     email_verified: Boolean(user.email_verified ?? user.emailVerified),
-    role: normalizedRole,
+    role: String(user.role || "").toLowerCase(),
 
     organizationId:
       user.organization_id ??
@@ -125,12 +120,10 @@ function normalizeUser(user) {
   async function login(credentials) {
     validateCredentials(credentials);
 
-    // Render free instances can take a while to wake after inactivity.
-    // Give sign-in a longer, explicit timeout than ordinary API requests.
     const response = await api.post("auth/login", {
       email: credentials.email.trim().toLowerCase(),
       password: credentials.password
-    }, { timeoutMs: 90000 });
+    });
 
     persistToken(response.token || response.data?.token || "");
     persistRefreshToken(response.refresh_token || response.data?.refresh_token || "");
