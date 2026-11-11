@@ -94,7 +94,7 @@ function normalizeUser(user) {
     account_status: user.account_status || "",
     created_at: user.created_at || null,
     email_verified: Boolean(user.email_verified ?? user.emailVerified),
-    role: String(user.role || "").toLowerCase(),
+    role: (String(user.role || "").trim().toLowerCase() === "staff" ? "employee" : String(user.role || "").trim().toLowerCase()),
 
     organizationId:
       user.organization_id ??
