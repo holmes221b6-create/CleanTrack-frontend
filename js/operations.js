@@ -433,9 +433,9 @@ quick.querySelectorAll("button[data-queue]").forEach(target=>{
   makeFilters(root);
   renderRows(root);
   const label=target.textContent.trim();
-  const directory=root.querySelector("[data-op-directory]");
+  let modal=root._opQueueModal;
+  const directory=modal?._queueDirectory||root.querySelector("[data-op-directory]");
   if(directory){
-   let modal=root._opQueueModal;
    if(!modal){
     modal=el("div","ct-op-queue-modal");
     modal.dataset.opQueueModal="true";
@@ -455,12 +455,15 @@ quick.querySelectorAll("button[data-queue]").forEach(target=>{
     const body=el("div","ct-op-queue-modal-body");
     panel.append(head,body);
     modal.append(backdrop,panel);
-    const queueDirectory=directory.cloneNode(true);
-    queueDirectory.hidden=false;
-    body.appendChild(queueDirectory);
+    // Move the live directory into the dialog instead of cloning it.
+    // This preserves its real controls and ensures it is not left mounted behind the overlay.
+    modal._queueParent=directory.parentNode;
+    modal._queueNextSibling=directory.nextSibling;
+    modal._queueDirectory=directory;
+    directory.hidden=false;
+    body.appendChild(directory);
     document.body.appendChild(modal);
     root._opQueueModal=modal;
-    modal._queueDirectory=queueDirectory;
     modal._closeButton=close;
     modal.addEventListener("keydown",event=>{if(event.key==="Escape"){event.preventDefault();closeQueueModal(root);}});
    }else{
@@ -472,12 +475,25 @@ quick.querySelectorAll("button[data-queue]").forEach(target=>{
    modal.hidden=false;
    modal._closeButton?.focus();
   }
-  const count=root.querySelector("[data-op-count]")?.textContent||"0 operations";
+  const count=(root._opQueueModal?.querySelector("[data-op-count]")||root.querySelector("[data-op-count]"))?.textContent||"0 operations";
   notice(root.querySelector("[data-op-notice]"),label+" · "+count,false);
  });
 });
 root.appendChild(quick);const note=el("p","ct-op-supervisor-scope-note","Showing only operations within your organization and the teams, sites, and assignments you are authorized to manage. Queue counts and records are loaded from the operations database.");note.dataset.supervisorScopeNote="true";root.appendChild(note);}const viewbar=el("div","ct-op-viewbar");viewbar.append(button(role()==="supervisor"?"All operations":"Operations directory","ct-op-button ct-op-button-secondary",()=>{filter={q:"",status:"",category:"",location:"",zone:"",team:"",supervisor:"",priority:"",from:"",to:""};supervisorQueue="all";activeView="directory";setView(root,"directory");root.querySelectorAll("[data-queue]").forEach(x=>{const active=x.dataset.queue==="all";x.classList.toggle("is-active",active);x.setAttribute("aria-pressed",active?"true":"false");});makeFilters(root);renderRows(root);notice(root.querySelector("[data-op-notice]"),"All operations · "+(root.querySelector("[data-op-count]")?.textContent||"0 operations"),false);}),button("Maintenance & repairs","ct-op-button ct-op-button-secondary",()=>{filter.category="Maintenance & Repairs";activeView="directory";setView(root,"directory");makeFilters(root);renderRows(root);}),);Array.from(viewbar.children).forEach((x,i)=>{x.dataset.opView=i===0?"directory":i===1?"directory":"calendar";if(i===1)x.dataset.opCalendarTrigger="true";});if(role()==="supervisor"){const blockersButton=button("Blockers & escalations","ct-op-button ct-op-button-secondary",()=>setView(root,"blockers"));blockersButton.dataset.opView="blockers";viewbar.appendChild(blockersButton);}const queryContext=new URLSearchParams(window.location.search);if(queryContext.has("supervisor_id")||queryContext.has("location_id")||queryContext.has("zone_id")||queryContext.has("location")||queryContext.has("zone")){viewbar.appendChild(button("Clear QR / supervisor view","ct-op-button ct-op-button-secondary",()=>{["supervisor_id","location_id","zone_id","location","zone"].forEach(k=>queryContext.delete(k));const q=queryContext.toString();history.replaceState(null,"",window.location.pathname+(q?"?"+q:"")+window.location.hash);filter={q:"",status:"",category:"",location:"",zone:"",team:"",supervisor:"",priority:"",from:"",to:""};activeView="directory";render(host,mode);}));}root.appendChild(viewbar);const directory=el("div","ct-op-directory");directory.dataset.opDirectory="true";const filtersCard=card("Operations directory","Search and narrow real operations by status, type, assignment and due date."),filters=el("div","ct-op-filters");filters.dataset.opFilters="true";filtersCard.appendChild(filters);const listCard=card("Work queue","Open an operation for its assignment details, checklist and full history."),toolbar=el("div","ct-op-list-toolbar"),count=el("p","ct-op-muted","");count.dataset.opCount="true";toolbar.appendChild(count);listCard.append(toolbar);const tableHead=el("div","ct-op-table-head");["Operation","Site / team","Assigned to","Due date","Status / priority",""].forEach(label=>tableHead.appendChild(el("span","",label)));listCard.appendChild(tableHead);const rowsBox=el("div","ct-op-rows");rowsBox.dataset.opRows="true";listCard.appendChild(rowsBox);directory.append(filtersCard,listCard);if(role()==="supervisor"){const workspace=el("div","ct-op-supervisor-workspace");workspace.append(stats,directory);root.appendChild(workspace);}else root.appendChild(directory);const blockersPanel=el("section","ct-op-blockers-view");blockersPanel.dataset.opBlockers="true";blockersPanel.hidden=true;root.appendChild(blockersPanel);const formPanel=el("section","ct-op-card ct-op-form-panel");formPanel.dataset.opFormPanel="true";formPanel.hidden=true;root.appendChild(formPanel);const backdrop=el("button","ct-op-detail-backdrop");backdrop.type="button";backdrop.dataset.opDetailBackdrop="true";backdrop.setAttribute("aria-label","Close operation details");backdrop.hidden=true;backdrop.addEventListener("click",()=>closeDetail(root));root.appendChild(backdrop);const detail=el("section","ct-op-detail ct-op-detail-panel");detail.dataset.opDetail="true";detail.hidden=true;root.appendChild(detail);container.appendChild(root);root._opDetailPanel=detail;root._opDetailBackdrop=backdrop;return root;}
-function closeQueueModal(root){const modal=root?._opQueueModal;if(!modal)return;modal.hidden=true;const directory=root.querySelector("[data-op-directory]");if(directory)directory.hidden=false;}
+function closeQueueModal(root){
+ const modal=root?._opQueueModal;
+ if(!modal)return;
+ modal.hidden=true;
+ const directory=modal._queueDirectory;
+ const parent=modal._queueParent;
+ if(directory&&parent){
+  directory.hidden=false;
+  if(modal._queueNextSibling&&modal._queueNextSibling.parentNode===parent)parent.insertBefore(directory,modal._queueNextSibling);
+  else parent.appendChild(directory);
+ }
+ modal._queueParent=null;
+ modal._queueNextSibling=null;
+}
 async function render(container,mode="operations"){host=container;const root=shell(container,mode);if(role()==="supervisor")startSupervisorAutoRefresh(root);else stopSupervisorAutoRefresh();if(!API||!AUTH?.getCurrentUser?.()){root.replaceChildren(el("p","ct-op-error","Sign in to view operations."));return;}if(mode==="operations"&&!["admin","supervisor"].includes(role())){root.replaceChildren(el("p","ct-op-error","Operations management is available to Admins and Supervisors. Open My Work to execute assigned operations."));return;}try{await loadData();buildForm(root);
 const params=new URLSearchParams(window.location.search);
 const locationId=params.get("location_id")||params.get("location")||"";
