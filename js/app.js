@@ -1765,25 +1765,8 @@ function bindNavigation() {
     form.dataset.loginBound = "true";
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
-      const loginMessage = getElement("login-message");
-      const submitButton = getElement("login-submit");
-      if (loginMessage) {
-        loginMessage.textContent = "";
-        loginMessage.className = "form-message";
-      }
+      clearMessage();
       setLoading(true);
-      const loginStartedAt = Date.now();
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = "Signing in…";
-      }
-      // Show progress while a sleeping hosted API instance wakes up.
-      const progressTimer = window.setInterval(function () {
-        const elapsed = Math.floor((Date.now() - loginStartedAt) / 1000);
-        if (!submitButton) return;
-        if (elapsed >= 35) submitButton.textContent = "Server is taking longer than usual…";
-        else if (elapsed >= 12) submitButton.textContent = "Connecting to server…";
-      }, 1000);
 
       const formData = new FormData(form);
 
@@ -1792,6 +1775,20 @@ function bindNavigation() {
           email: formData.get("email"),
           password: formData.get("password")
         });
+
+        state.started = true;
+        showAuthenticatedLayout(user);
+        showMessage("You are now signed in.", "success");
+        maybeShowFirstSetup(user);
+      } catch (error) {
+        showMessage(
+          error.message || "Unable to sign in. Please try again.",
+          "error"
+        );
+      } finally {
+        setLoading(false);
+      }
+    });
 
         state.started = true;
         showAuthenticatedLayout(user);
