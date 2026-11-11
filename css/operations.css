@@ -1566,3 +1566,34 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 .ct-op-queue-launcher-copy p{margin:0}
 .ct-op-queue-launcher .ct-op-button{flex:none}
 @media(max-width:640px){.ct-op-supervisor-workspace .ct-op-queue-launcher{align-items:flex-start;flex-direction:column}.ct-op-queue-launcher .ct-op-button{width:100%}}
+
+/* Operations summary: horizontal strip immediately below the supervisor queue selector. */
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar{
+ display:block!important;position:static!important;width:100%!important;min-width:0!important;
+ margin:12px 0 18px!important;padding:0!important;border:1px solid rgba(166,157,191,.2)!important;
+ border-radius:12px!important;overflow:hidden!important;background:#14141c!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-heading{
+ padding:10px 15px!important;min-height:0!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-list{
+ display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+ flex-direction:row!important;padding:0!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ justify-content:center!important;gap:7px!important;min-width:0!important;min-height:72px!important;
+ padding:11px 14px!important;border:0!important;border-right:1px solid rgba(166,157,191,.13)!important;
+ border-radius:0!important;background:transparent!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row:last-child{border-right:0!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-label{font-size:.7rem!important;line-height:1.2!important;white-space:nowrap!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-value{font-size:1.35rem!important;line-height:1!important;text-align:left!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row.is-total{background:rgba(145,112,211,.09)!important}
+@media(max-width:760px){
+ #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-list{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row{border-bottom:1px solid rgba(166,157,191,.1)!important}
+}
+@media(max-width:460px){
+ #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
