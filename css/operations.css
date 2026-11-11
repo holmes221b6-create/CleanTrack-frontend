@@ -1618,3 +1618,14 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-label{font-size:.75rem!important;white-space:normal!important}
 #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-value{font-size:.88rem!important;text-align:right!important}
 #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row.is-total{background:rgba(145,112,211,.09)!important}
+
+/* Center the All Operations total value within its summary row. */
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row.is-total .ct-op-status-sidebar-value{
+ display:block!important;
+ width:100%!important;
+ min-width:0!important;
+ margin:0 auto!important;
+ padding:0!important;
+ text-align:center!important;
+ align-self:center!important;
+}
