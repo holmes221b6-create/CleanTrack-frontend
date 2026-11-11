@@ -75,6 +75,11 @@ function normalizeUser(user) {
     user.data?.organization ??
     null;
 
+  const rawRole = String(user.role || "").trim().toLowerCase();
+  // The API stores this role as "Staff"; the frontend employee workspace
+  // is the corresponding route set. Normalize it once for login and restore.
+  const normalizedRole = rawRole === "staff" ? "employee" : rawRole;
+
   const organizationName =
     user.organization_name ||
     user.organizationName ||
@@ -92,7 +97,7 @@ function normalizeUser(user) {
     account_status: user.account_status || "",
     created_at: user.created_at || null,
     email_verified: Boolean(user.email_verified ?? user.emailVerified),
-    role: String(user.role || "").toLowerCase(),
+    role: normalizedRole,
 
     organizationId:
       user.organization_id ??
