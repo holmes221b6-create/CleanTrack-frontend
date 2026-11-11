@@ -152,11 +152,19 @@ async function renderSupervisor(container){
  function showReportView(){previewPanel.classList.remove("ct-reports-hidden");previewPanel.classList.add("is-open");closePreview.focus();}
  function invalidate(){latest=null;latestPayload=null;generateBtn.disabled=true;hideReportView();}
  function renderPreview(data){
-  previewSummary.replaceChildren();
+  const selected=format.value;
+  const formatNames={pdf:"PDF document",xlsx:"Excel workbook",csv:"CSV data file",html:"HTML table",svg:"SVG image"};
+  const formatNote=$("p","ct-reports-muted","Preview format: "+(formatNames[selected]||selected.toUpperCase())+". This preview reflects the selected output format; Generate report creates the downloadable file.");
+  previewSummary.replaceChildren(formatNote);
   [["Matching records",data.row_count],["Reporting period",data.start_date+" – "+data.end_date],["Preview",Math.min(100,data.row_count)+(data.preview_truncated?"+":"")+" rows"]].forEach(([label,value])=>{const cell=$("div","ct-sup-summary-item");cell.append($("span","",label),$("strong","",value));previewSummary.append(cell);});
   tableWrap.replaceChildren();
   if(!data.headers?.length){tableWrap.append($("p","ct-reports-empty","No report fields are available."));return;}
-  const table=$("table","ct-reports-table"),thead=$("thead",""),tr=$("tr","");data.headers.forEach(h=>tr.append($("th","",h)));thead.append(tr);table.append(thead);
+  const table=$("table","ct-reports-table"),thead=$("thead",""),tr=$("tr","");
+  data.headers.forEach(h=>tr.append($("th","",h)));thead.append(tr);table.append(thead);
+  if(selected==="pdf"||selected==="html")table.classList.add("ct-reports-document-preview");
+  if(selected==="csv")table.classList.add("ct-reports-csv-preview");
+  if(selected==="xlsx")table.classList.add("ct-reports-xlsx-preview");
+  if(selected==="svg")table.classList.add("ct-reports-image-data-preview");
   const tbody=$("tbody","");(data.rows||[]).forEach(row=>{const line=$("tr","");row.forEach(v=>line.append($("td","",escText(v))));tbody.append(line);});table.append(tbody);tableWrap.append(table);
   if(!data.rows?.length)tableWrap.append($("p","ct-reports-empty","No records match these filters."));
  }
@@ -183,7 +191,7 @@ async function renderSupervisor(container){
   }catch(e){notify(e.message||"The report could not be generated.",true);}
   finally{generateBtn.disabled=false;generateBtn.textContent="Generate report";}
  }
- async function download(id){
+ async function download(id,formatOverride=null){
   try{
    const cfg=window.CleanTrackConfig,token=AUTH?.getAuthToken?.()||sessionStorage.getItem("cleantrack_token");
    const response=await fetch(cfg.apiBaseUrl.replace(/\/$/,"")+"/reports/supervisor/"+encodeURIComponent(id)+"/download",{headers:token?{Authorization:"Bearer "+token}:{},credentials:"include",cache:"no-store"});
@@ -191,7 +199,7 @@ async function renderSupervisor(container){
    const blob=await response.blob(),url=URL.createObjectURL(blob),a=$("a","");
    const disposition=response.headers.get("Content-Disposition")||"",match=disposition.match(/filename="?([^";]+)"?/i);
    const ext={pdf:"pdf",xlsx:"xlsx",csv:"csv",svg:"svg",html:"html"};
-   const selectedFormat=formatOverride||null;
+   const selectedFormat=formatOverride||history.find(item=>String(item.id)===String(id))?.file_format||format.value;
    a.href=url;a.download=match?.[1]||("mechnar-report-"+id+"."+(ext[selectedFormat]||"pdf"));
    document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);notify("Download started.");
   }catch(e){notify(e.message||"Download failed.",true);}
