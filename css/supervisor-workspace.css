@@ -140,3 +140,8 @@ html[data-theme="light"] .mw-calendar-popover{background:#fff;color:#202532;bord
 .mw-activity-dialog-body .mw-activity small{font-size:10px}
 .mw-activity-dialog-body .mw-activity-message{font-size:11px}
 @media(max-width:600px){.mw-activity-overlay{padding:12px}.mw-activity-dialog{max-height:calc(100vh - 24px);border-radius:13px}.mw-activity-dialog-head{padding:17px 17px 14px}.mw-activity-dialog-body{padding:15px 17px 18px}}
+
+/* The Supervisor Operations Calendar can be repositioned by dragging its header. */
+.mw-calendar-popover-head{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.mw-calendar-popover-head.is-dragging{cursor:grabbing}
+.mw-calendar-popover-head button{cursor:pointer;touch-action:manipulation}
