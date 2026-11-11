@@ -125,10 +125,12 @@ function normalizeUser(user) {
   async function login(credentials) {
     validateCredentials(credentials);
 
+    // Render free instances can take a while to wake after inactivity.
+    // Give sign-in a longer, explicit timeout than ordinary API requests.
     const response = await api.post("auth/login", {
       email: credentials.email.trim().toLowerCase(),
       password: credentials.password
-    });
+    }, { timeoutMs: 90000 });
 
     persistToken(response.token || response.data?.token || "");
     persistRefreshToken(response.refresh_token || response.data?.refresh_token || "");
