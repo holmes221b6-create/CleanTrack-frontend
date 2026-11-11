@@ -211,7 +211,14 @@ async function renderSupervisor(container){
     const item=$("article","ct-sup-history-row");item.dataset.reportId=String(report.id);
     const details=$("div","ct-sup-history-copy");details.append($("strong","",report.name));
     const meta=$("p","ct-reports-muted",(reportLabels[report.report_type]||report.report_type)+" · "+String(report.file_format||"").toUpperCase()+" · "+new Date(report.created_at).toLocaleString()+" · "+(Number(report.file_size||0)/1024).toFixed(1)+" KB");
-    const filterText=report.filters||{};const scope=$("small","",["From "+(filterText.start_date||"—"),"To "+(filterText.end_date||"—")].join(" · "));
+    const filterText=report.filters||{};
+    const filterParts=["From "+(filterText.start_date||"—"),"To "+(filterText.end_date||"—")];
+    if(filterText.employee_id){const person=(options?.staff||[]).find(x=>String(x.id)===String(filterText.employee_id));filterParts.push("Personnel: "+(person?.name||"Selected person"));}
+    if(filterText.location_id){const place=(options?.locations||[]).find(x=>String(x.id)===String(filterText.location_id));filterParts.push("Location: "+(place?.name||"Selected location"));}
+    if(filterText.zone_id){const area=(options?.zones||[]).find(x=>String(x.id)===String(filterText.zone_id));filterParts.push("Zone: "+(area?.name||"Selected zone"));}
+    if(filterText.status)filterParts.push("Status: "+filterText.status);
+    if(filterText.operation_type)filterParts.push("Operation type: "+filterText.operation_type);
+    const scope=$("small","","Filters: "+filterParts.join(" · "));
     details.append(meta,scope);
     const actions=$("div","ct-sup-history-actions");actions.append(BTN("Download","",()=>download(report.id)),BTN("Share","primary",()=>openShare(report)));
     item.append(details,actions);historyList.append(item);
