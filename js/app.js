@@ -1058,7 +1058,7 @@
     }
 
     if (pageId === "reports") {
-      if (String(user?.role || "").toLowerCase() !== "admin") {
+      if (!["admin", "supervisor"].includes(String(user?.role || "").toLowerCase())) {
         pageContent.appendChild(Object.assign(document.createElement("p"), {
           textContent: "Reports are not available to your role."
         }));
