@@ -1597,3 +1597,24 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 @media(max-width:460px){
  #page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* Operations summary: vertical rows, directly below the supervisor queue selector. */
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar{
+ display:block!important;position:static!important;width:100%!important;min-width:0!important;
+ margin:12px 0 18px!important;padding:0!important;border:1px solid rgba(166,157,191,.2)!important;
+ border-radius:12px!important;overflow:hidden!important;background:#14141c!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-heading{padding:10px 15px!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-list{
+ display:flex!important;flex-direction:column!important;padding:4px 0!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row{
+ display:flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:space-between!important;gap:12px!important;min-width:0!important;min-height:39px!important;
+ padding:8px 15px!important;border:0!important;border-bottom:1px solid rgba(166,157,191,.1)!important;
+ border-radius:0!important;background:transparent!important;
+}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row:last-child{border-bottom:0!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-label{font-size:.75rem!important;white-space:normal!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-value{font-size:.88rem!important;text-align:right!important}
+#page-content .ct-op-supervisor-page>.ct-op-stats.ct-op-status-sidebar .ct-op-status-sidebar-row.is-total{background:rgba(145,112,211,.09)!important}
