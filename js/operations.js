@@ -327,6 +327,36 @@ function renderBlockers(root,items){
  });
  listCard.appendChild(list);panel.append(formCard,summary,escalationCard,listCard);
 }
+function closeBlockersModal(root){
+ if(!root)return;
+ const modal=root._opBlockersModal;
+ if(!modal)return;
+ const panel=root._opBlockersPanel;
+ if(panel&&modal._body&&panel.parentNode===modal._body)root.appendChild(panel);
+ modal.hidden=true;
+ activeView="directory";
+ root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="directory"));
+}
+function openBlockersModal(root){
+ const blockers=root.querySelector("[data-op-blockers]");
+ if(!blockers)return;
+ let modal=root._opBlockersModal;
+ if(!modal){
+  modal=el("div","ct-op-queue-modal");modal.dataset.opBlockersModal="true";
+  modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-label","Blockers and escalations");
+  const backdrop=button("","ct-op-queue-modal-backdrop",()=>closeBlockersModal(root));backdrop.setAttribute("aria-label","Close blockers and escalations");
+  const panel=el("section","ct-op-queue-modal-panel"),head=el("header","ct-op-queue-modal-head"),heading=el("div","");
+  heading.append(el("span","ct-op-queue-modal-eyebrow","SUPERVISOR OPERATIONS"),el("h2","","Blockers & escalations"));
+  const close=button("×","ct-op-queue-modal-close",()=>closeBlockersModal(root));close.setAttribute("aria-label","Close blockers and escalations");
+  const body=el("div","ct-op-queue-modal-body");head.append(heading,close);panel.append(head,body);modal.append(backdrop,panel);
+  modal._body=body;modal._closeButton=close;root.appendChild(modal);root._opBlockersModal=modal;root._opBlockersPanel=blockers;
+  modal.addEventListener("keydown",event=>{if(event.key==="Escape"){event.preventDefault();closeBlockersModal(root);}});
+ }
+ modal._body.appendChild(blockers);modal.hidden=false;
+ root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="blockers"));
+ modal._closeButton?.focus();
+ loadBlockers(root);
+}
 function setView(root,view){
  if(view==="directory"||view==="blockers"||view==="calendar")closeDetail(root);
  const directory=root.querySelector("[data-op-directory]");
@@ -334,8 +364,8 @@ function setView(root,view){
  const detail=root._opDetailPanel||root.querySelector("[data-op-detail]");
  const detailBackdrop=root._opDetailBackdrop||root.querySelector("[data-op-detail-backdrop]");
  const blockers=root.querySelector("[data-op-blockers]");
- if(view==="blockers"){if(directory)directory.hidden=true;if(calendar)calendar.hidden=true;if(detail)detail.hidden=true;if(detailBackdrop)detailBackdrop.hidden=true;if(blockers)blockers.hidden=false;root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="blockers"));loadBlockers(root);return;}
- if(blockers)blockers.hidden=true;
+ if(view==="blockers"){if(directory)directory.hidden=false;if(calendar)calendar.hidden=true;if(detail)detail.hidden=true;if(detailBackdrop)detailBackdrop.hidden=true;openBlockersModal(root);return;}
+ if(blockers){closeBlockersModal(root);blockers.hidden=true;}
  if(view==="calendar"){
   if(directory)directory.hidden=false;
   if(detail)detail.hidden=true;
