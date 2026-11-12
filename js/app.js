@@ -849,6 +849,17 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
+    if (pageId === "reviews" && String(user?.role || "").toLowerCase() === "supervisor") {
+      if (window.MechnarSupervisorReviewQueue && typeof window.MechnarSupervisorReviewQueue.render === "function") {
+        await window.MechnarSupervisorReviewQueue.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), {
+          textContent: "Supervisor Review Queue could not load. Refresh the page and try again."
+        }));
+      }
+      return;
+    }
+
     if (pageId === "reviews" && String(user?.role || "").toLowerCase() === "admin") {
       if (window.CleanTrackLogs && typeof window.CleanTrackLogs.render === "function") {
         await window.CleanTrackLogs.render(pageContent);
