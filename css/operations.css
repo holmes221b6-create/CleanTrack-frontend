@@ -1696,3 +1696,36 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-optio
 #page-content .ct-operations-page .ct-op-evidence-choice span{pointer-events:none}
 html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-choice{background:#f3f0f8!important;color:#282333!important;border-color:#c9bfdc!important}
 html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-choice:has(input:checked){background:#e8def8!important;border-color:#9272c5!important}
+
+
+/* Dedicated Maintenance & Repairs panel */
+.ct-op-maintenance-modal{position:fixed!important;inset:0!important;z-index:10020!important;display:grid!important;place-items:center!important;padding:20px!important;box-sizing:border-box!important}
+.ct-op-maintenance-modal[hidden]{display:none!important}
+.ct-op-maintenance-backdrop{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;background:rgba(7,5,13,.72)!important;backdrop-filter:blur(7px)!important;cursor:default!important}
+.ct-op-maintenance-dialog{position:relative!important;z-index:1!important;width:min(940px,96vw)!important;max-height:min(90dvh,900px)!important;overflow:auto!important;border:1px solid var(--border-strong,rgba(155,145,180,.34))!important;border-radius:18px!important;background:var(--bg-secondary,#17151f)!important;color:var(--text-primary,#f4f1fa)!important;box-shadow:0 28px 90px rgba(0,0,0,.5)!important;animation:ctOpMaintenanceIn .18s ease-out both!important}
+.ct-op-maintenance-head{position:sticky!important;top:0!important;z-index:3!important;display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:18px!important;padding:22px 24px 18px!important;border-bottom:1px solid var(--border,rgba(155,145,180,.2))!important;background:var(--bg-secondary,#17151f)!important}
+.ct-op-maintenance-head h2{margin:4px 0 5px!important;font-size:1.45rem!important}
+.ct-op-maintenance-head p{margin:0!important}
+.ct-op-maintenance-close{flex:0 0 38px!important;width:38px!important;height:38px!important;border:1px solid var(--border-strong,#514866)!important;border-radius:10px!important;background:transparent!important;color:inherit!important;font-size:1.5rem!important;cursor:pointer!important}
+.ct-op-maintenance-body{display:grid!important;gap:18px!important;padding:22px 24px 26px!important}
+.ct-op-maintenance-body .ct-op-card{margin:0!important}
+.ct-op-maintenance-form{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px!important}
+.ct-op-maintenance-form .ct-op-field:has(textarea),.ct-op-maintenance-form .ct-op-check,.ct-op-maintenance-form button[type=submit]{grid-column:1/-1!important}
+.ct-op-maintenance-form .ct-op-field{min-width:0!important}
+.ct-op-maintenance-form .ct-op-input{width:100%!important;box-sizing:border-box!important}
+.ct-op-maintenance-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;margin:6px 0 16px!important}
+.ct-op-maintenance-stat{display:grid!important;gap:7px!important;padding:13px!important;border:1px solid var(--border,rgba(155,145,180,.25))!important;border-radius:11px!important;background:var(--bg-elevated,rgba(130,110,170,.07))!important}
+.ct-op-maintenance-stat span{font-size:.76rem!important;color:var(--text-secondary,#aaa2ba)!important}
+.ct-op-maintenance-stat strong{font-size:1.4rem!important}
+.ct-op-maintenance-row{display:grid!important;gap:8px!important;padding:15px 0!important;border-top:1px solid var(--border,rgba(155,145,180,.2))!important}
+.ct-op-maintenance-row-top{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:12px!important}
+.ct-op-maintenance-row-top strong{font-size:.98rem!important}
+.ct-op-maintenance-meta,.ct-op-maintenance-row>small{font-size:.78rem!important;color:var(--text-secondary,#aaa2ba)!important}
+.ct-op-maintenance-safety{margin:0!important;color:#e6a45e!important;font-size:.82rem!important}
+.ct-op-maintenance-admin-note{margin:0!important;padding:10px 12px!important;border-left:3px solid #9477d4!important;background:rgba(148,119,212,.1)!important;border-radius:5px!important;font-size:.84rem!important}
+.ct-op-maintenance-status{white-space:nowrap!important}
+@keyframes ctOpMaintenanceIn{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:640px){.ct-op-maintenance-modal{padding:8px!important}.ct-op-maintenance-dialog{width:100%!important;max-height:95dvh!important;border-radius:13px!important}.ct-op-maintenance-head{padding:17px!important}.ct-op-maintenance-body{padding:16px!important}.ct-op-maintenance-form{grid-template-columns:1fr!important}.ct-op-maintenance-form>*{grid-column:1!important}.ct-op-maintenance-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ct-op-maintenance-row-top{align-items:flex-start!important;flex-direction:column!important}}
+html[data-theme="light"] .ct-op-maintenance-dialog{background:#fff!important;color:#282333!important}
+html[data-theme="light"] .ct-op-maintenance-head{background:#fff!important}
+@media(prefers-reduced-motion:reduce){.ct-op-maintenance-dialog{animation:none!important}}
