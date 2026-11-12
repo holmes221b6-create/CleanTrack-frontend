@@ -1729,3 +1729,10 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-choic
 html[data-theme="light"] .ct-op-maintenance-dialog{background:#fff!important;color:#282333!important}
 html[data-theme="light"] .ct-op-maintenance-head{background:#fff!important}
 @media(prefers-reduced-motion:reduce){.ct-op-maintenance-dialog{animation:none!important}}
+
+.ct-op-maintenance-review{display:grid!important;gap:10px!important;margin-top:8px!important;padding:13px!important;border:1px solid var(--border,rgba(155,145,180,.24))!important;border-radius:12px!important;background:var(--bg-elevated,rgba(130,110,170,.06))!important}
+.ct-op-maintenance-review .ct-op-field{display:grid!important;gap:6px!important}
+.ct-op-maintenance-review textarea{width:100%!important;box-sizing:border-box!important;resize:vertical!important}
+.ct-op-maintenance-review-actions{display:flex!important;flex-wrap:wrap!important;gap:9px!important}
+.ct-op-maintenance-review-actions button:disabled{opacity:.55!important;cursor:wait!important}
+@media(max-width:540px){.ct-op-maintenance-review-actions{display:grid!important;grid-template-columns:1fr!important}}
