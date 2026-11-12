@@ -333,6 +333,7 @@ function closeBlockersModal(root){
  if(!modal)return;
  const panel=root._opBlockersPanel;
  if(panel&&modal._body&&panel.parentNode===modal._body)root.appendChild(panel);
+ if(panel)panel.hidden=true;
  modal.hidden=true;
  activeView="directory";
  root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="directory"));
@@ -352,7 +353,7 @@ function openBlockersModal(root){
   modal._body=body;modal._closeButton=close;root.appendChild(modal);root._opBlockersModal=modal;root._opBlockersPanel=blockers;
   modal.addEventListener("keydown",event=>{if(event.key==="Escape"){event.preventDefault();closeBlockersModal(root);}});
  }
- modal._body.appendChild(blockers);modal.hidden=false;
+ modal._body.appendChild(blockers);blockers.hidden=false;modal.hidden=false;activeView="blockers";
  root.querySelectorAll("[data-op-view]").forEach(b=>b.classList.toggle("is-active",b.dataset.opView==="blockers"));
  modal._closeButton?.focus();
  loadBlockers(root);
