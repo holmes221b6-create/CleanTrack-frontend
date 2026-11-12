@@ -1674,3 +1674,14 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 @keyframes ctOpFormModalIn{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:640px){.ct-op-form-modal{padding:8px!important}.ct-op-form-modal-dialog{width:100%!important;max-height:94dvh!important;border-radius:13px!important}}
 @media(prefers-reduced-motion:reduce){.ct-op-form-modal-dialog{animation:none!important}}
+
+
+/* Evidence choices are independent multi-select buttons, not radio-style controls. */
+#page-content .ct-operations-page .ct-op-evidence{display:flex!important;flex-wrap:wrap!important;gap:9px!important;align-items:stretch!important}
+#page-content .ct-operations-page .ct-op-evidence-option{appearance:none!important;-webkit-appearance:none!important;display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;min-height:40px!important;padding:9px 13px!important;border:1px solid var(--border-strong,#514866)!important;border-radius:9px!important;background:var(--bg-elevated,#17151f)!important;color:var(--text,#eeeaf6)!important;font:inherit!important;font-size:.82rem!important;cursor:pointer!important;user-select:none!important}
+#page-content .ct-operations-page .ct-op-evidence-option::before{content:"+";display:inline-grid;place-items:center;width:19px;height:19px;flex:0 0 19px;border:1px solid currentColor;border-radius:5px;font-weight:800;line-height:1}
+#page-content .ct-operations-page .ct-op-evidence-option[aria-pressed="true"]{border-color:#9477d4!important;background:rgba(148,119,212,.2)!important;color:#d8c8ff!important;box-shadow:inset 0 0 0 1px rgba(148,119,212,.25)!important}
+#page-content .ct-operations-page .ct-op-evidence-option[aria-pressed="true"]::before{content:"✓";background:#8062bd;color:#fff;border-color:#8062bd}
+#page-content .ct-operations-page .ct-op-evidence-option:focus-visible{outline:2px solid #a98be8!important;outline-offset:2px!important}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-option{background:#f3f0f8!important;color:#282333!important;border-color:#c9bfdc!important}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-option[aria-pressed="true"]{background:#e8def8!important;color:#49346d!important;border-color:#9272c5!important}
