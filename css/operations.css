@@ -1685,3 +1685,14 @@ html[data-theme="light"] #page-content .ct-operations-page .ct-op-input[type="da
 #page-content .ct-operations-page .ct-op-evidence-option:focus-visible{outline:2px solid #a98be8!important;outline-offset:2px!important}
 html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-option{background:#f3f0f8!important;color:#282333!important;border-color:#c9bfdc!important}
 html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-option[aria-pressed="true"]{background:#e8def8!important;color:#49346d!important;border-color:#9272c5!important}
+
+
+/* Native independent checkboxes for required evidence. Each checkbox has the same
+   name and a different value so the form submits every selected evidence type. */
+#page-content .ct-operations-page fieldset.ct-op-evidence{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))!important;gap:10px!important}
+#page-content .ct-operations-page .ct-op-evidence-choice{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;min-height:42px!important;padding:10px 12px!important;border:1px solid var(--border-strong,#514866)!important;border-radius:9px!important;background:var(--bg-elevated,#17151f)!important;color:var(--text,#eeeaf6)!important;font-size:.82rem!important;font-weight:550!important;cursor:pointer!important;user-select:none!important}
+#page-content .ct-operations-page .ct-op-evidence-choice input[type="checkbox"]{appearance:auto!important;-webkit-appearance:checkbox!important;display:inline-block!important;position:static!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;flex:0 0 18px!important;width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;margin:0!important;padding:0!important;accent-color:#9477d4!important;cursor:pointer!important}
+#page-content .ct-operations-page .ct-op-evidence-choice:has(input:checked){border-color:#9477d4!important;background:rgba(148,119,212,.16)!important}
+#page-content .ct-operations-page .ct-op-evidence-choice span{pointer-events:none}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-choice{background:#f3f0f8!important;color:#282333!important;border-color:#c9bfdc!important}
+html[data-theme="light"] #page-content .ct-operations-page .ct-op-evidence-choice:has(input:checked){background:#e8def8!important;border-color:#9272c5!important}
