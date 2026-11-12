@@ -498,7 +498,30 @@ async function renderMaintenancePanel(root){
   [["Total requests",items.length],["Awaiting Admin",items.filter(x=>x.status==="Awaiting Admin review").length],["In progress",items.filter(x=>/progress|arranging/i.test(x.status)).length],["Closed",items.length-open.length]].forEach(([label,value])=>{const tile=el("article","ct-op-maintenance-stat");tile.append(el("span","",label),el("strong","",value));summary.appendChild(tile);});
   listCard.appendChild(summary);
   if(!items.length)listCard.appendChild(el("p","ct-op-empty",role()==="supervisor"?"You have not raised any maintenance requests yet.":"There are no maintenance requests from Supervisors yet."));
-  items.forEach(item=>{const row=el("article","ct-op-maintenance-row"),top=el("div","ct-op-maintenance-row-top");top.append(el("strong","",item.title),el("span","ct-op-pill ct-op-maintenance-status",item.status));row.append(top,el("p","ct-op-muted",item.description),el("div","ct-op-maintenance-meta",(item.issue_type||"Repair")+" · "+item.priority+" priority · "+(item.location_name||"Location not specified")+(item.zone_name?" / "+item.zone_name:"")+" · "+(item.team_name||"Team not specified")),el("small","ct-op-muted","Raised by "+(item.requested_by_name||"Supervisor")+" · "+date(item.created_at)));if(item.asset_reference)row.appendChild(el("small","ct-op-muted","Asset: "+item.asset_reference));if(item.safety_impact)row.appendChild(el("p","ct-op-maintenance-safety","Safety impact flagged"));if(item.admin_note)row.appendChild(el("p","ct-op-maintenance-admin-note","Admin update: "+item.admin_note));listCard.appendChild(row);});
+  items.forEach(item=>{const row=el("article","ct-op-maintenance-row"),top=el("div","ct-op-maintenance-row-top");top.append(el("strong","",item.title),el("span","ct-op-pill ct-op-maintenance-status",item.status));row.append(top,el("p","ct-op-muted",item.description),el("div","ct-op-maintenance-meta",(item.issue_type||"Repair")+" · "+item.priority+" priority · "+(item.location_name||"Location not specified")+(item.zone_name?" / "+item.zone_name:"")+" · "+(item.team_name||"Team not specified")),el("small","ct-op-muted","Raised by "+(item.requested_by_name||"Supervisor")+" · "+date(item.created_at)));if(item.asset_reference)row.appendChild(el("small","ct-op-muted","Asset: "+item.asset_reference));if(item.safety_impact)row.appendChild(el("p","ct-op-maintenance-safety","Safety impact flagged"));if(item.admin_note)row.appendChild(el("p","ct-op-maintenance-admin-note","Admin update: "+item.admin_note));
+  if(role()==="admin"&&!["Completed","Rejected"].includes(item.status)){
+   const controls=el("div","ct-op-maintenance-review");
+   const note=textarea(item.admin_note||"","admin_note","Add an update or rejection reason…",2);note.maxLength=3000;
+   const noteField=field("Admin note",note,"A reason is required when rejecting a request.");
+   const actions=el("div","ct-op-maintenance-review-actions");
+   const sendDecision=async(decision)=>{
+    const value=note.value.trim();
+    if(decision==="reject"&&!value){notice(reviewNotice,"Add a reason before rejecting this request.",true);note.focus();return;}
+    actions.querySelectorAll("button").forEach(b=>b.disabled=true);
+    notice(reviewNotice,"Updating request…");
+    try{const result=await API.patch("operations/maintenance-requests/"+item.id,{decision,admin_note:value});notice(reviewNotice,result.message||"Request updated.");await renderMaintenancePanel(root);}
+    catch(error){notice(reviewNotice,error.message||"Could not update this request.",true);actions.querySelectorAll("button").forEach(b=>b.disabled=false);}
+   };
+   const reviewNotice=el("p","ct-op-notice");reviewNotice.hidden=true;
+   if(item.status==="Awaiting Admin review"){
+    actions.append(button("Approve request","ct-op-button ct-op-button-primary",()=>sendDecision("approve")),button("Reject request","ct-op-button ct-op-button-secondary",()=>sendDecision("reject")));
+   }else{
+    if(!/progress/i.test(item.status))actions.append(button("Mark repair in progress","ct-op-button ct-op-button-primary",()=>sendDecision("in_progress")));
+    actions.append(button("Mark completed","ct-op-button ct-op-button-secondary",()=>sendDecision("complete")));
+   }
+   controls.append(noteField,actions,reviewNotice);row.appendChild(controls);
+  }
+  listCard.appendChild(row);});
   const refresh=button("↻ Refresh requests","ct-op-button ct-op-button-secondary",()=>renderMaintenancePanel(root));listCard.appendChild(refresh);body.appendChild(listCard);
  }catch(error){body.replaceChildren(el("p","ct-op-error",error.message||"Maintenance requests could not be loaded."));}
 }
