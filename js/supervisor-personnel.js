@@ -12,7 +12,7 @@ async function render(root){
  let members=[],selected=null,mode="empty",filter="all",profileTab="overview",profileRefreshTimer=null,teamLeaderState=null;
  const notice=(msg,bad=false)=>{let n=root.querySelector(".mp-toast");if(!n){n=el("div","mp-toast");root.append(n)}n.textContent=msg;n.classList.toggle("bad",bad);n.hidden=false;setTimeout(()=>n.hidden=true,3500)};
  const avatar=(m,large=false)=>{const a=el("span","mp-avatar"+(large?" large":""));if(m.avatar_url){const img=document.createElement("img");img.src=m.avatar_url;img.alt="";a.append(img)}else a.textContent=initials(m.name);return a};
- async function load(){try{teamLeaderState=await API.get("quality/team-leader");}catch(_){teamLeaderState=null;}list.innerHTML='<p class="mp-loading">Loading your team…</p>';try{const data=await API.get("supervisor/personnel");members=data.members||[];paintList();}catch(e){list.innerHTML='<p class="mp-error">'+esc(e.message)+'</p>';}}
+ async function load(){try{teamLeaderState=await API.get("quality/team-leader");}catch(_){teamLeaderState=null;}list.innerHTML='<p class="mp-loading">Loading your team…</p>';try{const data=await API.get("supervisor/personnel");members=data.members||[];members.forEach(m=>{m.designation=String(m.id)===String(teamLeaderState?.team_leader?.id)?"Team Leader":"Staff";});paintList();}catch(e){list.innerHTML='<p class="mp-error">'+esc(e.message)+'</p>';}}
  function paintList(){
   const q=search.value.trim().toLowerCase();let rows=members.filter(m=>[m.name,m.email,m.phone].join(" ").toLowerCase().includes(q));
   if(filter==="recent")rows=rows.filter(m=>m.last_message_at);
@@ -20,7 +20,7 @@ async function render(root){
   if(!rows.length){list.append(el("p","mp-muted",members.length?"No contacts match your search.":"No active Staff members are assigned to your team yet."));return;}
   rows.forEach(m=>{const row=el("div","mp-contact"+(String(selected?.id)===String(m.id)?" selected":""));
     const av=avatar(m);av.title="View profile";av.tabIndex=0;av.setAttribute("role","button");av.addEventListener("click",()=>openProfile(m));av.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openProfile(m)}});
-    const copy=el("div","mp-contact-copy"),name=el("button","mp-contact-name",m.name||"Staff member");name.type="button";name.addEventListener("click",()=>openChat(m));
+    const copy=el("div","mp-contact-copy"),name=el("button","mp-contact-name",(m.name||"Staff member")+(m.designation==="Team Leader"?" · Team Leader":""));name.type="button";name.addEventListener("click",()=>openChat(m));
     const preview=el("p","mp-contact-preview",m.last_message||m.email||"No messages yet");const meta=el("span","mp-contact-time",m.last_message_at?new Date(m.last_message_at).toLocaleDateString():"");
     copy.append(name,preview);row.append(av,copy,meta);row.addEventListener("click",e=>{if(!e.target.closest("button"))openProfile(m)});list.append(row);
   });
