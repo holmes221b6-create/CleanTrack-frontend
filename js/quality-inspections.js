@@ -8,7 +8,22 @@ async function render(root,mode){
  if(!API){root.textContent="Quality module unavailable.";return;}
  const isStaff=mode==="staff",isAdmin=mode==="admin";
  root.innerHTML='<section class="sr-page"><header class="sr-head"><div><span class="sr-kicker">QUALITY CONTROL</span><h1>'+(isStaff?"Team Leader · Inspections":isAdmin?"Inspection Reports":"Inspections & Quality")+'</h1><p>'+(isStaff?"Conduct assigned inspections and submit your findings to your Supervisor.":isAdmin?"Review inspection reports forwarded by Supervisors.":"Plan inspections, manage templates and review submitted quality checks.")+'</p></div><button class="sr-refresh" type="button">Refresh</button></header><div class="sr-notice" hidden></div><div class="sr-body"></div></section>';
- const page=root.querySelector(".sr-page"),body=page.querySelector(".sr-body"),notice=page.querySelector(".sr-notice");
+ const page=root.querySelector(".sr-page"),dashboard=page.querySelector(".sr-body"),notice=page.querySelector(".sr-notice");
+ let body=dashboard;
+ const overlay=el("div","sr-panel-overlay");
+ overlay.hidden=true;
+ overlay.setAttribute("role","dialog");overlay.setAttribute("aria-modal","true");overlay.setAttribute("aria-label","Inspection workspace");
+ const shell=el("section","sr-panel-shell");
+ const bar=el("div","sr-panel-bar");
+ const panelTitle=el("strong","","Inspection workspace");
+ const close=el("button","sr-panel-close","Close ×");close.type="button";
+ const panelBody=el("div","sr-panel-body");
+ bar.append(panelTitle,close);shell.append(bar,panelBody);overlay.append(shell);page.append(overlay);
+ const openPanel=next=>{view=next;body=panelBody;overlay.hidden=false;document.body.classList.add("sr-panel-open");draw();close.focus();};
+ const closePanel=()=>{overlay.hidden=true;document.body.classList.remove("sr-panel-open");body=dashboard;view="home";home();};
+ close.onclick=closePanel;
+ overlay.addEventListener("click",e=>{if(e.target===overlay)closePanel();});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)closePanel();});
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
  let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},view="home";
  const get=async()=>{const d=await API.get("quality/inspections");items=d.items||[];if(!isStaff&&!isAdmin){const t=await API.get("quality/templates");templates=t.templates||[];const sc=await API.get("quality/schedules");schedules=sc.schedules||[];try{leader=await API.get("quality/team-leader");}catch(_){leader=null;}try{options=await API.get("supervisor/records/options");}catch(_){options={operations:[],locations:[],zones:[]};}}};
@@ -16,18 +31,18 @@ async function render(root,mode){
  const panel=(title,desc)=>{const p=el("section","sr-panel");p.append(el("div","sr-panel-heading"),);p.firstChild.append(el("div","",title),el("p","",desc||""));return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
  const select=(label,name,rows,placeholder="Not specified")=>'<label class="sr-field"><span>'+label+'</span><select name="'+name+'"><option value="">'+placeholder+'</option>'+rows.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name||x.title)+'</option>').join("")+'</select></label>';
- const back=()=>{view="home";draw();};
+ const back=()=>closePanel();
  function home(){
   const grid=el("div","sr-directory-grid");
   const cards=isStaff?[["assigned","Assigned inspections","Your scheduled checks and returned inspections"],["history","Submission history","Your submitted inspection records"]]:isAdmin?[["reports","Forwarded reports","Inspection reports sent by Supervisors"],["history","Report history","Reports already acknowledged or returned"]]:[["schedule","Schedule inspection","Create a one-time or recurring inspection"],["templates","Inspection templates","Create and maintain reusable checklists"],["schedules","Inspection schedules","Review, pause or cancel recurring schedules"],["directory","Inspection directory","Track planned, active and completed inspections"],["review","Review queue","Review Team Leader submissions"],["history","Inspection history","Completed and reviewed inspections"],["failed","Failed inspections","Review quality failures"],["analytics","Quality overview","Analytics calculated from recorded inspections"]];
-  cards.forEach(([key,title,desc])=>{const count=key==="review"?items.filter(x=>x.status==="submitted").length:key==="assigned"?items.filter(x=>["scheduled","in_progress","returned"].includes(x.status)).length:key==="reports"?items.filter(x=>x.status==="forwarded").length:key==="failed"?items.filter(x=>x.outcome==="fail").length:undefined;const b=el("button","sr-directory-card");b.type="button";b.append(el("span","sr-card-icon","◉"));const copy=el("span","sr-card-copy");copy.append(el("strong","",title),el("small","",desc));b.append(copy);if(count!==undefined)b.append(el("span","sr-card-count",String(count)));b.onclick=()=>{view=key;draw();};grid.append(b);});
+  cards.forEach(([key,title,desc])=>{const count=key==="review"?items.filter(x=>x.status==="submitted").length:key==="assigned"?items.filter(x=>["scheduled","in_progress","returned"].includes(x.status)).length:key==="reports"?items.filter(x=>x.status==="forwarded").length:key==="failed"?items.filter(x=>x.outcome==="fail").length:undefined;const b=el("button","sr-directory-card");b.type="button";b.append(el("span","sr-card-icon","◉"));const copy=el("span","sr-card-copy");copy.append(el("strong","",title),el("small","",desc));b.append(copy);if(count!==undefined)b.append(el("span","sr-card-count",String(count)));b.onclick=()=>openPanel(key);grid.append(b);});
   body.replaceChildren(grid);
   const stats=el("div","sr-metric-grid");
   const due=items.filter(x=>["scheduled","in_progress","returned"].includes(x.status)).length;
   [[isStaff?"Assigned":"Total inspections",items.length],["Awaiting review",items.filter(x=>x.status==="submitted").length],["Approved",items.filter(x=>["approved","forwarded","admin_acknowledged"].includes(x.status)).length],["Overdue",items.filter(x=>["scheduled","in_progress","returned"].includes(x.status)&&new Date(x.scheduled_at)<new Date()).length]].forEach(([k,v])=>{const m=el("div","sr-metric");m.append(el("span","",k),el("strong","",String(v)));stats.append(m);});
   body.append(stats);
  }
- function top(title,desc){const wrap=el("div","sr-workspace");const head=el("div","sr-workspace-top");head.append(button("← Back",back,"sr-back"),el("h2","",title),el("p","",desc));wrap.append(head);return wrap;}
+ function top(title,desc){panelTitle.textContent=title;const wrap=el("div","sr-workspace");const head=el("div","sr-workspace-top");head.append(button("← Back",back,"sr-back"),el("h2","",title),el("p","",desc));wrap.append(head);return wrap;}
  function list(key){
   let rows=[...items];
   if(key==="assigned")rows=rows.filter(x=>["scheduled","in_progress","returned"].includes(x.status));
@@ -123,7 +138,7 @@ async function render(root,mode){
  async function reload(next){await get();view=next;draw();}
  async function draw(){try{if(view==="home")return home();if(view==="schedule")return schedule();if(view==="templates")return templatePage();if(view==="schedules")return scheduleList();if(view==="analytics")return await analytics();if(view==="detail")return;return list(view);}catch(e){say(e.message||"Could not load inspection records.",true);}}
  page.querySelector(".sr-refresh").onclick=async()=>{try{await reload(view);}catch(e){say(e.message,true);}};
- await get();draw();
+ await get();home();
 }
 window.MechnarQualityInspections={render};
 })();
