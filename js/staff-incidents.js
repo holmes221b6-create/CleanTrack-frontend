@@ -33,15 +33,15 @@
       urgentForm.addEventListener("submit",async e=>{e.preventDefault();urgentSubmit.disabled=true;try{await API.post("announcements/urgent/staff",{team_id:Number(urgentTeam.value),title:urgentTitle.value.trim(),message:urgentMessage.value.trim(),severity:urgentSeverity.value});say("Urgent alert sent to your Team Supervisor and organisation Admin.");urgentForm.reset();if(teams.length===1)urgentTeam.value=String(teams[0].id);await load();}catch(err){say(err.message||"Urgent alert could not be sent.",true);}finally{urgentSubmit.disabled=false;}});
       urgentPanel.append(urgentForm);
       const urgentList=el("div","sr-records");
-      const visibleUrgent=urgentAlerts.filter(x=>x.alert_status!=="resolved");
-      if(!visibleUrgent.length)urgentList.append(el("p","sr-empty","No open urgent alerts."));
+      const visibleUrgent=urgentAlerts;
+      if(!visibleUrgent.length)urgentList.append(el("p","sr-empty","No urgent alerts are recorded for your assigned teams."));
       visibleUrgent.forEach(item=>{
         const card=el("article","sr-record"),top=el("div","sr-record-top");
         top.append(el("h3","",item.title),badge(item.severity));card.append(top,el("p","sr-record-copy",item.message),el("p","sr-meta",[item.created_by_name,item.team_name,date(item.published_at||item.created_at)].filter(Boolean).join(" · ")));
         const receipt=item.my_receipt||{};
-        if(item.can_acknowledge&&receipt.state!=="acknowledged"){
+        if(item.alert_status!=="resolved"&&item.can_acknowledge&&receipt.state!=="acknowledged"){
           const ack=el("button","sr-secondary","Acknowledge alert");ack.type="button";ack.onclick=async()=>{ack.disabled=true;try{await API.post("announcements/"+item.id+"/acknowledge",{});say("Urgent alert acknowledged.");await load();}catch(err){say(err.message||"Could not acknowledge alert.",true);ack.disabled=false;}};card.append(ack);
-        }else if(receipt.state==="acknowledged")card.append(el("p","sr-resolution","You acknowledged this alert."));
+        }else if(receipt.state==="acknowledged")card.append(el("p","sr-resolution","You acknowledged this alert."));if(item.alert_status==="resolved")card.append(el("p","sr-resolution","Resolved "+date(item.resolved_at)));
         urgentList.append(card);
       });
       urgentPanel.append(urgentList);body.append(urgentPanel);
