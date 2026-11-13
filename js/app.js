@@ -906,7 +906,23 @@
       return;
     }
 
-    if (String(user?.role || "").toLowerCase() === "supervisor" && ["incidents", "inspections", "handovers"].includes(pageId)) {
+    if (pageId === "inspections" && ["staff", "employee"].includes(String(user?.role || "").toLowerCase())) {
+      if (window.MechnarQualityInspections) await window.MechnarQualityInspections.render(pageContent, "staff");
+      else pageContent.textContent = "Team Leader inspections could not load. Refresh the page and try again.";
+      return;
+    }
+    if (pageId === "inspections" && String(user?.role || "").toLowerCase() === "admin") {
+      if (window.MechnarQualityInspections) await window.MechnarQualityInspections.render(pageContent, "admin");
+      else pageContent.textContent = "Quality reports could not load. Refresh the page and try again.";
+      return;
+    }
+    if (pageId === "inspections" && String(user?.role || "").toLowerCase() === "supervisor") {
+      if (window.MechnarQualityInspections) await window.MechnarQualityInspections.render(pageContent, "supervisor");
+      else pageContent.textContent = "Inspections & Quality could not load. Refresh the page and try again.";
+      return;
+    }
+
+    if (String(user?.role || "").toLowerCase() === "supervisor" && ["incidents", "handovers"].includes(pageId)) {
       if (window.MechnarSupervisorRecords && typeof window.MechnarSupervisorRecords.render === "function") {
         await window.MechnarSupervisorRecords.render(pageContent, pageId);
       } else {
