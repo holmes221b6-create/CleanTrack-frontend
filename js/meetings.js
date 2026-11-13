@@ -57,7 +57,16 @@
   function notice(root,message,error){
     let box=root.querySelector(".mn-meeting-notice");
     if(!box){box=node("div","mn-meeting-notice");root.prepend(box);}
-    box.textContent=message;box.classList.toggle("is-error",!!error);
+    box.replaceChildren(node("span","",message));
+    box.classList.toggle("is-error",!!error);
+  }
+  function showConfirmation(root,title,message){
+    root.replaceChildren();
+    const panel=node("section","mn-meeting-confirmation");
+    panel.append(node("div","mn-meeting-confirmation-mark","✓"),node("h2","",title),node("p","",message));
+    const back=node("button","mn-meeting-btn mn-primary","← Back to Meetings");
+    back.type="button";back.addEventListener("click",()=>render(root));
+    panel.append(back);root.append(panel);
   }
   async function loadData(){
     const [meetingData, teamData]=await Promise.all([
@@ -100,8 +109,10 @@
   async function cancelMeeting(root,m,button){
     if(!window.confirm("Cancel this meeting for everyone?"))return;
     button.disabled=true;
-    try{await API.post("meetings/"+m.id+"/cancel",{});await refresh(root);notice(root,"Meeting cancelled.",false);}
-    catch(e){notice(root,e.message||"Could not cancel meeting.",true);button.disabled=false;}
+    try{
+      await API.post("meetings/"+m.id+"/cancel",{});
+      showConfirmation(root,"Meeting cancelled","The meeting has been cancelled and the team has been notified.");
+    }catch(e){notice(root,e.message||"Could not cancel meeting.",true);button.disabled=false;}
   }
   async function joinMeeting(root,m,button){
     button.disabled=true;button.textContent="Connecting…";
@@ -182,7 +193,7 @@
       e.preventDefault();submit.disabled=true;submit.textContent="Scheduling…";
       try{
         await API.post("meetings",{topic:topic.value.trim(),agenda:agenda.value.trim(),team_id:Number(teamSelect.value),start_at:new Date(start.value).toISOString(),duration_minutes:Number(duration.value)});
-        await refresh(root);notice(root,"Meeting scheduled. Team members have been notified.",false);
+        showConfirmation(root,"Meeting scheduled","Your team has been notified. You can return to the Meetings page to view or start it.");
       }catch(err){notice(root,err.message||"Could not schedule the meeting.",true);}
       finally{submit.disabled=false;submit.textContent="Schedule meeting";}
     });
