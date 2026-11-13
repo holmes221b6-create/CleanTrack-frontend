@@ -46,24 +46,24 @@ a.appendChild(formcard("Personal profile","Update details for your own account. 
     if(!org) return;
     const labels=org.role_labels||{Admin:"Admin",Supervisor:"Supervisor",Staff:"Staff"};
     const canonical=String(user.role||"Staff");
-    const roleCard=card("Organisation role name","Rename how your role appears to everyone in this organisation. Your actual access permissions and features will not change.","◇");
+    const roleCard=card("Designations","Customise the title used for your position across the organisation. Changes are visible to all members and do not affect system permissions.","◇");
     const roleInput=inp("text",labels[canonical]||canonical,"role_label");
     roleInput.required=true;roleInput.minLength=2;roleInput.maxLength=40;
     const roleStatus=el("p","ct-settings-status");roleStatus.hidden=true;roleStatus.setAttribute("role","status");
-    const saveRole=btn("Save role name","ct-settings-button ct-settings-button-primary",async()=>{
+    const saveRole=btn("Save designation","ct-settings-button ct-settings-button-primary",async()=>{
       saveRole.disabled=true;const original=saveRole.textContent;saveRole.textContent="Saving…";
       try{
         const result=await API.patch("organizations/role-labels",{label:roleInput.value.trim()});
         roleInput.value=result.role_label||roleInput.value.trim();
         if(AUTH.getCurrentUser())AUTH.getCurrentUser().role_label=roleInput.value;
         user.role_label=roleInput.value;
-        roleStatus.textContent=result.message||"Role name updated. Organisation members have been notified.";
+        roleStatus.textContent=result.message||"Designation updated. Organisation members have been notified.";
         roleStatus.className="ct-settings-status is-success";roleStatus.hidden=false;
         window.dispatchEvent(new CustomEvent("cleantrack:role-labels-updated",{detail:{role_labels:result.role_labels||{}}}));
-      }catch(error){roleStatus.textContent=error.message||"Role name could not be saved.";roleStatus.className="ct-settings-status is-error";roleStatus.hidden=false;}
+      }catch(error){roleStatus.textContent=error.message||"Designation could not be saved.";roleStatus.className="ct-settings-status is-error";roleStatus.hidden=false;}
       finally{saveRole.disabled=false;saveRole.textContent=original;}
     });
-    roleCard.append(fld("Your role's display name",roleInput,"2–40 characters. Only your own role label can be changed from this account."),saveRole,roleStatus);
+    roleCard.append(fld("Your designation",roleInput,"2–40 characters. This updates the shared designation for everyone with your role."),saveRole,roleStatus);
     a.appendChild(roleCard);
   } catch(error) {
     // Keep the rest of personal settings available if organisation profile is unavailable.
