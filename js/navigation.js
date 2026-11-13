@@ -55,6 +55,7 @@
       { id: "my-desk", label: "My Desk", icon: "⌂" },
       { id: "my-tasks", label: "My Work", icon: "☷" },
       { id: "my-history", label: "Work History", icon: "◷" },
+      { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "skills", label: "My Skills", icon: "★" },
