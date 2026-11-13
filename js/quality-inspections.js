@@ -26,7 +26,18 @@ async function render(root,mode){
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)closePanel();});
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
  let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},view="home";
- const get=async()=>{const d=await API.get("quality/inspections");items=d.items||[];if(!isStaff&&!isAdmin){const t=await API.get("quality/templates");templates=t.templates||[];const sc=await API.get("quality/schedules");schedules=sc.schedules||[];try{leader=await API.get("quality/team-leader");}catch(_){leader=null;}try{options=await API.get("supervisor/records/options");}catch(_){options={operations:[],locations:[],zones:[]};}}};
+ const get=async()=>{
+  const d=await API.get("quality/inspections");items=d.items||[];
+  if(!isStaff&&!isAdmin){
+   const results=await Promise.allSettled([API.get("quality/templates"),API.get("quality/schedules"),API.get("quality/team-leader"),API.get("supervisor/records/options")]);
+   templates=results[0].status==="fulfilled"?(results[0].value.templates||[]):[];
+   schedules=results[1].status==="fulfilled"?(results[1].value.schedules||[]):[];
+   leader=results[2].status==="fulfilled"?results[2].value:null;
+   options=results[3].status==="fulfilled"?results[3].value:{operations:[],locations:[],zones:[]};
+   const failed=results.slice(0,2).filter(x=>x.status==="rejected");
+   if(failed.length)say("Some inspection tools could not load. Your inspection directory is available; refresh to retry the missing sections.",true);
+  }
+ };
  const button=(label,fn,cls="sr-secondary")=>{const b=el("button",cls,label);b.type="button";b.onclick=fn;return b;};
  const panel=(title,desc)=>{const p=el("section","sr-panel");p.append(el("div","sr-panel-heading"),);p.firstChild.append(el("div","",title),el("p","",desc||""));return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
@@ -136,9 +147,9 @@ async function render(root,mode){
   body.replaceChildren(wrap);
  }
  async function reload(next){await get();view=next;draw();}
- async function draw(){try{if(view==="home")return home();if(view==="schedule")return schedule();if(view==="templates")return templatePage();if(view==="schedules")return scheduleList();if(view==="analytics")return await analytics();if(view==="detail")return;return list(view);}catch(e){say(e.message||"Could not load inspection records.",true);}}
+ async function draw(){try{if(view==="home")return home();if(view==="schedule")return schedule();if(view==="templates")return templatePage();if(view==="schedules")return scheduleList();if(view==="analytics")return await analytics();if(view==="detail")return;return list(view);}catch(e){say(e.message||"Could not load inspection records.",true);const error=el("section","sr-panel");error.append(el("h3","","This inspection section could not load"),el("p","sr-empty",e.message||"The server could not return the requested inspection data."),button("Try again",()=>reload(view),"sr-primary"));body.replaceChildren(error);}}
  page.querySelector(".sr-refresh").onclick=async()=>{try{await reload(view);}catch(e){say(e.message,true);}};
- await get();home();
+ try{await get();home();}catch(e){say(e.message||"Inspections could not load. Please refresh and try again.",true);const error=el("section","sr-panel");error.append(el("h2","","Inspections could not load"),el("p","sr-empty",e.message||"The server did not return inspection data."),button("Retry",async()=>{try{say("");await get();home();}catch(err){say(err.message||"Still unable to load inspections.",true);}},"sr-primary"));dashboard.replaceChildren(error);}
 }
 window.MechnarQualityInspections={render};
 })();
