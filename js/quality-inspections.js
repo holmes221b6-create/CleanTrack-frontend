@@ -43,16 +43,18 @@ async function render(root,mode){
   search.oninput=paint;paint();body.replaceChildren(wrap);
  }
  function detail(x){
+  const currentUser=window.CleanTrackAuth?.getCurrentUser?.();
+  const canConduct=isStaff||(!isAdmin&&String(x.assigned_to_id)===String(currentUser?.id));
   const wrap=top(x.title,"Scheduled "+fmt(x.scheduled_at)+" · "+(x.location_name||"No location")+(x.zone_name?" / "+x.zone_name:""));
   const p=panel("Inspection details","Checklist and recorded findings. No evidence attachments are required.");
   const meta=el("p","sr-meta","Assigned to: "+(x.assigned_to||"—")+" · Created by: "+(x.created_by||"—")+" · Status: "+x.status);p.append(meta);
   const form=el("form","sr-form");
   const checks=el("div","sr-checklist");
-  (x.checklist||[]).forEach((v,i)=>{const label=el("label","sr-check");const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!v.checked;cb.dataset.i=i;cb.disabled=!isStaff&&x.status!=="scheduled"&&x.status!=="in_progress"&&x.status!=="returned";label.append(cb,el("span","",v.label));checks.append(label);});
+  (x.checklist||[]).forEach((v,i)=>{const label=el("label","sr-check");const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!v.checked;cb.dataset.i=i;cb.disabled=!canConduct||!["scheduled","in_progress","returned"].includes(x.status);label.append(cb,el("span","",v.label));checks.append(label);});
   p.append(checks);
   const findings=el("textarea","sr-control");findings.name="findings";findings.rows=4;findings.maxLength=4000;findings.placeholder="Inspection findings, observations or corrective action";findings.value=x.findings||"";
   const findingLabel=el("label","sr-field");findingLabel.append(el("span","","Findings / corrective action"),findings);p.append(findingLabel);
-  if(isStaff && ["scheduled","in_progress","returned"].includes(x.status)){
+  if(canConduct && ["scheduled","in_progress","returned"].includes(x.status)){
    const submit=button("Submit inspection to Supervisor",async()=>{const checklist=(x.checklist||[]).map((v,i)=>({checked:!!checks.querySelector('[data-i="'+i+'"]').checked}));submit.disabled=true;try{await API.patch("quality/inspections/"+x.id+"/submit",{checklist,findings:findings.value});say("Inspection submitted to your Supervisor.");await reload("assigned");}catch(e){say(e.message,true);submit.disabled=false;} },"sr-primary");p.append(submit);
   }
   if(!isStaff&&!isAdmin&&x.status==="submitted"){
