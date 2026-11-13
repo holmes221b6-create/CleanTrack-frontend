@@ -199,7 +199,7 @@
     const groupDefinitions = [
       { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
       { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
-      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "reviews", "incidents", "inspections", "handovers"] },
+      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "incident-reports", "reviews", "incidents", "inspections", "handovers"] },
       { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "settings", "org-settings", "billing"] }
     ];
 
