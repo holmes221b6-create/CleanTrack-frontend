@@ -113,11 +113,11 @@ async function renderStaffIncidentWorkspace(container){
  const refresh=el("button","sr-refresh","Refresh");refresh.type="button";header.append(intro,refresh);
  const notice=el("div","sr-notice");notice.hidden=true;
  const body=el("div","sr-body");root.append(header,notice,body);
- let active=[],history=[],adminReports=[],alerts=[],recurring=[],teamOptions=[],view="home",selected=null,events=[];
+ let active=[],history=[],adminReports=[],alerts=[],recurring=[],recurringSourceCount=0,teamOptions=[],view="home",selected=null,events=[];
  const say=(message,bad=false)=>{notice.hidden=!message;notice.textContent=message||"";notice.classList.toggle("is-error",bad);};
  const panel=(title,subtitle)=>{const p=el("section","sr-panel"),h=el("div","sr-panel-heading");h.append(el("div","",title),el("p","",subtitle||""));p.append(h);return p;};
  const back=()=>{view="home";selected=null;draw();};
- const load=async()=>{try{const [a,h,ar,al,opts,rec]=await Promise.all([API.get("supervisor/incident-reports"),API.get("supervisor/incident-reports/history"),API.get("supervisor/admin-reports"),API.get("announcements"),API.get("announcements/options"),API.get("supervisor/incident-reports/recurring")]);active=a.items||[];history=h.items||[];adminReports=ar.items||[];alerts=(al.announcements||[]).filter(x=>x.announcement_type==="alert");teamOptions=opts.teams||[];recurring=rec.items||[];draw();}catch(e){body.replaceChildren(el("p","sr-error",e.message||"Could not load staff reports."));}};
+ const load=async()=>{try{const [a,h,ar,al,opts,rec]=await Promise.all([API.get("supervisor/incident-reports"),API.get("supervisor/incident-reports/history"),API.get("supervisor/admin-reports"),API.get("announcements"),API.get("announcements/options"),API.get("supervisor/incident-reports/recurring")]);active=a.items||[];history=h.items||[];adminReports=ar.items||[];alerts=(al.announcements||[]).filter(x=>x.announcement_type==="alert");teamOptions=opts.teams||[];recurring=rec.items||[];recurringSourceCount=rec.source_count||0;draw();}catch(e){body.replaceChildren(el("p","sr-error",e.message||"Could not load staff reports."));}};
  const date=v=>{const d=new Date(v);return v&&!Number.isNaN(d.getTime())?d.toLocaleString():"Not recorded";};
  const badge=s=>el("span","sr-badge "+(s||""),String(s||"reported").replaceAll("_"," "));
  const card=(key,title,desc,count)=>{const b=el("button","sr-directory-card");b.type="button";b.append(el("span","sr-card-icon",key==="staff"?"▤":"◷"),el("span","sr-card-copy"));b.lastChild.append(el("strong","",title),el("small","",desc));b.append(el("span","sr-card-count",String(count)));b.onclick=()=>{view=key;draw();};return b;};
