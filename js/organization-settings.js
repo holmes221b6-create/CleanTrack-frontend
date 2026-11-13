@@ -289,7 +289,7 @@
         nameCell.append(el("strong", "", member.name || "Unnamed member"));
         nameCell.append(el("small", "", member.email || "No email available"));
         const roleCell = el("td");
-        roleCell.appendChild(el("span", "ct-org-role-pill", member.role || "member"));
+        roleCell.appendChild(el("span", "ct-org-role-pill", member.role_label || member.role || "member"));
         const teamsCell = el("td");
         teamsCell.textContent = (member.team_names || []).join(", ") || "No team assigned";
         const manageCell = el("td");
