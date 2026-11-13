@@ -849,6 +849,15 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
+    if (pageId === "meetings" && ["supervisor","staff","employee"].includes(String(user?.role || "").toLowerCase())) {
+      if (window.MechnarMeetings && typeof window.MechnarMeetings.render === "function") {
+        await window.MechnarMeetings.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Meetings could not load. Refresh the page and try again." }));
+      }
+      return;
+    }
+
     if (pageId === "reviews" && String(user?.role || "").toLowerCase() === "supervisor") {
       if (window.MechnarSupervisorReviewQueue && typeof window.MechnarSupervisorReviewQueue.render === "function") {
         await window.MechnarSupervisorReviewQueue.render(pageContent);
