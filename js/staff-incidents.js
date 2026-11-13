@@ -58,6 +58,11 @@
         rows.forEach(item=>{
           const card=el("article","sr-record"),top=el("div","sr-record-top");top.append(el("h3","",item.reference+" · "+item.title),badge(item.status));
           card.append(top,el("p","sr-record-copy",item.description),el("p","sr-meta",[item.report_type,item.category,item.severity,date(item.created_at)].join(" · ")));
+          const flow=[["reported","Reported"],["acknowledged","Acknowledged"],["in_progress","In progress"],["awaiting_staff_response","Staff response"],["resolution_submitted","Verification"],["forwarded_to_admin","Admin review"],["forwarded_acknowledged","Admin acknowledged"],["resolved","Resolved"]];
+          const stepIndex=flow.findIndex(x=>x[0]===item.status),track=el("div","sr-lifecycle");
+          flow.forEach((step,i)=>{const node=el("div","sr-lifecycle-step"+(i<=stepIndex?" is-complete":"")+(i===stepIndex?" is-current":""));node.append(el("span","sr-lifecycle-dot",i<stepIndex?"✓":String(i+1)),el("span","sr-lifecycle-label",step[1]));track.append(node);});
+          card.append(track);
+
           if(item.staff_resolution_note)card.append(el("p","sr-resolution","Your resolution: "+item.staff_resolution_note));
           const attachments=el("div","sr-evidence-list");(item.attachments||[]).forEach(file=>{const b=el("button","sr-secondary","View / download · "+file.filename);b.type="button";b.onclick=async()=>{try{const url=await API.download("incident-reports/attachments/"+file.id+"/download");const a=el("a");a.href=url;a.download=file.filename;a.target="_blank";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}catch(e){say(e.message,true);}};attachments.append(b);});card.append(attachments);
           if(item.status==="awaiting_staff_response"){
