@@ -82,7 +82,7 @@
     const list=node("div","mn-meeting-list");
     const now=Date.now();
     const sorted=[...meetings].sort((a,b)=>new Date(a.start_at)-new Date(b.start_at));
-    if(!sorted.length){list.append(node("div","mn-meeting-empty","No meetings have been scheduled for your team yet."));return list;}
+    if(!sorted.length){const admin=String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="admin";list.append(node("div","mn-meeting-empty",admin?"No meetings have been scheduled for your organisation yet.":"No meetings have been scheduled for your team yet."));return list;}
     sorted.forEach(m=>{
       const card=node("article","mn-meeting-card");
       const top=node("div","mn-meeting-card-top");
@@ -165,14 +165,15 @@
     root.classList.add("mn-meetings-page");
     root.replaceChildren();
     const header=node("header","mn-meeting-header");
-    header.append(node("div","mn-meeting-eyebrow","TEAM COLLABORATION"),node("h1","","Meetings"),node("p","","Schedule team discussions and join live meetings without leaving MECHNAR."));
+    const isAdmin=String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="admin";
+    header.append(node("div","mn-meeting-eyebrow",isAdmin?"ORGANISATION COLLABORATION":"TEAM COLLABORATION"),node("h1","","Meetings"),node("p","",isAdmin?"Schedule discussions with all Supervisors in your organisation and join live meetings without leaving MECHNAR.":"Schedule team discussions and join live meetings without leaving MECHNAR."));
     root.append(header);
     const content=node("section","mn-meeting-content");
     root.append(content);
     try{
       await loadData();
       if(["supervisor","admin"].includes(String(AUTH.getCurrentUser()?.role||"").toLowerCase())) renderCreateForm(root,content);
-      content.append(node("h2","mn-meeting-section-title","Team meetings"),renderList(root));
+      content.append(node("h2","mn-meeting-section-title",isAdmin?"Organisation meetings":"Team meetings"),renderList(root));
     }catch(e){notice(root,e.message||"Meetings could not be loaded.",true);}
   }
   function renderCreateForm(root,content){
