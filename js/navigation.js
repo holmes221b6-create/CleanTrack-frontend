@@ -355,6 +355,24 @@
     updateBackButton();
   });
 
+  // Keep the Staff/Team Leader navigation in sync without changing the canonical Staff role.
+  window.setInterval(async function () {
+    const current = auth.getCurrentUser();
+    if (!current || String(current.role || "").toLowerCase() !== "staff" || !window.CleanTrackApi) return;
+    try {
+      const status = await window.CleanTrackApi.get("quality/team-leader");
+      const next = !!status.is_team_leader;
+      if (staffTeamLeaderAccess === null) { staffTeamLeaderAccess = next; return; }
+      if (staffTeamLeaderAccess !== next) {
+        staffTeamLeaderAccess = next;
+        const nav = document.getElementById("workspace-navigation");
+        if (nav) renderMenu(nav);
+        if (next && activePage !== "inspections") setActivePage("inspections");
+        if (!next && activePage === "inspections") setActivePage("my-desk");
+      }
+    } catch (_) { /* Keep the last confirmed navigation state during temporary network failures. */ }
+  }, 45000);
+
   window.CleanTrackNavigation = Object.freeze({
     getMenu: getMenu,
     setActivePage: setActivePage,
