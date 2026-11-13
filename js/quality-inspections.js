@@ -31,7 +31,7 @@ async function render(root,mode){
  function list(key){
   let rows=[...items];
   if(key==="assigned")rows=rows.filter(x=>["scheduled","in_progress","returned"].includes(x.status));
-  if(key==="history")rows=rows.filter(x=>isStaff?["submitted","approved","forwarded","admin_acknowledged","admin_returned"].includes(x.status):["approved","forwarded","admin_acknowledged","admin_returned"].includes(x.status));
+  if(key==="history")rows=rows.filter(x=>isStaff?["submitted","approved","forwarded","admin_acknowledged","admin_returned"].includes(x.status):["approved","forwarded","admin_acknowledged","admin_returned","legacy_completed"].includes(x.status));
   if(key==="review")rows=rows.filter(x=>x.status==="submitted");
   if(key==="reports")rows=rows.filter(x=>x.status==="forwarded");
   if(key==="failed")rows=rows.filter(x=>x.outcome==="fail");
@@ -61,6 +61,7 @@ async function render(root,mode){
    const actions=el("div","sr-actions");actions.append(button("Return for correction",async()=>{const notes=prompt("Explain what needs correction:");if(!notes)return;try{await API.patch("quality/inspections/"+x.id+"/review",{action:"return",notes});say("Inspection returned to Team Leader.");await reload("review");}catch(e){say(e.message,true);}}),button("Approve inspection",async()=>{if(!confirm("Approve this inspection?"))return;try{await API.patch("quality/inspections/"+x.id+"/review",{action:"approve",notes:findings.value});say("Inspection approved.");await reload("review");}catch(e){say(e.message,true);}},"sr-primary"));p.append(actions);
   }
   if(!isStaff&&!isAdmin&&x.status==="approved")p.append(button("Forward approved report to Admin",async()=>{try{await API.request("quality/inspections/"+x.id+"/forward",{method:"POST",body:{}});say("Inspection report forwarded to Admin.");await reload("directory");}catch(e){say(e.message,true);}},"sr-primary"));
+  if(!isStaff&&!isAdmin&&x.status==="admin_returned")p.append(button("Resubmit updated report to Admin",async()=>{const notes=prompt("Add an update for Admin:",x.admin_notes||"");if(notes===null)return;try{await API.post("quality/inspections/"+x.id+"/resend-admin",{notes});say("Updated report resubmitted to Admin.");await reload("directory");}catch(e){say(e.message,true);}},"sr-primary"));
   if(isAdmin&&x.status==="forwarded"){
    const note=el("textarea","sr-control");note.rows=3;note.placeholder="Admin note (required when returning)";p.append(note,button("Return to Supervisor",async()=>{if(!note.value.trim()){say("Add a reason before returning.",true);return;}try{await API.patch("quality/inspections/"+x.id+"/admin-review",{action:"return",notes:note.value});say("Report returned to Supervisor.");await reload("reports");}catch(e){say(e.message,true);}}),button("Acknowledge report",async()=>{try{await API.patch("quality/inspections/"+x.id+"/admin-review",{action:"acknowledge",notes:note.value});say("Report acknowledged.");await reload("reports");}catch(e){say(e.message,true);}},"sr-primary"));
   }
