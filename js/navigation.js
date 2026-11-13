@@ -46,10 +46,10 @@
       { id: "handovers", label: "Shift Handover", icon: "⇄" },
       { id: "sites", label: "Sites & Zones", icon: "⌖" },
       { id: "team-channel", label: "Team Channel", icon: "▤" },
-      { id: "meetings", label: "Meetings", icon: "◉" },
+      { id: "settings", label: "Settings", icon: "⚙" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
       { id: "reports", label: "Reports", icon: "▧" },
-      { id: "settings", label: "Settings", icon: "⚙" }
+      { id: "meetings", label: "Meetings", icon: "◉" }
     ],
 
     employee: [
@@ -59,10 +59,10 @@
       { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
-      { id: "meetings", label: "Meetings", icon: "◉" },
-      { id: "skills", label: "My Skills", icon: "★" },
       { id: "settings", label: "Settings", icon: "⚙" },
-      { id: "audit", label: "My Activity", icon: "◷" }
+      { id: "skills", label: "My Skills", icon: "★" },
+      { id: "audit", label: "My Activity", icon: "◷" },
+      { id: "meetings", label: "Meetings", icon: "◉" }
     ]
   };
 
