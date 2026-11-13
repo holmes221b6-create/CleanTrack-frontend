@@ -10,7 +10,7 @@ const configs={
 };
 async function render(container,page){
  if(!API){container.textContent="API client unavailable.";return;}
- const cfg=configs[page];if(!cfg){container.textContent="Unknown supervisor workspace.";return;}
+ const cfg=configs[page];if(!cfg){container.textContent="Unknown supervisor workspace.";return;}if(page==="incidents"){await renderStaffIncidentWorkspace(container);return;}
  const root=el("section","sr-page");container.append(root);
  let opts={operations:[],locations:[],zones:[]},items=[],view="home",filter="";
  const notice=el("div","sr-notice");notice.hidden=true;
