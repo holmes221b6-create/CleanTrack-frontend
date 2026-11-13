@@ -10,8 +10,8 @@ async function render(root,mode){
  root.innerHTML='<section class="sr-page"><header class="sr-head"><div><span class="sr-kicker">QUALITY CONTROL</span><h1>'+(isStaff?"Team Leader · Inspections":isAdmin?"Inspection Reports":"Inspections & Quality")+'</h1><p>'+(isStaff?"Conduct assigned inspections and submit your findings to your Supervisor.":isAdmin?"Review inspection reports forwarded by Supervisors.":"Plan inspections, manage templates and review submitted quality checks.")+'</p></div><button class="sr-refresh" type="button">Refresh</button></header><div class="sr-notice" hidden></div><div class="sr-body"></div></section>';
  const page=root.querySelector(".sr-page"),body=page.querySelector(".sr-body"),notice=page.querySelector(".sr-notice");
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
- let items=[],templates=[],leader=null,options={operations:[],locations:[],zones:[]},view="home";
- const get=async()=>{const d=await API.get("quality/inspections");items=d.items||[];if(!isStaff&&!isAdmin){const t=await API.get("quality/templates");templates=t.templates||[];try{leader=await API.get("quality/team-leader");}catch(_){leader=null;}try{options=await API.get("supervisor/records/options");}catch(_){options={operations:[],locations:[],zones:[]};}}};
+ let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},view="home";
+ const get=async()=>{const d=await API.get("quality/inspections");items=d.items||[];if(!isStaff&&!isAdmin){const t=await API.get("quality/templates");templates=t.templates||[];const sc=await API.get("quality/schedules");schedules=sc.schedules||[];try{leader=await API.get("quality/team-leader");}catch(_){leader=null;}try{options=await API.get("supervisor/records/options");}catch(_){options={operations:[],locations:[],zones:[]};}}};
  const button=(label,fn,cls="sr-secondary")=>{const b=el("button",cls,label);b.type="button";b.onclick=fn;return b;};
  const panel=(title,desc)=>{const p=el("section","sr-panel");p.append(el("div","sr-panel-heading"),);p.firstChild.append(el("div","",title),el("p","",desc||""));return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
@@ -19,7 +19,7 @@ async function render(root,mode){
  const back=()=>{view="home";draw();};
  function home(){
   const grid=el("div","sr-directory-grid");
-  const cards=isStaff?[["assigned","Assigned inspections","Your scheduled checks and returned inspections"],["history","Submission history","Your submitted inspection records"]]:isAdmin?[["reports","Forwarded reports","Inspection reports sent by Supervisors"]]:[["schedule","Schedule inspection","Create a one-time or recurring inspection"],["templates","Inspection templates","Create and maintain reusable checklists"],["directory","Inspection directory","Track planned, active and completed inspections"],["review","Review queue","Review Team Leader submissions"],["history","Inspection history","Completed and reviewed inspections"],["failed","Failed inspections","Review quality failures"],["analytics","Quality overview","Analytics calculated from recorded inspections"]];
+  const cards=isStaff?[["assigned","Assigned inspections","Your scheduled checks and returned inspections"],["history","Submission history","Your submitted inspection records"]]:isAdmin?[["reports","Forwarded reports","Inspection reports sent by Supervisors"]]:[["schedule","Schedule inspection","Create a one-time or recurring inspection"],["templates","Inspection templates","Create and maintain reusable checklists"],["schedules","Inspection schedules","Review, pause or cancel recurring schedules"],["directory","Inspection directory","Track planned, active and completed inspections"],["review","Review queue","Review Team Leader submissions"],["history","Inspection history","Completed and reviewed inspections"],["failed","Failed inspections","Review quality failures"],["analytics","Quality overview","Analytics calculated from recorded inspections"]];
   cards.forEach(([key,title,desc])=>{const count=key==="review"?items.filter(x=>x.status==="submitted").length:key==="assigned"?items.filter(x=>["scheduled","in_progress","returned"].includes(x.status)).length:key==="reports"?items.filter(x=>x.status==="forwarded").length:key==="failed"?items.filter(x=>x.outcome==="fail").length:undefined;const b=el("button","sr-directory-card");b.type="button";b.append(el("span","sr-card-icon","◉"));const copy=el("span","sr-card-copy");copy.append(el("strong","",title),el("small","",desc));b.append(copy);if(count!==undefined)b.append(el("span","sr-card-count",String(count)));b.onclick=()=>{view=key;draw();};grid.append(b);});
   body.replaceChildren(grid);
   const stats=el("div","sr-metric-grid");
@@ -84,6 +84,13 @@ async function render(root,mode){
   form.onsubmit=async e=>{e.preventDefault();const fd=new FormData(form);const data={template_id:fd.get("template_id")||null,title:fd.get("title"),location_id:fd.get("location_id")||null,zone_id:fd.get("zone_id")||null,operation_id:fd.get("operation_id")||null,scheduled_at:fd.get("scheduled_at"),assigned_to_id:fd.get("assigned_to_id")||null,recurrence:fd.get("recurrence"),timezone:fd.get("timezone"),recurrence_days:fd.getAll("recurrence_days").map(Number),recurrence_day:fd.get("recurrence_day")?Number(fd.get("recurrence_day")):null,checklist:String(fd.get("checklist")||"").split("\n").map(s=>s.trim()).filter(Boolean)};try{await API.post("quality/schedules",data);say("Inspection scheduled and the inspector has been notified.");await reload("directory");}catch(err){say(err.message,true);}};
   p.append(form);wrap.append(p);body.replaceChildren(wrap);
  }
+ async function scheduleList(){
+  const wrap=top("Inspection schedules","Manage one-time and recurring inspection schedules. Pausing a schedule prevents future occurrences; existing records remain in history.");
+  const list=el("div","sr-records");
+  if(!schedules.length)list.append(el("p","sr-empty","No inspection schedules have been created yet."));
+  schedules.forEach(s=>{const card=el("article","sr-record");card.append(el("div","sr-record-top"),el("h3","",s.title),el("p","sr-meta",(s.recurrence==="once"?"One time":s.recurrence)+" · "+fmt(s.first_due_at)+" · Inspector: "+(s.assigned_to||"—")),el("span","sr-badge "+(s.active?"approved":"closed"),s.active?"Active":"Paused"));card.append(button(s.active?"Pause schedule":"Resume schedule",async()=>{try{await API.patch("quality/schedules/"+s.id,{active:!s.active});await get();scheduleList();say("Schedule updated.");}catch(e){say(e.message,true);}}));list.append(card);});
+  wrap.append(list);body.replaceChildren(wrap);
+ }
  async function templatePage(){
   const wrap=top("Inspection templates","Keep reusable checklists organised by category. Editing a template does not change inspections already scheduled.");
   const p=panel("Create template","Use a short name, one category and a focused checklist.");
@@ -99,7 +106,7 @@ async function render(root,mode){
   wrap.append(grid);const failures=panel("Repeated checklist failures","Checklist items that have failed at least twice in recorded inspections.");if(!(data.repeated_failures||[]).length)failures.append(el("p","sr-empty","No repeated checklist failures recorded yet."));else data.repeated_failures.forEach(f=>failures.append(el("p","sr-meta",f.checklist_item+" · "+f.failures+" failures")));wrap.append(failures);body.replaceChildren(wrap);
  }
  async function reload(next){await get();view=next;draw();}
- async function draw(){try{if(view==="home")return home();if(view==="schedule")return schedule();if(view==="templates")return templatePage();if(view==="analytics")return await analytics();if(view==="detail")return;return list(view);}catch(e){say(e.message||"Could not load inspection records.",true);}}
+ async function draw(){try{if(view==="home")return home();if(view==="schedule")return schedule();if(view==="templates")return templatePage();if(view==="schedules")return scheduleList();if(view==="analytics")return await analytics();if(view==="detail")return;return list(view);}catch(e){say(e.message||"Could not load inspection records.",true);}}
  page.querySelector(".sr-refresh").onclick=async()=>{try{await reload(view);}catch(e){say(e.message,true);}};
  await get();draw();
 }
