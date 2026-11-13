@@ -106,6 +106,13 @@
   async function joinMeeting(root,m,button){
     button.disabled=true;button.textContent="Connecting…";
     try{
+      if(m.is_host){
+        if(!m.host_start_url) throw new Error("Zoom host launch link is unavailable. Cancel and recreate this meeting.");
+        window.open(m.host_start_url,"_blank","noopener,noreferrer");
+        notice(root,"The meeting is opening in Zoom for you to host. Team members can join from their MECHNAR Meetings page.",false);
+        button.disabled=false;button.textContent="Open Zoom again";
+        return;
+      }
       const authData=await API.post("meetings/"+m.id+"/signature",{});
       const sdk=await loadSdk();
       const content=root.querySelector(".mn-meeting-content");
