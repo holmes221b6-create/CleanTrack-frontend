@@ -6,3 +6,33 @@
 .mn-meeting-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.mn-meeting-card{display:flex;flex-direction:column;gap:10px}.mn-meeting-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.mn-meeting-card h3{margin:0;font-size:17px}.mn-meeting-status{font-size:11px;padding:5px 8px;border-radius:20px;background:rgba(126,92,220,.16);white-space:nowrap}.mn-meeting-status.is-cancelled{background:rgba(220,70,70,.14);color:#e88b8b}.mn-meeting-meta,.mn-meeting-agenda{font-size:13px;line-height:1.5;opacity:.75;margin:0}.mn-meeting-actions{display:flex;gap:8px;margin-top:auto;padding-top:6px}.mn-meeting-empty{padding:24px;border:1px dashed var(--ct-border,var(--border,#454052));border-radius:14px;opacity:.7}.mn-meeting-section-title{margin:10px 0 0}.mn-meeting-notice{padding:12px 15px;border-radius:10px;background:rgba(94,175,130,.13);border:1px solid rgba(94,175,130,.35)}.mn-meeting-notice.is-error{background:rgba(210,75,75,.12);border-color:rgba(210,75,75,.35)}
 .mn-live-meeting{grid-column:1/-1}.mn-live-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.mn-live-heading h2{margin:0}.mn-live-heading p{opacity:.65;margin:5px 0 14px}.mn-zoom-root{min-height:600px;width:100%;overflow:hidden}.mn-meeting-content:has(.mn-live-meeting){display:block}
 @media(max-width:700px){.mn-meeting-create{grid-template-columns:1fr}.mn-meeting-create h2,.mn-meeting-field:last-of-type{grid-column:auto}.mn-zoom-root{min-height:520px}}
+
+/* Keep Meetings primary actions on the product's violet accent. */
+.mn-meetings-page .mn-meeting-btn.mn-primary,
+.mn-meeting-confirmation .mn-meeting-btn.mn-primary {
+  background:#7651d5 !important;
+  border-color:#7651d5 !important;
+  color:#fff !important;
+}
+.mn-meeting-page .mn-meeting-btn.mn-primary:hover,
+.mn-meetings-page .mn-meeting-btn.mn-primary:hover {
+  background:#6240bd !important;
+  border-color:#6240bd !important;
+}
+.mn-meeting-confirmation {
+  max-width:560px;
+  margin:42px auto;
+  padding:34px;
+  text-align:center;
+  border:1px solid var(--ct-border,var(--border,#343044));
+  background:var(--ct-card,var(--surface,#171923));
+  border-radius:18px;
+  box-shadow:0 14px 42px rgba(0,0,0,.10);
+}
+.mn-meeting-confirmation-mark {
+  width:54px;height:54px;margin:0 auto 16px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(118,81,213,.16);
+  color:#a78af3;font-size:27px;font-weight:800;
+}
+.mn-meeting-confirmation h2 { margin:0 0 10px;font-size:23px; }
+.mn-meeting-confirmation p { margin:0 auto 22px;max-width:420px;line-height:1.6;opacity:.75; }
