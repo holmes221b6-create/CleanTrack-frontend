@@ -69,3 +69,13 @@ html[data-theme="light"] .mp-media-item{background:#fff;border-color:#e7e3eb}
 .mp-chat-menu-pop[hidden],.mp-options-menu[hidden]{display:none!important}
 .mp-chat-menu-pop{top:calc(100% - 2px);right:12px;z-index:30}
 .mp-chat-menu-pop button[data-media-visibility]{font-weight:750;color:#d6b6f4}
+
+/* Personnel page return navigation */
+.mp-page-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:0 2px}
+.mp-page-back{display:inline-flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid var(--border,#393946);border-radius:10px;background:var(--surface-raised,#1b1b25);color:var(--text-primary,#eee);font:inherit;font-size:12px;font-weight:650;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.mp-page-back:hover{background:rgba(143,100,198,.15);border-color:#8b5cf6;transform:translateX(-2px)}
+.mp-page-back span:first-child{font-size:17px;line-height:1;color:#b99ae8}
+.mp-page-back:focus-visible{outline:2px solid #a78bfa;outline-offset:3px}
+.mp-page-context{font-size:9px;letter-spacing:.16em;font-weight:800;color:var(--text-secondary,#999)}
+html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-color:#dedee8}
+@media(prefers-reduced-motion:reduce){.mp-page-back{transition:none}}
