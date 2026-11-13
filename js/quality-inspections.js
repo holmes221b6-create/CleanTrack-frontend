@@ -91,7 +91,11 @@ async function render(root,mode){
   const wrap=top("Inspection schedules","Manage one-time and recurring inspection schedules. Pausing a schedule prevents future occurrences; existing records remain in history.");
   const list=el("div","sr-records");
   if(!schedules.length)list.append(el("p","sr-empty","No inspection schedules have been created yet."));
-  schedules.forEach(s=>{const card=el("article","sr-record");card.append(el("div","sr-record-top"),el("h3","",s.title),el("p","sr-meta",(s.recurrence==="once"?"One time":s.recurrence)+" · "+fmt(s.first_due_at)+" · Inspector: "+(s.assigned_to||"—")),el("span","sr-badge "+(s.active?"approved":"closed"),s.active?"Active":"Paused"));card.append(button(s.active?"Pause schedule":"Resume schedule",async()=>{try{await API.patch("quality/schedules/"+s.id,{active:!s.active});await get();scheduleList();say("Schedule updated.");}catch(e){say(e.message,true);}}));list.append(card);});
+  schedules.forEach(s=>{const card=el("article","sr-record");card.append(el("div","sr-record-top"),el("h3","",s.title),el("p","sr-meta",(s.recurrence==="once"?"One time":s.recurrence)+" · "+fmt(s.first_due_at)+" · Inspector: "+(s.assigned_to||"—")),el("span","sr-badge "+(s.active?"approved":"closed"),s.active?"Active":"Paused"));const actions=el("div","sr-actions");
+   const dateInput=el("input","sr-control");dateInput.type="datetime-local";const parsed=new Date(s.first_due_at);if(!Number.isNaN(parsed.getTime()))dateInput.value=new Date(parsed.getTime()-parsed.getTimezoneOffset()*60000).toISOString().slice(0,16);
+   actions.append(dateInput,button("Reschedule",async()=>{if(!dateInput.value){say("Choose a new date and time.",true);return;}try{await API.patch("quality/schedules/"+s.id,{scheduled_at:dateInput.value});await get();scheduleList();say("Inspection schedule rescheduled.");}catch(e){say(e.message,true);}}));
+   actions.append(button(s.active?"Pause schedule":"Resume schedule",async()=>{try{await API.patch("quality/schedules/"+s.id,{active:!s.active});await get();scheduleList();say("Schedule updated.");}catch(e){say(e.message,true);}}));
+   card.append(actions);list.append(card);});
   wrap.append(list);body.replaceChildren(wrap);
  }
  async function templatePage(){
