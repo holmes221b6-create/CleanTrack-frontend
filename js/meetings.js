@@ -69,7 +69,14 @@
     panel.append(back);root.append(panel);
   }
   async function loadData(){
-
+    const role=String(AUTH.getCurrentUser()?.role||"").toLowerCase();
+    const [meetingData,teamData]=await Promise.all([
+      API.get("meetings"),
+      role==="supervisor" ? API.get("teams/supervisor/mine").catch(()=>({team:null})) : Promise.resolve({team:null})
+    ]);
+    meetings=Array.isArray(meetingData.meetings)?meetingData.meetings:[];
+    const team=teamData.team||teamData;
+    teams=team && team.id ? [team] : [];
   }
   function renderList(root){
     const list=node("div","mn-meeting-list");
