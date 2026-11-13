@@ -125,6 +125,7 @@
         isSupportAV:true,
         success:()=>{
           sdk.join({
+            sdkKey:authData.client_id,
             signature:authData.signature,
             meetingNumber:String(authData.meeting_number),
             passWord:authData.password||"",
