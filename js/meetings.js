@@ -69,15 +69,7 @@
     panel.append(back);root.append(panel);
   }
   async function loadData(){
-    const [meetingData, teamData]=await Promise.all([
-      API.get("meetings"),
-      String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="supervisor"
-        ? API.get("teams/supervisor/mine").catch(()=>({team:null}))
-        : Promise.resolve({team:null})
-    ]);
-    meetings=Array.isArray(meetingData.meetings)?meetingData.meetings:[];
-    const team=teamData.team||teamData;
-    teams=team && team.id ? [team] : [];
+
   }
   function renderList(root){
     const list=node("div","mn-meeting-list");
@@ -97,7 +89,7 @@
       if(m.status==="scheduled"){
         const join=node("button","mn-meeting-btn mn-primary",m.is_host?"Start meeting":"Join meeting");
         join.type="button";join.addEventListener("click",()=>joinMeeting(root,m,join));actions.append(join);
-        if(m.is_host && String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="supervisor"){
+        if(m.is_host && ["supervisor","admin"].includes(String(AUTH.getCurrentUser()?.role||"").toLowerCase())){
           const cancel=node("button","mn-meeting-btn mn-secondary","Cancel");
           cancel.type="button";cancel.addEventListener("click",()=>cancelMeeting(root,m,cancel));actions.append(cancel);
         }
@@ -172,7 +164,7 @@
     root.append(content);
     try{
       await loadData();
-      if(String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="supervisor") renderCreateForm(root,content);
+      if(["supervisor","admin"].includes(String(AUTH.getCurrentUser()?.role||"").toLowerCase())) renderCreateForm(root,content);
       content.append(node("h2","mn-meeting-section-title","Team meetings"),renderList(root));
     }catch(e){notice(root,e.message||"Meetings could not be loaded.",true);}
   }
@@ -180,20 +172,29 @@
     const form=node("form","mn-meeting-create");
     const teamSelect=node("select","");teamSelect.name="team_id";teamSelect.required=true;
     teams.forEach(t=>{const o=node("option","",t.name||("Team "+t.id));o.value=t.id;teamSelect.append(o);});
+    const isAdmin=String(AUTH.getCurrentUser()?.role||"").toLowerCase()==="admin";
     const topic=node("input","");topic.name="topic";topic.maxLength=200;topic.required=true;topic.placeholder="e.g. Weekly operations review";
     const agenda=node("textarea","");agenda.name="agenda";agenda.maxLength=5000;agenda.rows=3;agenda.placeholder="Meeting agenda (optional)";
     const start=node("input","");start.type="datetime-local";start.name="start_at";start.required=true;start.value=localInputValue(Date.now()+5*60000);
     const duration=node("select","");duration.name="duration_minutes";
     [15,30,40,60,90,120,180].forEach(n=>{const o=node("option","",n+" minutes");o.value=n;if(n===40)o.selected=true;duration.append(o);});
     function field(label,control){const wrap=node("label","mn-meeting-field");wrap.append(node("span","",label),control);return wrap;}
-    form.append(node("h2","","Schedule a meeting"),field("Meeting topic",topic),field("Assigned team",teamSelect),field("Date and time",start),field("Duration",duration),field("Agenda",agenda));
+    form.append(node("h2","","Schedule a meeting"),field("Meeting topic",topic));
+    if(isAdmin){
+      form.append(node("p","mn-meeting-agenda","Participants: all active Supervisors in your organisation. Staff members are not included."));
+    }else{
+      form.append(field("Assigned team",teamSelect));
+    }
+    form.append(field("Date and time",start),field("Duration",duration),field("Agenda",agenda));
     const submit=node("button","mn-meeting-btn mn-primary","Schedule meeting");submit.type="submit";
     form.append(submit);
     form.addEventListener("submit",async e=>{
       e.preventDefault();submit.disabled=true;submit.textContent="Scheduling…";
       try{
-        await API.post("meetings",{topic:topic.value.trim(),agenda:agenda.value.trim(),team_id:Number(teamSelect.value),start_at:new Date(start.value).toISOString(),duration_minutes:Number(duration.value)});
-        showConfirmation(root,"Meeting scheduled successfully","Your meeting has been created and your team has been notified. You can return to Meetings to view or start it.");
+        const payload={topic:topic.value.trim(),agenda:agenda.value.trim(),start_at:new Date(start.value).toISOString(),duration_minutes:Number(duration.value)};
+        if(!isAdmin) payload.team_id=Number(teamSelect.value);
+        await API.post("meetings",payload);
+        showConfirmation(root,"Meeting scheduled successfully",isAdmin?"Your meeting has been created. All active Supervisors in your organisation have been notified.":"Your meeting has been created and your team has been notified. You can return to Meetings to view or start it.");
       }catch(err){notice(root,err.message||"Could not schedule the meeting.",true);}
       finally{submit.disabled=false;submit.textContent="Schedule meeting";}
     });
