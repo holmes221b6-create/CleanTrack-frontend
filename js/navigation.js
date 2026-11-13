@@ -46,10 +46,10 @@
       { id: "handovers", label: "Shift Handover", icon: "⇄" },
       { id: "sites", label: "Sites & Zones", icon: "⌖" },
       { id: "team-channel", label: "Team Channel", icon: "▤" },
-      { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "meetings", label: "Meetings", icon: "◉" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
       { id: "reports", label: "Reports", icon: "▧" },
-      { id: "meetings", label: "Meetings", icon: "◉" }
+      { id: "settings", label: "Settings", icon: "⚙" }
     ],
 
     employee: [
@@ -59,10 +59,10 @@
       { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
-      { id: "settings", label: "Settings", icon: "⚙" },
+      { id: "meetings", label: "Meetings", icon: "◉" },
       { id: "skills", label: "My Skills", icon: "★" },
       { id: "audit", label: "My Activity", icon: "◷" },
-      { id: "meetings", label: "Meetings", icon: "◉" }
+      { id: "settings", label: "Settings", icon: "⚙" }
     ]
   };
 
@@ -202,7 +202,7 @@
       { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
       { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
       { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "incident-reports", "reviews", "incidents", "inspections", "handovers"] },
-      { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "settings", "org-settings", "billing"] }
+      { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "meetings", "org-settings", "billing"] }
     ];
 
     const menuIds = new Set(menu.map(item => item.id));
