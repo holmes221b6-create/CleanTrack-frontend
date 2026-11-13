@@ -193,7 +193,7 @@
       e.preventDefault();submit.disabled=true;submit.textContent="Scheduling…";
       try{
         await API.post("meetings",{topic:topic.value.trim(),agenda:agenda.value.trim(),team_id:Number(teamSelect.value),start_at:new Date(start.value).toISOString(),duration_minutes:Number(duration.value)});
-        showConfirmation(root,"Meeting scheduled","Your team has been notified. You can return to the Meetings page to view or start it.");
+        showConfirmation(root,"Meeting scheduled successfully","Your meeting has been created and your team has been notified. You can return to Meetings to view or start it.");
       }catch(err){notice(root,err.message||"Could not schedule the meeting.",true);}
       finally{submit.disabled=false;submit.textContent="Schedule meeting";}
     });
