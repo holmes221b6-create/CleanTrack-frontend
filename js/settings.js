@@ -37,7 +37,39 @@ paintSettingsPicker(localAvatar()||user.avatar_url||"");avatarPickerButton.addEv
 avatarFile.addEventListener("change",()=>{const file=avatarFile.files&&avatarFile.files[0];if(!file)return;if(!/^image\/(png|jpeg|webp|gif)$/.test(file.type||"")){alert("Choose a PNG, JPG, WEBP, or GIF image.");avatarFile.value="";return}if(file.size>2*1024*1024){alert("Choose an image smaller than 2 MB.");avatarFile.value="";return}const reader=new FileReader();reader.onload=()=>{try{const data=String(reader.result||"");localStorage.setItem(avKey,data);applyHeaderAvatar(data);paintSettingsPicker(data);window.dispatchEvent(new CustomEvent("cleantrack:avatar-updated",{detail:{userId:user.id}}))}catch(_){alert("Unable to save this picture in the browser. Try a smaller image.")}};reader.onerror=()=>alert("Unable to read this image.");reader.readAsDataURL(file)});
 
 a.appendChild(formcard("Personal profile","Update details for your own account. Email editing is not enabled yet.","♙",[avatarPickerWrap,fld("Full name",nm),fld("Email address",em,"Read-only until account email change is supported."),fld("Phone number",ph),fld("Profile avatar URL",av,"Optional public image URL, saved to your account.")],async()=>{const r=await API.patch("auth/me",{full_name:nm.value.trim(),phone:ph.value.trim(),avatar_url:av.value.trim()}),u=r.user||{},name=u.full_name||nm.value.trim();Object.assign(user,{name,full_name:name,phone:u.phone||ph.value.trim(),avatar_url:u.avatar_url||av.value.trim()});if(AUTH.getCurrentUser())Object.assign(AUTH.getCurrentUser(),{name,phone:user.phone});try{localStorage.setItem(avKey,av.value.trim())}catch(_){}const h=document.getElementById("header-user-name");if(h)h.textContent=name;const icon=document.getElementById("header-avatar");if(icon){icon.textContent=name[0]?.toUpperCase()||"U";icon.style.backgroundImage=av.value.trim()?"url('"+av.value.trim().replace(/['()\\]/g,"")+"')":"";icon.style.backgroundSize="cover";icon.style.color=av.value.trim()?"transparent":""}},"Save account details"));
-const info=card("Account information","Current values returned by your account record.","ⓘ"),dl=el("dl","ct-settings-account-data");[["Account status",user.account_status||"Not available"],["Role",user.role||"Not available"],["Organization",user.organization_name||"Not available"],["Email verified",user.email_verified===true?"Yes":user.email_verified===false?"No":"Not available"],["Created",user.created_at||"Not available"],["Account ID",user.id??"Not available"]].forEach(([x,y])=>dl.append(el("dt","",x),el("dd","",y)));info.appendChild(dl);a.appendChild(info);
+
+// ORGANISATION ROLE DISPLAY NAME — this changes the label only, never the permission role.
+(async()=>{
+  try {
+    const profileResult=await API.get("organizations/my-profile");
+    const org=profileResult.organization;
+    if(!org) return;
+    const labels=org.role_labels||{Admin:"Admin",Supervisor:"Supervisor",Staff:"Staff"};
+    const canonical=String(user.role||"Staff");
+    const roleCard=card("Organisation role name","Rename how your role appears to everyone in this organisation. Your actual access permissions and features will not change.","◇");
+    const roleInput=inp("text",labels[canonical]||canonical,"role_label");
+    roleInput.required=true;roleInput.minLength=2;roleInput.maxLength=40;
+    const roleStatus=el("p","ct-settings-status");roleStatus.hidden=true;roleStatus.setAttribute("role","status");
+    const saveRole=btn("Save role name","ct-settings-button ct-settings-button-primary",async()=>{
+      saveRole.disabled=true;const original=saveRole.textContent;saveRole.textContent="Saving…";
+      try{
+        const result=await API.patch("organizations/role-labels",{label:roleInput.value.trim()});
+        roleInput.value=result.role_label||roleInput.value.trim();
+        if(AUTH.getCurrentUser())AUTH.getCurrentUser().role_label=roleInput.value;
+        user.role_label=roleInput.value;
+        roleStatus.textContent=result.message||"Role name updated. Organisation members have been notified.";
+        roleStatus.className="ct-settings-status is-success";roleStatus.hidden=false;
+        window.dispatchEvent(new CustomEvent("cleantrack:role-labels-updated",{detail:{role_labels:result.role_labels||{}}}));
+      }catch(error){roleStatus.textContent=error.message||"Role name could not be saved.";roleStatus.className="ct-settings-status is-error";roleStatus.hidden=false;}
+      finally{saveRole.disabled=false;saveRole.textContent=original;}
+    });
+    roleCard.append(fld("Your role's display name",roleInput,"2–40 characters. Only your own role label can be changed from this account."),saveRole,roleStatus);
+    a.appendChild(roleCard);
+  } catch(error) {
+    // Keep the rest of personal settings available if organisation profile is unavailable.
+  }
+})();
+const info=card("Account information","Current values returned by your account record.","ⓘ"),dl=el("dl","ct-settings-account-data");[["Account status",user.account_status||"Not available"],["Role",user.role_label||user.role||"Not available"],["Organization",user.organization_name||"Not available"],["Email verified",user.email_verified===true?"Yes":user.email_verified===false?"No":"Not available"],["Created",user.created_at||"Not available"],["Account ID",user.id??"Not available"]].forEach(([x,y])=>dl.append(el("dt","",x),el("dd","",y)));info.appendChild(dl);a.appendChild(info);
 // Password changes are intentionally handled outside Settings (registration/account recovery flows).
 if(role==="admin"){const org=card("Organization settings","Organization profile, member approvals, policies, audit trail and archive controls.","◇");org.appendChild(btn("Open Organization Settings","ct-settings-button ct-settings-button-primary",()=>window.CleanTrackNavigation?.setActivePage("org-settings")));a.appendChild(org)}
 if(role==="supervisor"){const sc=card("Team scope","Assigned team/location/zone scope is read-only; ask an Admin to change it.","♧"),load=el("p","ct-settings-muted","Loading assigned scope…"),groups=el("div","ct-settings-scope-grid");sc.append(load,groups);a.appendChild(sc);API.get("organizations/team-scope").then(d=>{load.remove();[["Teams",d.teams],["Locations",d.locations],["Zones",d.zones]].forEach(([label,rows])=>{const g=el("div","ct-settings-scope-group");g.appendChild(el("h3","",label));const ns=Array.isArray(rows)?rows.map(x=>x.name):[];if(!ns.length)g.appendChild(el("p","ct-settings-muted","No assignments recorded."));else{const ul=el("ul","ct-settings-chip-list");ns.forEach(x=>ul.appendChild(el("li","",x)));g.appendChild(ul)}groups.appendChild(g)})}).catch(e=>load.textContent=e.message||"Unable to load assigned scope.")}
