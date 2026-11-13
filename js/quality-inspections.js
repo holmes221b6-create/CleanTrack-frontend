@@ -51,7 +51,7 @@ async function render(root,mode){
   const form=el("form","sr-form");
   const checks=el("div","sr-checklist");
   (x.checklist||[]).forEach((v,i)=>{const label=el("label","sr-check");const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!v.checked;cb.dataset.i=i;cb.disabled=!canConduct||!["scheduled","in_progress","returned"].includes(x.status);label.append(cb,el("span","",v.label));checks.append(label);});
-  p.append(checks);
+  p.append(el("p","sr-meta","Tick each item only when it meets the required standard. Any unticked item is recorded as a failed check."),checks);
   const findings=el("textarea","sr-control");findings.name="findings";findings.rows=4;findings.maxLength=4000;findings.placeholder="Inspection findings, observations or corrective action";findings.value=x.findings||"";
   const findingLabel=el("label","sr-field");findingLabel.append(el("span","","Findings / corrective action"),findings);p.append(findingLabel);
   if(canConduct && ["scheduled","in_progress","returned"].includes(x.status)){
