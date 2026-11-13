@@ -888,6 +888,15 @@
       }
       return;
     }
+    if (["staff", "employee"].includes(String(user?.role || "").toLowerCase()) && pageId === "incident-reports") {
+      if (window.MechnarStaffIncidents && typeof window.MechnarStaffIncidents.render === "function") {
+        window.MechnarStaffIncidents.render(pageContent);
+      } else {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Staff incident reporting could not load. Refresh the page and try again." }));
+      }
+      return;
+    }
+
     if (String(user?.role || "").toLowerCase() === "supervisor" && ["incidents", "inspections", "handovers"].includes(pageId)) {
       if (window.MechnarSupervisorRecords && typeof window.MechnarSupervisorRecords.render === "function") {
         await window.MechnarSupervisorRecords.render(pageContent, pageId);
