@@ -72,6 +72,22 @@ async function render(container,page){
   if(page==="incidents")form.innerHTML=field("Incident title","title","text",true)+'<label class="sr-field"><span>Description</span><textarea name="description" rows="4" required></textarea></label><div class="sr-two">'+select("Related operation","operation_id",opts.operations)+select("Location","location_id",opts.locations)+'</div><div class="sr-two"><label class="sr-field"><span>Category</span><select name="category"><option value="other">Other</option><option value="equipment">Equipment failure</option><option value="safety">Safety concern</option><option value="staffing">Staffing</option><option value="resource">Missing resource</option><option value="facility">Facility issue</option></select></label><label class="sr-field"><span>Severity</span><select name="severity"><option value="medium">Medium</option><option value="low">Low</option><option value="high">High</option><option value="critical">Critical</option></select></label></div>'+select("Zone","zone_id",opts.zones)+'<button class="sr-primary">Submit incident report</button>';
   if(page==="inspections")form.innerHTML=field("Inspection title","title","text",true)+'<div class="sr-two">'+select("Location","location_id",opts.locations)+select("Zone","zone_id",opts.zones)+'</div>'+select("Related operation","operation_id",opts.operations)+'<label class="sr-field"><span>Checklist points (one per line)</span><textarea name="checklist" rows="6" required placeholder="Check item condition&#10;Verify required standard&#10;Confirm area is safe"></textarea></label><button class="sr-primary">Schedule inspection</button>';
   if(page==="handovers")form.innerHTML=field("Shift name","shift_label","text",true)+'<div class="sr-two">'+field("Outgoing time","outgoing_at","datetime-local",true)+field("Incoming time","incoming_at","datetime-local")+'</div><label class="sr-field"><span>Handover summary</span><textarea name="summary" rows="5" required placeholder="What happened? What must the next shift know?"></textarea></label><label class="sr-field"><span>Outstanding items (one per line)</span><textarea name="outstanding_items" rows="4"></textarea></label><div class="sr-actions"><button class="sr-secondary" type="button" data-draft>Save draft</button><button class="sr-primary" type="submit">Publish handover</button></div>';
+  if(page==="incidents"||page==="inspections"){
+   const locationSelect=form.querySelector('[name="location_id"]');
+   const zoneSelect=form.querySelector('[name="zone_id"]');
+   if(locationSelect&&zoneSelect){
+    const syncZones=()=>{
+     const chosen=locationSelect.value;
+     const previous=zoneSelect.value;
+     const available=opts.zones.filter(zone=>!chosen||String(zone.location_id)===String(chosen));
+     zoneSelect.replaceChildren();
+     const empty=el("option","","Not specified");empty.value="";zoneSelect.append(empty);
+     available.forEach(zone=>{const option=el("option","",zone.name);option.value=zone.id;zoneSelect.append(option);});
+     if(available.some(zone=>String(zone.id)===previous))zoneSelect.value=previous;
+    };
+    locationSelect.addEventListener("change",syncZones);syncZones();
+   }
+  }
   form.addEventListener("submit",async e=>{e.preventDefault();await submitForm(form,page==="handovers"?"true":null);});
   const draft=form.querySelector("[data-draft]");if(draft)draft.addEventListener("click",()=>submitForm(form,"false"));
   p.append(form);wrap.append(p);body.replaceChildren(wrap);
@@ -86,7 +102,7 @@ async function render(container,page){
  async function update(path,data,method="PATCH"){try{await API.request(path,{method,body:data});say("Record updated.");await load();view="directory";draw();}catch(e){say(e.message||"Could not update record.",true);}}
  function analytics(){const wrap=el("div","sr-workspace");wrap.append(workspace(page==="incidents"?"Incident overview":"Quality overview","Counts are calculated from the records returned by the team API; no estimated values are shown."));const grid=el("div","sr-metric-grid");let metrics=[];if(page==="incidents"){metrics=[["Total incidents",items.length],["Open",items.filter(x=>["open","in_progress"].includes(x.status)).length],["High / critical",items.filter(x=>["high","critical"].includes(x.severity)).length],["Resolved / closed",items.filter(x=>["resolved","closed"].includes(x.status)).length]];}else{metrics=[["Total inspections",items.length],["Scheduled / active",items.filter(x=>x.status!=="completed").length],["Passed",items.filter(x=>String(x.outcome).toLowerCase()==="pass").length],["Failed",items.filter(x=>String(x.outcome).toLowerCase()==="fail").length]];}metrics.forEach(([k,v])=>{const m=el("div","sr-metric");m.append(el("span","",k),el("strong","",String(v)));grid.append(m);});wrap.append(grid);body.replaceChildren(wrap);}
  function draw(){say("");if(view==="home"){directory();return;}if(["report","schedule","create"].includes(view)){createView();return;}if(["records","history","critical","failed","pending","outstanding"].includes(view)){listView(view==="records"?"directory":view);return;}if(view==="analytics"||view==="reports"){analytics();return;}}
- async function load(){try{const [res,options]=await Promise.all([API.get(cfg.endpoint),API.get("supervisor/records/options").catch(()=>({}))]);items=res.items||[];opts={operations:options.operations||[],locations:options.locations||[],zones:options.zones||[]};draw();}catch(e){body.replaceChildren(el("p","sr-error",e.message||"Could not load records."));}}
+ async function load(){try{const [res,options]=await Promise.all([API.get(cfg.endpoint),API.get("supervisor/records/options")]);items=res.items||[];opts={operations:options.operations||[],locations:options.locations||[],zones:options.zones||[]};draw();}catch(e){body.replaceChildren(el("p","sr-error",e.message||"Could not load records."));}}
  refresh.addEventListener("click",load);await load();
 }
 window.MechnarSupervisorRecords=Object.freeze({render});
