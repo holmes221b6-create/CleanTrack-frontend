@@ -58,6 +58,7 @@
       { id: "my-tasks", label: "My Work", icon: "☷" },
       { id: "my-history", label: "Work History", icon: "◷" },
       { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
+      { id: "inspections", label: "Team Leader Inspections", icon: "◉" },
       { id: "announcements", label: "Announcements", icon: "♢" },
       { id: "team-channel", label: "Team Channel", icon: "♧" },
       { id: "meetings", label: "Meetings", icon: "◉" },
@@ -67,6 +68,7 @@
     ]
   };
 
+  let staffTeamLeaderAccess = null;
   let activePage = null;
   const pageHistory = [];
   const viewHistory = [];
@@ -194,6 +196,22 @@
       return;
     }
 
+    if (String(user.role || "").toLowerCase() === "staff" && staffTeamLeaderAccess === null) {
+      container.replaceChildren();
+      const api = window.CleanTrackApi;
+      if (api && typeof api.get === "function") {
+        api.get("quality/team-leader").then(result => {
+          staffTeamLeaderAccess = !!result.is_team_leader;
+          renderMenu(container);
+        }).catch(() => {
+          staffTeamLeaderAccess = false;
+          renderMenu(container);
+        });
+      } else {
+        staffTeamLeaderAccess = false;
+      }
+      return;
+    }
     const menu = getMenu(user.role);
     const fragment = document.createDocumentFragment();
 
