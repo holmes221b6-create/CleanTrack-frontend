@@ -849,7 +849,7 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
-    if (pageId === "meetings" && ["supervisor","staff","employee"].includes(String(user?.role || "").toLowerCase())) {
+    if (pageId === "meetings" && ["admin","supervisor","staff","employee"].includes(String(user?.role || "").toLowerCase())) {
       if (window.MechnarMeetings && typeof window.MechnarMeetings.render === "function") {
         await window.MechnarMeetings.render(pageContent);
       } else {
