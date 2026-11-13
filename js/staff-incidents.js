@@ -10,17 +10,41 @@
     const refresh=el("button","sr-refresh","Refresh");refresh.type="button";header.append(intro,refresh);
     const notice=el("div","sr-notice");notice.hidden=true;
     const body=el("div","sr-body");root.append(header,notice,body);container.replaceChildren(root);
-    let teams=[],items=[];
+    let teams=[],items=[],urgentAlerts=[];
     const say=(message,bad=false)=>{notice.hidden=!message;notice.textContent=message||"";notice.classList.toggle("is-error",bad);};
     const panel=(title,desc)=>{const p=el("section","sr-panel"),h=el("div","sr-panel-heading");h.append(el("div","",title),el("p","",desc));p.append(h);return p;};
     async function load(){
       try{
-        const [o,l]=await Promise.all([API.get("staff/incident-reports/options"),API.get("staff/incident-reports")]);
-        teams=o.teams||[];items=l.items||[];draw();
+        const [o,l,alerts]=await Promise.all([API.get("staff/incident-reports/options"),API.get("staff/incident-reports"),API.get("announcements")]);
+        teams=o.teams||[];items=l.items||[];urgentAlerts=(alerts.announcements||[]).filter(x=>x.announcement_type==="alert"&&x.status==="published");draw();
       }catch(e){body.replaceChildren(el("p","sr-error",e.message||"Could not load your incident reports."));}
     }
     function draw(){
       body.replaceChildren();
+      const urgentPanel=panel("Urgent Alerts","Raise an immediate operational alert. Your assigned Team Supervisor and organisation Admin are notified; urgent alerts from other authorised roles appear here for acknowledgement.");
+      const urgentForm=el("form","sr-form"),urgentTeam=el("select","sr-control");
+      urgentTeam.required=true;urgentTeam.append(new Option("Choose assigned team",""));teams.forEach(t=>urgentTeam.append(new Option(t.name,String(t.id))));if(teams.length===1)urgentTeam.value=String(teams[0].id);
+      const urgentTitle=el("input","sr-control");urgentTitle.maxLength=200;urgentTitle.required=true;urgentTitle.placeholder="Urgent alert title";
+      const urgentSeverity=el("select","sr-control");urgentSeverity.append(new Option("High","high"),new Option("Critical","critical"));
+      const urgentMessage=el("textarea","sr-control");urgentMessage.rows=3;urgentMessage.maxLength=12000;urgentMessage.required=true;urgentMessage.placeholder="What is happening, where, and what immediate action is needed?";
+      const urgentSubmit=el("button","sr-primary","Send urgent alert");urgentSubmit.type="submit";
+      function urgentField(label,node){const w=el("label","sr-field");w.append(el("span","",label),node);return w;}
+      urgentForm.append(urgentField("Assigned team",urgentTeam),urgentField("Title",urgentTitle),urgentField("Priority",urgentSeverity),urgentField("Details",urgentMessage),urgentSubmit);
+      urgentForm.addEventListener("submit",async e=>{e.preventDefault();urgentSubmit.disabled=true;try{await API.post("announcements/urgent/staff",{team_id:Number(urgentTeam.value),title:urgentTitle.value.trim(),message:urgentMessage.value.trim(),severity:urgentSeverity.value});say("Urgent alert sent to your Team Supervisor and organisation Admin.");urgentForm.reset();if(teams.length===1)urgentTeam.value=String(teams[0].id);await load();}catch(err){say(err.message||"Urgent alert could not be sent.",true);}finally{urgentSubmit.disabled=false;}});
+      urgentPanel.append(urgentForm);
+      const urgentList=el("div","sr-records");
+      const visibleUrgent=urgentAlerts.filter(x=>x.alert_status!=="resolved");
+      if(!visibleUrgent.length)urgentList.append(el("p","sr-empty","No open urgent alerts."));
+      visibleUrgent.forEach(item=>{
+        const card=el("article","sr-record"),top=el("div","sr-record-top");
+        top.append(el("h3","",item.title),badge(item.severity));card.append(top,el("p","sr-record-copy",item.message),el("p","sr-meta",[item.created_by_name,item.team_name,date(item.published_at||item.created_at)].filter(Boolean).join(" · ")));
+        const receipt=item.my_receipt||{};
+        if(item.can_acknowledge&&receipt.state!=="acknowledged"){
+          const ack=el("button","sr-secondary","Acknowledge alert");ack.type="button";ack.onclick=async()=>{ack.disabled=true;try{await API.post("announcements/"+item.id+"/acknowledge",{});say("Urgent alert acknowledged.");await load();}catch(err){say(err.message||"Could not acknowledge alert.",true);ack.disabled=false;}};card.append(ack);
+        }else if(receipt.state==="acknowledged")card.append(el("p","sr-resolution","You acknowledged this alert."));
+        urgentList.append(card);
+      });
+      urgentPanel.append(urgentList);body.append(urgentPanel);
       const formPanel=panel("Report an incident or issue","A photo, screenshot or document is mandatory so your Supervisor can verify the report. Up to five files, 10 MB each.");
       const form=el("form","sr-form");
       const team=el("select","sr-control");team.required=true;team.append(new Option("Choose your team",""));teams.forEach(t=>team.append(new Option(t.name,String(t.id))));if(teams.length===1)team.value=String(teams[0].id);
