@@ -53,8 +53,8 @@
       const category=el("select","sr-control");[["equipment","Equipment"],["safety","Safety"],["staffing","Staffing"],["resource","Resource"],["facility","Facility"],["operational","Operational"],["other","Other"]].forEach(x=>category.append(new Option(x[1],x[0])));
       const severity=el("select","sr-control");[["low","Low"],["medium","Medium"],["high","High"],["critical","Critical"]].forEach(x=>severity.append(new Option(x[1],x[0])));severity.value="medium";
       const description=el("textarea","sr-control");description.rows=4;description.maxLength=12000;description.required=true;description.placeholder="Describe what happened, where it happened and how it affects the operation.";
-      const evidence=el("input","sr-control");evidence.type="file";evidence.multiple=true;evidence.required=true;evidence.accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,image/jpeg,image/png,image/webp,application/pdf,text/plain";
-      const fileHint=el("small","sr-muted","Required: at least one JPG, PNG, WEBP, PDF or TXT file. Maximum five files, 10 MB each.");
+      const evidence=el("input","sr-control");evidence.type="file";evidence.multiple=true;evidence.required=true;evidence.accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,application/pdf,text/plain,video/mp4,video/webm,video/quicktime";
+      const fileHint=el("small","sr-muted","Required: at least one image, document or video (JPG, PNG, WEBP, PDF, TXT, MP4, WEBM or MOV). Maximum five files, 10 MB each.");
       const submit=el("button","sr-primary","Submit report with evidence");submit.type="submit";
       function field(label,node){const wrap=el("label","sr-field");wrap.append(el("span","",label),node);return wrap;}
       form.append(field("Assigned team",team),field("Title",title),field("Report type",type),field("Category",category),field("Severity",severity),field("Details",description),field("Evidence (required)",evidence),fileHint,submit);
@@ -95,7 +95,7 @@
             card.append(responseForm);
           }
           if(item.status==="awaiting_staff_response"||item.status==="in_progress"||item.status==="acknowledged"){
-            const addForm=el("form","sr-inline-upload"),files=el("input","sr-control");files.type="file";files.multiple=true;files.accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,image/jpeg,image/png,image/webp,application/pdf,text/plain";const add=el("button","sr-secondary","Add evidence");add.type="submit";addForm.append(files,add);
+            const addForm=el("form","sr-inline-upload"),files=el("input","sr-control");files.type="file";files.multiple=true;files.accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,application/pdf,text/plain,video/mp4,video/webm,video/quicktime";const add=el("button","sr-secondary","Add evidence");add.type="submit";addForm.append(files,add);
             addForm.addEventListener("submit",async e=>{e.preventDefault();if(!files.files.length){say("Choose evidence files first.",true);return;}if(files.files.length>5||Array.from(files.files).some(f=>f.size>10*1024*1024)){say("Maximum five files, 10 MB each.",true);return;}const fd=new FormData();Array.from(files.files).forEach(f=>fd.append("evidence",f));try{await API.request("incident-reports/"+item.id+"/attachments",{method:"POST",body:fd});say("Evidence added.");await load();}catch(err){say(err.message,true);}});
             card.append(addForm);
           }
