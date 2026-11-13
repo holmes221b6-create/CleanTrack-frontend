@@ -33,7 +33,8 @@
       { id: "settings", label: "Settings", icon: "⚙" },
       { id: "org-settings", label: "Organization Settings", icon: "◇" },
       { id: "billing", label: "Billing", icon: "$" },
-      { id: "meetings", label: "Meetings", icon: "◉" }
+      { id: "meetings", label: "Meetings", icon: "◉" },
+      { id: "inspections", label: "Quality Reports", icon: "◉" }
     ],
 
     supervisor: [
