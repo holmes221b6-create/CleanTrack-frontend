@@ -219,7 +219,7 @@ async function renderStaffIncidentWorkspace(container){
   });
   if(!own.length)hist.append(el("p","sr-empty","No urgent alerts are recorded for your assigned teams."));wrap.append(hist);
  }
- async function perform(path,data,method,fade){try{await API.request(path,{method,body:data});say("Update saved.");await load();if(fade){const cardNode=body.querySelector(".sr-workspace");if(cardNode){cardNode.classList.add("sr-fade-out");await new Promise(resolve=>setTimeout(resolve,620));}view="staff";draw();}else{const updated=(active||[]).find(x=>x.id===selected.id);if(updated){selected=updated;await openReport(updated);}else{view="staff";draw();}}}catch(e){say(e.message||"Could not save the update.",true);}}
+ async function perform(path,data,method,fade){try{await API.request(path,{method,body:data});say("Update saved.");await load();if(fade){const cardNode=content.querySelector(".sr-workspace");if(cardNode){cardNode.classList.add("sr-fade-out");await new Promise(resolve=>setTimeout(resolve,620));}view="staff";draw();}else{const updated=(active||[]).find(x=>x.id===selected.id);if(updated){selected=updated;await openReport(updated);}else{view="staff";draw();}}}catch(e){say(e.message||"Could not save the update.",true);}}
  refresh.addEventListener("click",load);await load();
 }
 
