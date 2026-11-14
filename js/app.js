@@ -1004,6 +1004,12 @@
       } else if (role === "employee") {
         if (window.CleanTrackAnnouncements && typeof window.CleanTrackAnnouncements.render === "function") {
           await window.CleanTrackAnnouncements.render(pageContent, "team-channel");
+          if (window.MechnarOrgTools?.renderTeamPolicy) {
+            const policySection = document.createElement("section");
+            policySection.className = "ct-staff-team-policy";
+            await window.MechnarOrgTools.renderTeamPolicy(policySection, true);
+            pageContent.appendChild(policySection);
+          }
         } else {
           pageContent.appendChild(Object.assign(document.createElement("p"), {
             textContent: "Team Channel could not load. Refresh and try again."
