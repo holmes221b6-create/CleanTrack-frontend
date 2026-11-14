@@ -21,6 +21,9 @@ html[data-theme="light"] .sr-control{background:#fff;color:#202532;border-color:
 /* Supervisor Incidents & Issues: dedicated section workspace */
 .sr-incident-overlay{position:fixed;inset:0;z-index:10060;display:flex;align-items:center;justify-content:center;padding:clamp(10px,3vw,30px);background:rgba(5,5,12,.74);backdrop-filter:blur(8px)}
 .sr-incident-overlay[hidden]{display:none!important}
+.sr-handover-overlay{position:fixed;inset:0;z-index:10061;display:flex;align-items:center;justify-content:center;padding:clamp(10px,3vw,30px)}
+.sr-handover-shell{width:min(1180px,100%);height:min(920px,calc(100vh - 36px))}
+body.sr-incident-panel-open{overflow:hidden}
 .sr-incident-shell{display:flex;flex-direction:column;width:min(1180px,100%);height:min(920px,calc(100vh - 36px));min-height:0;overflow:hidden;border:1px solid var(--border,#393946);border-radius:18px;background:var(--surface,#15151e);color:var(--text-primary,#eee);box-shadow:0 30px 100px rgba(0,0,0,.52)}
 .sr-incident-bar{display:flex;flex:none;align-items:center;justify-content:space-between;gap:16px;min-height:62px;padding:0 22px;border-bottom:1px solid var(--border,#393946);background:var(--surface-raised,#20202a)}
 .sr-incident-bar strong{font-size:14px;font-weight:700;letter-spacing:.01em}
