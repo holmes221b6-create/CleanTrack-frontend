@@ -19,7 +19,7 @@ async function render(root,mode){
  const close=el("button","sr-panel-close","Close ×");close.type="button";
  const panelBody=el("div","sr-panel-body");
  bar.append(panelTitle,close);shell.append(bar,panelBody);overlay.append(shell);page.append(overlay);
- const openPanel=next=>{view=next;body=panelBody;overlay.hidden=false;document.body.classList.add("sr-panel-open");draw();close.focus();};
+ const openPanel=next=>{view=next;body=panelBody;overlay.hidden=false;document.body.classList.add("sr-panel-open");panelBody.replaceChildren(el("div","sr-loading","Loading inspection workspace…"));close.focus();draw();};
  const closePanel=()=>{overlay.hidden=true;document.body.classList.remove("sr-panel-open");body=dashboard;view="home";home();};
  close.onclick=closePanel;
  overlay.addEventListener("click",e=>{if(e.target===overlay)closePanel();});
@@ -42,7 +42,7 @@ async function render(root,mode){
  const panel=(title,desc)=>{const p=el("section","sr-panel");p.append(el("div","sr-panel-heading"),);p.firstChild.append(el("div","",title),el("p","",desc||""));return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
  const select=(label,name,rows,placeholder="Not specified")=>'<label class="sr-field"><span>'+label+'</span><select name="'+name+'"><option value="">'+placeholder+'</option>'+rows.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name||x.title)+'</option>').join("")+'</select></label>';
- const back=()=>closePanel();
+ const back=()=>{overlay.hidden=true;document.body.classList.remove("sr-panel-open");body=dashboard;view="home";home();};
  function home(){
   const grid=el("div","sr-directory-grid");
   const cards=isStaff?[["assigned","Assigned inspections","Your scheduled checks and returned inspections"],["history","Submission history","Your submitted inspection records"]]:isAdmin?[["reports","Forwarded reports","Inspection reports sent by Supervisors"],["history","Report history","Reports already acknowledged or returned"]]:[["schedule","Schedule inspection","Create a one-time or recurring inspection"],["templates","Inspection templates","Create and maintain reusable checklists"],["schedules","Inspection schedules","Review, pause or cancel recurring schedules"],["directory","Inspection directory","Track planned, active and completed inspections"],["review","Review queue","Review Team Leader submissions"],["history","Inspection history","Completed and reviewed inspections"],["failed","Failed inspections","Review quality failures"],["analytics","Quality overview","Analytics calculated from recorded inspections"]];
@@ -69,6 +69,7 @@ async function render(root,mode){
   search.oninput=paint;paint();body.replaceChildren(wrap);
  }
  function detail(x){
+  view="detail";
   const currentUser=window.CleanTrackAuth?.getCurrentUser?.();
   const canConduct=isStaff||(!isAdmin&&String(x.assigned_to_id)===String(currentUser?.id));
   const wrap=top(x.title,"Scheduled "+fmt(x.scheduled_at)+" · "+(x.location_name||"No location")+(x.zone_name?" / "+x.zone_name:""));
@@ -131,7 +132,7 @@ async function render(root,mode){
   form.onsubmit=async e=>{e.preventDefault();const fd=new FormData(form);try{await API.post("quality/templates",{name:fd.get("name"),category:fd.get("category"),description:fd.get("description"),checklist:String(fd.get("checklist")).split("\n").map(s=>s.trim()).filter(Boolean)});say("Template saved.");await get();templatePage();}catch(err){say(err.message,true);}};
   p.append(form);wrap.append(p);
   const list=el("div","sr-records");templates.forEach(t=>{const card=el("article","sr-record");card.append(el("div","sr-record-top"),el("h3","",t.name),el("p","sr-meta",t.category+" · "+(t.checklist||[]).length+" checklist items"),el("p","sr-record-copy",t.description));card.firstChild.append(el("strong","",t.is_archived?"Archived":"Active"));const actions=el("div","sr-actions");
-   actions.append(button("Edit",async()=>{const name=prompt("Template name:",t.name);if(name===null)return;const raw=prompt("Checklist items, one per line:",(t.checklist||[]).map(v=>v.label).join("\\n"));if(raw===null)return;try{await API.patch("quality/templates/"+t.id,{name,checklist:raw.split("\\n").map(v=>v.trim()).filter(Boolean)});await get();templatePage();say("Template updated.");}catch(e){say(e.message,true);}}));
+   actions.append(button("Edit",async()=>{const name=prompt("Template name:",t.name);if(name===null)return;const raw=prompt("Checklist items, one per line:",(t.checklist||[]).map(v=>v.label).join("\n"));if(raw===null)return;try{await API.patch("quality/templates/"+t.id,{name,checklist:raw.split("\n").map(v=>v.trim()).filter(Boolean)});await get();templatePage();say("Template updated.");}catch(e){say(e.message,true);}}));
    actions.append(button("Duplicate",async()=>{const name=prompt("Name for the duplicate:",t.name+" copy");if(!name)return;try{await API.post("quality/templates",{name,category:t.category,description:t.description,checklist:(t.checklist||[]).map(v=>v.label)});await get();templatePage();say("Template duplicated.");}catch(e){say(e.message,true);}}));
    actions.append(button(t.is_archived?"Restore template":"Archive template",async()=>{try{await API.patch("quality/templates/"+t.id,{is_archived:!t.is_archived});await get();templatePage();}catch(e){say(e.message,true);}}));
    card.append(actions);list.append(card);});wrap.append(list);body.replaceChildren(wrap);
