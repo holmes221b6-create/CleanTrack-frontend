@@ -16,3 +16,5 @@ html[data-theme="light"] .sr-panel-shell{background:#fff;border-color:#d9dce5}
 html[data-theme="light"] .sr-panel-bar{background:#f8f8fc;border-color:#e1e3ea}
 html[data-theme="light"] .sr-panel-bar strong,html[data-theme="light"] .sr-panel-close{color:#202532}
 @media(max-width:650px){.sr-panel-overlay{padding:0}.sr-panel-shell{width:100%;height:100dvh;max-height:100dvh;border-radius:0;border:0}.sr-panel-bar{min-height:56px;padding:0 15px}.sr-panel-body{padding:15px}}
+
+.sr-loading{min-height:150px;display:grid;place-items:center;color:var(--text-secondary,#aaa);font-size:13px;letter-spacing:.02em}
