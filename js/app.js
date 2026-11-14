@@ -1259,24 +1259,13 @@
       return;
     }
 
-    if (["inventory", "workforce", "escalations", "team-policy"].includes(pageId)) {
+    if (pageId === "inventory") {
       const tools = window.MechnarOrgTools;
-      if (!tools) {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organisation tools could not load. Refresh the page and try again." }));
+      if (!tools?.renderInventory) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Inventory could not load. Refresh the page and try again." }));
         return;
       }
-      const renderers = {
-        inventory: tools.renderInventory,
-        workforce: tools.renderWorkforce,
-        escalations: tools.renderEscalations,
-        "team-policy": tools.renderTeamPolicy
-      };
-      const currentRole = String(user?.role || "").toLowerCase();
-      if (!["admin", "supervisor", "staff"].includes(currentRole)) {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "This workspace is not available for your role." }));
-        return;
-      }
-      await renderers[pageId](pageContent);
+      await tools.renderInventory(pageContent);
       return;
     }
 
