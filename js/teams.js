@@ -242,7 +242,8 @@ async function renderSupervisorTeams(container){
   ["operations","Operations","Your team's operational workload and progress."],
   ["locations","Locations & zones","The work areas assigned to your team."],
   ["performance","Performance","Your team's recorded performance."],
-  ["activity","Activity","A history of recorded team changes."]
+  ["activity","Activity","A history of recorded team changes."],
+  ["team-policy","Team Policy","Published instructions, objectives and standards for your team."]
  ];
  const pageViews=new Map();
  pages.forEach(([id,label,description],index)=>{
@@ -328,6 +329,8 @@ async function renderSupervisorTeams(container){
  }
  async function renderOwn(data){
   const t=data.team||{};
+  const policyView=pageViews.get("team-policy");
+  if(policyView&&window.MechnarOrgTools?.renderTeamPolicy) window.MechnarOrgTools.renderTeamPolicy(policyView,true);
   const overview=pageViews.get("overview"),membersPage=pageViews.get("members"),operationsPage=pageViews.get("operations"),locationsPage=pageViews.get("locations"),performancePage=pageViews.get("performance"),activityPage=pageViews.get("activity");
   [membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
   own.replaceChildren();
