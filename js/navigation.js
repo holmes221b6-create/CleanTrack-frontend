@@ -22,6 +22,7 @@
       { id: "staff", label: "Staff", icon: "♙" },
       { id: "invitations", label: "Invitations", icon: "✉" },
       { id: "teams", label: "Teams", icon: "♧" },
+      { id: "inventory", label: "Inventory", icon: "▣" },
       { id: "locations", label: "Locations", icon: "⌖" },
       { id: "zones", label: "Zones", icon: "▦" },
       { id: "operations", label: "Operations Management", icon: "☷" },
@@ -41,6 +42,7 @@
       { id: "workspace", label: "My Workspace", icon: "⌂" },
       { id: "personnel", label: "Personnel", icon: "♙" },
       { id: "teams", label: "Teams", icon: "♧" },
+      { id: "inventory", label: "Inventory", icon: "▣" },
       { id: "operations", label: "Operations", icon: "☷" },
       { id: "reviews", label: "Review Queue", icon: "✓" },
       { id: "incidents", label: "Incidents & Issues", icon: "⚠" },
@@ -56,6 +58,7 @@
 
     employee: [
       { id: "my-desk", label: "My Desk", icon: "⌂" },
+      { id: "inventory", label: "Inventory", icon: "▣" },
       { id: "my-tasks", label: "My Work", icon: "☷" },
       { id: "my-history", label: "Work History", icon: "◷" },
       { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
