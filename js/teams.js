@@ -330,7 +330,7 @@ async function renderSupervisorTeams(container){
  async function renderOwn(data){
   const t=data.team||{};
   const policyView=pageViews.get("team-policy");
-  if(policyView&&window.MechnarOrgTools?.renderTeamPolicy) window.MechnarOrgTools.renderTeamPolicy(policyView,true);
+  if(policyView&&window.MechnarOrgTools?.renderTeamPolicy) await window.MechnarOrgTools.renderTeamPolicy(policyView,true);
   const overview=pageViews.get("overview"),membersPage=pageViews.get("members"),operationsPage=pageViews.get("operations"),locationsPage=pageViews.get("locations"),performancePage=pageViews.get("performance"),activityPage=pageViews.get("activity");
   [membersPage,operationsPage,locationsPage,performancePage,activityPage].forEach(node=>node.replaceChildren());
   own.replaceChildren();
