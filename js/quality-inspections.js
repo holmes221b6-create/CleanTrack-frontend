@@ -25,20 +25,27 @@ async function render(root,mode){
  overlay.addEventListener("click",e=>{if(e.target===overlay)closePanel();});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)closePanel();});
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
- let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},view="home";
+ let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},toolErrors={},view="home";
  const get=async()=>{
   const d=await API.get("quality/inspections");items=d.items||[];
   if(!isStaff&&!isAdmin){
    const results=await Promise.allSettled([API.get("quality/templates"),API.get("quality/schedules"),API.get("quality/team-leader"),API.get("supervisor/records/options")]);
+   toolErrors={
+    templates:results[0].status==="rejected"?results[0].reason:null,
+    schedules:results[1].status==="rejected"?results[1].reason:null,
+    leader:results[2].status==="rejected"?results[2].reason:null,
+    options:results[3].status==="rejected"?results[3].reason:null
+   };
    templates=results[0].status==="fulfilled"?(results[0].value.templates||[]):[];
    schedules=results[1].status==="fulfilled"?(results[1].value.schedules||[]):[];
    leader=results[2].status==="fulfilled"?results[2].value:null;
    options=results[3].status==="fulfilled"?results[3].value:{operations:[],locations:[],zones:[]};
-   const failed=results.slice(0,2).filter(x=>x.status==="rejected");
-   if(failed.length)say("Some inspection tools could not load. Your inspection directory is available; refresh to retry the missing sections.",true);
+   const failed=results.filter(x=>x.status==="rejected");
+   if(failed.length)say("Some inspection tools could not load. Open the affected section to retry; the rest of the inspection workspace remains available.",true);
   }
  };
  const button=(label,fn,cls="sr-secondary")=>{const b=el("button",cls,label);b.type="button";b.onclick=fn;return b;};
+ const sectionError=(message,retry)=>{const p=el("section","sr-panel");p.append(el("h3","","This section could not load"),el("p","sr-empty",message||"The server could not return this section."),button("Retry",retry,"sr-primary"));return p;};
  const panel=(title,desc)=>{const p=el("section","sr-panel");p.append(el("div","sr-panel-heading"),);p.firstChild.append(el("div","",title),el("p","",desc||""));return p;};
  const field=(label,name,type="text",required=false)=>'<label class="sr-field"><span>'+label+'</span><input name="'+name+'" type="'+type+'" '+(required?"required":"")+'></label>';
  const select=(label,name,rows,placeholder="Not specified")=>'<label class="sr-field"><span>'+label+'</span><select name="'+name+'"><option value="">'+placeholder+'</option>'+rows.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name||x.title)+'</option>').join("")+'</select></label>';
@@ -95,6 +102,7 @@ async function render(root,mode){
   wrap.append(p);body.replaceChildren(wrap);
  }
  async function schedule(){
+  if(toolErrors.options){body.replaceChildren(sectionError(toolErrors.options.message||"Location and operation options could not load.",async()=>{try{say("");await get();await schedule();}catch(e){say(e.message,true);}}));return;}
   const wrap=top("Schedule an inspection","Choose a reusable template or build a concise checklist from scratch.");
   const p=panel("Inspection setup","Each scheduled occurrence becomes its own inspection record.");
   const form=el("form","sr-form");
@@ -115,6 +123,7 @@ async function render(root,mode){
   p.append(form);wrap.append(p);body.replaceChildren(wrap);
  }
  async function scheduleList(){
+  if(toolErrors.schedules){body.replaceChildren(sectionError(toolErrors.schedules.message||"Inspection schedules could not be retrieved.",async()=>{try{say("");await get();await scheduleList();}catch(e){say(e.message,true);}}));return;}
   const wrap=top("Inspection schedules","Manage one-time and recurring inspection schedules. Pausing a schedule prevents future occurrences; existing records remain in history.");
   const list=el("div","sr-records");
   if(!schedules.length)list.append(el("p","sr-empty","No inspection schedules have been created yet."));
@@ -126,6 +135,7 @@ async function render(root,mode){
   wrap.append(list);body.replaceChildren(wrap);
  }
  async function templatePage(){
+  if(toolErrors.templates){body.replaceChildren(sectionError(toolErrors.templates.message||"Inspection templates could not be retrieved.",async()=>{try{say("");await get();await templatePage();}catch(e){say(e.message,true);}}));return;}
   const wrap=top("Inspection templates","Keep reusable checklists organised by category. Editing a template does not change inspections already scheduled.");
   const p=panel("Create template","Use a short name, one category and a focused checklist.");
   const form=el("form","sr-form");form.innerHTML=field("Template name","name","text",true)+'<div class="sr-two"><label class="sr-field"><span>Category</span><select name="category"><option value="general">General</option><option value="cleaning">Cleaning</option><option value="safety">Safety</option><option value="maintenance">Maintenance</option></select></label>'+field("Description","description")+'</div><label class="sr-field"><span>Checklist items (one per line)</span><textarea name="checklist" rows="5" required></textarea></label><button class="sr-primary">Save template</button>';
