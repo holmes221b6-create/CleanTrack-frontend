@@ -22,10 +22,6 @@
       { id: "staff", label: "Staff", icon: "♙" },
       { id: "invitations", label: "Invitations", icon: "✉" },
       { id: "teams", label: "Teams", icon: "♧" },
-      { id: "inventory", label: "Inventory", icon: "▣" },
-      { id: "workforce", label: "Capacity & Coverage", icon: "◫" },
-      { id: "escalations", label: "Escalations", icon: "⚑" },
-      { id: "team-policy", label: "Team Policy", icon: "§" },
       { id: "locations", label: "Locations", icon: "⌖" },
       { id: "zones", label: "Zones", icon: "▦" },
       { id: "operations", label: "Operations Management", icon: "☷" },
@@ -45,10 +41,6 @@
       { id: "workspace", label: "My Workspace", icon: "⌂" },
       { id: "personnel", label: "Personnel", icon: "♙" },
       { id: "teams", label: "Teams", icon: "♧" },
-      { id: "inventory", label: "Inventory", icon: "▣" },
-      { id: "workforce", label: "Capacity & Coverage", icon: "◫" },
-      { id: "escalations", label: "Escalations", icon: "⚑" },
-      { id: "team-policy", label: "Team Policy", icon: "§" },
       { id: "operations", label: "Operations", icon: "☷" },
       { id: "reviews", label: "Review Queue", icon: "✓" },
       { id: "incidents", label: "Incidents & Issues", icon: "⚠" },
@@ -232,8 +224,8 @@
     // Every route is rendered exactly once; no route or permission is changed.
     const groupDefinitions = [
       { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
-      { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "inventory", "team-policy", "locations", "zones", "sites"] },
-      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "my-tasks", "my-history", "incident-reports", "reviews", "incidents", "inspections", "handovers", "escalations", "workforce"] },
+      { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
+      { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "inventory", "my-tasks", "my-history", "incident-reports", "reviews", "incidents", "inspections", "handovers"] },
       { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "meetings", "org-settings", "billing"] }
     ];
 
