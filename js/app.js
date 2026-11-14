@@ -1259,6 +1259,27 @@
       return;
     }
 
+    if (["inventory", "workforce", "escalations", "team-policy"].includes(pageId)) {
+      const tools = window.MechnarOrgTools;
+      if (!tools) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organisation tools could not load. Refresh the page and try again." }));
+        return;
+      }
+      const renderers = {
+        inventory: tools.renderInventory,
+        workforce: tools.renderWorkforce,
+        escalations: tools.renderEscalations,
+        "team-policy": tools.renderTeamPolicy
+      };
+      const currentRole = String(user?.role || "").toLowerCase();
+      if (!["admin", "supervisor", "staff"].includes(currentRole)) {
+        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "This workspace is not available for your role." }));
+        return;
+      }
+      await renderers[pageId](pageContent);
+      return;
+    }
+
     const message = document.createElement("p");
     message.className = "page-placeholder";
     message.textContent =
