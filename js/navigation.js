@@ -56,10 +56,6 @@
 
     employee: [
       { id: "my-desk", label: "My Desk", icon: "⌂" },
-      { id: "inventory", label: "Inventory", icon: "▣" },
-      { id: "workforce", label: "My Capacity", icon: "◫" },
-      { id: "escalations", label: "Escalations", icon: "⚑" },
-      { id: "team-policy", label: "Team Policy", icon: "§" },
       { id: "my-tasks", label: "My Work", icon: "☷" },
       { id: "my-history", label: "Work History", icon: "◷" },
       { id: "incident-reports", label: "Incidents & Issues", icon: "⚠" },
