@@ -1,0 +1,83 @@
+/* MECHNAR compact density system — Plenty Pulse-inspired spacing.
+   Applied consistently across Admin, Supervisor and Staff without changing
+   component behaviour, colours, typography hierarchy or responsive structure. */
+:root {
+  --mn-space-1: 4px;
+  --mn-space-2: 7px;
+  --mn-space-3: 10px;
+  --mn-space-4: 14px;
+  --mn-space-5: 18px;
+}
+#workspace-view #page-content,
+#workspace-view .page-content,
+#page-content {
+  padding-inline: clamp(14px, 1.7vw, 24px) !important;
+  padding-top: 14px !important;
+  padding-bottom: 20px !important;
+}
+#page-content > :first-child { margin-top: 0 !important; }
+#page-content > * + * { margin-top: 14px; }
+#page-content :is(.page-header,.page-heading,.content-header,.workspace-heading) {
+  margin: 0 0 14px !important;
+  gap: 8px !important;
+}
+#page-content :is(.section,.dashboard-section,.content-section,.workspace-section) {
+  margin-block: 0 16px !important;
+  gap: 10px !important;
+}
+#page-content :is(.section-header,.section-heading,.panel-header,.card-header) {
+  margin-bottom: 9px !important;
+  gap: 8px !important;
+}
+#page-content :is(.card,.panel,.stat-card,.metric-card,.dashboard-card,.form-card,
+ .content-card,.section-card,.report-card,.analytics-card,.settings-card,.ct-card,
+ .ct-panel,.chart-card,.widget,.widget-card) {
+  padding: 13px !important;
+}
+#page-content :is(.card-grid,.card-list,.panel-grid,.content-grid,.dashboard-grid,
+ .overview-grid,.analytics-grid,.reports-grid,.workspace-grid,.list-grid) {
+  gap: 10px !important;
+}
+#page-content :is(.stats-grid,.stat-grid,.metrics-grid,.dashboard-stats,
+ .dashboard-metrics,.summary-grid,.kpi-grid) {
+  gap: 8px !important;
+}
+#page-content :is(.card-body,.panel-body) { padding: 10px 12px !important; }
+#page-content :is(.card-footer,.panel-footer) {
+  padding: 9px 12px !important;
+  margin-top: 8px !important;
+}
+#page-content :is(.field,.form-group,.form-field) { margin-bottom: 10px !important; }
+#page-content :is(label) { margin-bottom: 5px; }
+#page-content :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),
+ select,textarea) {
+  min-height: 38px;
+  padding: 8px 10px;
+}
+#page-content textarea { min-height: 82px; }
+#page-content :is(.tabs,.tab-list,.filter-row,.toolbar,.action-row) { gap: 7px !important; }
+#page-content :is(.tabs button,.tab,.tab-button) { padding: 8px 11px !important; }
+#page-content :is(table th,table td) { padding: 8px 10px !important; }
+#page-content :is(.table-wrap,.table-container) { margin-block: 7px !important; }
+#page-content :is(.empty-state,.no-results,.empty-placeholder) {
+  min-height: 96px !important;
+  padding: 14px !important;
+}
+#page-content :is(.divider,hr) { margin-block: 10px !important; }
+/* Preserve comfortable reading and usable touch targets on small screens. */
+@media (max-width: 800px) {
+  #workspace-view #page-content,#workspace-view .page-content,#page-content {
+    padding: 12px 12px 18px !important;
+  }
+  #page-content :is(.card,.panel,.stat-card,.metric-card,.dashboard-card,.form-card,
+   .content-card,.section-card,.report-card,.analytics-card,.settings-card,.ct-card,
+   .ct-panel,.chart-card,.widget,.widget-card) { padding: 11px !important; }
+  #page-content :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select) {
+    min-height: 40px;
+  }
+}
+/* Dialogs and overlays retain their own carefully sized layouts. */
+#page-content :is(.modal,.modal-content,.modal-dialog,.modal-body,
+ .modal-backdrop,[role=dialog],.inspection-modal,.incident-modal) {
+  scroll-margin: 12px;
+}
