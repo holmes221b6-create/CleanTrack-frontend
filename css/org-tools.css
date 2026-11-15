@@ -110,3 +110,36 @@
  .mt-policy-form-actions{justify-content:stretch}
  .mt-policy-form-actions .mt-btn{flex:1 1 100%}
 }
+
+
+/* Muted dark-theme lavender: intentionally subdued, not pastel or bright. */
+.mt-btn-primary{
+  background:#51445f !important;
+  border-color:#756487 !important;
+  color:#eee8f3 !important;
+}
+.mt-btn-primary:hover{
+  background:#5d4e6b !important;
+  border-color:#88769a !important;
+  color:#f4eff8 !important;
+}
+.mt-btn:not(.mt-btn-primary){
+  background:#29232f !important;
+  border-color:#51465c !important;
+  color:#d9d0e2 !important;
+}
+.mt-btn:not(.mt-btn-primary):hover{
+  background:#342c3d !important;
+  border-color:#756487 !important;
+  color:#f0eaf5 !important;
+}
+.mt-btn:focus-visible{
+  outline:2px solid #88769a !important;
+  outline-offset:2px;
+}
+.mt-policy-version,.mt-policy-live{
+  background:#302838;
+  border-color:#574a63;
+  color:#c5b7d1;
+}
+.mt-policy-block h3{color:#c9bdd4}
