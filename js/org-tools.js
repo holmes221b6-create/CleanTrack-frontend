@@ -122,11 +122,16 @@ async function renderTeamPolicy(container,embedded){
   [["structured","Structured policy"],["custom","Custom policy — free writing"]].forEach(([value,label])=>{const option=$("option","",label);option.value=value;typeSelect.append(option)});
   typeSelect.value=currentType;
   const typeField=field("Policy format",typeSelect);
+  const formatChoices=$("div","mt-policy-format-choices");
+  const structuredChoice=btn("Structured policy",()=>setPolicyMode("structured"),false);
+  const customChoice=btn("Custom policy",()=>setPolicyMode("custom"),false);
+  formatChoices.append(structuredChoice,customChoice);
+  function setPolicyMode(mode){typeSelect.value=mode;typeSelect.dispatchEvent(new Event("change"));structuredChoice.classList.toggle("is-selected",mode==="structured");customChoice.classList.toggle("is-selected",mode==="custom")}
   const defs=[["title","Policy title","Single, clear title for this team's policy."],["objectives","Purpose & objectives","What the team is responsible for achieving."],["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],["standards","Standards & expectations","Define expected quality, conduct and completion standards."],["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]];
   defs.forEach(([key])=>{fields[key]=key==="title"?input(key,existing?.[key]||""):area(key,existing?.[key]||"")});
   const customContent=area("custom_content",currentType==="custom"?(existing?.instructions||""):"");
   const customField=field("Write your policy",customContent);
-  const grid=$("div","mt-policy-form-grid");grid.append(typeField);
+  const grid=$("div","mt-policy-form-grid");grid.append(formatChoices,typeField);
   defs.forEach(([key,label,hint])=>{const group=$("div","mt-policy-field-group");group.append(field(label,fields[key]),$("small","mt-policy-field-hint",hint));grid.append(group)});
   grid.append(customField);
   function updateMode(){
@@ -134,7 +139,7 @@ async function renderTeamPolicy(container,embedded){
    defs.forEach(([key])=>{const group=fields[key].closest(".mt-policy-field-group");if(group)group.hidden=custom});
    customField.hidden=!custom;
   }
-  updateMode();typeSelect.addEventListener("change",updateMode);
+  updateMode();typeSelect.addEventListener("change",updateMode);setPolicyMode(currentType);
   const actions=$("div","mt-policy-form-actions"),save=btn("Save draft",null,false),publish=btn("Publish to team",null,true);
   actions.append(save,publish);
   const p=panel(existing?.status==="draft"?"Edit policy draft":existing?"Prepare new policy version":"Write team policy","Choose structured sections or write freely. Publishing makes the policy visible to every member of the selected team.",form);
