@@ -46,3 +46,67 @@
  .mt-policy-form-grid .mt-field:has(textarea),.mt-policy-form .mt-field:has(textarea){grid-column:auto}
  .mt-policy-toolbar .mt-field{max-width:none;flex:1 1 100%}
 }
+
+
+/* Final Team Policy polish: consistent control scale and muted lavender. */
+.mt-btn,
+.mt-policy-form-actions .mt-btn{
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  min-width:112px;
+  padding:8px 14px;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:12px;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.mt-btn-primary{
+  background:#8976a8;
+  border-color:#a18bbf;
+  color:#fff;
+}
+.mt-btn-primary:hover{
+  background:#9885b7;
+  border-color:#b19ccc;
+  color:#fff;
+}
+.mt-btn:not(.mt-btn-primary){
+  background:rgba(154,137,177,.09);
+  border-color:rgba(171,151,195,.34);
+  color:#e4dced;
+}
+.mt-btn:not(.mt-btn-primary):hover{
+  background:rgba(154,137,177,.17);
+  border-color:#a18bbf;
+}
+.mt-btn:focus-visible{outline:2px solid #b6a2d0;outline-offset:2px}
+.mt-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.mt-policy-toolbar{align-items:center;justify-content:space-between}
+.mt-policy-toolbar .mt-field{flex:0 1 260px}
+.mt-policy-teamhead{padding-bottom:12px}
+.mt-policy-document{max-width:100%;padding:20px 22px}
+.mt-policy-block{display:grid;grid-template-columns:minmax(150px,220px) minmax(0,1fr);gap:16px;align-items:start}
+.mt-policy-block h3{margin:2px 0 0}
+.mt-policy-copy{max-width:none}
+.mt-policy-meta{margin-top:8px}
+.mt-policy-actions,.mt-policy-form-actions{gap:10px}
+.mt-policy-draft-row .mt-btn{min-width:104px}
+.mt-policy-form-grid{gap:12px 18px}
+.mt-policy-form-grid .mt-field>span{font-size:12px}
+.mt-policy-form-grid .mt-input{min-height:38px;font-size:13px}
+.mt-policy-field-hint{margin-top:-7px;padding-right:8px}
+@media(max-width:680px){
+ .mt-policy-toolbar{align-items:stretch}
+ .mt-policy-toolbar .mt-field{flex:1 1 100%}
+ .mt-policy-block{grid-template-columns:1fr;gap:5px}
+ .mt-policy-document{padding:15px}
+ .mt-policy-form-actions{justify-content:stretch}
+ .mt-policy-form-actions .mt-btn{flex:1 1 100%}
+}
