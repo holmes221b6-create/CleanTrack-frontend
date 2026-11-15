@@ -54,14 +54,116 @@ async function renderEscalations(container){
  await load();
 }
 async function renderTeamPolicy(container,embedded){
- const root=embedded?container:shell(container,"TEAM GOVERNANCE","Team Policy","Published objectives, responsibilities, procedures and standards for your team.");
+ const root=embedded?container:shell(container,"TEAM GOVERNANCE","Team Policy","The current instructions and standards your team is expected to follow.");
  root.replaceChildren();if(!embedded)container.append(root);
- const head=$("div","mt-toolbar"),teamSelect=select("team_id",[]);head.append(field("Team",teamSelect));const canEdit=["admin","supervisor"].includes(role());if(canEdit)head.append(btn("+ New policy",()=>editPolicy(null),true));root.append(head);const content=$("div","mt-content");root.append(content);
+ const canEdit=role()==="supervisor";
+ const head=$("div","mt-policy-toolbar"),teamSelect=select("team_id",[]);
+ const teamField=field("Team",teamSelect);head.append(teamField);
+ if(canEdit)head.append(btn("+ Write policy",()=>editPolicy(null),true));
+ root.append(head);
+ const content=$("div","mt-policy-content");root.append(content);
  let teamRows=[];
- async function load(){content.replaceChildren($("p","mt-muted","Loading published team policies…"));try{const r=await API.get("org-tools/team-policy");teamRows=r.teams||[];teamSelect.replaceChildren();teamRows.forEach(x=>{const o=$("option","",x.team.name);o.value=x.team.id;teamSelect.append(o)});if(!teamRows.length){content.replaceChildren($("p","mt-empty","No team policy is available for your membership."));return}draw()}catch(e){content.replaceChildren($("p","mt-error",e.message||"Team policy could not be loaded."))}}
- function draw(){const selected=teamRows.find(x=>String(x.team.id)===teamSelect.value)||teamRows[0];content.replaceChildren();if(!selected)return;const p=selected.policy;if(!p){content.append($("p","mt-empty","No published policy for this team yet."));if(canEdit)content.append(btn("Create team policy",()=>editPolicy(null),true));return}const section=$("article","mt-section");section.append($("p","mt-eyebrow","PUBLISHED POLICY · VERSION "+p.version),$("h2","",p.title));[["Objectives",p.objectives],["Responsibilities",p.responsibilities],["Instructions",p.instructions],["Standards",p.standards],["Safety guidance",p.safety_guidance]].forEach(([label,value])=>{if(value){section.append($("h3","",label));section.append($("p","mt-policy-copy",value))}});section.append($("p","mt-footnote","Published "+(p.published_at?new Date(p.published_at).toLocaleString():"date unavailable")));content.append(section);if(canEdit){content.append(btn("Create new version",()=>editPolicy(p),true));if((selected.drafts||[]).length){const draftSection=$("section","mt-section");draftSection.append($("h2","","Unpublished drafts"));(selected.drafts||[]).forEach(d=>{const row=$("div","mt-draft-row");row.append($("span","",d.title+" · Version "+d.version),btn("Continue editing",()=>editPolicy(d)));draftSection.append(row)});content.append(draftSection)}}}
+ async function load(){
+  content.replaceChildren($("p","mt-muted","Loading team policy…"));
+  try{
+   const r=await API.get("org-tools/team-policy");teamRows=r.teams||[];
+   teamSelect.replaceChildren();
+   teamRows.forEach(x=>{const o=$("option","",x.team.name);o.value=x.team.id;teamSelect.append(o)});
+   teamField.hidden=teamRows.length<2;
+   if(!teamRows.length){content.replaceChildren($("div","mt-policy-empty","No team policy is available for your membership yet."));return}
+   draw();
+  }catch(e){content.replaceChildren($("p","mt-error",e.message||"Team policy could not be loaded."))}
+ }
+ function draw(){
+  const selected=teamRows.find(x=>String(x.team.id)===teamSelect.value)||teamRows[0];
+  content.replaceChildren();if(!selected)return;
+  const policy=selected.policy;
+  const teamHead=$("div","mt-policy-teamhead");
+  teamHead.append($("div","mt-eyebrow","TEAM STANDARD"),$("h2","",selected.team.name));
+  if(policy)teamHead.append($("span","mt-policy-version","CURRENT VERSION · "+policy.version));
+  content.append(teamHead);
+  if(!policy){
+   const empty=$("div","mt-policy-empty");
+   empty.append($("strong","","No published policy yet"),$("p","","Your supervisor has not published the team's instructions. Once published, the current policy will appear here for everyone in the team."));
+   content.append(empty);
+   if(canEdit)content.append(btn("Write the first team policy",()=>editPolicy(null),true));
+   return;
+  }
+  const intro=$("div","mt-policy-intro");
+  intro.append($("span","mt-policy-live","● PUBLISHED"),$("span","mt-footnote","Effective version "+policy.version));
+  content.append(intro);
+  const sections=[
+   ["Purpose & objectives",policy.objectives],
+   ["Roles & responsibilities",policy.responsibilities],
+   ["Instructions to follow",policy.instructions],
+   ["Standards & expectations",policy.standards],
+   ["Safety guidance",policy.safety_guidance]
+  ];
+  const body=$("article","mt-policy-document");
+  body.append($("h2","mt-policy-document-title",policy.title));
+  sections.forEach(([label,value],index)=>{
+   if(!String(value||"").trim())return;
+   const section=$("section","mt-policy-block");
+   section.append($("h3","",label),$("p","mt-policy-copy",value));
+   body.append(section);
+  });
+  const meta=$("footer","mt-policy-meta");
+  meta.append($("span","","Published "+(policy.published_at?new Date(policy.published_at).toLocaleString():"date unavailable")));
+  body.append(meta);content.append(body);
+  if(canEdit){
+   const actions=$("div","mt-policy-actions");
+   actions.append(btn("Publish new version",()=>editPolicy(policy),true));
+   content.append(actions);
+   if((selected.drafts||[]).length){
+    const drafts=$("section","mt-policy-drafts"),title=$("div","mt-policy-drafts-head");
+    title.append($("h3","","Unpublished drafts"),$("span","mt-footnote",String(selected.drafts.length)+" saved"));
+    drafts.append(title);
+    selected.drafts.forEach(d=>{
+     const row=$("div","mt-policy-draft-row"),copy=$("div","mt-policy-draft-copy");
+     copy.append($("strong","",d.title),$("small","", "Draft · Version "+d.version));
+     row.append(copy,btn("Edit draft",()=>editPolicy(d)));
+     drafts.append(row);
+    });
+    content.append(drafts);
+   }
+  }
+ }
  teamSelect.addEventListener("change",draw);
- function editPolicy(existing){const form=$("form","mt-form"),fields={};const defs=[["title","Policy title"],["objectives","Team objectives"],["responsibilities","Roles & responsibilities"],["instructions","Operating instructions"],["standards","Standards & expectations"],["safety_guidance","Safety guidance"]];defs.forEach(([k,label])=>{fields[k]=k==="title"?input(k,existing?.[k]||""):area(k,existing?.[k]||"");});const grid=$("div","mt-form-grid");defs.forEach(([k,label])=>grid.append(field(label,fields[k])));const actions=$("div","mt-actions"),draft=btn("Save draft",null,false),publish=btn("Publish to team",null,true);draft.type=publish.type="button";actions.append(draft,publish,btn("Cancel",()=>p.overlay.remove()));form.append(grid,actions);const p=panel(existing?"Create policy version":"Write team policy","Only published versions are visible to team members.",form);async function save(publishNow){const payload={team_id:Number(teamSelect.value),publish:publishNow};if(existing?.status==="draft")payload.policy_id=existing.id;defs.forEach(([k])=>payload[k]=fields[k].value);try{await API.post("org-tools/team-policy",payload);p.overlay.remove();await load()}catch(e){notice(form,e.message||"Could not save policy.",true)}}draft.addEventListener("click",()=>save(false));publish.addEventListener("click",()=>save(true))}
+ function editPolicy(existing){
+  const form=$("form","mt-form mt-policy-form"),fields={};
+  const defs=[
+   ["title","Policy title","Single, clear title for this team's policy."],
+   ["objectives","Purpose & objectives","What the team is responsible for achieving."],
+   ["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],
+   ["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],
+   ["standards","Standards & expectations","Define expected quality, conduct and completion standards."],
+   ["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]
+  ];
+  defs.forEach(([key])=>{fields[key]=key==="title"?input(key,existing?.[key]||""):area(key,existing?.[key]||"")});
+  const grid=$("div","mt-policy-form-grid");
+  defs.forEach(([key,label,hint])=>grid.append(field(label,fields[key]),$("small","mt-policy-field-hint",hint)));
+  const actions=$("div","mt-policy-form-actions"),save=btn("Save draft",null,false),publish=btn("Publish to team",null,true);
+  save.type=publish.type="button";
+  actions.append(save,publish,btn("Cancel",()=>p.overlay.remove()));
+  form.append(grid,actions);
+  const p=panel(existing?.status==="draft"?"Edit policy draft":existing?"Prepare new policy version":"Write team policy","Review the instructions carefully. Publishing makes this version visible to every member of the selected team.",form);
+  async function savePolicy(publishNow){
+   const title=fields.title.value.trim();
+   if(!title){notice(form,"Enter a policy title before saving.",true);fields.title.focus();return}
+   const payload={team_id:Number(teamSelect.value),publish:publishNow};
+   if(existing?.status==="draft")payload.policy_id=existing.id;
+   defs.forEach(([key])=>payload[key]=fields[key].value.trim());
+   save.disabled=publish.disabled=true;
+   try{
+    const result=await API.post("org-tools/team-policy",payload);
+    p.overlay.remove();await load();
+    if(publishNow)notice(root,result.message||"The policy is now published for the team.");
+   }catch(e){notice(form,e.message||"Could not save policy.",true)}
+   finally{save.disabled=publish.disabled=false}
+  }
+  save.addEventListener("click",()=>savePolicy(false));
+  publish.addEventListener("click",()=>savePolicy(true));
+ }
  await load();
 }
 window.MechnarOrgTools=Object.freeze({renderInventory,renderWorkforce,renderEscalations,renderTeamPolicy});
