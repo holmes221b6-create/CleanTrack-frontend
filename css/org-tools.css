@@ -172,3 +172,25 @@
   max-height:min(88vh,900px);
   overflow:auto;
 }
+
+
+/* Freeform custom policy: one uninterrupted writing surface. */
+.mt-policy-custom-copy{
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+ min-height:100px;
+ font-size:13px;
+ line-height:1.75;
+ color:var(--text,#eee8f5);
+}
+.mt-policy-form-grid>.mt-field[hidden],
+.mt-policy-form-grid>.mt-policy-field-group[hidden]{display:none!important}
+.mt-policy-form-grid>.mt-field:has(textarea[name="custom_content"]){grid-column:1/-1}
+.mt-policy-form-grid textarea[name="custom_content"]{
+ min-height:300px;
+ width:100%;
+ resize:vertical;
+ line-height:1.65;
+ padding:13px 14px;
+}
+.mt-policy-form-grid select[name="policy_type"]{max-width:360px}
