@@ -194,3 +194,22 @@
  padding:13px 14px;
 }
 .mt-policy-form-grid select[name="policy_type"]{max-width:360px}
+
+
+.mt-policy-format-choices{
+ display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ padding:0 0 10px;
+ border-bottom:1px solid rgba(160,140,190,.16);
+}
+.mt-policy-format-choices .mt-btn{
+ min-width:150px;
+ min-height:38px;
+ padding:8px 14px;
+}
+.mt-policy-format-choices .mt-btn.is-selected{
+ background:#51445f!important;
+ border-color:#88769a!important;
+ color:#f0eaf5!important;
+ box-shadow:inset 0 0 0 1px rgba(185,165,205,.14);
+}
+.mt-policy-form-grid>.mt-field:has(select[name="policy_type"]){display:none!important}
