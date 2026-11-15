@@ -14,7 +14,8 @@ function panel(title,subtitle,content){
  const head=$("header","mt-panel-head"),copy=$("div","");copy.append($("p","mt-eyebrow","MECHNAR WORKSPACE"),$("h2","",title),$("p","mt-muted",subtitle));
  const close=btn("×",()=>overlay.remove());close.className="mt-close";close.setAttribute("aria-label","Close panel");head.append(copy,close);dialog.append(head,content);overlay.append(dialog);
  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove()});document.addEventListener("keydown",function esc(e){if(e.key==="Escape"&&overlay.isConnected){overlay.remove();document.removeEventListener("keydown",esc)}});
- document.body.append(overlay);return {overlay,dialog};
+ const teamWorkspace=document.querySelector(".ct-team-fullscreen-shell");
+ (teamWorkspace||document.body).append(overlay);return {overlay,dialog};
 }
 function shell(container,eyebrow,title,desc){container.replaceChildren();const root=$("section","mt-page");const head=$("header","mt-page-head"),copy=$("div","");copy.append($("p","mt-eyebrow",eyebrow),$("h1","",title),$("p","mt-muted",desc));head.append(copy);root.append(head);container.append(root);return root}
 function table(headers,rows){const wrap=$("div","mt-table-wrap"),t=$("table","mt-table"),thead=$("thead"),tr=$("tr");headers.forEach(x=>tr.append($("th","",x)));thead.append(tr);const body=$("tbody");rows.forEach(row=>{const r=$("tr");row.forEach(cell=>{const td=$("td");if(cell instanceof Node)td.append(cell);else td.textContent=cell??"—";r.append(td)});body.append(r)});t.append(thead,body);wrap.append(t);return wrap}
