@@ -97,9 +97,12 @@ async function renderTeamPolicy(container,embedded){
   const intro=$("div","mt-policy-intro");
   intro.append($("span","mt-policy-live","● PUBLISHED"),$("span","mt-footnote","Effective version "+policy.version));
   content.append(intro);
-  const sections=[["Purpose & objectives",policy.objectives],["Roles & responsibilities",policy.responsibilities],["Instructions to follow",policy.instructions],["Standards & expectations",policy.standards],["Safety guidance",policy.safety_guidance]];
   const body=$("article","mt-policy-document");body.append($("h2","mt-policy-document-title",policy.title));
-  sections.forEach(([label,value])=>{if(!String(value||"").trim())return;const section=$("section","mt-policy-block");section.append($("h3","",label),$("p","mt-policy-copy",value));body.append(section)});
+  if(policy.policy_type==="custom"){body.append($("div","mt-policy-custom-copy",policy.instructions||""))}
+  else{
+   const sections=[["Purpose & objectives",policy.objectives],["Roles & responsibilities",policy.responsibilities],["Instructions to follow",policy.instructions],["Standards & expectations",policy.standards],["Safety guidance",policy.safety_guidance]];
+   sections.forEach(([label,value])=>{if(!String(value||"").trim())return;const section=$("section","mt-policy-block");section.append($("h3","",label),$("p","mt-policy-copy",value));body.append(section)});
+  }
   const meta=$("footer","mt-policy-meta");meta.append($("span","","Published "+(policy.published_at?new Date(policy.published_at).toLocaleString():"date unavailable")));body.append(meta);content.append(body);
   if(canEdit){
    content.append(btn("Publish new version",()=>editPolicy(policy),true));
@@ -114,22 +117,38 @@ async function renderTeamPolicy(container,embedded){
  teamSelect.addEventListener("change",()=>{if(writeButton)writeButton.textContent=selectedTeam()?.policy?"Write policy":"Write your first policy";draw()});
  function editPolicy(existing){
   const form=$("form","mt-form mt-policy-form"),fields={};
+  const currentType=existing?.policy_type||"structured";
+  const typeSelect=$("select","mt-input");typeSelect.name="policy_type";
+  [["structured","Structured policy"],["custom","Custom policy — free writing"]].forEach(([value,label])=>{const option=$("option","",label);option.value=value;typeSelect.append(option)});
+  typeSelect.value=currentType;
+  const typeField=field("Policy format",typeSelect);
   const defs=[["title","Policy title","Single, clear title for this team's policy."],["objectives","Purpose & objectives","What the team is responsible for achieving."],["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],["standards","Standards & expectations","Define expected quality, conduct and completion standards."],["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]];
   defs.forEach(([key])=>{fields[key]=key==="title"?input(key,existing?.[key]||""):area(key,existing?.[key]||"")});
-  const grid=$("div","mt-policy-form-grid");
+  const customContent=area("custom_content",currentType==="custom"?(existing?.instructions||""):"");
+  const customField=field("Write your policy",customContent);
+  const grid=$("div","mt-policy-form-grid");grid.append(typeField);
   defs.forEach(([key,label,hint])=>{const group=$("div","mt-policy-field-group");group.append(field(label,fields[key]),$("small","mt-policy-field-hint",hint));grid.append(group)});
+  grid.append(customField);
+  function updateMode(){
+   const custom=typeSelect.value==="custom";
+   defs.forEach(([key])=>{const group=fields[key].closest(".mt-policy-field-group");if(group)group.hidden=custom});
+   customField.hidden=!custom;
+  }
+  updateMode();typeSelect.addEventListener("change",updateMode);
   const actions=$("div","mt-policy-form-actions"),save=btn("Save draft",null,false),publish=btn("Publish to team",null,true);
   actions.append(save,publish);
-  const p=panel(existing?.status==="draft"?"Edit policy draft":existing?"Prepare new policy version":"Write team policy","Review the instructions carefully. Publishing makes this version visible to every member of the selected team.",form);
-  const cancel=btn("Cancel",()=>p.overlay.remove());actions.append(cancel);
+  const p=panel(existing?.status==="draft"?"Edit policy draft":existing?"Prepare new policy version":"Write team policy","Choose structured sections or write freely. Publishing makes the policy visible to every member of the selected team.",form);
+  actions.append(btn("Cancel",()=>p.overlay.remove()));
   form.append(grid,actions);
   async function savePolicy(publishNow){
-   const title=fields.title.value.trim();
-   if(!title){notice(form,"Enter a policy title before saving.",true);fields.title.focus();return}
+   const isCustom=typeSelect.value==="custom";
+   const title=isCustom?(fields.title.value.trim()||"Custom policy"):fields.title.value.trim();
+   if(!isCustom&&!title){notice(form,"Enter a policy title before saving.",true);fields.title.focus();return}
+   if(isCustom&&!customContent.value.trim()){notice(form,"Write the policy before saving or publishing.",true);customContent.focus();return}
    const selected=selectedTeam();if(!selected){notice(form,"Select a team before saving.",true);return}
-   const payload={team_id:Number(selected.team.id),publish:publishNow};
+   const payload={team_id:Number(selected.team.id),publish:publishNow,policy_type:typeSelect.value,custom_content:customContent.value.trim(),title};
    if(existing?.status==="draft")payload.policy_id=existing.id;
-   defs.forEach(([key])=>payload[key]=fields[key].value.trim());
+   defs.forEach(([key])=>payload[key]=isCustom?"":fields[key].value.trim());
    save.disabled=publish.disabled=true;
    try{
     const result=await API.post("org-tools/team-policy",payload);
