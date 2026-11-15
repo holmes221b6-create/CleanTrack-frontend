@@ -77,7 +77,7 @@ async function renderTeamPolicy(container,embedded){
    teamSelect.replaceChildren();
    teamRows.forEach(x=>{const o=$("option","",x.team.name);o.value=x.team.id;teamSelect.append(o)});
    teamField.hidden=teamRows.length<2;
-   if(writeButton){writeButton.hidden=!teamRows.length;writeButton.textContent=teamRows.some(x=>x.policy)?"Write policy":"Write your first policy"}
+   if(writeButton){writeButton.hidden=!teamRows.length;writeButton.textContent=selectedTeam()?.policy?"Write policy":"Write your first policy"}
    if(!teamRows.length){content.replaceChildren($("div","mt-policy-empty","No team policy is available for your membership yet."));return}
    draw();
   }catch(e){content.replaceChildren($("p","mt-error",e.message||"Team policy could not be loaded."))}
@@ -111,7 +111,7 @@ async function renderTeamPolicy(container,embedded){
    }
   }
  }
- teamSelect.addEventListener("change",draw);
+ teamSelect.addEventListener("change",()=>{if(writeButton)writeButton.textContent=selectedTeam()?.policy?"Write policy":"Write your first policy";draw()});
  function editPolicy(existing){
   const form=$("form","mt-form mt-policy-form"),fields={};
   const defs=[["title","Policy title","Single, clear title for this team's policy."],["objectives","Purpose & objectives","What the team is responsible for achieving."],["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],["standards","Standards & expectations","Define expected quality, conduct and completion standards."],["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]];
