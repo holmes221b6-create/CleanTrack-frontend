@@ -58,11 +58,17 @@ async function renderTeamPolicy(container,embedded){
  root.replaceChildren();if(!embedded)container.append(root);
  const canEdit=role()==="supervisor";
  const head=$("div","mt-policy-toolbar"),teamSelect=select("team_id",[]);
- const teamField=field("Team",teamSelect);head.append(teamField);
- if(canEdit)head.append(btn("+ Write policy",()=>editPolicy(null),true));
+ const teamField=field("Team",teamSelect);
+ const writeButton=canEdit?btn("Write your first policy",openEditor,true):null;
+ head.append(teamField);if(writeButton)head.append(writeButton);
  root.append(head);
  const content=$("div","mt-policy-content");root.append(content);
  let teamRows=[];
+ function selectedTeam(){return teamRows.find(x=>String(x.team.id)===teamSelect.value)||teamRows[0]||null}
+ function openEditor(){
+  if(!selectedTeam()){notice(root,"No team is available for policy creation.",true);return}
+  try{editPolicy(null)}catch(error){console.error("MECHNAR team policy editor:",error);notice(root,error.message||"The policy editor could not be opened.",true)}
+ }
  async function load(){
   content.replaceChildren($("p","mt-muted","Loading team policy…"));
   try{
@@ -70,13 +76,13 @@ async function renderTeamPolicy(container,embedded){
    teamSelect.replaceChildren();
    teamRows.forEach(x=>{const o=$("option","",x.team.name);o.value=x.team.id;teamSelect.append(o)});
    teamField.hidden=teamRows.length<2;
+   if(writeButton){writeButton.hidden=!teamRows.length;writeButton.textContent=teamRows.some(x=>x.policy)?"Write policy":"Write your first policy"}
    if(!teamRows.length){content.replaceChildren($("div","mt-policy-empty","No team policy is available for your membership yet."));return}
    draw();
   }catch(e){content.replaceChildren($("p","mt-error",e.message||"Team policy could not be loaded."))}
  }
  function draw(){
-  const selected=teamRows.find(x=>String(x.team.id)===teamSelect.value)||teamRows[0];
-  content.replaceChildren();if(!selected)return;
+  const selected=selectedTeam();content.replaceChildren();if(!selected)return;
   const policy=selected.policy;
   const teamHead=$("div","mt-policy-teamhead");
   teamHead.append($("div","mt-eyebrow","TEAM STANDARD"),$("h2","",selected.team.name));
@@ -85,45 +91,21 @@ async function renderTeamPolicy(container,embedded){
   if(!policy){
    const empty=$("div","mt-policy-empty");
    empty.append($("strong","","No published policy yet"),$("p","","Your supervisor has not published the team's instructions. Once published, the current policy will appear here for everyone in the team."));
-   content.append(empty);
-   if(canEdit)content.append(btn("Write the first team policy",()=>editPolicy(null),true));
-   return;
+   content.append(empty);return;
   }
   const intro=$("div","mt-policy-intro");
   intro.append($("span","mt-policy-live","● PUBLISHED"),$("span","mt-footnote","Effective version "+policy.version));
   content.append(intro);
-  const sections=[
-   ["Purpose & objectives",policy.objectives],
-   ["Roles & responsibilities",policy.responsibilities],
-   ["Instructions to follow",policy.instructions],
-   ["Standards & expectations",policy.standards],
-   ["Safety guidance",policy.safety_guidance]
-  ];
-  const body=$("article","mt-policy-document");
-  body.append($("h2","mt-policy-document-title",policy.title));
-  sections.forEach(([label,value],index)=>{
-   if(!String(value||"").trim())return;
-   const section=$("section","mt-policy-block");
-   section.append($("h3","",label),$("p","mt-policy-copy",value));
-   body.append(section);
-  });
-  const meta=$("footer","mt-policy-meta");
-  meta.append($("span","","Published "+(policy.published_at?new Date(policy.published_at).toLocaleString():"date unavailable")));
-  body.append(meta);content.append(body);
+  const sections=[["Purpose & objectives",policy.objectives],["Roles & responsibilities",policy.responsibilities],["Instructions to follow",policy.instructions],["Standards & expectations",policy.standards],["Safety guidance",policy.safety_guidance]];
+  const body=$("article","mt-policy-document");body.append($("h2","mt-policy-document-title",policy.title));
+  sections.forEach(([label,value])=>{if(!String(value||"").trim())return;const section=$("section","mt-policy-block");section.append($("h3","",label),$("p","mt-policy-copy",value));body.append(section)});
+  const meta=$("footer","mt-policy-meta");meta.append($("span","","Published "+(policy.published_at?new Date(policy.published_at).toLocaleString():"date unavailable")));body.append(meta);content.append(body);
   if(canEdit){
-   const actions=$("div","mt-policy-actions");
-   actions.append(btn("Publish new version",()=>editPolicy(policy),true));
-   content.append(actions);
+   content.append(btn("Publish new version",()=>editPolicy(policy),true));
    if((selected.drafts||[]).length){
     const drafts=$("section","mt-policy-drafts"),title=$("div","mt-policy-drafts-head");
-    title.append($("h3","","Unpublished drafts"),$("span","mt-footnote",String(selected.drafts.length)+" saved"));
-    drafts.append(title);
-    selected.drafts.forEach(d=>{
-     const row=$("div","mt-policy-draft-row"),copy=$("div","mt-policy-draft-copy");
-     copy.append($("strong","",d.title),$("small","", "Draft · Version "+d.version));
-     row.append(copy,btn("Edit draft",()=>editPolicy(d)));
-     drafts.append(row);
-    });
+    title.append($("h3","","Unpublished drafts"),$("span","mt-footnote",String(selected.drafts.length)+" saved"));drafts.append(title);
+    selected.drafts.forEach(d=>{const row=$("div","mt-policy-draft-row"),copy=$("div","mt-policy-draft-copy");copy.append($("strong","",d.title),$("small","","Draft · Version "+d.version));row.append(copy,btn("Edit draft",()=>editPolicy(d)));drafts.append(row)});
     content.append(drafts);
    }
   }
@@ -131,26 +113,20 @@ async function renderTeamPolicy(container,embedded){
  teamSelect.addEventListener("change",draw);
  function editPolicy(existing){
   const form=$("form","mt-form mt-policy-form"),fields={};
-  const defs=[
-   ["title","Policy title","Single, clear title for this team's policy."],
-   ["objectives","Purpose & objectives","What the team is responsible for achieving."],
-   ["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],
-   ["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],
-   ["standards","Standards & expectations","Define expected quality, conduct and completion standards."],
-   ["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]
-  ];
+  const defs=[["title","Policy title","Single, clear title for this team's policy."],["objectives","Purpose & objectives","What the team is responsible for achieving."],["responsibilities","Roles & responsibilities","Who is responsible for each part of the work."],["instructions","Instructions to follow","Write the actual steps and procedures team members must follow."],["standards","Standards & expectations","Define expected quality, conduct and completion standards."],["safety_guidance","Safety guidance","Required precautions, reporting steps and safety rules."]];
   defs.forEach(([key])=>{fields[key]=key==="title"?input(key,existing?.[key]||""):area(key,existing?.[key]||"")});
   const grid=$("div","mt-policy-form-grid");
-  defs.forEach(([key,label,hint])=>grid.append(field(label,fields[key]),$("small","mt-policy-field-hint",hint)));
+  defs.forEach(([key,label,hint])=>{const group=$("div","mt-policy-field-group");group.append(field(label,fields[key]),$("small","mt-policy-field-hint",hint));grid.append(group)});
   const actions=$("div","mt-policy-form-actions"),save=btn("Save draft",null,false),publish=btn("Publish to team",null,true);
-  save.type=publish.type="button";
-  actions.append(save,publish,btn("Cancel",()=>p.overlay.remove()));
-  form.append(grid,actions);
+  actions.append(save,publish);
   const p=panel(existing?.status==="draft"?"Edit policy draft":existing?"Prepare new policy version":"Write team policy","Review the instructions carefully. Publishing makes this version visible to every member of the selected team.",form);
+  const cancel=btn("Cancel",()=>p.overlay.remove());actions.append(cancel);
+  form.append(grid,actions);
   async function savePolicy(publishNow){
    const title=fields.title.value.trim();
    if(!title){notice(form,"Enter a policy title before saving.",true);fields.title.focus();return}
-   const payload={team_id:Number(teamSelect.value),publish:publishNow};
+   const selected=selectedTeam();if(!selected){notice(form,"Select a team before saving.",true);return}
+   const payload={team_id:Number(selected.team.id),publish:publishNow};
    if(existing?.status==="draft")payload.policy_id=existing.id;
    defs.forEach(([key])=>payload[key]=fields[key].value.trim());
    save.disabled=publish.disabled=true;
