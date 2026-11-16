@@ -742,3 +742,18 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 .ct-team-member-photo-overlay img{max-width:min(88vw,680px);max-height:82vh;object-fit:contain;border:1px solid #514566;border-radius:12px;box-shadow:0 20px 70px rgba(0,0,0,.6)}
 .ct-team-member-photo-close{position:absolute;top:22px;right:22px}
 @media(max-width:520px){.ct-team-fullscreen-shell .ct-team-supervisor-member{align-items:flex-start}.ct-team-fullscreen-shell .ct-team-supervisor-memberidentity{gap:9px}.ct-team-fullscreen-shell .ct-team-member-detail-body{padding:15px}}
+
+/* Operations page mirrors the single-panel metric selector used in Team Overview. */
+.ct-team-fullscreen-shell .ct-team-supervisor-operations-summary{padding:20px;border:1px solid #292c36;border-radius:16px;background:radial-gradient(ellipse at 100% 0%,rgb(118 101 164 / 8%),transparent 48%),#10141c}
+.ct-team-fullscreen-shell .ct-team-operations-filter{display:flex;flex-direction:column;gap:3px;padding:10px;border:1px solid #292c36;border-radius:12px;background:#0d1017;align-self:start}
+.ct-team-fullscreen-shell .ct-team-operations-filter .ct-team-overview-filter-heading{margin:1px 7px 5px}
+.ct-team-fullscreen-shell .ct-team-operations-filter .ct-team-overview-filter-option{min-height:32px;padding:6px 9px;font-size:.81rem;line-height:1.2}
+.ct-team-fullscreen-shell .ct-team-operations-display{min-height:320px;padding:28px}
+.ct-team-fullscreen-shell .ct-team-operations-result-list{width:100%;margin-top:18px}
+.ct-team-fullscreen-shell .ct-team-operations-result-list .ct-team-supervisor-operation{padding:12px 0;border-top:1px solid #292c36}
+@media(max-width:760px){
+ .ct-team-fullscreen-shell .ct-team-supervisor-operations-summary{padding:16px}
+ .ct-team-fullscreen-shell .ct-team-operations-filter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:9px}
+ .ct-team-fullscreen-shell .ct-team-operations-filter .ct-team-overview-filter-heading{grid-column:1/-1}
+ .ct-team-fullscreen-shell .ct-team-operations-display{min-height:240px;padding:22px}
+}
