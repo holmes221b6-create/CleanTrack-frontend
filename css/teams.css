@@ -686,3 +686,12 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 .ct-team-fullscreen-shell .ct-team-controls-panel .ct-team-history-panel-body{max-height:calc(88vh - 90px);overflow:auto}
 .ct-team-fullscreen-shell .ct-team-controls-panel .ct-team-supervisor-management{margin:0}
 @media(max-width:560px){.ct-team-fullscreen-shell .ct-team-supervisor-controls-entry{align-items:flex-start;flex-direction:column}.ct-team-fullscreen-shell .ct-team-controls-panel{width:calc(100vw - 18px);max-height:92vh}}
+
+/* Team Leader assignment controls inside the Supervisor permitted-controls panel. */
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-controls{margin-top:24px;padding-top:18px;border-top:1px solid #292c36}
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-controls h3{margin:0 0 7px}
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-current{margin:12px 0;padding:11px 13px;border:1px solid #393148;border-radius:9px;background:rgba(142,122,184,.08);color:#e4d9f4;font-size:.88rem}
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-controls>.ct-team-input{width:100%;margin:4px 0 10px}
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions{display:flex;gap:9px;flex-wrap:wrap}
+.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-notice{margin:12px 0 0;color:#c8b9e6;font-size:.84rem}
+@media(max-width:460px){.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions{flex-direction:column}.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions button{width:100%}}
