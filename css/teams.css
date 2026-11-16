@@ -695,3 +695,21 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 .ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions{display:flex;gap:9px;flex-wrap:wrap}
 .ct-team-fullscreen-shell .ct-team-supervisor-teamleader-notice{margin:12px 0 0;color:#c8b9e6;font-size:.84rem}
 @media(max-width:460px){.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions{flex-direction:column}.ct-team-fullscreen-shell .ct-team-supervisor-teamleader-actions button{width:100%}}
+
+/* Tighten Supervisor Overview metric rail and result panel to sit neatly within page padding. */
+.ct-team-fullscreen-shell .ct-team-supervisor-overview-summary{padding:20px}
+.ct-team-fullscreen-shell .ct-team-overview-layout{margin-top:14px;gap:14px;align-items:stretch}
+.ct-team-fullscreen-shell .ct-team-overview-filter{gap:3px;padding:10px;align-self:start}
+.ct-team-fullscreen-shell .ct-team-overview-filter-heading{margin:1px 7px 5px}
+.ct-team-fullscreen-shell .ct-team-overview-filter-option{min-height:32px;padding:6px 9px;font-size:.81rem;line-height:1.2}
+.ct-team-fullscreen-shell .ct-team-overview-display{min-height:320px;padding:28px;align-self:stretch}
+.ct-team-fullscreen-shell .ct-team-overview-display-head{margin-bottom:10px}
+.ct-team-fullscreen-shell .ct-team-overview-primary-value{font-size:clamp(2.6rem,5.2vw,4.5rem);margin:4px 0 9px}
+.ct-team-fullscreen-shell .ct-team-overview-detail{font-size:.94rem;line-height:1.45}
+.ct-team-fullscreen-shell .ct-team-overview-note{margin-top:9px}
+@media(max-width:760px){
+ .ct-team-fullscreen-shell .ct-team-supervisor-overview-summary{padding:16px}
+ .ct-team-fullscreen-shell .ct-team-overview-filter{padding:9px}
+ .ct-team-fullscreen-shell .ct-team-overview-filter-option{min-height:34px}
+ .ct-team-fullscreen-shell .ct-team-overview-display{min-height:240px;padding:22px}
+}
