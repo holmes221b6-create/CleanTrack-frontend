@@ -390,7 +390,7 @@ async function renderSupervisorTeams(container){
    panelTitle.append(el("p","ct-team-eyebrow","SUPERVISOR WORKSPACE"),el("h2","","Permitted team controls"));
    const closePanel=button("×","ct-team-fullscreen-close",closeControls);closePanel.setAttribute("aria-label","Close permitted team controls");closePanel.title="Close";
    panelHead.append(panelTitle,closePanel);panel.append(panelHead);
-   const panelBody=el("div","ct-team-history-panel-body");panelBody.append(management);panel.append(panelBody);overlay.append(panel);
+   const panelBody=el("div","ct-team-history-panel-body");panelBody.append(management);panel.append(panelBody);overlay.append(panel);leaderCurrent.textContent="Loading current Team Leader…";leaderNotice.hidden=true;try{leaderState=await API.get("quality/team-leader/"+encodeURIComponent(t.id));paintLeaderState()}catch(err){leaderCurrent.textContent=err.message||"Could not load Team Leader assignment.";removeLeaderBtn.disabled=true}
    overlay.addEventListener("click",event=>{if(event.target===overlay)closeControls()});
    function closeControls(){overlay.remove();document.removeEventListener("keydown",onControlsKey)}
    const onControlsKey=event=>{if(event.key==="Escape")closeControls()};
@@ -413,6 +413,55 @@ async function renderSupervisorTeams(container){
   const assignGrid=el("div","ct-team-supervisor-management-grid"),opField=el("label","ct-team-supervisor-management-field"),staffField=el("label","ct-team-supervisor-management-field");opField.append(el("span","","Operation"),opSelect);staffField.append(el("span","","Assign to Staff"),staffSelect);assignGrid.append(opField,staffField);
   const assignBtn=button("Assign / reassign","ct-team-btn ct-team-btn--primary",async()=>{if(!opSelect.value||!staffSelect.value){noticeNode.hidden=false;noticeNode.textContent="Choose an operation and a Staff member.";return}assignBtn.disabled=true;try{await API.patch("operations/"+encodeURIComponent(opSelect.value),{assigned_to_id:Number(staffSelect.value)});noticeNode.hidden=false;noticeNode.textContent="Assignment updated and recorded. Refreshing team data…";const refreshed=await API.get("teams/supervisor/mine");await renderOwn(refreshed);}catch(e){noticeNode.hidden=false;noticeNode.textContent=e.message||"Assignment could not be updated.";}finally{assignBtn.disabled=false;}});
   management.append(el("p","ct-team-muted","Only active Staff in this team are selectable. Assignment changes are recorded in operation history."),assignGrid,assignBtn);
+  const leaderSection=el("section","ct-team-supervisor-teamleader-controls");
+  leaderSection.append(el("h3","","Team Leader designation"),el("p","ct-team-muted","Assign one active Staff member as Team Leader for this team. This adds inspection access without changing their Staff role or existing data."));
+  const leaderCurrent=el("p","ct-team-supervisor-teamleader-current","Loading current Team Leader…");
+  const leaderSelect=el("select","ct-team-input");leaderSelect.setAttribute("aria-label","Select Staff member to designate as Team Leader");
+  const leaderPlaceholder=el("option","","Select an active Staff member");leaderPlaceholder.value="";leaderSelect.append(leaderPlaceholder);
+  const eligibleStaff=(data.members||[]).filter(m=>String(m.role||"").toLowerCase()==="staff"&&String(m.account_status||"").toLowerCase()==="active");
+  eligibleStaff.forEach(m=>{const option=el("option","",m.name||m.full_name||("Staff #"+m.id));option.value=String(m.id);leaderSelect.append(option)});
+  const leaderActions=el("div","ct-team-supervisor-teamleader-actions");
+  const setLeaderBtn=button("Assign Team Leader","ct-team-btn ct-team-btn--primary",async()=>{
+   if(!leaderSelect.value){leaderNotice.hidden=false;leaderNotice.textContent="Select an active Staff member first.";return}
+   const chosen=eligibleStaff.find(m=>String(m.id)===String(leaderSelect.value));
+   const currentName=leaderState?.team_leader?.name;
+   const promptText=currentName?"Assign "+(chosen?.name||chosen?.full_name||"this Staff member")+" and replace "+currentName+" as Team Leader?":"Assign "+(chosen?.name||chosen?.full_name||"this Staff member")+" as Team Leader?";
+   if(!confirm(promptText+" Their Staff role, team membership and existing data will remain unchanged."))return;
+   setLeaderBtn.disabled=true;
+   try{
+    await API.request("quality/team-leader/"+encodeURIComponent(t.id),{method:"PUT",body:{staff_id:Number(leaderSelect.value)}});
+    leaderState=await API.get("quality/team-leader/"+encodeURIComponent(t.id));
+    paintLeaderState();
+    leaderNotice.hidden=false;leaderNotice.textContent=(chosen?.name||chosen?.full_name||"Staff member")+" is now the Team Leader.";
+   }catch(err){leaderNotice.hidden=false;leaderNotice.textContent=err.message||"Could not update Team Leader designation."}
+   finally{setLeaderBtn.disabled=false}
+  });
+  const removeLeaderBtn=button("Remove Team Leader","ct-team-btn",async()=>{
+   if(!leaderState?.team_leader){return}
+   if(!confirm("Remove "+leaderState.team_leader.name+"'s Team Leader designation? Their Staff role and existing data will remain unchanged."))return;
+   removeLeaderBtn.disabled=true;
+   try{
+    await API.request("quality/team-leader/"+encodeURIComponent(t.id),{method:"PUT",body:{staff_id:null}});
+    leaderState=await API.get("quality/team-leader/"+encodeURIComponent(t.id));
+    paintLeaderState();
+    leaderNotice.hidden=false;leaderNotice.textContent="Team Leader designation removed.";
+   }catch(err){leaderNotice.hidden=false;leaderNotice.textContent=err.message||"Could not remove Team Leader designation."}
+   finally{removeLeaderBtn.disabled=false}
+  });
+  leaderActions.append(setLeaderBtn,removeLeaderBtn);
+  const leaderNotice=el("p","ct-team-supervisor-teamleader-notice");leaderNotice.hidden=true;
+  leaderSection.append(leaderCurrent,leaderSelect,leaderActions,leaderNotice);
+  let leaderState=null;
+  function paintLeaderState(){
+   const current=leaderState?.team_leader;
+   leaderCurrent.textContent=current?"Current Team Leader: "+current.name:"No Team Leader is currently assigned.";
+   removeLeaderBtn.disabled=!current;
+   setLeaderBtn.textContent=current?"Replace Team Leader":"Assign Team Leader";
+   leaderSelect.value="";
+  }
+  leaderSection.dataset.teamLeaderControls="true";
+  management.append(leaderSection);
+
   const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
   const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
   const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
