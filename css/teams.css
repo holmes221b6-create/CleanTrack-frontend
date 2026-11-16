@@ -681,8 +681,8 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 /* Supervisor overview controls open in their own dismissible workspace panel. */
 .ct-team-fullscreen-shell .ct-team-supervisor-controls-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:16px 18px;border:1px solid #292c36;border-radius:12px;background:#10141c}
 .ct-team-fullscreen-shell .ct-team-supervisor-controls-entry>p{margin:0}
-.ct-team-fullscreen-shell .ct-team-controls-overlay{z-index:2147483647}
-.ct-team-fullscreen-shell .ct-team-controls-panel{width:min(760px,calc(100vw - 32px));max-height:min(88vh,900px)}
+.ct-team-fullscreen-shell .ct-team-controls-overlay{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,7,18,.78);backdrop-filter:blur(6px)}
+.ct-team-fullscreen-shell .ct-team-controls-panel{width:min(760px,calc(100vw - 32px));max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden}
 .ct-team-fullscreen-shell .ct-team-controls-panel .ct-team-history-panel-body{max-height:calc(88vh - 90px);overflow:auto}
 .ct-team-fullscreen-shell .ct-team-controls-panel .ct-team-supervisor-management{margin:0}
 @media(max-width:560px){.ct-team-fullscreen-shell .ct-team-supervisor-controls-entry{align-items:flex-start;flex-direction:column}.ct-team-fullscreen-shell .ct-team-controls-panel{width:calc(100vw - 18px);max-height:92vh}}
