@@ -32,6 +32,42 @@ async function render(root){
   const skills=el("textarea","mp-own-profile-input");skills.name="skills";skills.rows=4;skills.maxLength=2500;skills.value=Array.isArray(user.skills)?user.skills.join("\n"):"";skills.placeholder="Add one skill per line";
   function field(label,input,hint){const wrap=el("label","mp-own-profile-field");wrap.append(el("span","",label),input);if(hint)wrap.append(el("small","mp-muted",hint));return wrap;}
   const grid=el("div","mp-own-profile-grid");grid.append(field("Full name",name),field("Email address",email,"Email changes are managed separately."),field("Phone number",phone),field("Skills",skills,"These appear in your Personnel profile."));
+  const qualificationSection=el("section","mp-own-profile-qualifications"),qualificationHead=el("div","mp-own-profile-qualification-head");
+  qualificationHead.append(el("strong","","Qualifications & certifications"),el("small","mp-muted","Add supporting documents to the profile your Supervisor sees."));
+  const qualificationList=el("div","mp-own-profile-qualification-list"),qualificationForm=el("div","mp-own-profile-qualification-form");
+  const qTitle=el("input","mp-own-profile-input");qTitle.placeholder="Qualification or certification title";qTitle.maxLength=180;
+  const qIssuer=el("input","mp-own-profile-input");qIssuer.placeholder="Issuing organisation (optional)";qIssuer.maxLength=180;
+  const qDate=el("input","mp-own-profile-input");qDate.type="date";
+  const qFile=el("input","mp-own-profile-input");qFile.type="file";qFile.accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp";
+  const qAdd=el("button","mp-secondary","Add qualification");qAdd.type="button";
+  qualificationForm.append(qTitle,qIssuer,qDate,qFile,qAdd);qualificationSection.append(qualificationHead,qualificationList,qualificationForm);
+  async function loadQualifications(){
+   qualificationList.replaceChildren(el("small","mp-muted","Loading qualifications…"));
+   try{
+    const result=await API.get("auth/me/qualifications");qualificationList.replaceChildren();
+    const rows=result.qualifications||[];
+    if(!rows.length)qualificationList.append(el("small","mp-muted","No qualifications or certifications added yet."));
+    rows.forEach(item=>{
+     const row=el("div","mp-own-profile-qualification-row"),copy=el("div","");
+     copy.append(el("strong","",item.title),el("small","mp-muted",[item.issuer,item.issue_date,item.file_name].filter(Boolean).join(" · ")));
+     const remove=el("button","mp-own-profile-qualification-remove","Remove");remove.type="button";
+     remove.onclick=async()=>{remove.disabled=true;try{await API.delete("auth/me/qualifications/"+item.id);await loadQualifications();}catch(err){notice(err.message||"Could not remove qualification.",true);remove.disabled=false;}};
+     row.append(copy,remove);qualificationList.append(row);
+    });
+   }catch(err){qualificationList.replaceChildren(el("small","mp-error",err.message||"Could not load qualifications."));}
+  }
+  qAdd.onclick=async()=>{
+   const title=qTitle.value.trim(),file=qFile.files?.[0];
+   if(title.length<2){notice("Enter the qualification title.",true);return;}
+   if(!file){notice("Choose the supporting document.",true);return;}
+   if(file.size>5*1024*1024){notice("Choose a document smaller than 5 MB.",true);return;}
+   const data=new FormData();data.append("title",title);data.append("issuer",qIssuer.value.trim());data.append("issue_date",qDate.value);data.append("file",file);
+   qAdd.disabled=true;qAdd.textContent="Uploading…";
+   try{await API.post("auth/me/qualifications",data);qTitle.value="";qIssuer.value="";qDate.value="";qFile.value="";await loadQualifications();notice("Qualification added.");}
+   catch(err){notice(err.message||"Qualification could not be added.",true);}
+   finally{qAdd.disabled=false;qAdd.textContent="Add qualification";}
+  };
+  form.append(qualificationSection);loadQualifications();
   const actions=el("footer","mp-own-profile-actions"),status=el("p","mp-own-profile-status"),save=el("button","mp-primary","Save profile"),cancel=el("button","mp-secondary","Cancel");save.type="submit";cancel.type="button";
   actions.append(status,cancel,save);form.append(photoArea,grid,actions);panel.append(top,form);overlay.append(panel);root.append(overlay);
   const dismiss=()=>overlay.remove();close.onclick=cancel.onclick=dismiss;overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});
