@@ -394,7 +394,7 @@ async function renderSupervisorTeams(container){
    overlay.addEventListener("click",event=>{if(event.target===overlay)closeControls()});
    function closeControls(){overlay.remove();document.removeEventListener("keydown",onControlsKey)}
    const onControlsKey=event=>{if(event.key==="Escape")closeControls()};
-   document.addEventListener("keydown",onControlsKey);document.body.append(overlay);closePanel.focus();
+   document.addEventListener("keydown",onControlsKey);shell.append(overlay);closePanel.focus();
   });
   controlsEntry.append(openControls);own.append(controlsEntry);
   const management=el("section","ct-team-supervisor-page-section ct-team-supervisor-management");
