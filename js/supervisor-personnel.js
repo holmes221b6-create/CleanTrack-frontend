@@ -7,12 +7,63 @@ const date=v=>v?new Date(v).toLocaleDateString():"—";
 const time=v=>v?new Date(v).toLocaleString():"";
 const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
 async function render(root){
- root.innerHTML='<div class="mp-page-toolbar"><button class="mp-page-back" type="button"><span aria-hidden="true">←</span><span>Back to Workspace</span></button><span class="mp-page-context">PERSONNEL</span></div><section class="mp-shell"><aside class="mp-rail"><header class="mp-rail-head"><div><span class="mp-kicker">YOUR TEAM</span><h1>Personnel</h1><p>People and conversations</p></div><div class="mp-rail-actions"><button class="mp-onboarding" type="button">Onboarding</button><button class="mp-invite" type="button" aria-label="Invite staff">＋</button></div></header><label class="mp-search"><span>⌕</span><input type="search" placeholder="Search contacts" aria-label="Search contacts"></label><div class="mp-filter"><button class="active" data-filter="all">All</button><button data-filter="recent">Recent chats</button></div><div class="mp-contact-list" aria-live="polite"></div></aside><section class="mp-main"><div class="mp-empty"><div class="mp-empty-mark">M</div><h2>Your team, connected.</h2><p>Select a contact to view their details, or open their name to start a conversation.</p></div></section></section>';
+ root.innerHTML='<div class="mp-page-toolbar"><button class="mp-page-back" type="button"><span aria-hidden="true">←</span><span>Back to Workspace</span></button><span class="mp-page-context">PERSONNEL</span></div><section class="mp-shell"><aside class="mp-rail"><header class="mp-rail-head"><div><span class="mp-kicker">YOUR TEAM</span><h1>Personnel</h1><p>People and conversations</p></div><div class="mp-rail-actions"><button class="mp-my-profile" type="button">My Profile</button><button class="mp-onboarding" type="button">Onboarding</button><button class="mp-invite" type="button" aria-label="Invite staff">＋</button></div></header><label class="mp-search"><span>⌕</span><input type="search" placeholder="Search contacts" aria-label="Search contacts"></label><div class="mp-filter"><button class="active" data-filter="all">All</button><button data-filter="recent">Recent chats</button></div><div class="mp-contact-list" aria-live="polite"></div></aside><section class="mp-main"><div class="mp-empty"><div class="mp-empty-mark">M</div><h2>Your team, connected.</h2><p>Select a contact to view their details, or open their name to start a conversation.</p></div></section></section>';
  const pageBack=root.querySelector(".mp-page-back");
  pageBack.addEventListener("click",()=>window.dispatchEvent(new CustomEvent("cleantrack:navigate",{detail:{page:"workspace"}})));
  const rail=root.querySelector(".mp-rail"),list=root.querySelector(".mp-contact-list"),main=root.querySelector(".mp-main"),search=root.querySelector(".mp-search input");
  let members=[],selected=null,mode="empty",filter="all",profileTab="overview",profileRefreshTimer=null,teamLeaderState=null;
  const notice=(msg,bad=false)=>{let n=root.querySelector(".mp-toast");if(!n){n=el("div","mp-toast");root.append(n)}n.textContent=msg;n.classList.toggle("bad",bad);n.hidden=false;setTimeout(()=>n.hidden=true,3500)};
+ async function openOwnProfile(){
+  let user={...(window.CleanTrackAuth?.getCurrentUser?.()||{})};
+  try{user={...user,...((await API.get("auth/me")).user||{})};}catch(e){notice(e.message||"Could not load your profile.",true);return;}
+  const overlay=el("div","mp-own-profile-overlay"),panel=el("section","mp-own-profile-panel");
+  const top=el("header","mp-own-profile-head"),heading=el("div","");
+  heading.append(el("span","mp-kicker","PERSONAL DETAILS"),el("h2","","My Personnel Profile"),el("p","mp-muted","This profile is visible to your team. Your top-right account avatar remains separate."));
+  const close=el("button","mp-own-profile-close","×");close.type="button";close.setAttribute("aria-label","Close profile editor");top.append(heading,close);
+  const form=el("form","mp-own-profile-form"),photoArea=el("div","mp-own-profile-photo-area"),photo=el("button","mp-own-profile-photo",user.personnel_avatar_url?"":"＋"),file=el("input","");file.type="file";file.accept="image/png,image/jpeg,image/webp";file.hidden=true;
+  const photoCopy=el("div","");photoCopy.append(el("strong","","Profile picture"),el("small","mp-muted","JPG, PNG or WEBP · maximum 2 MB before compression"));
+  photo.type="button";photo.setAttribute("aria-label","Change Personnel profile picture");
+  let photoValue=user.personnel_avatar_url||"";
+  function paintPhoto(){photo.textContent=photoValue?"":(String(user.full_name||user.name||"U").trim().charAt(0).toUpperCase()||"U");photo.style.backgroundImage=photoValue?"url('"+photoValue.replace(/['()\\]/g,"")+"')":"";photo.style.backgroundSize="cover";photo.style.backgroundPosition="center";photo.style.color=photoValue?"transparent":"";}
+  paintPhoto();photo.onclick=()=>file.click();photoArea.append(photo,photoCopy,file);
+  const name=el("input","mp-own-profile-input");name.name="full_name";name.value=user.full_name||user.name||"";name.required=true;name.minLength=2;name.maxLength=120;
+  const email=el("input","mp-own-profile-input");email.value=user.email||"";email.readOnly=true;
+  const phone=el("input","mp-own-profile-input");phone.name="phone";phone.value=user.phone||"";phone.maxLength=30;
+  const skills=el("textarea","mp-own-profile-input");skills.name="skills";skills.rows=4;skills.maxLength=2500;skills.value=Array.isArray(user.skills)?user.skills.join("\n"):"";skills.placeholder="Add one skill per line";
+  function field(label,input,hint){const wrap=el("label","mp-own-profile-field");wrap.append(el("span","",label),input);if(hint)wrap.append(el("small","mp-muted",hint));return wrap;}
+  const grid=el("div","mp-own-profile-grid");grid.append(field("Full name",name),field("Email address",email,"Email changes are managed separately."),field("Phone number",phone),field("Skills",skills,"These appear in your Personnel profile."));
+  const actions=el("footer","mp-own-profile-actions"),status=el("p","mp-own-profile-status"),save=el("button","mp-primary","Save profile"),cancel=el("button","mp-secondary","Cancel");save.type="submit";cancel.type="button";
+  actions.append(status,cancel,save);form.append(photoArea,grid,actions);panel.append(top,form);overlay.append(panel);root.append(overlay);
+  const dismiss=()=>overlay.remove();close.onclick=cancel.onclick=dismiss;overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});
+  file.addEventListener("change",()=>{
+   const chosen=file.files?.[0];if(!chosen)return;
+   if(!/^image\/(png|jpeg|webp)$/.test(chosen.type||"")){notice("Choose a JPG, PNG or WEBP image.",true);file.value="";return;}
+   if(chosen.size>2*1024*1024){notice("Choose an image smaller than 2 MB.",true);file.value="";return;}
+   const reader=new FileReader();reader.onload=()=>{
+    const image=new Image();image.onload=()=>{
+     const canvas=document.createElement("canvas"),max=280,scale=Math.min(1,max/Math.max(image.width,image.height));canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+     const ctx=canvas.getContext("2d");ctx.drawImage(image,0,0,canvas.width,canvas.height);
+     photoValue=canvas.toDataURL("image/jpeg",0.78);
+     if(photoValue.length>190000)photoValue=canvas.toDataURL("image/jpeg",0.58);
+     if(photoValue.length>200000){notice("This image is too detailed to store. Choose a smaller image.",true);photoValue=user.personnel_avatar_url||"";return;}
+     paintPhoto();
+    };image.onerror=()=>notice("This image could not be opened.",true);image.src=String(reader.result||"");
+   };reader.onerror=()=>notice("Unable to read this image.",true);reader.readAsDataURL(chosen);
+  });
+  form.addEventListener("submit",async e=>{
+   e.preventDefault();if(!name.value.trim()||name.value.trim().length<2){notice("Enter a name with at least 2 characters.",true);return;}
+   save.disabled=true;save.textContent="Saving…";status.textContent="";
+   try{
+    const cleanSkills=skills.value.split(/[\n,]/).map(x=>x.trim()).filter(Boolean).slice(0,40);
+    const result=await API.patch("auth/me",{full_name:name.value.trim(),phone:phone.value.trim(),skills:cleanSkills,personnel_avatar_url:photoValue});
+    const updated=result.user||{},current=window.CleanTrackAuth?.getCurrentUser?.();
+    if(current)Object.assign(current,{name:updated.full_name||name.value.trim(),full_name:updated.full_name||name.value.trim(),phone:updated.phone||phone.value.trim(),skills:updated.skills||cleanSkills,personnel_avatar_url:updated.personnel_avatar_url??photoValue});
+    user={...user,...updated};members.forEach(m=>{if(String(m.id)===String(user.id)){m.name=user.full_name||user.name;m.phone=user.phone;m.avatar_url=user.personnel_avatar_url;}});
+    paintList();document.dispatchEvent(new CustomEvent("cleantrack:personnel-profile-updated",{detail:{userId:user.id,avatarUrl:user.personnel_avatar_url||"",name:user.full_name||user.name||""}}));
+    notice("Personnel profile updated.");dismiss();
+   }catch(err){notice(err.message||"Profile could not be saved.",true);save.disabled=false;save.textContent="Save profile";}
+  });
+ }
  const avatar=(m,large=false)=>{const a=el("span","mp-avatar"+(large?" large":""));if(m.avatar_url){const img=document.createElement("img");img.src=m.avatar_url;img.alt="";a.append(img)}else a.textContent=initials(m.name);return a};
  async function load(){try{teamLeaderState=await API.get("quality/team-leader");}catch(_){teamLeaderState=null;}list.innerHTML='<p class="mp-loading">Loading your team…</p>';try{const data=await API.get("supervisor/personnel");members=data.members||[];members.forEach(m=>{m.designation=String(m.id)===String(teamLeaderState?.team_leader?.id)?"Team Leader":"Staff";});paintList();}catch(e){list.innerHTML='<p class="mp-error">'+esc(e.message)+'</p>';}}
  function paintList(){
@@ -151,7 +202,7 @@ async function render(root){
  }
  async function openOnboarding(){selected=null;mode="onboarding";main.innerHTML='<section class="mp-onboarding-panel"><header class="mp-info-topbar"><button class="mp-info-back" type="button">‹</button><strong>Staff onboarding</strong><span class="mp-onboarding-subtitle">Joining and orientation progress</span></header><div class="mp-onboarding-body"><p class="mp-loading">Loading onboarding records…</p></div></section>';main.querySelector(".mp-info-back").onclick=()=>{mode="empty";main.innerHTML='<div class="mp-empty"><div class="mp-empty-mark">M</div><h2>Your team, connected.</h2><p>Select a contact to view their details, or open their name to start a conversation.</p></div>'};const body=main.querySelector(".mp-onboarding-body");try{const data=await API.get("supervisor/personnel/onboarding");body.replaceChildren();(data.onboarding||[]).forEach(record=>{const card=el("article","mp-onboard-card");const head=el("div","mp-onboard-head");head.append(el("strong","",record.name),el("span","",record.status==="completed"?"Completed":record.status==="in_progress"?"In progress":"Not started"));card.append(head);const progress=el("div","mp-progress");const fill=el("span");fill.style.width=(record.progress||0)+"%";progress.append(fill);card.append(progress,el("small","mp-muted",record.completed_steps+" of "+record.total_steps+" steps completed"));const action=el("button","mp-primary",record.status==="not_started"?"Start onboarding":"Open checklist");action.type="button";action.onclick=async()=>{try{if(record.status==="not_started")await API.post("supervisor/personnel/"+record.staff_id+"/onboarding",{});const current=await API.get("supervisor/personnel/onboarding");const fresh=(current.onboarding||[]).find(x=>x.staff_id===record.staff_id);if(!fresh)return;drawChecklist(fresh);}catch(err){notice(err.message,true)}};card.append(action);body.append(card)});if(!(data.onboarding||[]).length)body.append(el("p","mp-muted","No active staff members are assigned to your team."));}catch(err){body.replaceChildren(el("p","mp-error",err.message))}}
  function drawChecklist(record){const body=main.querySelector(".mp-onboarding-body");body.replaceChildren();body.append(el("h2","",record.name+" · Onboarding checklist"),el("p","mp-muted","Tick each step only after it has been completed and verified."));const checks=el("div","mp-onboard-checks");record.steps.forEach(step=>{const label=el("label","mp-onboard-step");const box=document.createElement("input");box.type="checkbox";box.checked=Boolean(step.done);box.dataset.step=step.id;label.append(box,el("span","",step.label));checks.append(label)});body.append(checks);const notes=el("textarea","mp-onboard-notes");notes.maxLength=4000;notes.placeholder="Supervisor notes (optional)";notes.value=record.notes||"";body.append(notes);const save=el("button","mp-primary","Save onboarding progress");save.type="button";save.onclick=async()=>{save.disabled=true;try{const steps=Array.from(checks.querySelectorAll("input")).map(box=>({id:box.dataset.step,done:box.checked,completed_at:box.checked?new Date().toISOString():null}));await API.patch("supervisor/personnel/"+record.staff_id+"/onboarding",{steps,notes:notes.value});notice("Onboarding progress saved.");openOnboarding();}catch(err){notice(err.message,true)}finally{save.disabled=false}};body.append(save)}
- root.querySelector(".mp-invite").onclick=invite;root.querySelector(".mp-onboarding").onclick=openOnboarding;search.addEventListener("input",paintList);
+ root.querySelector(".mp-my-profile").onclick=openOwnProfile;root.querySelector(".mp-invite").onclick=invite;root.querySelector(".mp-onboarding").onclick=openOnboarding;search.addEventListener("input",paintList);
  root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;root.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));paintList()});
  await load();
 }
