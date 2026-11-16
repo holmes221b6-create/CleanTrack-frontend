@@ -268,38 +268,7 @@
       }
 
       button.addEventListener("click", function () {
-        if (item.id !== "teams") {
-          setActivePage(item.id);
-          return;
-        }
-        if (window.__MECHNAR_TEAMS_LOADING__) return;
-        window.__MECHNAR_TEAMS_LOADING__ = true;
-        let overlay = document.getElementById("mechnar-teams-loading");
-        if (!overlay) {
-          if (!document.getElementById("mechnar-teams-loading-style")) {
-            const style = document.createElement("style");
-            style.id = "mechnar-teams-loading-style";
-            style.textContent =
-              "#mechnar-teams-loading{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(9,9,12,.94);backdrop-filter:blur(9px);color:#f1eef8;font-family:inherit}" +
-              "#mechnar-teams-loading .mt-loading-ring{width:48px;height:48px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:mtTeamsSpin .82s linear infinite}" +
-              "#mechnar-teams-loading .mt-loading-label{font-size:15px;font-weight:600;letter-spacing:.025em}" +
-              "#mechnar-teams-loading .mt-loading-sub{margin-top:-12px;font-size:12px;color:#9b95a8}" +
-              "@keyframes mtTeamsSpin{to{transform:rotate(360deg)}}" +
-              "@media(prefers-reduced-motion:reduce){#mechnar-teams-loading .mt-loading-ring{animation-duration:2.4s}}";
-            document.head.appendChild(style);
-          }
-          overlay = document.createElement("div");
-          overlay.id = "mechnar-teams-loading";
-          overlay.setAttribute("role", "status");
-          overlay.setAttribute("aria-live", "polite");
-          overlay.innerHTML = '<span class="mt-loading-ring" aria-hidden="true"></span><span class="mt-loading-label">Working on it</span><span class="mt-loading-sub">Opening Teams</span>';
-          document.body.appendChild(overlay);
-        }
-        window.setTimeout(function () {
-          setActivePage("teams");
-          if (overlay && overlay.isConnected) overlay.remove();
-          window.__MECHNAR_TEAMS_LOADING__ = false;
-        }, 3000);
+        if (item.id !== "teams") setActivePage(item.id);
       });
       return button;
     }
@@ -374,6 +343,40 @@
       }
     );
   }
+
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest('#workspace-navigation .nav-item[data-page="teams"]');
+    if (!button || !auth.getCurrentUser()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (window.__MECHNAR_TEAMS_LOADING__) return;
+    window.__MECHNAR_TEAMS_LOADING__ = true;
+    const overlay = document.createElement("div");
+    overlay.id = "mechnar-teams-loading";
+    overlay.setAttribute("role", "status");
+    overlay.setAttribute("aria-live", "polite");
+    overlay.innerHTML = '<span class="mt-loading-ring" aria-hidden="true"></span><span class="mt-loading-label">Working on it</span><span class="mt-loading-sub">Opening Teams</span>';
+    if (!document.getElementById("mechnar-teams-loading-style")) {
+      const style = document.createElement("style");
+      style.id = "mechnar-teams-loading-style";
+      style.textContent =
+        "#mechnar-teams-loading{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(9,9,12,.97);backdrop-filter:blur(9px);color:#f1eef8;font-family:inherit}" +
+        "#mechnar-teams-loading .mt-loading-ring{width:48px;height:48px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:mtTeamsSpin .82s linear infinite}" +
+        "#mechnar-teams-loading .mt-loading-label{font-size:15px;font-weight:600;letter-spacing:.025em}" +
+        "#mechnar-teams-loading .mt-loading-sub{margin-top:-12px;font-size:12px;color:#9b95a8}" +
+        "@keyframes mtTeamsSpin{to{transform:rotate(360deg)}}" +
+        "@media(prefers-reduced-motion:reduce){#mechnar-teams-loading .mt-loading-ring{animation-duration:2.4s}}";
+      document.head.appendChild(style);
+    }
+    document.body.appendChild(overlay);
+    window.setTimeout(function () {
+      try { setActivePage("teams"); }
+      finally {
+        overlay.remove();
+        window.__MECHNAR_TEAMS_LOADING__ = false;
+      }
+    }, 3000);
+  }, true);
 
   document.addEventListener("DOMContentLoaded", ensureBackButton);
   if (document.readyState !== "loading") ensureBackButton();
