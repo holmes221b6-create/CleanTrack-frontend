@@ -381,6 +381,22 @@ async function renderSupervisorTeams(container){
    option.dataset.overviewMetric=item.key;option.setAttribute("aria-pressed","false");filterPane.append(option);
   });
   overviewLayout.append(filterPane,display);summary.append(overviewLayout);renderSelected("members");own.append(summary);
+  const controlsEntry=el("section","ct-team-supervisor-controls-entry");
+  controlsEntry.append(el("p","ct-team-eyebrow","TEAM CONTROLS"),el("p","ct-team-muted","Team details and assignment coordination are available in a separate panel."));
+  const openControls=button("Open permitted team controls","ct-team-btn ct-team-btn--primary",()=>{
+   const overlay=el("div","ct-team-history-overlay ct-team-controls-overlay");
+   const panel=el("section","ct-team-history-panel ct-team-controls-panel");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","Permitted team controls");
+   const panelHead=el("header","ct-team-history-panel-head"),panelTitle=el("div","");
+   panelTitle.append(el("p","ct-team-eyebrow","SUPERVISOR WORKSPACE"),el("h2","","Permitted team controls"));
+   const closePanel=button("×","ct-team-fullscreen-close",closeControls);closePanel.setAttribute("aria-label","Close permitted team controls");closePanel.title="Close";
+   panelHead.append(panelTitle,closePanel);panel.append(panelHead);
+   const panelBody=el("div","ct-team-history-panel-body");panelBody.append(management);panel.append(panelBody);overlay.append(panel);
+   overlay.addEventListener("click",event=>{if(event.target===overlay)closeControls()});
+   function closeControls(){overlay.remove();document.removeEventListener("keydown",onControlsKey)}
+   const onControlsKey=event=>{if(event.key==="Escape")closeControls()};
+   document.addEventListener("keydown",onControlsKey);document.body.append(overlay);closePanel.focus();
+  });
+  controlsEntry.append(openControls);own.append(controlsEntry);
   const management=el("section","ct-team-supervisor-page-section ct-team-supervisor-management");
   management.append(el("p","ct-team-eyebrow","PERMITTED TEAM CONTROLS"),el("h2","","Team management & assignment coordination"),el("p","ct-team-muted","Edit permitted team details and coordinate assignments. Admin retains team creation, deletion and final membership authority."));
   const descInput=el("textarea","ct-team-input");descInput.rows=3;descInput.maxLength=2000;descInput.value=t.description||"";
@@ -396,7 +412,7 @@ async function renderSupervisorTeams(container){
   addChoice(staffSelect,"","Select a Staff member");(data.members||[]).filter(m=>String(m.role).toLowerCase()==="staff"&&String(m.account_status).toLowerCase()==="active").forEach(m=>addChoice(staffSelect,String(m.id),m.name));
   const assignGrid=el("div","ct-team-supervisor-management-grid"),opField=el("label","ct-team-supervisor-management-field"),staffField=el("label","ct-team-supervisor-management-field");opField.append(el("span","","Operation"),opSelect);staffField.append(el("span","","Assign to Staff"),staffSelect);assignGrid.append(opField,staffField);
   const assignBtn=button("Assign / reassign","ct-team-btn ct-team-btn--primary",async()=>{if(!opSelect.value||!staffSelect.value){noticeNode.hidden=false;noticeNode.textContent="Choose an operation and a Staff member.";return}assignBtn.disabled=true;try{await API.patch("operations/"+encodeURIComponent(opSelect.value),{assigned_to_id:Number(staffSelect.value)});noticeNode.hidden=false;noticeNode.textContent="Assignment updated and recorded. Refreshing team data…";const refreshed=await API.get("teams/supervisor/mine");await renderOwn(refreshed);}catch(e){noticeNode.hidden=false;noticeNode.textContent=e.message||"Assignment could not be updated.";}finally{assignBtn.disabled=false;}});
-  management.append(el("p","ct-team-muted","Only active Staff in this team are selectable. Assignment changes are recorded in operation history."),assignGrid,assignBtn);own.append(management);
+  management.append(el("p","ct-team-muted","Only active Staff in this team are selectable. Assignment changes are recorded in operation history."),assignGrid,assignBtn);
   const status=el("section","ct-team-supervisor-overview-status");status.append(el("h3","","Team status"));
   const statusGrid=el("div","ct-team-supervisor-overview-statusgrid");
   const capacityLabel=t.capacity_status==="over_capacity"?"Over capacity":t.capacity_status==="within_capacity"?"Within capacity":"Capacity not configured";
