@@ -537,15 +537,27 @@ async function renderSupervisorTeams(container){
   }
   membersPage.append(roster);
   const operations=data.operations||[];
-  const opSection=el("section","ct-team-supervisor-page-section");
+  const opSection=el("section","ct-team-supervisor-page-section ct-team-supervisor-operations-summary");
   opSection.append(el("p","ct-team-eyebrow","TEAM WORKLOAD"),el("h2","","Operations"),el("p","ct-team-muted",operations.length+" recorded operations associated with your team."));
-  const opMetrics=el("div","ct-team-supervisor-metrics");
-  [["Active",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue",t.overdue_operation_count],["Completed",t.completed_operation_count]].forEach(x=>opMetrics.append(metricSmall(x[0],x[1])));
-  opSection.append(opMetrics);
-  if(!operations.length)opSection.append(el("p","ct-team-muted","No operations are currently recorded for this team."));
-  else{
-   const list=el("div","ct-team-supervisor-operationlist");
-   operations.forEach(op=>{
+  const operationFilters=el("aside","ct-team-operations-filter");
+  operationFilters.append(el("p","ct-team-overview-filter-heading","VIEW BY"));
+  const operationDisplay=el("section","ct-team-overview-display ct-team-operations-display");operationDisplay.setAttribute("aria-live","polite");
+  const operationMeasures=[
+   {key:"active",label:"Active",match:op=>!op.completed&&["assigned","in progress","in_progress"].includes(String(op.status||"").trim().toLowerCase()),description:"Operations currently assigned or in progress.",note:"Matches the team's active-operation status rules."},
+   {key:"pending",label:"Pending review",match:op=>!op.completed&&["created","pending","submitted","rejected"].includes(String(op.status||"").trim().toLowerCase()),description:"Operations awaiting review or action.",note:"Includes created, pending, submitted and rejected statuses."},
+   {key:"overdue",label:"Overdue",match:op=>!op.completed&&Boolean(op.overdue_calculated),description:"Operations past their due date that are not completed.",note:"Uses the backend's calculated overdue flag."},
+   {key:"completed",label:"Completed",match:op=>Boolean(op.completed),description:"Operations recorded as completed.",note:"Includes completed, complete, approved, done and closed statuses."}
+  ];
+  const renderOperationMeasure=key=>{
+   const measure=operationMeasures.find(x=>x.key===key)||operationMeasures[0];
+   operationFilters.querySelectorAll("[data-operation-filter]").forEach(node=>{const active=node.dataset.operationFilter===measure.key;node.classList.toggle("is-active",active);node.setAttribute("aria-pressed",String(active))});
+   const selected=operations.filter(measure.match);
+   operationDisplay.replaceChildren();
+   const head=el("div","ct-team-overview-display-head");head.append(el("p","ct-team-eyebrow","SELECTED MEASURE"),el("h3","",measure.label+" operations"));
+   operationDisplay.append(head,el("strong","ct-team-overview-primary-value",String(selected.length)),el("p","ct-team-overview-detail",measure.description),el("p","ct-team-overview-note",measure.note));
+   if(!selected.length){operationDisplay.append(el("p","ct-team-muted","No operations match this category."));return}
+   const list=el("div","ct-team-supervisor-operationlist ct-team-operations-result-list");
+   selected.forEach(op=>{
     const row=el("article","ct-team-supervisor-operation"),copy=el("div","");
     copy.append(el("strong","",op.title||"Untitled operation"));
     if(op.description)copy.append(el("p","ct-team-muted",op.description));
@@ -554,8 +566,15 @@ async function renderSupervisorTeams(container){
     if(op.due_at)meta.append(el("span","ct-team-muted","Due "+dateTime(op.due_at)));
     if(op.overdue_calculated)meta.append(el("span","ct-team-error","Overdue"));
     row.append(copy,meta);list.append(row);
-   });opSection.append(list);
-  }
+   });
+   operationDisplay.append(list);
+  };
+  operationMeasures.forEach(measure=>{
+   const option=button(measure.label,"ct-team-overview-filter-option",()=>renderOperationMeasure(measure.key));
+   option.dataset.operationFilter=measure.key;option.setAttribute("aria-pressed","false");operationFilters.append(option);
+  });
+  const operationLayout=el("div","ct-team-overview-layout ct-team-operations-layout");
+  operationLayout.append(operationFilters,operationDisplay);opSection.append(operationLayout);renderOperationMeasure("active");
   operationsPage.append(opSection);
 
   const areas=el("section","ct-team-supervisor-page-section");
