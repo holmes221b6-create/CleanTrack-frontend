@@ -655,3 +655,5 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 .ct-bi-workspace:not(.is-presentation) .ct-bi-visual-card{resize:both;min-width:240px;min-height:190px;max-width:100%;max-height:680px;overflow:auto;cursor:grab}
 .ct-bi-workspace:not(.is-presentation) .ct-bi-visual-card:active{cursor:grabbing}
 .ct-bi-workspace:not(.is-presentation) .ct-bi-visual-card .ct-bi-remove{display:none!important}
+
+.ct-team-fullscreen-brandmark.has-personnel-photo{background-position:center;background-size:cover;background-repeat:no-repeat;border-radius:50%;overflow:hidden;color:transparent;font-size:0;box-shadow:0 0 0 1px rgba(184,151,224,.55)}
