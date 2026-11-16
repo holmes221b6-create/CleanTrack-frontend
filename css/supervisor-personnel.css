@@ -79,3 +79,25 @@ html[data-theme="light"] .mp-media-item{background:#fff;border-color:#e7e3eb}
 .mp-page-context{font-size:9px;letter-spacing:.16em;font-weight:800;color:var(--text-secondary,#999)}
 html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-color:#dedee8}
 @media(prefers-reduced-motion:reduce){.mp-page-back{transition:none}}
+
+/* Personal Personnel profile editor */
+.mp-rail-actions{display:flex;align-items:center;gap:7px}
+.mp-my-profile{height:36px;padding:0 11px;border:1px solid #76559b;border-radius:9px;background:rgba(111,76,151,.2);color:#ddc9f4;font:inherit;font-size:10px;font-weight:750;white-space:nowrap;cursor:pointer}
+.mp-my-profile:hover{background:rgba(130,91,178,.32)}
+.mp-own-profile-overlay{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:20px;background:rgba(5,5,10,.78);backdrop-filter:blur(7px)}
+.mp-own-profile-panel{width:min(620px,100%);max-height:min(88vh,780px);overflow:auto;border:1px solid #484052;border-radius:17px;background:#17161f;color:#f0edf5;box-shadow:0 28px 90px #0009}
+.mp-own-profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 15px;border-bottom:1px solid #34303d}
+.mp-own-profile-head h2{margin:6px 0;font-size:20px}.mp-own-profile-head p{margin:0;max-width:440px}
+.mp-own-profile-close{width:34px;height:34px;border:1px solid #484052;border-radius:50%;background:#24212d;color:#eee;font-size:21px;cursor:pointer}
+.mp-own-profile-form{padding:20px 24px}
+.mp-own-profile-photo-area{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+.mp-own-profile-photo{width:76px;height:76px;flex:none;border:1px solid #8060a6;border-radius:50%;background:linear-gradient(145deg,#553b78,#292039);background-position:center;background-size:cover;color:#eadcff;font-size:25px;font-weight:800;cursor:pointer}
+.mp-own-profile-photo-area strong,.mp-own-profile-photo-area small{display:block}.mp-own-profile-photo-area small{margin-top:5px}
+.mp-own-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mp-own-profile-field{display:flex;flex-direction:column;gap:7px;min-width:0}.mp-own-profile-field>span{font-size:10px;color:#c9b5df;font-weight:700}.mp-own-profile-field small{font-size:9px}
+.mp-own-profile-input{width:100%;min-height:40px;padding:10px 11px;border:1px solid #3d3948;border-radius:9px;background:#100f16;color:#eee;font:inherit;font-size:11px;outline:none}
+.mp-own-profile-input:focus{border-color:#9872bd}.mp-own-profile-input[readonly]{opacity:.7}
+.mp-own-profile-field:has(textarea){grid-column:1/-1}.mp-own-profile-field textarea{resize:vertical;min-height:90px}
+.mp-own-profile-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-top:20px;padding-top:15px;border-top:1px solid #34303d}
+.mp-own-profile-status{margin:0 auto 0 0;color:#b9a5cd;font-size:10px}
+@media(max-width:600px){.mp-rail-actions{gap:5px}.mp-my-profile{padding:0 8px;font-size:9px}.mp-own-profile-overlay{padding:10px}.mp-own-profile-panel{max-height:94vh}.mp-own-profile-head,.mp-own-profile-form{padding:17px}.mp-own-profile-grid{grid-template-columns:1fr}.mp-own-profile-field:has(textarea){grid-column:auto}}
