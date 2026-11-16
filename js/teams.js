@@ -220,14 +220,20 @@ async function download(id,format){
 }
 
 async function renderSupervisorTeams(container){
- const user=AUTH?.getCurrentUser?.();
+ let user=AUTH?.getCurrentUser?.();
+ try{const fresh=await API.get("auth/me");if(fresh?.user){user=Object.assign(user||{},fresh.user);}}catch(_){}
  const shell=el("section","ct-team-fullscreen-shell");
  shell.setAttribute("role","region");shell.setAttribute("aria-label","Teams workspace");
  const topbar=el("header","ct-team-fullscreen-topbar");
- const brand=el("div","ct-team-fullscreen-brand");brand.append(el("span","ct-team-fullscreen-brandmark","M"),el("strong","","MECHNAR"),el("span","ct-team-fullscreen-divider","/"),el("span","","Teams"));
+ const brand=el("div","ct-team-fullscreen-brand"),brandmark=el("span","ct-team-fullscreen-brandmark",user?.personnel_avatar_url?"":"M");
+ if(user?.personnel_avatar_url){brandmark.style.backgroundImage="url('"+String(user.personnel_avatar_url).replace(/['()\\]/g,"")+"')";brandmark.classList.add("has-personnel-photo");brandmark.setAttribute("aria-label","Your Personnel profile picture");}
+ brand.append(brandmark,el("strong","","MECHNAR"),el("span","ct-team-fullscreen-divider","/"),el("span","","Teams"));
+ const syncPersonnelAvatar=event=>{if(String(event.detail?.userId)!==String(user?.id))return;const src=event.detail?.avatarUrl||"";brandmark.textContent=src?"":"M";brandmark.style.backgroundImage=src?"url('"+String(src).replace(/['()\\]/g,"")+"')":"";brandmark.classList.toggle("has-personnel-photo",Boolean(src));};
+ document.addEventListener("cleantrack:personnel-profile-updated",syncPersonnelAvatar);
+
  const topActions=el("div","ct-team-fullscreen-topactions");
  const who=el("span","ct-team-fullscreen-user",user?.name||user?.email||"Supervisor");
- const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{shell.remove();document.documentElement.classList.remove("ct-team-workspace-open");document.body.classList.remove("ct-team-workspace-open");window.CleanTrackNavigation?.setActivePage("workspace")});
+ const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{document.removeEventListener("cleantrack:personnel-profile-updated",syncPersonnelAvatar);shell.remove();document.documentElement.classList.remove("ct-team-workspace-open");document.body.classList.remove("ct-team-workspace-open");window.CleanTrackNavigation?.setActivePage("workspace")});
  closeWorkspace.type="button";closeWorkspace.setAttribute("aria-label","Close Teams workspace");closeWorkspace.title="Close Teams workspace";
  topActions.append(who,closeWorkspace);topbar.append(brand,topActions);
  const sidebar=el("aside","ct-team-fullscreen-sidebar");sidebar.append(el("p","ct-team-fullscreen-side-label","TEAM SPACE"));
