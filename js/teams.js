@@ -383,7 +383,7 @@ async function renderSupervisorTeams(container){
   overviewLayout.append(filterPane,display);summary.append(overviewLayout);renderSelected("members");own.append(summary);
   const controlsEntry=el("section","ct-team-supervisor-controls-entry");
   controlsEntry.append(el("p","ct-team-eyebrow","TEAM CONTROLS"),el("p","ct-team-muted","Team details and assignment coordination are available in a separate panel."));
-  const openControls=button("Open permitted team controls","ct-team-btn ct-team-btn--primary",()=>{
+  const openControls=button("Open permitted team controls","ct-team-btn ct-team-btn--primary",async()=>{
    const overlay=el("div","ct-team-history-overlay ct-team-controls-overlay");
    const panel=el("section","ct-team-history-panel ct-team-controls-panel");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","Permitted team controls");
    const panelHead=el("header","ct-team-history-panel-head"),panelTitle=el("div","");
