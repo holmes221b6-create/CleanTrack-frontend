@@ -471,33 +471,71 @@ async function renderSupervisorTeams(container){
   const roster=el("section","ct-team-supervisor-roster");
   roster.append(el("p","ct-team-eyebrow","TEAM DIRECTORY"),el("h2","","Team members"),el("p","ct-team-muted",(data.members||[]).length+" people assigned to your team."));
   const members=data.members||[];
+  const initials=name=>String(name||"M").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"M";
+  const makeMemberAvatar=(member,large=false)=>{
+   const avatar=el("span","ct-team-member-avatar"+(large?" is-large":""));
+   if(member.personnel_avatar_url){const img=document.createElement("img");img.src=member.personnel_avatar_url;img.alt=(member.name||"Member")+"'s Personnel profile picture";img.loading="lazy";avatar.append(img)}
+   else avatar.textContent=initials(member.name);
+   return avatar;
+  };
+  const openPhoto=(member)=>{
+   if(!member.personnel_avatar_url)return;
+   const overlay=el("div","ct-team-member-photo-overlay");
+   const image=document.createElement("img");image.src=member.personnel_avatar_url;image.alt=(member.name||"Team member")+"'s Personnel profile picture";
+   const close=button("×","ct-team-member-photo-close",()=>overlay.remove());close.setAttribute("aria-label","Close profile picture");
+   overlay.append(close,image);overlay.addEventListener("click",event=>{if(event.target===overlay)overlay.remove()});
+   const onKey=event=>{if(event.key==="Escape"){overlay.remove();document.removeEventListener("keydown",onKey)}};
+   document.addEventListener("keydown",onKey);document.body.append(overlay);
+  };
+  const openMemberPanel=async(member)=>{
+   const overlay=el("div","ct-team-member-detail-overlay");
+   const panel=el("section","ct-team-member-detail-panel");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label",member.name+" team profile");
+   const head=el("header","ct-team-member-detail-head");
+   const title=el("div","");title.append(el("p","ct-team-eyebrow","TEAM MEMBER PROFILE"),el("h2","",member.name||"Team member"));
+   const close=button("×","ct-team-member-detail-close",dismiss);close.setAttribute("aria-label","Close member profile");
+   head.append(title,close);
+   const body=el("div","ct-team-member-detail-body");
+   const identity=el("div","ct-team-member-detail-identity");
+   const photo=makeMemberAvatar(member,true);
+   if(member.personnel_avatar_url){photo.classList.add("is-clickable");photo.title="View profile picture";photo.setAttribute("role","button");photo.tabIndex=0;photo.addEventListener("click",()=>openPhoto(member));photo.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openPhoto(member)}})}
+   const summary=el("div","");summary.append(el("strong","",member.name||"Team member"),el("p","ct-team-muted",String(member.role||"Staff")+(member.is_team_leader?" · Team Leader":"")));
+   identity.append(photo,summary);body.append(identity);
+   const details=el("div","ct-team-member-detail-sections");
+   const addSection=(label,items,empty)=>{
+    const section=el("section","ct-team-member-detail-section");section.append(el("h3","",label));
+    if(!items?.length)section.append(el("p","ct-team-muted",empty));
+    else{const chips=el("div","ct-team-member-detail-chips");items.forEach(item=>chips.append(el("span","ct-team-member-detail-chip",typeof item==="string"?item:item.title||item.name||"")));section.append(chips)}
+    details.append(section);
+   };
+   addSection("Skills",member.skills||[],"No skills have been added to this Personnel profile.");
+   addSection("Qualifications & certifications",member.qualifications||[],"No qualifications or certifications have been recorded.");
+   const joined=el("section","ct-team-member-detail-section");joined.append(el("h3","","Team membership"),el("p","ct-team-muted",member.assigned_at?"Joined this team "+date(member.assigned_at):"Team assignment date unavailable"));details.append(joined);
+   body.append(details);panel.append(head,body);overlay.append(panel);
+   function dismiss(){overlay.remove();document.removeEventListener("keydown",onKey)}
+   overlay.addEventListener("click",event=>{if(event.target===overlay)dismiss()});
+   const onKey=event=>{if(event.key==="Escape")dismiss()};
+   document.addEventListener("keydown",onKey);shell.append(overlay);close.focus();
+  };
   if(!members.length)roster.append(el("p","ct-team-muted","No active team members are recorded."));
   else{
    const list=el("div","ct-team-supervisor-memberlist");
-   // Ranking is optional enrichment; it must not block the other Team pages.
-   const rankingById={};
    members.forEach(member=>{
-    const row=el("div","ct-team-supervisor-member"),identity=el("div","ct-team-supervisor-memberidentity"),rank=rankingById[String(member.id)];
-    identity.append(el("strong","",member.name||"Unnamed member"),el("small","ct-team-muted",String(member.role||"Staff")+" · "+(member.account_status||"Unknown status")));
+    const row=el("article","ct-team-supervisor-member");
+    const identity=el("div","ct-team-supervisor-memberidentity");
+    const avatar=makeMemberAvatar(member);
+    if(member.personnel_avatar_url){avatar.classList.add("is-clickable");avatar.title="View profile picture";avatar.setAttribute("role","button");avatar.tabIndex=0;avatar.addEventListener("click",event=>{event.stopPropagation();openPhoto(member)});avatar.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();event.stopPropagation();openPhoto(member)}})}
+    const copy=el("button","ct-team-supervisor-member-open");
+    copy.type="button";copy.append(el("strong","",member.name||"Unnamed member"),el("small","ct-team-muted",String(member.role||"Staff")+" · "+(member.account_status||"Unknown status")));
+    copy.addEventListener("click",()=>openMemberPanel(member));
+    identity.append(avatar,copy);
     row.append(identity);
-    if(String(member.role).toLowerCase()==="staff"&&rank){const badge=el("div","ct-team-supervisor-rankbadge");badge.append(el("strong","",rank.score===null?"—":rank.score.toFixed(1)+" / 100"),el("small","ct-team-muted",rank.team_rank?"Team #"+rank.team_rank+" · Org #"+(rank.organization_rank||"—"):"Insufficient data"));row.append(badge);}
+    if(member.is_team_leader)row.append(el("span","ct-team-supervisor-rankbadge","Team Leader"));
     else row.append(el("small","ct-team-muted",member.assigned_at?"Joined team "+date(member.assigned_at):"Team assignment date unavailable"));
     list.append(row);
-   });roster.append(list);
-   roster.append(el("p","ct-team-muted","Scores use workload- and priority-weighted completion, punctuality and overdue avoidance. Rankings require at least three assigned operations; insufficient records are not scored."));
+   });
+   roster.append(list);
   }
   membersPage.append(roster);
-  API.get("teams/supervisor/performance").then(rankData=>{
-   const ranks=Object.fromEntries((rankData.members||[]).map(x=>[String(x.id),x]));
-   roster.querySelectorAll(".ct-team-supervisor-member").forEach((row,index)=>{
-    const member=members[index],rank=member&&ranks[String(member.id)];
-    if(!rank||String(member.role).toLowerCase()!=="staff")return;
-    const badge=el("div","ct-team-supervisor-rankbadge");
-    badge.append(el("strong","",rank.score===null?"—":Number(rank.score).toFixed(1)+" / 100"),el("small","ct-team-muted",rank.team_rank?"Team #"+rank.team_rank+" · Org #"+(rank.organization_rank||"—"):"Insufficient data"));
-    row.append(badge);
-   });
-  }).catch(()=>{});
-
   const operations=data.operations||[];
   const opSection=el("section","ct-team-supervisor-page-section");
   opSection.append(el("p","ct-team-eyebrow","TEAM WORKLOAD"),el("h2","","Operations"),el("p","ct-team-muted",operations.length+" recorded operations associated with your team."));
