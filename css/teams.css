@@ -657,3 +657,24 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
 .ct-bi-workspace:not(.is-presentation) .ct-bi-visual-card .ct-bi-remove{display:none!important}
 
 .ct-team-fullscreen-brandmark.has-personnel-photo{background-position:center;background-size:cover;background-repeat:no-repeat;border-radius:50%;overflow:hidden;color:transparent;font-size:0;box-shadow:0 0 0 1px rgba(184,151,224,.55)}
+
+
+/* Supervisor overview: one spacious analytical panel with a compact filter rail. */
+#page-content .ct-team-supervisor-overview-summary{padding:clamp(18px,2.4vw,30px);border:1px solid #292c36;border-radius:16px;background:radial-gradient(ellipse at 100% 0%,rgb(118 101 164 / 8%),transparent 48%),#10141c}
+#page-content .ct-team-supervisor-overview-summary>h2{margin:0 0 6px;color:#eeebf7;font-size:1.2rem}
+#page-content .ct-team-overview-filter{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:20px 0 16px;padding:13px 15px;border:1px solid #292c36;border-radius:12px;background:#0d1017}
+#page-content .ct-team-overview-filter-label{display:grid;gap:6px;min-width:190px;color:#aaa3bb;font-size:.78rem;font-weight:650}
+#page-content .ct-team-overview-filter-label .ct-team-input{min-width:190px}
+#page-content .ct-team-overview-display{min-height:230px;padding:clamp(16px,2vw,24px);border:1px solid #292c36;border-radius:13px;background:linear-gradient(145deg,#14131e,#10141c)}
+#page-content .ct-team-overview-display-head{margin-bottom:20px}
+#page-content .ct-team-overview-display-head h3{margin:0 0 5px;color:#eeebf7;font-size:1.05rem}
+#page-content .ct-team-overview-display-head p{margin:0}
+#page-content .ct-team-overview-metric-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px}
+#page-content .ct-team-overview-metric-row{min-width:0}
+#page-content .ct-team-overview-metric-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:#bdb7cb;font-size:.88rem}
+#page-content .ct-team-overview-metric-top strong{color:#eeeaf7;font-size:1rem}
+#page-content .ct-team-overview-bar{height:7px;overflow:hidden;border-radius:99px;background:#292333}
+#page-content .ct-team-overview-bar-fill{display:block;height:100%;border-radius:99px;background:#8e7ab8}
+#page-content .ct-team-overview-footnote{margin:14px 0 0;color:#858194;font-size:.82rem}
+#page-content .ct-team-overview-warning{margin:16px 0 0;padding:10px 12px;border-left:2px solid #d6a366;background:rgb(214 163 102 / 7%);color:#d6b87e;font-size:.85rem}
+@media(max-width:650px){#page-content .ct-team-overview-filter{align-items:stretch;flex-direction:column}#page-content .ct-team-overview-filter-label,#page-content .ct-team-overview-filter-label .ct-team-input{width:100%;min-width:0}#page-content .ct-team-overview-metric-list{grid-template-columns:1fr}}
