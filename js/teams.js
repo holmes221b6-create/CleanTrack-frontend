@@ -344,55 +344,43 @@ async function renderSupervisorTeams(container){
   identity.append(el("p","ct-team-eyebrow","YOUR TEAM"),el("h2","",t.name||"Your team"),el("p","ct-team-muted",t.description||"Your assigned team."));
   teamHead.append(identity,el("span","ct-team-status",t.status||"Active"));own.append(teamHead);
   const summary=el("section","ct-team-supervisor-overview-summary");
-  summary.append(el("h2","","Team overview"),el("p","ct-team-muted","Explore your team's position through one focused view. Choose an aspect to update the information below."));
-  const filterPane=el("div","ct-team-overview-filter");
-  const filterLabel=el("label","ct-team-overview-filter-label");
-  filterLabel.append(el("span","","View by"));
-  const aspect=el("select","ct-team-input");aspect.setAttribute("aria-label","Team overview aspect");
-  [["composition","Team composition"],["operations","Operations workload"],["performance","Performance"],["capacity","Capacity & work areas"]].forEach(([value,label])=>{const option=el("option","",label);option.value=value;aspect.append(option)});
-  filterLabel.append(aspect);filterPane.append(filterLabel);
-  const rangeLabel=el("label","ct-team-overview-filter-label");rangeLabel.append(el("span","","Performance range"));
-  const range=el("select","ct-team-input");range.setAttribute("aria-label","Performance date range");
-  [["4","Last 4 weeks"],["8","Last 8 weeks"],["12","Last 12 weeks"]].forEach(([value,label])=>{const option=el("option","",label);option.value=value;range.append(option)});
-  rangeLabel.append(range);filterPane.append(rangeLabel);summary.append(filterPane);
-  const display=el("section","ct-team-overview-display");display.setAttribute("aria-live","polite");summary.append(display);
-  const renderAspect=()=>{
+  summary.append(el("h2","","Team overview"),el("p","ct-team-muted","Select any of the original overview measures. The central view updates with that measure and its current team data."));
+  const overviewLayout=el("div","ct-team-overview-layout");
+  const filterPane=el("aside","ct-team-overview-filter");
+  filterPane.append(el("p","ct-team-overview-filter-heading","VIEW BY"));
+  const metricOptions=[
+   {key:"members",label:"Team members",value:()=>String(Number(t.member_count||0)),detail:()=>"Total people currently assigned to this team.",note:()=>"Includes all assigned team members."},
+   {key:"staff",label:"Staff",value:()=>String(Number(t.staff_count||0)),detail:()=>"Staff members currently assigned to this team.",note:()=>"Based on the team's current membership records."},
+   {key:"supervisors",label:"Supervisors",value:()=>String(Number(t.supervisor_count||0)),detail:()=>"Supervisors currently assigned to this team.",note:()=>"Based on the team's current membership records."},
+   {key:"active",label:"Active operations",value:()=>String(Number(t.active_operation_count||0)),detail:()=>"Operations currently active for this team.",note:()=>"Uses the current operation status totals."},
+   {key:"pending",label:"Pending review",value:()=>String(Number(t.pending_operation_count||0)),detail:()=>"Operations awaiting review.",note:()=>"Uses the current operation review status totals."},
+   {key:"overdue",label:"Overdue operations",value:()=>String(Number(t.overdue_operation_count||0)),detail:()=>"Operations past their due date and not completed.",note:()=>"Overdue count is calculated from current operation records."},
+   {key:"completed",label:"Completed operations",value:()=>String(Number(t.completed_operation_count||0)),detail:()=>"Operations recorded as completed.",note:()=>"Uses the current completed-operation total."},
+   {key:"total",label:"Total operations",value:()=>String(Number(t.total_operation_count||0)),detail:()=>"All operations currently counted for this team.",note:()=>"Includes the statuses represented in the team's operation totals."},
+   {key:"completion",label:"Completion rate",value:()=>t.completion_rate===null||t.completion_rate===undefined?"—":Number(t.completion_rate)+"%",detail:()=>"The team's recorded operation completion rate.",note:()=>"A percentage supplied by the team overview data; shown as unavailable when no rate is reported."},
+   {key:"locations",label:"Assigned locations",value:()=>String(Number(t.location_count||0)),detail:()=>"Locations currently assigned to this team.",note:()=>"Based on current location assignments."},
+   {key:"zones",label:"Assigned zones",value:()=>String(Number(t.zone_count||0)),detail:()=>"Zones currently assigned to this team.",note:()=>"Based on current zone assignments."},
+   {key:"capacity",label:"Team capacity",value:()=>t.capacity===null||t.capacity===undefined?"Not set":String(Number(t.member_count||0))+" / "+String(t.capacity),detail:()=>"Current membership compared with the configured team capacity.",note:()=>t.capacity===null||t.capacity===undefined?"No capacity limit has been configured for this team.":Number(t.member_count||0)>Number(t.capacity)?"The team is above its configured capacity.":"Assigned membership is within the configured capacity."}
+  ];
+  const display=el("section","ct-team-overview-display");display.setAttribute("aria-live","polite");
+  const renderSelected=(key)=>{
+   const item=metricOptions.find(x=>x.key===key)||metricOptions[0];
+   filterPane.querySelectorAll("[data-overview-metric]").forEach(node=>{const active=node.dataset.overviewMetric===item.key;node.classList.toggle("is-active",active);node.setAttribute("aria-pressed",String(active))});
    display.replaceChildren();
-   const heading=el("div","ct-team-overview-display-head");
-   const titleMap={composition:["Team composition","People currently assigned to your team."],operations:["Operations workload","Current operation status and outstanding work."],performance:["Performance","Recorded weekly creation, completion and due-date compliance."],capacity:["Capacity & work areas","Current team capacity and assigned operational areas."]};
-   const copy=titleMap[aspect.value];heading.append(el("h3","",copy[0]),el("p","ct-team-muted",copy[1]));display.append(heading);
-   const rows=[];
-   if(aspect.value==="composition"){
-    [["Team members",t.member_count],["Staff",t.staff_count],["Supervisors",t.supervisor_count]].forEach(([label,value])=>rows.push([label,value]));
-   }else if(aspect.value==="operations"){
-    [["Active",t.active_operation_count],["Pending review",t.pending_operation_count],["Overdue",t.overdue_operation_count],["Completed",t.completed_operation_count],["Total",t.total_operation_count]].forEach(([label,value])=>rows.push([label,value]));
-   }else if(aspect.value==="capacity"){
-    rows.push(["Assigned members",t.member_count],["Team capacity",t.capacity===null||t.capacity===undefined?"Not set":t.capacity],["Assigned locations",t.location_count],["Assigned zones",t.zone_count]);
-   }
-   if(aspect.value==="performance"){
-    const weeks=(data.performance||[]).slice(-Number(range.value));
-    if(!weeks.length){display.append(el("p","ct-team-muted","No performance history is available for this team yet."));return}
-    const tableNode=table(["Week starting","Created","Completed","On-time compliance"],weeks.map(x=>[date(x.week_start),Number(x.tasks_created||0),Number(x.tasks_completed||0),x.compliance_rate===null||x.compliance_rate===undefined?"—":x.compliance_rate+"%"]));
-    display.append(tableNode);
-    const totals=weeks.reduce((acc,x)=>{acc.created+=Number(x.tasks_created||0);acc.completed+=Number(x.tasks_completed||0);return acc},{created:0,completed:0});
-    const footer=el("p","ct-team-overview-footnote",totals.created+" operations created · "+totals.completed+" completed across "+weeks.length+" recorded weeks.");display.append(footer);return;
-   }
-   const max=Math.max(1,...rows.map(x=>Number(x[1])||0));
-   const list=el("div","ct-team-overview-metric-list");
-   rows.forEach(([label,value])=>{
-    const row=el("div","ct-team-overview-metric-row"),top=el("div","ct-team-overview-metric-top");
-    top.append(el("span","",label),el("strong","",value===null||value===undefined||value===""?"—":String(value)));
-    const track=el("div","ct-team-overview-bar"),fill=el("span","ct-team-overview-bar-fill");
-    const numeric=Number(value);fill.style.width=Number.isFinite(numeric)&&numeric>0?(numeric/max*100)+"%":"0%";
-    track.append(fill);row.append(top,track);list.append(row);
-   });
-   display.append(list);
-   if(aspect.value==="operations"&&Number(t.overdue_operation_count||0)>0)display.append(el("p","ct-team-overview-warning",t.overdue_operation_count+" overdue operation(s) require attention."));
-   if(aspect.value==="capacity"&&t.capacity!==null&&t.capacity!==undefined&&Number(t.member_count||0)>Number(t.capacity))display.append(el("p","ct-team-overview-warning","Assigned membership exceeds the configured team capacity."));
+   const head=el("div","ct-team-overview-display-head");head.append(el("p","ct-team-eyebrow","SELECTED MEASURE"),el("h3","",item.label));
+   const value=el("strong","ct-team-overview-primary-value",item.value());
+   const detail=el("p","ct-team-overview-detail",item.detail());
+   const note=el("p","ct-team-overview-note",item.note());
+   display.append(head,value,detail,note);
+   if(item.key==="overdue"&&Number(t.overdue_operation_count||0)>0)display.append(el("p","ct-team-overview-warning","There are overdue operations that may need follow-up."));
+   if(item.key==="capacity"&&t.capacity!==null&&t.capacity!==undefined&&Number(t.member_count||0)>Number(t.capacity))display.append(el("p","ct-team-overview-warning","Assigned membership exceeds the configured team capacity."));
+   if(item.key==="completion"&&(t.completion_rate===null||t.completion_rate===undefined))display.append(el("p","ct-team-overview-note","A completion rate cannot be displayed until the team data reports a valid value."));
   };
-  aspect.addEventListener("change",renderAspect);range.addEventListener("change",renderAspect);
-  rangeLabel.hidden=true;aspect.addEventListener("change",()=>{rangeLabel.hidden=aspect.value!=="performance"});
-  renderAspect();own.append(summary);
+  metricOptions.forEach(item=>{
+   const option=button(item.label,"ct-team-overview-filter-option",()=>renderSelected(item.key));
+   option.dataset.overviewMetric=item.key;option.setAttribute("aria-pressed","false");filterPane.append(option);
+  });
+  overviewLayout.append(filterPane,display);summary.append(overviewLayout);renderSelected("members");own.append(summary);
   const management=el("section","ct-team-supervisor-page-section ct-team-supervisor-management");
   management.append(el("p","ct-team-eyebrow","PERMITTED TEAM CONTROLS"),el("h2","","Team management & assignment coordination"),el("p","ct-team-muted","Edit permitted team details and coordinate assignments. Admin retains team creation, deletion and final membership authority."));
   const descInput=el("textarea","ct-team-input");descInput.rows=3;descInput.maxLength=2000;descInput.value=t.description||"";
