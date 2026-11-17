@@ -379,3 +379,189 @@ html[data-theme] body .ct-bi-workspace :is(
 html[data-theme] body .ct-bi-workspace :is(.ct-bi-axis) {
   fill: var(--mn-muted);
 }
+
+
+/* -------------------------------------------------------------------------
+   GLOBAL THEME ENFORCEMENT — final cascade layer
+   The account preference is html[data-theme]. Apply it to the real workspace
+   and to overlays mounted directly under body, not just #page-content.
+   ------------------------------------------------------------------------- */
+html[data-theme="default"] {
+  --bg:#0f1016!important; --bg-elevated:#151821!important;
+  --surface:#151821!important; --surface-hover:#222432!important;
+  --surface-raised:#1b1d28!important; --border:#30303d!important;
+  --border-strong:#454253!important; --text:#eeebf7!important;
+  --text-secondary:#c0bacd!important; --text-muted:#aaa4b8!important;
+  --ct-bg:#0f1016!important; --ct-page:#0f1016!important;
+  --ct-surface:#151821!important; --ct-panel:#151821!important;
+  --ct-panel-raised:#1b1d28!important; --ct-border:#30303d!important;
+  --ct-text:#eeebf7!important; --ct-muted:#aaa4b8!important;
+}
+html[data-theme="black"] {
+  --bg:#050608!important; --bg-elevated:#0d1118!important;
+  --surface:#0d1118!important; --surface-hover:#1a2230!important;
+  --surface-raised:#121823!important; --border:#283342!important;
+  --border-strong:#3b4657!important; --text:#f1f4f8!important;
+  --text-secondary:#c0c8d4!important; --text-muted:#a4adbb!important;
+  --ct-bg:#050608!important; --ct-page:#050608!important;
+  --ct-surface:#0d1118!important; --ct-panel:#0d1118!important;
+  --ct-panel-raised:#121823!important; --ct-border:#283342!important;
+  --ct-text:#f1f4f8!important; --ct-muted:#a4adbb!important;
+}
+html[data-theme="light"] {
+  --bg:#ffffff!important; --bg-elevated:#f6f8fb!important;
+  --surface:#ffffff!important; --surface-hover:#eef2f7!important;
+  --surface-raised:#f6f8fb!important; --border:#dce3eb!important;
+  --border-strong:#c8d2de!important; --text:#172334!important;
+  --text-secondary:#405168!important; --text-muted:#5e6b7c!important;
+  --ct-bg:#ffffff!important; --ct-page:#ffffff!important;
+  --ct-surface:#ffffff!important; --ct-panel:#ffffff!important;
+  --ct-panel-raised:#f6f8fb!important; --ct-border:#dce3eb!important;
+  --ct-text:#172334!important; --ct-muted:#5e6b7c!important;
+}
+
+/* Every role workspace, page frame, rail and page-level container. */
+html[data-theme] body,
+html[data-theme] body #app,
+html[data-theme] body #workspace-view,
+html[data-theme] body .workspace-layout,
+html[data-theme] body .workspace-main,
+html[data-theme] body .workspace-content,
+html[data-theme] body .workspace-body,
+html[data-theme] body #main-content,
+html[data-theme] body #page-content,
+html[data-theme] body .page-content,
+html[data-theme] body .page-container,
+html[data-theme] body .page-shell,
+html[data-theme] body .content-area,
+html[data-theme] body .main-content,
+html[data-theme] body .ct-workspace-shell,
+html[data-theme] body .ct-workspace-main {
+  color:var(--mn-text)!important;
+  background-color:var(--mn-page)!important;
+  background-image:none!important;
+}
+html[data-theme] body :is(
+  aside.sidebar,.sidebar,.ct-sidebar,.sidebar-nav,.sidebar-menu,
+  .sidebar-brand,.ct-sidebar-brand,.sidebar-footer,.sidebar-bottom,
+  .app-header,.workspace-header,.workspace-toolbar,.ct-workspace-toolbar,
+  .mobile-workspace-bar,.topbar,.top-bar,.navbar,.navigation-rail
+) {
+  color:var(--mn-text)!important;
+  background:var(--mn-shell)!important;
+  border-color:var(--mn-border)!important;
+  box-shadow:none!important;
+}
+
+/* Feature modules use different class names; normalize their neutral surfaces. */
+html[data-theme] body :is(
+  .card,.panel,.stat-card,.metric-card,.dashboard-card,.form-card,.content-card,
+  .section-card,.table-wrap,.table-container,.table-wrapper,.data-table-container,
+  .ct-card,.ct-panel,.ct-widget,.ct-home-card,.ct-home-panel,.ct-dash-panel,
+  .ct-dash-kpi,.ct-org-card,.ct-org-panel,.ct-location-card,.ct-zone-card,
+  .ct-operation-card,.ct-report-card,.ct-analytics-card,.ct-create-form,
+  .ct-details-panel,.workspace-panel,.overview-panel,.summary-panel,
+  .settings-panel,.settings-section,.table-panel,.records-panel,
+  .operations-panel,.inventory-panel,.inspection-panel,.incident-panel,
+  .review-panel,.report-panel,.analytics-panel
+) {
+  color:var(--mn-text)!important;
+  background-color:var(--mn-surface)!important;
+  background-image:none!important;
+  border-color:var(--mn-border)!important;
+}
+html[data-theme] body :is(
+  .card, .panel, .stat-card, .metric-card, .dashboard-card, .content-card,
+  .ct-card,.ct-panel,.ct-home-card,.ct-home-panel,.ct-dash-panel
+) :is(h1,h2,h3,h4,h5,h6,p,label,small,span,strong,li,dt,dd,th,td) {
+  color:inherit;
+}
+
+/* Consistent text and field contrast in every page and body-mounted dialog. */
+html[data-theme] body :is(
+  h1,h2,h3,h4,h5,h6,p,label,small,li,dt,dd,th,td,legend,summary,
+  .page-title,.section-title,.card-title,.panel-title,.field-label
+) { color:var(--mn-text); }
+html[data-theme] body :is(
+  .muted,.text-muted,.ct-muted,.description,.hint,.field-hint,.help-text,
+  .page-description,.section-description,.subtitle
+) { color:var(--mn-muted)!important; }
+html[data-theme] body :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,textarea
+) {
+  color:var(--mn-text)!important;
+  background-color:var(--mn-field)!important;
+  border-color:var(--mn-border)!important;
+}
+html[data-theme] body :is(input,textarea)::placeholder { color:var(--mn-muted)!important; }
+html[data-theme] body select option {
+  color:var(--mn-text)!important;background:var(--mn-surface)!important;
+}
+
+/* Modal roots, nested panels, drawers and popovers, including dynamically
+   inserted nodes under body. Overlay backdrops remain translucent. */
+html[data-theme] body :is(
+  .modal,.modal-content,.modal-dialog,.modal-panel,.modal-body,
+  .app-modal,#app-modal,.filter-modal,.filter-dialog,.filter-panel,
+  .detail-modal,.detail-panel,.history-modal,.history-panel,
+  .drawer,.drawer-panel,.side-panel,.popover,.dropdown-menu,
+  [role="dialog"],dialog,.ct-modal,.ct-modal-panel,.ct-dialog,.ct-drawer
+):not(.modal-overlay):not(.dialog-overlay):not(.drawer-overlay) {
+  color:var(--mn-text)!important;
+  background-color:var(--mn-surface)!important;
+  background-image:none!important;
+  border-color:var(--mn-border)!important;
+}
+html[data-theme] body :is(
+  .modal-overlay,.dialog-overlay,.drawer-overlay,.overlay-backdrop,
+  .ct-modal-overlay,.filter-backdrop
+) { background:var(--mn-overlay)!important; }
+html[data-theme] body :is(
+  .modal-header,.modal-footer,.panel-header,.panel-footer,
+  .drawer-header,.drawer-footer
+) {
+  color:var(--mn-text)!important;
+  background:transparent!important;
+  border-color:var(--mn-border)!important;
+}
+
+/* Keep navigation legible and active states tied to the same accent. */
+html[data-theme] body :is(
+  .sidebar a,.sidebar button,.ct-sidebar a,.ct-sidebar button,
+  .sidebar-nav a,.sidebar-menu a,.navigation-link
+) { color:var(--mn-text); }
+html[data-theme] body :is(
+  .sidebar a:hover,.sidebar button:hover,.ct-sidebar a:hover,
+  .ct-sidebar button:hover,.sidebar-nav a:hover,.sidebar-menu a:hover,
+  .navigation-link:hover
+) { background:var(--mn-surface-hover)!important;color:var(--mn-text)!important; }
+html[data-theme] body :is(
+  .sidebar .active,.sidebar .is-active,.ct-sidebar .active,
+  .ct-sidebar .is-active,[aria-current="page"]
+) {
+  color:var(--mn-accent)!important;background:var(--mn-accent-soft)!important;
+}
+
+/* Avoid flattening status badges, charts, photos, maps and primary actions. */
+html[data-theme] body :is(
+  .status-badge,.badge-success,.badge-warning,.badge-danger,.badge-info,
+  .status-success,.status-warning,.status-danger,.status-info,
+  .leaflet-container,.map-container,canvas,svg,img,video
+) { background-image:initial; }
+html[data-theme] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) { color:#fff!important; }
+html[data-theme="light"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) { background:#7650a6!important;border-color:#7650a6!important; }
+html[data-theme="default"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) { background:#765b9d!important;border-color:#765b9d!important; }
+html[data-theme="black"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) { background:#8b72bd!important;border-color:#8b72bd!important; }
