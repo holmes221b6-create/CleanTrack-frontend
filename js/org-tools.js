@@ -45,7 +45,8 @@ async function renderInventory(container){
   }catch(e){activeContent.replaceChildren($("p","mt-error",e.message||"Inventory could not be loaded."),btn("Retry",load))}
  }
  function metric(label,value,sub,action){const b=btn("",action);b.className="mt-stat mt-stat-action";b.append($("span","mt-muted",label),$("strong","",String(value)),$("small","mt-muted",sub));return b}
- function openViewPanel(id,label){state.view=id;const body=$("div","mt-content");panel(label,"Inventory workspace · "+label,body);activeContent=body;draw()}\n function draw(){
+ function openViewPanel(id,label){state.view=id;const body=$("div","mt-content");panel(label,"Inventory workspace · "+label,body);activeContent=body;draw()}
+ function draw(){
   tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("is-active",b.dataset.view===state.view));
   activeContent.replaceChildren();const q=search.value.trim().toLowerCase();
   if(state.view==="overview"){drawOverview();return}
