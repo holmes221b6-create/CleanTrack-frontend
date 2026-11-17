@@ -907,3 +907,63 @@ html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-axis,.ct-
 html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-donut-hole,
 html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-hole{fill:var(--ct-team-surface)!important}
 html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-ring{stroke:var(--ct-team-text)!important}
+
+
+/* Appearance completion pass: reach legacy Teams widgets and fixed/body-level
+   panels that escaped the first theme pass. Theme source is html[data-theme]. */
+html[data-theme="light"] .ct-team-fullscreen-shell{
+ --ct-team-bg:#fff;--ct-team-surface:#fff;--ct-team-surface-2:#f5f7fa;
+ --ct-team-text:#172334;--ct-team-muted:#5e6b7c;--ct-team-border:#dce3eb;
+ --ct-team-border-strong:#c6d1de;--ct-team-input:#fff;
+}
+html[data-theme="default"] .ct-team-fullscreen-shell{
+ --ct-team-bg:#0f1016;--ct-team-surface:#10141c;--ct-team-surface-2:#171522;
+ --ct-team-text:#eeebf7;--ct-team-muted:#aaa3bb;--ct-team-border:#292c36;
+ --ct-team-border-strong:#443b55;--ct-team-input:#0d1017;
+}
+html[data-theme="black"] .ct-team-fullscreen-shell{
+ --ct-team-bg:#090b10;--ct-team-surface:#11151d;--ct-team-surface-2:#171c26;
+ --ct-team-text:#f1f4f8;--ct-team-muted:#a4adbb;--ct-team-border:#2c3543;
+ --ct-team-border-strong:#3b4657;--ct-team-input:#090d14;
+}
+html[data-theme] .ct-team-fullscreen-shell{
+ background:var(--ct-team-bg)!important;color:var(--ct-team-text)!important;
+ color-scheme:light;
+}
+html[data-theme="default"] .ct-team-fullscreen-shell,
+html[data-theme="black"] .ct-team-fullscreen-shell{color-scheme:dark}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ [class*="sidebar"],[class*="workspace"],[class*="page"],[class*="panel"],
+ [class*="card"],[class*="drawer"],[class*="popover"],[class*="modal"],
+ [class*="filter"],[class*="section"],[class*="surface"],[class*="toolbar"],
+ [class*="table"],[class*="detail"],[class*="history"],[class*="management"]
+){
+ background-color:var(--ct-team-surface)!important;
+ border-color:var(--ct-team-border)!important;
+ color:var(--ct-team-text);
+}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ [class*="sidebar"],[class*="workspace"],[class*="page"],[class*="panel"],
+ [class*="card"],[class*="drawer"],[class*="popover"],[class*="modal"],
+ [class*="filter"],[class*="section"],[class*="surface"],[class*="toolbar"],
+ [class*="table"],[class*="detail"],[class*="history"],[class*="management"]
+) :is(h1,h2,h3,h4,p,span,strong,small,label,th,td,li){color:inherit}
+html[data-theme] .ct-team-fullscreen-shell :is(input,select,textarea,button){
+ color-scheme:inherit;
+}
+html[data-theme] body :is(.ct-team-supervisor-drawer,.ct-team-history-panel,
+ .ct-team-controls-panel,.ct-team-member-detail-panel,.ct-team-member-photo-overlay){
+ color:var(--ct-team-text)!important;
+}
+html[data-theme="light"] body :is(.ct-team-supervisor-drawer,.ct-team-history-panel,
+ .ct-team-controls-panel,.ct-team-member-detail-panel){
+ background:#fff!important;color:#172334!important;border-color:#dce3eb!important;
+}
+html[data-theme="default"] body :is(.ct-team-supervisor-drawer,.ct-team-history-panel,
+ .ct-team-controls-panel,.ct-team-member-detail-panel){
+ background:#10141c!important;color:#eeebf7!important;border-color:#292c36!important;
+}
+html[data-theme="black"] body :is(.ct-team-supervisor-drawer,.ct-team-history-panel,
+ .ct-team-controls-panel,.ct-team-member-detail-panel){
+ background:#11151d!important;color:#f1f4f8!important;border-color:#2c3543!important;
+}
