@@ -215,4 +215,13 @@
 .mt-policy-form-grid>.mt-field:has(select[name="policy_type"]){display:none!important}
 
 /* Inventory workspace */
-.mt-inventory-tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border,#39313f);padding:0 0 12px;margin:8px 0 18px}.mt-inventory-tabs .mt-btn{padding:8px 13px;font-size:13px}.mt-inventory-tabs .mt-btn.is-active{background:#6f35a4;border-color:#9460c3;color:#fff}.mt-inventory-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin:12px 0}.mt-inventory-details dt{color:var(--muted,#aaa2b7);font-size:12px}.mt-inventory-details dd{margin:0 0 8px;overflow-wrap:anywhere}.mt-inventory-details dt:nth-of-type(n){border-top:1px solid var(--border,#39313f);padding-top:8px}.mt-inventory-details dd:nth-of-type(n){border-top:1px solid var(--border,#39313f);padding-top:8px}@media(max-width:700px){.mt-inventory-details{grid-template-columns:1fr}.mt-inventory-tabs{overflow-x:auto;flex-wrap:nowrap}.mt-inventory-tabs .mt-btn{white-space:nowrap}}
+.mt-inventory-tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border,#39313f);padding:0 0 12px;margin:8px 0 18px}.mt-inventory-tabs .mt-btn{padding:8px 13px;font-size:13px}.mt-inventory-tabs .mt-btn.is-active{background:#51445f;border-color:#756487;color:#eee8f3}.mt-inventory-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin:12px 0}.mt-inventory-details dt{color:var(--muted,#aaa2b7);font-size:12px}.mt-inventory-details dd{margin:0 0 8px;overflow-wrap:anywhere}.mt-inventory-details dt:nth-of-type(n){border-top:1px solid var(--border,#39313f);padding-top:8px}.mt-inventory-details dd:nth-of-type(n){border-top:1px solid var(--border,#39313f);padding-top:8px}@media(max-width:700px){.mt-inventory-details{grid-template-columns:1fr}.mt-inventory-tabs{overflow-x:auto;flex-wrap:nowrap}.mt-inventory-tabs .mt-btn{white-space:nowrap}}
+
+/* Procurement workspace */
+.mt-inventory-tabs{gap:6px}
+.mt-inventory-tabs .mt-btn{min-height:34px;padding:7px 11px}
+.mt-inventory-tabs .mt-btn.is-active{box-shadow:inset 0 0 0 1px rgba(185,165,205,.12)}
+.mt-page .mt-content>.mt-actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.mt-page .mt-content>.mt-actions .mt-btn{min-width:120px}
+.mt-form-grid>.mt-field{min-width:0}
+@media(max-width:680px){.mt-page .mt-content>.mt-actions .mt-btn{flex:1 1 100%}}
