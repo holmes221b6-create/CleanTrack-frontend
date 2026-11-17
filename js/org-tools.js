@@ -61,7 +61,7 @@ async function renderInventory(container){
   if(state.view==="forecast"){drawForecast();return}
   if(state.view==="history"){drawHistory(q);return}
  }
- function downloadCsv(filename,rows){const csv=rows.map(row=>row.map(value=>'"'+String(value??"").replaceAll('"','""')+'"').join(",")).join("\r\n");const blob=new Blob(["\\ufeff"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=$("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
+ function downloadCsv(filename,rows){const csv=rows.map(row=>row.map(value=>'"'+String(value??"").replaceAll('"','""')+'"').join(",")).join("\r\n");const blob=new Blob([String.fromCharCode(65279)+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=$("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
  function exportItemsCsv(){downloadCsv("mechnar-inventory-items.csv",[["Item","Category","SKU","Asset tag","Serial","On hand","Unit","Minimum","Maximum","Condition","Status","Location"],...state.items.map(x=>[x.name,x.category,x.sku,x.asset_tag,x.serial_number,x.quantity,x.unit,x.minimum_quantity,x.maximum_quantity,x.condition,x.status,x.storage_location])])}
  function exportPurchasesCsv(){downloadCsv("mechnar-inventory-purchases.csv",[["Supplier","Invoice","Date","Currency","Subtotal","Tax","Discount","Total","Status"],...state.purchases.map(x=>[x.supplier_name,x.invoice_number,x.invoice_date,x.currency,x.subtotal,x.tax_total,x.discount_total,x.grand_total,x.status])])}
  function tableSection(title,heads,rows,empty="No matching records."){const sec=$("section","mt-section");sec.append($("h2","",title));if(!rows.length){sec.append($("p","mt-empty",empty));return sec}sec.append(table(heads,rows));return sec}
