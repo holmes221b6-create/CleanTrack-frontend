@@ -15,3 +15,28 @@
 html[data-theme="light"] #page-content :is(.card,.panel,.stat-card,.metric-card,.dashboard-card,.content-card,.section-card,.report-card,.analytics-card,.settings-card,.ct-card,.ct-panel,.chart-card,.widget,.widget-card) :is(.card,.panel,.stat-card,.metric-card,.dashboard-card,.content-card,.section-card,.report-card,.analytics-card,.settings-card,.ct-card,.ct-panel,.chart-card,.widget,.widget-card){background:transparent!important;border:0!important;box-shadow:none!important}
 html[data-theme="light"] #page-content :is(.empty-state,.no-results,.empty-placeholder,.ct-team-empty,.mt-empty){background:transparent!important;border:0!important;color:var(--text-secondary,#46586d)!important}
 @media(max-width:760px){#page-content :is(.page-header,.page-heading,.content-header,.workspace-heading){flex-direction:column;align-items:stretch}}
+
+
+/* Plain-text rendering pass: text itself must never look like a tiny boxed chip.
+   Outer cards/sections remain as layout surfaces; their text is transparent. */
+html[data-theme="light"] #page-content :is(
+ h1,h2,h3,h4,h5,h6,p,label,small,li,dt,dd,th,td,legend,summary,
+ strong,b,em,i,span,a,code,kbd,.muted,.ct-muted,.page-description,
+ .description,.help-text,.field-hint,.mt-footnote,.mt-muted
+):not(button):not(.badge):not(.pill):not([role="status"]){
+ background:transparent!important;
+ background-color:transparent!important;
+ background-image:none!important;
+ box-shadow:none!important;
+ text-shadow:none!important;
+}
+html[data-theme="light"] #page-content :is(
+ .mt-stat span,.mt-stat strong,.mt-stat label,
+ .mt-section h2,.mt-section h3,.mt-section p,
+ .mt-inventory-details dt,.mt-inventory-details dd
+){
+ background:transparent!important;
+ background-color:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+}
