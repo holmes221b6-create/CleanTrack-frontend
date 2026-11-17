@@ -757,3 +757,153 @@ body .ct-bi-workspace .ct-bi-topbar{border-color:var(--bi-border)!important}
  .ct-team-fullscreen-shell .ct-team-operations-filter .ct-team-overview-filter-heading{grid-column:1/-1}
  .ct-team-fullscreen-shell .ct-team-operations-display{min-height:240px;padding:22px}
 }
+
+
+/* FINAL TEAMS THEME OVERRIDE — covers the full Teams shell, sidebar, every
+   subpage, BI authoring workspace, drawers, popovers and body-mounted overlays.
+   The earlier page-content-only rules did not reach the fixed Teams shell. */
+html[data-theme="light"]{
+ --ct-team-bg:#ffffff;--ct-team-surface:#ffffff;--ct-team-surface-2:#f5f7fa;
+ --ct-team-text:#172334;--ct-team-muted:#5e6b7c;--ct-team-border:#dce3eb;
+ --ct-team-border-strong:#c6d1de;--ct-team-accent:#7650a6;--ct-team-accent-soft:#f0eafa;
+ --ct-team-input:#ffffff;--ct-team-overlay:rgba(24,34,49,.42);
+}
+html[data-theme="default"]{
+ --ct-team-bg:#0f1016;--ct-team-surface:#10141c;--ct-team-surface-2:#171522;
+ --ct-team-text:#eeebf7;--ct-team-muted:#aaa3bb;--ct-team-border:#292c36;
+ --ct-team-border-strong:#443b55;--ct-team-accent:#a69acb;--ct-team-accent-soft:rgba(142,122,184,.16);
+ --ct-team-input:#0d1017;--ct-team-overlay:rgba(3,7,18,.78);
+}
+html[data-theme="black"]{
+ --ct-team-bg:#090b10;--ct-team-surface:#11151d;--ct-team-surface-2:#171c26;
+ --ct-team-text:#f1f4f8;--ct-team-muted:#a4adbb;--ct-team-border:#2c3543;
+ --ct-team-border-strong:#3b4657;--ct-team-accent:#a18ad0;--ct-team-accent-soft:rgba(161,138,208,.16);
+ --ct-team-input:#090d14;--ct-team-overlay:rgba(0,0,0,.84);
+}
+html[data-theme] .ct-team-fullscreen-shell{
+ background:var(--ct-team-bg)!important;color:var(--ct-team-text)!important;
+ color-scheme:light;
+}
+html[data-theme="default"] .ct-team-fullscreen-shell,
+html[data-theme="black"] .ct-team-fullscreen-shell{color-scheme:dark}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ .ct-team-fullscreen-topbar,.ct-team-fullscreen-sidebar,.ct-team-fullscreen-main,
+ .ct-team-fullscreen-pagehead,.ct-team-fullscreen-pagebody,.ct-team-fullscreen-view,
+ .ct-team-fullscreen-workspace,.ct-team-supervisor,.ct-team-manager,
+ .ct-team-supervisor-own,.ct-team-supervisor-search,.ct-team-supervisor-other,
+ .ct-team-supervisor-overview-summary,.ct-team-supervisor-operations-summary,
+ .ct-team-supervisor-controls-entry,.ct-team-supervisor-performance,
+ .ct-team-supervisor-management,.ct-team-supervisor-chart,.ct-team-history-panel,
+ .ct-team-action-panel,.ct-team-detail,.ct-team-list-panel,.ct-team-recent-panel,
+ .ct-team-create-form,.ct-team-notice,.ct-team-bulk-panel,.ct-team-insight-panel
+){
+ background-color:var(--ct-team-surface)!important;color:var(--ct-team-text)!important;
+ border-color:var(--ct-team-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-fullscreen-topbar,.ct-team-fullscreen-sidebar){
+ background:var(--ct-team-surface)!important;border-color:var(--ct-team-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-fullscreen-sidebar{color:var(--ct-team-text)!important}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-fullscreen-nav{
+ background:transparent!important;color:var(--ct-team-muted)!important;border-color:transparent!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-fullscreen-nav:hover{
+ background:var(--ct-team-surface-2)!important;color:var(--ct-team-text)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-fullscreen-nav.is-active{
+ background:var(--ct-team-accent-soft)!important;color:var(--ct-team-accent)!important;
+ border-color:var(--ct-team-border-strong)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ .ct-team-card,.ct-team-metric,.ct-team-supervisor-metric,.ct-team-recent-item,
+ .ct-team-check-row,.ct-team-supervisor-week,.ct-team-supervisor-chip,
+ .ct-team-supervisor-score,.ct-team-readonly,.ct-team-overview-filter,
+ .ct-team-operations-filter,.ct-team-overview-display,.ct-team-operations-display,
+ .ct-team-supervisor-suggestions,.ct-team-supervisor-drawer,.ct-team-table,
+ .ct-team-table-wrap,.ct-team-history-panel,.ct-team-controls-panel,
+ .ct-team-member-detail-panel,.ct-team-member-detail-head,.ct-team-member-detail-body,
+ .ct-team-member-detail-section,.ct-team-member-detail-chip
+){
+ background:var(--ct-team-surface-2)!important;color:var(--ct-team-text)!important;
+ border-color:var(--ct-team-border)!important;box-shadow:none;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ .ct-team-overview-filter-option,.ct-team-tab,.ct-team-btn--quiet,
+ .ct-team-supervisor-member-open,.ct-team-inline-link,.ct-team-member-detail-close,
+ .ct-team-member-photo-close,.ct-team-fullscreen-close
+){background:transparent!important;color:var(--ct-team-text)!important;border-color:var(--ct-team-border)!important}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-overview-filter-option.is-active,.ct-team-tab.is-active){
+ background:var(--ct-team-accent-soft)!important;color:var(--ct-team-accent)!important;border-color:var(--ct-team-border-strong)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-btn--primary,.ct-team-fullscreen-brandmark){
+ background:var(--ct-team-accent)!important;color:#fff!important;border-color:var(--ct-team-accent)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(input,select,textarea,.ct-team-input){
+ background:var(--ct-team-input)!important;color:var(--ct-team-text)!important;
+ border:1px solid var(--ct-team-border-strong)!important;color-scheme:inherit;
+}
+html[data-theme] .ct-team-fullscreen-shell select option{background:var(--ct-team-surface)!important;color:var(--ct-team-text)!important}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ h1,h2,h3,h4,h5,h6,p,span,strong,small,label,th,td,li,dt,dd
+){color:inherit}
+html[data-theme] .ct-team-fullscreen-shell :is(
+ .ct-team-muted,.ct-team-fullscreen-side-label,.ct-team-fullscreen-user,
+ .ct-team-supervisor-member small,.ct-team-supervisor-activityrow small,
+ .ct-team-metric small,.ct-team-metric span,.ct-team-card__summary
+){color:var(--ct-team-muted)!important}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-fullscreen-pagehead,.ct-team-detail-header,.ct-team-section-heading){
+ border-color:var(--ct-team-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-table th{
+ background:var(--ct-team-surface)!important;color:var(--ct-team-muted)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-team-table td{
+ background:var(--ct-team-surface-2)!important;color:var(--ct-team-text)!important;border-color:var(--ct-team-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-history-overlay,.ct-team-controls-overlay,.ct-team-member-detail-overlay,.ct-team-member-photo-overlay){
+ background:var(--ct-team-overlay)!important;
+}
+html[data-theme] body :is(.ct-team-supervisor-drawer,.ct-team-history-panel,.ct-team-controls-panel,.ct-team-member-detail-panel){
+ background:var(--ct-team-surface)!important;color:var(--ct-team-text)!important;border-color:var(--ct-team-border)!important;
+}
+html[data-theme] body :is(.ct-team-supervisor-drawer__header,.ct-team-supervisor-drawer__body,.ct-team-history-panel-head,.ct-team-history-panel-body){
+ background:var(--ct-team-surface)!important;color:var(--ct-team-text)!important;border-color:var(--ct-team-border)!important;
+}
+/* BI authoring subpage: remove its fixed white/grey palette and use the active theme. */
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-layout,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-canvas-area,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-canvas,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-dock,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-pane,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-topbar,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-ribbon,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-status,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-app-rail,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-canvas-head,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-visual-card,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-kpi,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-gallery-item,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-pane-tab,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-pagebar,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-trend-strip,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-transform-panel{
+ background:var(--ct-team-surface)!important;color:var(--ct-team-text)!important;
+ border-color:var(--ct-team-border)!important;box-shadow:none!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-layout,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-canvas{background-color:var(--ct-team-bg)!important;background-image:none!important}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-bi-ribbon-tab,.ct-bi-ribbon-tool,.ct-bi-rail-button,.ct-bi-vertical-tab,.ct-bi-pane-tab){
+ background:transparent!important;color:var(--ct-team-muted)!important;border-color:var(--ct-team-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-bi-ribbon-tab.is-active,.ct-bi-rail-button.is-active,.ct-bi-vertical-tab.is-active,.ct-bi-pane-tab.is-active){
+ color:var(--ct-team-accent)!important;border-color:var(--ct-team-accent)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace :is(input,select,textarea,.ct-team-input){
+ background:var(--ct-team-input)!important;color:var(--ct-team-text)!important;border-color:var(--ct-team-border-strong)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace select option{background:var(--ct-team-surface)!important;color:var(--ct-team-text)!important}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-axis,.ct-bi-field-row,.ct-bi-side-field){color:var(--ct-team-muted)!important}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-donut-hole,
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-hole{fill:var(--ct-team-surface)!important}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-ring{stroke:var(--ct-team-text)!important}
