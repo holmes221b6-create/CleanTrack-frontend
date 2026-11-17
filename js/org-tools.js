@@ -24,9 +24,10 @@ async function renderInventory(container){
  const root=shell(container,"OPERATIONS RESOURCES","Inventory","A unified inventory control centre for assets, procurement, stock, locations and demand.");
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
- const toolbar=$("div","mt-toolbar"),search=input("search","","search");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
- if(canManage)toolbar.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
- toolbar.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv));root.append(toolbar);
+ const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
+ if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
+ toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
+ toolbar.append(toolbarActions);root.append(toolbar);
  const tabs=$("nav","mt-inventory-tabs"),content=$("div","mt-content");let activeContent=content;root.append(tabs,content);
  const views=[["overview","Overview"],["items","Items & assets"],["procurement","Procurement"],["stock","Stock control"],["locations","Locations"],["transfers","Transfers"],["requests","Requests"],["maintenance","Maintenance"],["analytics","Analytics"],["forecast","Forecast"],["history","Movement history"]];
  views.forEach(([id,label])=>{const b=btn(label,()=>{if(id==="overview"){state.view=id;activeContent=content;draw()}else openViewPanel(id,label)});b.dataset.view=id;tabs.append(b)});
