@@ -225,3 +225,28 @@
 .mt-page .mt-content>.mt-actions .mt-btn{min-width:120px}
 .mt-form-grid>.mt-field{min-width:0}
 @media(max-width:680px){.mt-page .mt-content>.mt-actions .mt-btn{flex:1 1 100%}}
+
+/* Advanced inventory command workspace */
+.mt-inventory-tabs{display:flex;gap:5px;flex-wrap:wrap;overflow-x:auto;padding:0 0 11px;margin:8px 0 16px;border-bottom:1px solid rgba(160,140,190,.18)}
+.mt-inventory-tabs .mt-btn{white-space:nowrap;min-height:35px;padding:7px 11px;font-size:12px}
+.mt-inventory-tabs .mt-btn.is-active{background:rgba(101,78,126,.42);border-color:rgba(174,147,202,.48);color:#f2edf7;box-shadow:inset 0 -2px 0 rgba(190,164,215,.55)}
+.mt-inventory-tabs~.mt-content{min-width:0}
+.mt-inventory-tabs~.mt-content>.mt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px;margin:2px 0 16px}
+.mt-inventory-tabs~.mt-content>.mt-stats .mt-stat{min-height:86px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:13px 15px;border:1px solid rgba(160,140,190,.18);border-radius:9px;background:rgba(35,29,42,.48)}
+.mt-inventory-tabs~.mt-content>.mt-stats .mt-stat strong{font-size:25px;line-height:1.1;font-weight:650}
+.mt-stat-action{cursor:pointer;text-align:left;color:inherit}
+.mt-stat-action:hover{border-color:rgba(181,153,209,.58);background:rgba(79,61,97,.3)}
+.mt-inventory-tabs~.mt-content>.mt-actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.mt-inventory-tabs~.mt-content>.mt-section{margin:0 0 16px;padding:14px 15px;border:1px solid rgba(160,140,190,.16);border-radius:9px;background:rgba(24,21,29,.34);overflow-x:auto}
+.mt-inventory-tabs~.mt-content>.mt-section h2{font-size:14px;margin:0 0 12px}
+.mt-inventory-tabs~.mt-content table{width:100%;min-width:650px;border-collapse:collapse}
+.mt-inventory-tabs~.mt-content th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted,#aaa2b7);font-weight:600}
+.mt-inventory-tabs~.mt-content td,.mt-inventory-tabs~.mt-content th{padding:10px 9px;border-bottom:1px solid rgba(160,140,190,.12);text-align:left;vertical-align:middle}
+.mt-inventory-tabs~.mt-content td{font-size:12px}
+.mt-inventory-tabs~.mt-content .mt-btn{min-height:30px;padding:6px 10px;font-size:11px}
+.mt-inventory-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+.mt-inventory-details dt,.mt-inventory-details dd{padding:9px 0;border-top:1px solid rgba(160,140,190,.13);font-size:12px}
+.mt-inventory-tabs~.mt-content .mt-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mt-inventory-tabs~.mt-content .mt-form-grid .mt-field:has(textarea){grid-column:1/-1}
+.mt-inventory-tabs~.mt-content .mt-empty{padding:18px 4px;font-size:12px}
+@media(max-width:700px){.mt-inventory-tabs{flex-wrap:nowrap;scrollbar-width:thin}.mt-inventory-tabs~.mt-content>.mt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.mt-inventory-tabs~.mt-content .mt-form-grid,.mt-inventory-details{grid-template-columns:1fr}.mt-inventory-tabs~.mt-content>.mt-section{padding:11px}}
