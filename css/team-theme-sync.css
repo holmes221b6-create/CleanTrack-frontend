@@ -1,0 +1,110 @@
+/* Teams workspace theme synchronisation.
+   Teams uses a fullscreen shell and custom overlays, so page-content theme rules
+   do not reach it. Map the selected global theme onto every Teams surface. */
+html[data-theme="light"] .ct-team-fullscreen-shell,
+html[data-theme="light"] body .ct-team-fullscreen-shell{
+ --ct-home-bg:#ffffff;--ct-home-card:#ffffff;--ct-home-card-2:#f5f7fa;
+ --ct-home-border:#dce3eb;--ct-home-border-accent:#b8a6d3;
+ --ct-home-text:#172334;--ct-home-muted:#5e6b7c;--ct-home-accent:#7650a6;
+ --primary:#7650a6;--primary-hover:#65428f;--primary-contrast:#fff;
+ --success:#287d63;--text:#172334;--text-secondary:#5e6b7c;
+ --surface:#ffffff;--bg-elevated:#f7f9fc;--border:#dce3eb;--border-strong:#c8d2de;
+ color:#172334!important;background:#fff!important;color-scheme:light!important;
+}
+html[data-theme="black"] .ct-team-fullscreen-shell,
+html[data-theme="black"] body .ct-team-fullscreen-shell{
+ --ct-home-bg:#090b10;--ct-home-card:#11151d;--ct-home-card-2:#171c26;
+ --ct-home-border:#2c3543;--ct-home-border-accent:#514566;
+ --ct-home-text:#f1f4f8;--ct-home-muted:#a4adbb;--ct-home-accent:#a18ad0;
+ --primary:#a18ad0;--primary-hover:#b7a5df;--primary-contrast:#100d17;
+ --success:#a18ad0;--text:#f1f4f8;--text-secondary:#a4adbb;
+ --surface:#11151d;--bg-elevated:#171c26;--border:#2c3543;--border-strong:#3b4657;
+ color:#f1f4f8!important;background:#090b10!important;color-scheme:dark!important;
+}
+/* Default is the established charcoal/violet MECHNAR appearance. */
+html:not([data-theme="light"]):not([data-theme="black"]) .ct-team-fullscreen-shell,
+html[data-theme="default"] .ct-team-fullscreen-shell{
+ --ct-home-bg:#0f1016;--ct-home-card:#10141c;--ct-home-card-2:#14131e;
+ --ct-home-border:#292c36;--ct-home-border-accent:#514566;
+ --ct-home-text:#eeebf7;--ct-home-muted:#858194;--ct-home-accent:#a69acb;
+ --primary:#a69acb;--primary-hover:#c0b1e8;--primary-contrast:#100d17;
+ --success:#a69acb;--text:#eeebf7;--text-secondary:#858194;
+ --surface:#10141c;--bg-elevated:#10141c;--border:#292c36;--border-strong:#383246;
+ color:#eeebf7;background:#0f1016;color-scheme:dark;
+}
+/* Team page structural surfaces */
+html[data-theme="light"] .ct-team-fullscreen-shell :is(
+ .ct-team-fullscreen-main,.ct-team-fullscreen-pagebody,.ct-team-fullscreen-content,
+ .ct-team-supervisor-overview-summary,.ct-team-supervisor-operations-summary,
+ .ct-team-supervisor-controls-entry,.ct-team-overview-filter,.ct-team-operations-filter,
+ .ct-team-overview-display,.ct-team-operations-display,.ct-team-member-detail-panel,
+ .ct-team-history-panel,.ct-team-panel,.ct-team-modal,.ct-team-section,
+ .ct-team-card,.ct-team-table-wrap,.ct-team-directory,.ct-team-performance-panel
+){
+ background:#fff!important;background-color:#fff!important;color:#172334!important;
+ border-color:#dce3eb!important;box-shadow:none!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(
+ .ct-team-overview-display,.ct-team-operations-display
+){background:#f7f9fc!important}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(
+ h1,h2,h3,h4,h5,p,span,strong,small,label,dt,dd,th,td,li,.ct-team-overview-detail,
+ .ct-team-overview-note,.ct-team-overview-filter-heading,.ct-team-member-detail-chip
+){color:inherit}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(
+ .ct-team-overview-filter-option,.ct-team-supervisor-member-open,
+ .ct-team-member-detail-close,.ct-team-member-photo-close
+){color:#263548!important;background:transparent!important;border-color:#dce3eb!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-team-overview-filter-option.is-active{
+ color:#65428f!important;background:#f0eafa!important;border-color:#cdbce5!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(input,select,textarea,.ct-team-input){
+ color:#172334!important;background:#fff!important;border-color:#cbd5e1!important;color-scheme:light!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell select option{color:#172334!important;background:#fff!important}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(button,.ct-team-btn):not(.ct-team-overview-filter-option){
+ color:#263548;border-color:#cbd5e1;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(.ct-team-member-detail-overlay,.ct-team-controls-overlay,.ct-team-member-photo-overlay){
+ background:rgba(24,34,49,.42)!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-team-member-detail-panel{
+ background:#fff!important;color:#172334!important;border-color:#dce3eb!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(.ct-team-member-detail-head,.ct-team-member-detail-body,.ct-team-member-detail-section){
+ background:#fff!important;color:#172334!important;border-color:#e2e8f0!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-team-member-detail-chip{
+ color:#5b4777!important;background:#f5f0fb!important;border-color:#e2d8ef!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace{
+ background:#f4f6f9!important;color:#172334!important;color-scheme:light!important;
+ --bi-bg:#f4f6f9;--bi-panel:#fff;--bi-panel-2:#f7f9fc;--bi-text:#172334;--bi-muted:#5e6b7c;--bi-border:#dce3eb;--bi-accent:#7650a6;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(
+ .ct-bi-topbar,.ct-bi-ribbon,.ct-bi-canvas-area,.ct-bi-visual-card,.ct-bi-kpi,
+ .ct-bi-dock,.ct-bi-pane,.ct-bi-pane-tab,.ct-bi-gallery-item,.ct-bi-trend-strip,
+ .ct-bi-pagebar,.ct-bi-transform-panel,.ct-bi-filter-rail,.ct-bi-status,
+ .ct-bi-canvas-head,.ct-bi-dock-title
+){background:#fff!important;color:#172334!important;border-color:#dce3eb!important;box-shadow:none}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(
+ .ct-bi-layout,.ct-bi-canvas
+){background:#f4f6f9!important;background-image:none!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(
+ .ct-bi-ribbon-tab,.ct-bi-ribbon-tool,.ct-bi-rail-button,.ct-bi-vertical-tab,.ct-bi-pane-tab
+){background:transparent!important;color:#344256!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(input,select,textarea,.ct-team-input){
+ background:#fff!important;color:#172334!important;border-color:#cbd5e1!important;color-scheme:light!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace select option{background:#fff!important;color:#172334!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-axis{fill:#5e6b7c!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-donut-hole,
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-hole{fill:#fff!important}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace .ct-bi-icon-ring{stroke:#344256!important}
+/* Team popovers and overlays are sometimes attached directly to body. */
+html[data-theme="light"] body :is(.ct-team-member-photo-overlay,.ct-team-member-detail-overlay,.ct-team-controls-overlay) .ct-team-member-detail-panel{
+ background:#fff!important;color:#172334!important;border-color:#dce3eb!important;
+}
+html[data-theme="light"] body .ct-team-member-photo-overlay .ct-team-member-photo-close{
+ color:#172334!important;background:#fff!important;border-color:#cbd5e1!important;
+}
