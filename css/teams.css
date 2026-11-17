@@ -967,3 +967,98 @@ html[data-theme="black"] body :is(.ct-team-supervisor-drawer,.ct-team-history-pa
  .ct-team-controls-panel,.ct-team-member-detail-panel){
  background:#11151d!important;color:#f1f4f8!important;border-color:#2c3543!important;
 }
+
+
+/* Definitive Teams appearance tokens. The original Teams and BI styles declared
+   their own charcoal palette later in this file, overriding application tokens. */
+html[data-theme="light"] .ct-team-fullscreen-shell{
+ --ct-home-bg:#e7ecf2;--ct-home-card:#ffffff;--ct-home-card-2:#f2f5f8;
+ --ct-home-border:#c4ceda;--ct-home-border-accent:#a9b8c8;
+ --ct-home-text:#19283a;--ct-home-muted:#52647a;--ct-home-accent:#7650a6;
+ --ct-home-border-strong:#a7b5c5;
+ --primary:#7650a6;--primary-hover:#63408f;--primary-contrast:#fff;
+ --success:#176746;--text:#19283a;--text-secondary:#52647a;
+ --surface:#fff;--bg-elevated:#f2f5f8;--border:#c4ceda;--border-strong:#a7b5c5;
+ color:#19283a!important;background:#e7ecf2!important;color-scheme:light;
+}
+html[data-theme="default"] .ct-team-fullscreen-shell{
+ --ct-home-bg:#0f1016;--ct-home-card:#10141c;--ct-home-card-2:#191725;
+ --ct-home-border:#292c36;--ct-home-border-accent:#514566;
+ --ct-home-text:#eeebf7;--ct-home-muted:#a29caf;--ct-home-accent:#a995d6;
+ --ct-home-border-strong:#443b55;
+ color:#eeebf7!important;background:#0f1016!important;color-scheme:dark;
+}
+html[data-theme="black"] .ct-team-fullscreen-shell{
+ --ct-home-bg:#090b10;--ct-home-card:#11151d;--ct-home-card-2:#171c26;
+ --ct-home-border:#2c3543;--ct-home-border-accent:#46546a;
+ --ct-home-text:#f1f4f8;--ct-home-muted:#a4adbb;--ct-home-accent:#a995d6;
+ --ct-home-border-strong:#3b4657;
+ color:#f1f4f8!important;background:#090b10!important;color-scheme:dark;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-fullscreen-topbar,.ct-team-fullscreen-sidebar,
+ .ct-team-fullscreen-workspace,.ct-team-fullscreen-main,.ct-team-fullscreen-pagehead,
+ .ct-team-fullscreen-pagebody,.ct-team-fullscreen-view){
+ background-color:var(--ct-home-bg)!important;color:var(--ct-home-text)!important;
+ border-color:var(--ct-home-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-team-fullscreen-nav,.ct-team-fullscreen-close,
+ .ct-bi-topbar,.ct-bi-ribbon,.ct-bi-status,.ct-bi-app-rail,.ct-bi-layout,
+ .ct-bi-canvas-area,.ct-bi-canvas-head,.ct-bi-kpis,.ct-bi-kpi,.ct-bi-canvas,
+ .ct-bi-visual-card,.ct-bi-dock,.ct-bi-filter-rail,.ct-bi-pane,.ct-bi-side-section,
+ .ct-bi-gallery-item,.ct-bi-trend-strip,.ct-bi-trend-chip,.ct-bi-pagebar,
+ .ct-bi-transform-panel,.ct-bi-data-table,.ct-bi-data-table thead,
+ .ct-bi-data-table tbody,.ct-bi-data-table tr,.ct-bi-data-table th,.ct-bi-data-table td){
+ background-color:var(--ct-home-card)!important;color:var(--ct-home-text)!important;
+ border-color:var(--ct-home-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-bi-layout,.ct-bi-canvas){
+ background-color:var(--ct-home-bg)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(.ct-bi-ribbon-tabs,.ct-bi-ribbon-tools,
+ .ct-bi-canvas-head,.ct-bi-dock-title,.ct-bi-filter-rail){
+ background-color:var(--ct-home-card-2)!important;color:var(--ct-home-text)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(button,.ct-team-btn,.ct-bi-ribbon-tab,
+ .ct-bi-ribbon-tool,.ct-bi-rail-button,.ct-bi-vertical-tab,.ct-bi-pane-tab,
+ .ct-bi-gallery-item,.ct-bi-remove,.ct-bi-clear){
+ color:var(--ct-home-text)!important;border-color:var(--ct-home-border)!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(input,select,textarea,.ct-team-input,
+ .ct-bi-side-field .ct-team-input,.ct-bi-topbar>input,.ct-bi-transform-filter input,
+ .ct-bi-transform-filter select){
+ background:var(--ct-home-card)!important;color:var(--ct-home-text)!important;
+ border-color:var(--ct-home-border)!important;color-scheme:inherit;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell :is(.ct-team-fullscreen-nav,.ct-team-fullscreen-close){
+ color:#19283a!important;
+}
+html[data-theme] .ct-team-fullscreen-shell :is(h1,h2,h3,h4,p,span,strong,small,label,
+ .ct-bi-dock-title,.ct-bi-side-section h3,.ct-bi-side-field,.ct-bi-field-row){
+ color:inherit;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace{
+ --bi-bg:#e7ecf2;--bi-panel:#fff;--bi-panel-2:#f2f5f8;
+ --bi-border:#c4ceda;--bi-text:#19283a;--bi-muted:#52647a;--bi-accent:#7650a6;
+ background:#e7ecf2!important;color:#19283a!important;color-scheme:light;
+}
+html[data-theme="default"] .ct-team-fullscreen-shell .ct-bi-workspace{
+ --bi-bg:#0f1016;--bi-panel:#10141c;--bi-panel-2:#191725;
+ --bi-border:#292c36;--bi-text:#eeebf7;--bi-muted:#a29caf;--bi-accent:#a995d6;
+}
+html[data-theme="black"] .ct-team-fullscreen-shell .ct-bi-workspace{
+ --bi-bg:#090b10;--bi-panel:#11151d;--bi-panel-2:#171c26;
+ --bi-border:#2c3543;--bi-text:#f1f4f8;--bi-muted:#a4adbb;--bi-accent:#a995d6;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace{
+ background:var(--bi-bg)!important;color:var(--bi-text)!important;color-scheme:inherit;
+}
+html[data-theme] .ct-team-fullscreen-shell .ct-bi-workspace :is(input,select,textarea,option){
+ background:var(--bi-panel-2)!important;color:var(--bi-text)!important;
+ border-color:var(--bi-border)!important;color-scheme:inherit;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-canvas,.ct-bi-layout){
+ background:#e7ecf2!important;
+}
+html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-status,.ct-bi-pagebar){
+ background:#f2f5f8!important;color:#52647a!important;
+}
