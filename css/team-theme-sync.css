@@ -108,3 +108,274 @@ html[data-theme="light"] body :is(.ct-team-member-photo-overlay,.ct-team-member-
 html[data-theme="light"] body .ct-team-member-photo-overlay .ct-team-member-photo-close{
  color:#172334!important;background:#fff!important;border-color:#cbd5e1!important;
 }
+
+
+/* -------------------------------------------------------------------------
+   MECHNAR ACCOUNT-WIDE APPEARANCE
+   This file is loaded after every feature stylesheet. The selected account
+   appearance is the single source of truth for every page and body-mounted
+   dialog/panel, including content created after navigation.
+   ------------------------------------------------------------------------- */
+html[data-theme="default"] {
+  color-scheme: dark !important;
+  --mn-page: #0f1016;
+  --mn-shell: #11131b;
+  --mn-surface: #151821;
+  --mn-surface-raised: #1b1d28;
+  --mn-surface-hover: #222432;
+  --mn-text: #eeebf7;
+  --mn-muted: #aaa4b8;
+  --mn-border: #30303d;
+  --mn-accent: #a69acb;
+  --mn-accent-soft: #292338;
+  --mn-field: #10121a;
+  --mn-shadow: 0 14px 38px rgba(0,0,0,.24);
+  --mn-overlay: rgba(3,3,8,.76);
+}
+html[data-theme="black"] {
+  color-scheme: dark !important;
+  --mn-page: #050608;
+  --mn-shell: #080a0e;
+  --mn-surface: #0d1118;
+  --mn-surface-raised: #121823;
+  --mn-surface-hover: #1a2230;
+  --mn-text: #f1f4f8;
+  --mn-muted: #a4adbb;
+  --mn-border: #283342;
+  --mn-accent: #a18ad0;
+  --mn-accent-soft: #211b30;
+  --mn-field: #090d14;
+  --mn-shadow: 0 16px 42px rgba(0,0,0,.48);
+  --mn-overlay: rgba(0,0,0,.84);
+}
+html[data-theme="light"] {
+  color-scheme: light !important;
+  --mn-page: #ffffff;
+  --mn-shell: #ffffff;
+  --mn-surface: #ffffff;
+  --mn-surface-raised: #f6f8fb;
+  --mn-surface-hover: #eef2f7;
+  --mn-text: #172334;
+  --mn-muted: #5e6b7c;
+  --mn-border: #dce3eb;
+  --mn-accent: #7650a6;
+  --mn-accent-soft: #f0eafa;
+  --mn-field: #ffffff;
+  --mn-shadow: 0 8px 24px rgba(23,35,52,.09);
+  --mn-overlay: rgba(24,34,49,.42);
+}
+
+/* App canvas, authenticated workspace, navigation rail and every page root. */
+html[data-theme] body,
+html[data-theme] body #app,
+html[data-theme] body #main-content,
+html[data-theme] body #workspace-view,
+html[data-theme] body #workspace-view .workspace-layout,
+html[data-theme] body #workspace-view .workspace-main,
+html[data-theme] body #workspace-view .ct-workspace-shell,
+html[data-theme] body #workspace-view .ct-workspace-main,
+html[data-theme] body #workspace-view #page-content,
+html[data-theme] body #page-content,
+html[data-theme] body .page-content,
+html[data-theme] body .ct-team-fullscreen-shell {
+  color: var(--mn-text) !important;
+  background-color: var(--mn-page) !important;
+  background-image: none !important;
+  color-scheme: inherit;
+}
+html[data-theme] body #workspace-view .sidebar,
+html[data-theme] body #workspace-view .ct-sidebar,
+html[data-theme] body #workspace-view .ct-workspace-toolbar,
+html[data-theme] body .app-header,
+html[data-theme] body #app-footer,
+html[data-theme] body .sidebar-brand,
+html[data-theme] body .ct-sidebar-brand,
+html[data-theme] body .workspace-identity,
+html[data-theme] body .sidebar-bottom,
+html[data-theme] body .mobile-workspace-bar {
+  color: var(--mn-text) !important;
+  background: var(--mn-shell) !important;
+  background-image: none !important;
+  border-color: var(--mn-border) !important;
+  box-shadow: none !important;
+}
+
+/* Shared surfaces across Admin, Supervisor, Staff and feature-specific pages. */
+html[data-theme] body #page-content :is(
+  .card,.panel,.stat-card,.metric-card,.dashboard-card,.form-card,.content-card,
+  .section-card,.table-wrap,.table-container,.table-wrapper,.data-table-container,
+  .ct-card,.ct-panel,.ct-widget,.ct-settings-card,.ct-settings-nav,.ct-settings-panel,
+  .ct-home-card,.ct-home-panel,.ct-dash-panel,.ct-dash-kpi,.ct-team-card,
+  .ct-org-card,.ct-org-panel,.ct-location-card,.ct-zone-card,.ct-operation-card,
+  .ct-report-card,.ct-analytics-card,.ct-create-form,.ct-details-panel,
+  [class*="-card"],[class*="-panel"],[class*="-widget"],[class*="-section"]
+),
+html[data-theme] body .ct-team-fullscreen-shell :is(
+  .ct-team-fullscreen-main,.ct-team-fullscreen-pagebody,.ct-team-fullscreen-content,
+  .ct-team-overview-display,.ct-team-operations-display,.ct-team-panel,
+  .ct-team-section,.ct-team-card,.ct-team-table-wrap,.ct-team-directory,
+  .ct-team-performance-panel,.ct-bi-topbar,.ct-bi-ribbon,.ct-bi-visual-card,
+  .ct-bi-kpi,.ct-bi-dock,.ct-bi-pane,.ct-bi-gallery-item,.ct-bi-pagebar
+) {
+  color: var(--mn-text) !important;
+  background: var(--mn-surface) !important;
+  background-image: none !important;
+  border-color: var(--mn-border) !important;
+  box-shadow: var(--mn-shadow) !important;
+}
+
+/* Keep page headings, copy, table content and labels legible in every theme. */
+html[data-theme] body #page-content :is(
+  h1,h2,h3,h4,h5,h6,p,label,small,li,dt,dd,th,td,legend,summary,
+  .page-title,.section-title,.card-title,.panel-title,.description,
+  .muted,.text-muted,.ct-muted,.ct-settings-muted,.ct-page-description
+),
+html[data-theme] body .ct-team-fullscreen-shell :is(
+  h1,h2,h3,h4,h5,h6,p,label,small,li,dt,dd,th,td,legend,summary
+) {
+  color: var(--mn-text) !important;
+  text-shadow: none !important;
+}
+html[data-theme] body #page-content :is(
+  .muted,.text-muted,.ct-muted,.ct-settings-muted,.ct-page-description,
+  .ct-section-description,.description,.hint,.field-hint,.help-text
+) {
+  color: var(--mn-muted) !important;
+}
+
+/* Inputs and neutral controls, including controls inside dynamically mounted panels. */
+html[data-theme] body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea),
+html[data-theme] body .ct-team-fullscreen-shell :is(input,select,textarea) {
+  color: var(--mn-text) !important;
+  background: var(--mn-field) !important;
+  border-color: var(--mn-border) !important;
+  color-scheme: inherit;
+}
+html[data-theme] body :is(input,textarea)::placeholder {
+  color: var(--mn-muted) !important;
+  opacity: .85;
+}
+html[data-theme] body select option {
+  color: var(--mn-text) !important;
+  background: var(--mn-surface) !important;
+}
+html[data-theme] body #page-content button:not(.button-primary):not(.btn-primary):not(.ct-button--primary):not(.ct-settings-button-primary):not(.ct-org-button-primary),
+html[data-theme] body #page-content .button-secondary,
+html[data-theme] body #page-content .btn-secondary,
+html[data-theme] body .ct-team-fullscreen-shell button:not(.ct-team-primary) {
+  color: var(--mn-text);
+  background-color: var(--mn-surface-raised);
+  border-color: var(--mn-border);
+}
+
+/* All body-mounted modals, detail panels, drawers, popovers and filter dialogs. */
+html[data-theme] body :is(
+  dialog,[role="dialog"],.app-modal,#app-modal,.modal-content,.modal-dialog,
+  .filter-modal,.filter-panel,.filter-dialog,.popover,.dropdown-menu,
+  .ct-modal,.ct-modal-panel,.ct-dialog,.ct-drawer,.ct-side-panel,
+  [class*="detail-panel"],[class*="history-panel"],[class*="controls-panel"],
+  [class*="member-detail-panel"],[class*="filter-panel"],[class*="modal-content"]
+):not([class*="overlay"]) {
+  color: var(--mn-text) !important;
+  background-color: var(--mn-surface) !important;
+  background-image: none !important;
+  border-color: var(--mn-border) !important;
+}
+html[data-theme] body :is(
+  dialog,[role="dialog"],.app-modal,#app-modal,.modal-content,.modal-dialog,
+  .filter-modal,.filter-panel,.filter-dialog,.popover,.dropdown-menu,
+  .ct-modal,.ct-modal-panel,.ct-dialog,.ct-drawer,.ct-side-panel,
+  [class*="detail-panel"],[class*="history-panel"],[class*="controls-panel"],
+  [class*="member-detail-panel"],[class*="filter-panel"],[class*="modal-content"]
+) :is(h1,h2,h3,h4,h5,p,label,span,strong,small,dt,dd,th,td) {
+  color: inherit;
+}
+html[data-theme] body :is(
+  .modal-overlay,.dialog-overlay,.drawer-overlay,.ct-modal-overlay,
+  .ct-team-member-detail-overlay,.ct-team-controls-overlay,.ct-team-member-photo-overlay
+) {
+  background: var(--mn-overlay) !important;
+}
+html[data-theme] body :is(
+  .modal-header,.modal-footer,.panel-header,.panel-footer,
+  .ct-modal-header,.ct-modal-footer
+) {
+  color: var(--mn-text) !important;
+  background: transparent !important;
+  border-color: var(--mn-border) !important;
+}
+
+/* Tables, separators and navigation states use the same selected palette. */
+html[data-theme] body :is(table,thead,tbody,tfoot,tr,th,td) {
+  border-color: var(--mn-border);
+}
+html[data-theme] body :is(th) {
+  color: var(--mn-muted) !important;
+  background: var(--mn-surface-raised) !important;
+}
+html[data-theme] body :is(td) {
+  color: var(--mn-text);
+}
+html[data-theme] body #workspace-view #workspace-navigation :is(a,button),
+html[data-theme] body #workspace-view .navigation-link {
+  color: var(--mn-text);
+}
+html[data-theme] body #workspace-view #workspace-navigation :is(a,button):hover,
+html[data-theme] body #workspace-view .navigation-link:hover {
+  color: var(--mn-text) !important;
+  background: var(--mn-surface-hover) !important;
+}
+html[data-theme] body #workspace-view #workspace-navigation :is(.active,[aria-current="page"],.ct-nav-active) {
+  color: var(--mn-accent) !important;
+  background: var(--mn-accent-soft) !important;
+  border-color: var(--mn-border) !important;
+}
+
+/* Accent actions remain branded; semantic success/warning/error indicators retain
+   their meaning and are deliberately not flattened into neutral theme colours. */
+html[data-theme] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary,.btn-primary
+) {
+  color: #fff !important;
+}
+html[data-theme="light"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) {
+  background-color: #7650a6 !important;
+  border-color: #7650a6 !important;
+}
+html[data-theme="default"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) {
+  background-color: #765b9d !important;
+  border-color: #765b9d !important;
+}
+html[data-theme="black"] body :is(
+  .button-primary,.btn-primary,.ct-button--primary,.ct-settings-button-primary,
+  .ct-org-button-primary,.ct-team-primary
+) {
+  background-color: #8b72bd !important;
+  border-color: #8b72bd !important;
+}
+
+/* Theme-aware chart/workspace surfaces without changing data-series colours. */
+html[data-theme] body .ct-bi-workspace {
+  color: var(--mn-text) !important;
+  background: var(--mn-page) !important;
+  color-scheme: inherit;
+}
+html[data-theme] body .ct-bi-workspace :is(
+  .ct-bi-layout,.ct-bi-canvas-area,.ct-bi-canvas,.ct-bi-pane,.ct-bi-dock,
+  .ct-bi-topbar,.ct-bi-ribbon,.ct-bi-pagebar,.ct-bi-transform-panel,
+  .ct-bi-filter-rail,.ct-bi-visual-card,.ct-bi-kpi,.ct-bi-gallery-item
+) {
+  color: var(--mn-text) !important;
+  background: var(--mn-surface) !important;
+  border-color: var(--mn-border) !important;
+}
+html[data-theme] body .ct-bi-workspace :is(.ct-bi-axis) {
+  fill: var(--mn-muted);
+}
