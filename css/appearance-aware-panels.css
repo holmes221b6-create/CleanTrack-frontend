@@ -1,0 +1,84 @@
+/* Appearance-aware overlay and filter-panel system.
+   These panels are mounted under body, outside #page-content; theme them explicitly. */
+:root{
+ --mn-dialog-bg:#15111d;--mn-dialog-surface:#1c1726;--mn-dialog-text:#f3edf9;
+ --mn-dialog-muted:#b7a9c8;--mn-dialog-border:#443650;--mn-dialog-input:#100d16;
+ --mn-dialog-accent:#9364bd;--mn-dialog-overlay:rgba(4,3,8,.78);
+}
+html[data-theme="default"]{
+ --mn-dialog-bg:#15111d;--mn-dialog-surface:#1c1726;--mn-dialog-text:#f3edf9;
+ --mn-dialog-muted:#b7a9c8;--mn-dialog-border:#443650;--mn-dialog-input:#100d16;
+ --mn-dialog-accent:#9364bd;--mn-dialog-overlay:rgba(4,3,8,.78);
+}
+html[data-theme="black"]{
+ --mn-dialog-bg:#090b10;--mn-dialog-surface:#11151d;--mn-dialog-text:#f1f4f8;
+ --mn-dialog-muted:#a4adbb;--mn-dialog-border:#2c3543;--mn-dialog-input:#090d14;
+ --mn-dialog-accent:#a18ad0;--mn-dialog-overlay:rgba(0,0,0,.84);
+}
+html[data-theme="light"]{
+ --mn-dialog-bg:#ffffff;--mn-dialog-surface:#f7f9fc;--mn-dialog-text:#172334;
+ --mn-dialog-muted:#5b6879;--mn-dialog-border:#d8e0e9;--mn-dialog-input:#ffffff;
+ --mn-dialog-accent:#7650a6;--mn-dialog-overlay:rgba(24,34,49,.42);
+}
+/* All Inventory/workflow panels and filter dialogs follow the selected appearance. */
+html body .mt-overlay{background:var(--mn-dialog-overlay)!important;color:var(--mn-dialog-text)!important}
+html body .mt-overlay .mt-panel{
+ background:var(--mn-dialog-bg)!important;color:var(--mn-dialog-text)!important;
+ border:1px solid var(--mn-dialog-border)!important;
+ box-shadow:0 24px 72px rgba(0,0,0,.22)!important
+}
+html body .mt-overlay .mt-panel-head{
+ background:transparent!important;color:var(--mn-dialog-text)!important;
+ border-bottom:1px solid var(--mn-dialog-border)!important
+}
+html body .mt-overlay .mt-panel-head :is(h1,h2,h3,h4,p,span,strong){background:transparent!important;color:inherit!important}
+html body .mt-overlay .mt-panel .mt-muted,
+html body .mt-overlay .mt-panel .mt-footnote,
+html body .mt-overlay .mt-panel .mt-field>span{color:var(--mn-dialog-muted)!important}
+html body .mt-overlay .mt-panel :is(.mt-section,.mt-stat,.mt-empty,.mt-recommendations){
+ background:transparent!important;color:var(--mn-dialog-text)!important;
+ box-shadow:none!important
+}
+html body .mt-overlay .mt-panel .mt-section{border-color:var(--mn-dialog-border)!important}
+html body .mt-overlay .mt-panel .mt-empty{
+ border:0!important;border-radius:0!important;padding:12px 0!important
+}
+html body .mt-overlay .mt-panel :is(input,select,textarea,.mt-input){
+ background:var(--mn-dialog-input)!important;color:var(--mn-dialog-text)!important;
+ border:1px solid var(--mn-dialog-border)!important
+}
+html body .mt-overlay .mt-panel select option{
+ background:var(--mn-dialog-bg)!important;color:var(--mn-dialog-text)!important
+}
+html body .mt-overlay .mt-panel :is(button,.mt-btn,.mt-close){
+ color:var(--mn-dialog-text)!important;border-color:var(--mn-dialog-border)!important
+}
+html body .mt-overlay .mt-panel .mt-btn-primary{
+ background:var(--mn-dialog-accent)!important;border-color:var(--mn-dialog-accent)!important;color:#fff!important
+}
+html body .mt-overlay .mt-panel .mt-close{background:transparent!important}
+html body .mt-overlay .mt-panel .mt-table th{background:var(--mn-dialog-surface)!important;color:var(--mn-dialog-muted)!important}
+html body .mt-overlay .mt-panel .mt-table td{background:transparent!important;color:var(--mn-dialog-text)!important;border-color:var(--mn-dialog-border)!important}
+/* Native shared modal and common filter/dialog shells use the same palette. */
+html body #app-modal,
+html body #app-modal .modal-content,
+html body .app-modal[open],
+html body .filter-modal,
+html body .filter-panel,
+html body .filter-dialog{
+ background:var(--mn-dialog-bg)!important;color:var(--mn-dialog-text)!important;
+ border-color:var(--mn-dialog-border)!important
+}
+html body #app-modal :is(.modal-header,.modal-content),
+html body .filter-modal :is(header,.modal-header),
+html body .filter-panel :is(header,.modal-header),
+html body .filter-dialog :is(header,.modal-header){
+ background:transparent!important;color:var(--mn-dialog-text)!important
+}
+html body #app-modal :is(h1,h2,h3,h4,p,label,span,strong,small){
+ color:var(--mn-dialog-text)!important;background:transparent!important
+}
+html[data-theme="light"] body #app-modal :is(input,select,textarea){
+ background:#fff!important;color:#172334!important;border-color:#cbd5e1!important
+}
+html[data-theme="light"] body #app-modal select option{background:#fff!important;color:#172334!important}
