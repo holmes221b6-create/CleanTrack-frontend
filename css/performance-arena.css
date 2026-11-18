@@ -105,3 +105,9 @@
 .pa-visual.pa-drop-target{outline:2px dashed var(--pa-accent);outline-offset:3px;background:color-mix(in srgb,var(--pa-accent) 7%,var(--pa-panel))}
 .pa-field-item[draggable=true]{cursor:grab}
 .pa-field-item[draggable=true]:active{cursor:grabbing}
+
+/* Data fields are assigned only to the exact field well chosen by the report author. */
+.pa-field-well{border:1px dashed var(--pa-accent);border-radius:7px;padding:8px;min-height:54px}
+.pa-field-well:has(select:focus){outline:1px solid var(--pa-accent)}
+.pa-field-item[draggable=true]{cursor:grab}
+.pa-visual.pa-drop-target{outline:0}
