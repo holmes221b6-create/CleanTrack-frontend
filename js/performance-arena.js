@@ -26,7 +26,7 @@ function addVisualField(v,h,role){
  v.fields=v.fields||{};
  const values=new Set(rows.map(r=>r[h]).filter(x=>x!==null&&x!==undefined&&String(x).trim()!==""));
  const numeric=values.size>0&&[...values].every(x=>Number.isFinite(Number(String(x).replace(/,/g,"").replace(/%$/,"").trim())));
- role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):numeric?"value":"category");
+ role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):numeric?(fieldList(v.fields.value).length?"y":"value"):(fieldList(v.fields.category).length?"legend":"category"));
  const list=fieldList(v.fields[role]);if(!list.includes(h))list.push(h);v.fields[role]=list;
  v.group=fieldList(v.fields.category)[0]||fieldList(v.fields.legend)[0]||fieldList(v.fields.location)[0]||fieldList(v.fields.x)[0]||"";
  v.measure=fieldList(v.fields.value)[0]||fieldList(v.fields.y)[0]||fieldList(v.fields.size)[0]||"";
@@ -35,18 +35,19 @@ function addVisualField(v,h,role){
 function assignFieldToVisual(v,h,role){return addVisualField(v,h,role)}
 function selectedVisual(){return current().items.find(x=>x.id===activeVisualId)||current().items.at(-1)||null}
 function aggregate(v){
- const f=v.fields||{},groups=[...fieldList(f.category),...fieldList(f.legend),...fieldList(f.location),...fieldList(f.x)],measures=[...new Set([...fieldList(f.value),...fieldList(f.y),...fieldList(f.size)])];
- const records=filtered(),numeric=raw=>{if(raw===null||raw===undefined)return NaN;const s=String(raw).trim().replace(/,/g,"").replace(/%$/,"");if(!s||["—","-","n/a"].includes(s.toLowerCase()))return NaN;const n=Number(s);return Number.isFinite(n)?n:NaN};
- if(!groups.length&&!measures.length)return [];
+ const f=v.fields||{},pick=k=>fieldList(f[k]),groups=[...new Set([...pick("category"),...pick("legend"),...pick("location"),...pick("x")])],measures=[...new Set([...pick("value"),...pick("y"),...pick("size")])];
+ const records=filtered(),toNum=raw=>{if(raw===null||raw===undefined)return NaN;let s=String(raw).trim().replace(/,/g,"").replace(/%$/,"");if(!s||["—","-","n/a","null"].includes(s.toLowerCase()))return NaN;let n=Number(s);return Number.isFinite(n)?n:NaN};
  const buckets=new Map();
- records.forEach((r,i)=>{
-  const label=groups.length?groups.map(k=>String(r[k]??"Unspecified")).join(" · "):String(fieldList(f.tooltips)[0]&&r[fieldList(f.tooltips)[0]]||"All records");
-  let vals=measures.map(k=>numeric(r[k])).filter(Number.isFinite);
-  let value=v.method==="count"?1:(vals.length?vals.reduce((a,b)=>a+b,0):(!measures.length?1:NaN));
-  if(!Number.isFinite(value))return;
-  const b=buckets.get(label)||{sum:0,count:0};b.sum+=value;b.count++;buckets.set(label,b);
+ records.forEach(r=>{
+  const label=groups.length?groups.map(k=>String(r[k]??"Unspecified")).join(" · "):"All records";
+  let b=buckets.get(label);if(!b){b={sum:0,count:0,valid:0};buckets.set(label,b)}
+  if(v.method==="count"){b.sum+=1;b.count++;b.valid++;return}
+  if(!measures.length){b.sum+=1;b.count++;b.valid++;return}
+  const nums=measures.map(k=>toNum(r[k])).filter(Number.isFinite);
+  if(!nums.length)return;
+  const n=nums.reduce((x,y)=>x+y,0);b.sum+=n;b.count++;b.valid++;
  });
- return [...buckets].map(([label,b])=>({label,value:v.method==="average"?b.sum/Math.max(1,b.count):b.sum})).slice(0,100);
+ return [...buckets].filter(([,b])=>b.valid>0).map(([label,b])=>({label,value:v.method==="average"?b.sum/b.count:b.sum,count:b.count})).sort((x,y)=>Math.abs(y.value)-Math.abs(x.value)).slice(0,100);
 }
 function paint(){
  sheetsEl.replaceChildren();sheets.forEach(s=>{let wrap=$("div","pa-sheet-wrap"),b=$("button",s.id===active?"active":"",s.name),x=icon("×","Close sheet");b.onclick=()=>{active=s.id;paint()};b.oncontextmenu=e=>{e.preventDefault();sheetMenu(s,b)};x.onclick=()=>{if(sheets.length===1){say("At least one sheet must remain.",true);return}if(confirm("Close sheet '"+s.name+"'?")){sheets=sheets.filter(q=>q.id!==s.id);active=sheets[0].id;paint()}};x.className="pa-sheet-close";wrap.append(b,x);sheetsEl.append(wrap)});
@@ -79,13 +80,17 @@ function paint(){
  }else if(!Object.values(v.fields||{}).some(Boolean)&&!v.group){
   renderExampleVisual(v,body);
  }else{
-  let fieldMap=v.fields||{},oldGroup=v.group,oldMeasure=v.measure;v.group=fieldMap.category||fieldMap.legend||fieldMap.location||fieldMap.x||oldGroup;v.measure=fieldMap.value||fieldMap.y||fieldMap.size||oldMeasure;
+  let fieldMap=v.fields||{},oldGroup=v.group,oldMeasure=v.measure;
+ const firstField=k=>fieldList(fieldMap[k])[0]||"";
+ v.group=firstField("category")||firstField("legend")||firstField("location")||firstField("x")||oldGroup||"";
+ v.measure=firstField("value")||firstField("y")||firstField("size")||oldMeasure||"";
+ fieldMap={...fieldMap,category:firstField("category"),legend:firstField("legend"),location:firstField("location"),x:firstField("x"),y:firstField("y"),value:firstField("value"),size:firstField("size"),latitude:firstField("latitude"),longitude:firstField("longitude"),columns:fieldList(fieldMap.columns)};
   if(v.type==="map"){let lat=fieldMap.latitude||v.latitude,lon=fieldMap.longitude||v.longitude;if(lat&&lon){v.latitude=lat;v.longitude=lon}else{body.append($("p","pa-map-empty",fieldMap.location?"Location field selected. Add latitude and longitude fields to plot these records.":"Add a Location field, or latitude and longitude fields, in the field wells."))}}
   if(v.type!=="map"||v.latitude&&v.longitude){
    let data=aggregate(v),max=Math.max(1,...data.map(x=>Math.abs(x.value)));if(!data.length){body.append($("p","pa-map-empty","No numeric values available for this field combination. Choose a category and a numeric measure, or use Count."))}
    if(v.type==="kpi"){body.append($("strong","pa-kpi",String(data.reduce((a,x)=>a+x.value,0))))}
    else if(v.type==="table"){let t=$("table","pa-table"),h=$("tr","");(fieldList(fieldMap.columns).length?fieldList(fieldMap.columns):headers).forEach(k=>h.append($("th","",k)));t.append(h);filtered().slice(0,100).forEach(row=>{let tr=$("tr","");(fieldList(fieldMap.columns).length?fieldList(fieldMap.columns):headers).forEach(k=>tr.append($("td","",String(row[k]??""))));t.append(tr)});body.append(t)}
-   else if(v.type==="donut"||v.type==="pie"){let total=data.reduce((a,x)=>a+x.value,0),parts=[],cursor=0;data.forEach((x,i)=>{let end=cursor+(total?x.value/total*100:0);parts.push("var(--pa-slice-"+(i%8)+") "+cursor+"% "+end+"%");cursor=end});const palette=["#7950a8","#b58bd8","#6d86c5","#4f9d91","#d59a54","#c66c83","#7198a9","#9a9a62"];let cursorPct=0;const slices=data.map((x,i)=>{const start=cursorPct;cursorPct+=total>0?Math.max(0,x.value)/total*100:0;return palette[i%palette.length]+" "+start+"% "+cursorPct+"%"});let ring=$("div",v.type==="donut"?"pa-donut":"pa-pie");ring.style.background="conic-gradient("+(slices.length?slices.join(","):"var(--pa-line) 0 100%")+")";if(v.type==="donut")ring.append($("b","",String(Number(total.toFixed(2)))));body.append(ring);data.forEach((x,i)=>{let l=$("p","pa-legend",x.label+" · "+Number(x.value.toFixed(2)));l.style.setProperty("--pa-legend-index",i%8);l.style.setProperty("--pa-legend-color",palette[i%palette.length]);body.append(l)})}
+   else if(v.type==="donut"||v.type==="pie"){let total=data.reduce((a,x)=>a+x.value,0),parts=[],cursor=0;data.forEach((x,i)=>{let end=cursor+(total?x.value/total*100:0);parts.push("var(--pa-slice-"+(i%8)+") "+cursor+"% "+end+"%");cursor=end});const palette=["#7950a8","#b58bd8","#6d86c5","#4f9d91","#d59a54","#c66c83","#7198a9","#9a9a62"];let cursorPct=0;const positiveTotal=data.reduce((sum,x)=>sum+Math.max(0,x.value),0);const slices=data.map((x,i)=>{const start=cursorPct;cursorPct+=positiveTotal>0?Math.max(0,x.value)/positiveTotal*100:0;return palette[i%palette.length]+" "+start+"% "+cursorPct+"%"});let ring=$("div",v.type==="donut"?"pa-donut":"pa-pie");ring.style.background="conic-gradient("+(slices.length?slices.join(","):"var(--pa-line) 0 100%")+")";if(v.type==="donut")ring.append($("b","",String(Number(total.toFixed(2)))));body.append(ring);data.forEach((x,i)=>{let pct=positiveTotal>0?Math.max(0,x.value)/positiveTotal*100:0;let l=$("p","pa-legend",x.label+" · "+Number(x.value.toFixed(2))+" · "+pct.toFixed(1)+"%");l.style.setProperty("--pa-legend-index",i%8);l.style.setProperty("--pa-legend-color",palette[i%palette.length]);body.append(l)})}
    else if(v.type==="waterfall"){data.slice().reverse().forEach(x=>{let r=$("div","pa-waterfall-row"),track=$("span","pa-bar-track"),fill=$("i","");fill.style.width=Math.abs(x.value)/max*100+"%";track.append(fill);r.append($("span","pa-bar-label",x.label),track,$("b","",String(Number(x.value.toFixed(2)))));body.append(r)})}
    else if(v.type==="map"){let points=filtered().map(r=>({lat:Number(r[v.latitude]),lon:Number(r[v.longitude]),label:String(r[v.group]??"Location"),value:v.measure?Number(r[v.measure]):1})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180);if(points.length){let minLat=Math.min(...points.map(p=>p.lat)),maxLat=Math.max(...points.map(p=>p.lat)),minLon=Math.min(...points.map(p=>p.lon)),maxLon=Math.max(...points.map(p=>p.lon));let svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox","0 0 600 320");svg.setAttribute("class","pa-map-svg");points.forEach(p=>{let c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",35+(p.lon-minLon)/(maxLon-minLon||1)*530);c.setAttribute("cy",285-(p.lat-minLat)/(maxLat-minLat||1)*250);c.setAttribute("r",7);c.setAttribute("class","pa-map-point");let title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=p.label;c.append(title);svg.append(c)});body.append(svg)}else body.append($("p","pa-map-empty","No valid coordinate pairs found in the selected records."))}
    else{
