@@ -11,3 +11,16 @@
 .pa-bottom .pa-sheet-wrap>button:first-child{padding:9px 12px}
 .pa-bottom .pa-sheet-close{font-size:15px}
 .pa-presentation .pa-bottom{display:none!important}
+
+/* Power BI-style data and visual authoring panes */
+.pa-data-empty{min-height:390px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:28px 18px;color:var(--pa-muted)}
+.pa-data-empty-icon{width:58px;height:58px;display:grid;place-items:center;border:1px solid var(--pa-line);border-radius:12px;color:var(--pa-accent);font-size:27px;background:color-mix(in srgb,var(--pa-accent) 9%,var(--pa-panel))}
+.pa-data-empty strong{font-size:14px;color:var(--pa-text)}
+.pa-data-empty p{font-size:10px;line-height:1.6;max-width:215px;margin:0}
+.pa-visual-palette{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.pa-visual-icon{min-width:0;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid var(--pa-line);border-radius:5px;background:transparent;color:var(--pa-text);cursor:pointer;padding:8px 4px}
+.pa-visual-icon:hover{border-color:var(--pa-accent);background:color-mix(in srgb,var(--pa-accent) 12%,transparent)}
+.pa-visual-glyph{font-size:24px;line-height:1;color:var(--pa-accent);font-weight:700}
+.pa-visual-label{font-size:9px;text-align:center;line-height:1.25;color:var(--pa-muted)}
+.pa-divider{width:100%;border:0;border-top:1px solid var(--pa-line);margin:5px 0}
+.pa-visual:focus-within,.pa-visual:hover{border-color:var(--pa-accent)}
