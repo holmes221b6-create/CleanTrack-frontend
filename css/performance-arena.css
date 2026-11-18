@@ -56,3 +56,5 @@
 .pa-ribbon-action small{display:none!important}
 
 .pa-arena-title{margin:0;color:var(--pa-text);font-size:22px;line-height:1.2;font-weight:750;letter-spacing:-.025em}
+
+.pa-brand{gap:5px;align-content:center}.pa-arena-title{margin:0;color:var(--pa-text);font-size:25px;line-height:1.2;font-weight:750;letter-spacing:-.025em}.pa-arena-description{margin:0;max-width:660px;color:var(--pa-muted);font-size:11px;line-height:1.5}
