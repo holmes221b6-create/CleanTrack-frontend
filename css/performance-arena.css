@@ -77,3 +77,19 @@
 .pa-title{font-size:12px;text-align:var(--pa-title-align,left)}
 .pa-visual[style*="background"] .pa-donut:before{background:inherit}
 @media(max-width:850px){.pa-visual-grid{min-width:720px}.pa-canvas{overflow:auto}.pa-visual{max-width:calc(100vw - 420px)}}
+
+/* Mouse-accessible resize grips on all visual edges and corners */
+.pa-visual{resize:none!important;overflow:visible!important;position:absolute;box-sizing:border-box}
+.pa-visual.pa-resizing{user-select:none}
+.pa-resize-handle{position:absolute;z-index:8;display:block;padding:0;margin:0;border:0;background:var(--pa-accent);opacity:0;transition:opacity .12s ease;touch-action:none}
+.pa-visual:hover .pa-resize-handle,.pa-visual:focus-within .pa-resize-handle,.pa-visual.pa-resizing .pa-resize-handle{opacity:1}
+.pa-resize-n,.pa-resize-s{height:7px;width:34px;left:calc(50% - 17px);cursor:ns-resize;border-radius:4px}
+.pa-resize-n{top:-4px}.pa-resize-s{bottom:-4px}
+.pa-resize-e,.pa-resize-w{width:7px;height:34px;top:calc(50% - 17px);cursor:ew-resize;border-radius:4px}
+.pa-resize-e{right:-4px}.pa-resize-w{left:-4px}
+.pa-resize-ne,.pa-resize-nw,.pa-resize-se,.pa-resize-sw{width:11px;height:11px;border:2px solid var(--pa-panel);border-radius:50%;box-sizing:border-box}
+.pa-resize-ne{right:-6px;top:-6px;cursor:nesw-resize}
+.pa-resize-nw{left:-6px;top:-6px;cursor:nwse-resize}
+.pa-resize-se{right:-6px;bottom:-6px;cursor:nwse-resize}
+.pa-resize-sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+@media(hover:none){.pa-resize-handle{opacity:1}}
