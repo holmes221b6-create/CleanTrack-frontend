@@ -27,7 +27,8 @@ function addVisualField(v,h,role){
  const values=new Set(rows.map(r=>r[h]).filter(x=>x!==null&&x!==undefined&&String(x).trim()!==""));
  const numeric=values.size>0&&[...values].every(x=>Number.isFinite(Number(String(x).replace(/,/g,"").replace(/%$/,"").trim())));
  const semanticMulti=["skills","qualifications"].includes(h.toLowerCase());
- role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):semanticMulti?(fieldList(v.fields.category).length?"value":"category"):numeric?(fieldList(v.fields.value).length?"y":"value"):(fieldList(v.fields.category).length?"legend":"category"));
+ const identifier=/(^|[ _-])(id|identifier|code|number)([ _-]|$)/i.test(h)||/^id$/i.test(h);
+ role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):semanticMulti?(fieldList(v.fields.category).length?"value":"category"):identifier?"category":numeric?(fieldList(v.fields.value).length?"y":"value"):(fieldList(v.fields.category).length?"legend":"category"));
  const list=fieldList(v.fields[role]);if(!list.includes(h))list.push(h);v.fields[role]=list;
  v.group=fieldList(v.fields.category)[0]||fieldList(v.fields.legend)[0]||fieldList(v.fields.location)[0]||fieldList(v.fields.x)[0]||"";
  v.measure=fieldList(v.fields.value)[0]||fieldList(v.fields.y)[0]||fieldList(v.fields.size)[0]||"";
@@ -91,7 +92,7 @@ function paint(){
  if(v.type==="text"||v.type==="shape"||v.type==="image"){
   if(v.type==="text"){let t=$("textarea","pa-text-element");t.value=v.text||"Text box";t.onchange=()=>v.text=t.value;body.append(t)}
   else if(v.type==="image"){let im=$("img","pa-image");im.src=v.src;body.append(im)}else body.append($("div","pa-shape-element",v.shape||"Rectangle"));
- }else if(!Object.values(v.fields||{}).some(Boolean)&&!v.group){
+ }else if(!Object.values(v.fields||{}).some(value=>fieldList(value).length)&&!v.group){
   renderExampleVisual(v,body);
  }else{
   let fieldMap=v.fields||{},oldGroup=v.group,oldMeasure=v.measure;
