@@ -21,18 +21,23 @@ function nums(){return headers.filter(h=>rows.some(r=>r[h]!==""&&Number.isFinite
 async function load(){try{if(!api())throw Error("MECHNAR data service unavailable");if(from.value>to.value)throw Error("Start date must be before end date");say("Loading assigned-team records…");if(!opts){opts=await api().get("reports/supervisor/options");team.textContent="TEAM · "+(opts.team?.name||"Assigned team");fill(staff,opts.staff,"All personnel");fill(location,opts.locations,"All locations");fill(zone,opts.zones,"All zones");fill(optype,opts.operation_types,"All operation types")}let d=await api().post("reports/supervisor/preview",payload());headers=d.headers||[];sourceName=source.options[source.selectedIndex]?.text||"Team data";sourceRecordCount=d.row_count||d.rows?.length||0;rows=(d.rows||[]).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]])));rawRows=rows.map(r=>({...r}));loaded=true;imported=false;state.replaceChildren(new Option("All statuses",""));(source.value==="operations"?["pending","in progress","submitted","completed","approved","rejected","overdue"]:source.value==="reviews"?["submitted","approved","rejected"]:["active","inactive"]).forEach(x=>state.add(new Option(x,x)));applyTransforms();say((d.row_count||0)+" matching records loaded · "+rows.length+" preview rows"+(d.preview_truncated?" (preview limit)":""));paint();renderDock("data")}catch(e){say(e.message||"Could not load team data",true);headers=[];rows=[];loaded=false;paint()}}
 function fill(s,list,label){let old=s.value;s.replaceChildren(new Option(label,""));(list||[]).forEach(x=>s.add(new Option(x.name,String(x.id))));if([...s.options].some(x=>x.value===old))s.value=old}
 function aggregate(v){
- const group=v.fields?.category||v.fields?.legend||v.fields?.location||v.fields?.x||v.group;
- const measure=v.fields?.value||v.fields?.y||v.fields?.size||v.measure;
- const records=filtered(),map=new Map();
- records.forEach(r=>{
-  const label=group?String(r[group]??"Unspecified"):"Total";
-  const raw=measure?r[measure]:1;
-  const n=(v.method==="count"||!measure)?1:Number(String(raw??"").replace(/,/g,""));
-  if(!Number.isFinite(n))return;
-  const item=map.get(label)||{sum:0,count:0};item.sum+=n;item.count++;map.set(label,item);
+ const f=v.fields||{};
+ const group=f.category||f.legend||f.location||f.x||v.group||"";
+ const measure=f.value||f.y||f.size||v.measure||"";
+ const records=filtered(),buckets=new Map();
+ records.forEach((row,index)=>{
+  const label=group?String(row[group]??"Unspecified"):("Record "+(index+1));
+  let value;
+  if(v.method==="count"||!measure)value=1;
+  else {const raw=row[measure];if(raw===null||raw===undefined||String(raw).trim()===""||String(raw).trim()==="—")return;value=Number(String(raw).replace(/,/g,"").replace(/%$/,""))}
+  if(!Number.isFinite(value))return;
+  const bucket=buckets.get(label)||{sum:0,count:0};bucket.sum+=value;bucket.count++;buckets.set(label,bucket);
  });
- let a=[...map].map(([label,x])=>({label,value:v.method==="average"&&measure?x.sum/Math.max(1,x.count):x.sum}));
- return a.sort((x,y)=>y.value-x.value).slice(0,40)
+ let result=[...buckets].map(([label,b])=>({label,value:v.method==="average"&&measure?b.sum/Math.max(1,b.count):b.sum}));
+ if(!group&&measure&&["pie","donut","bar","column","line","area","waterfall"].includes(v.type)){
+  result=records.map((row,i)=>({label:String(row[measure]??("Record "+(i+1))),value:1})).filter(x=>x.label!=="—").slice(0,40);
+ }
+ return result.slice(0,40);
 }
 function paint(){
  sheetsEl.replaceChildren();sheets.forEach(s=>{let wrap=$("div","pa-sheet-wrap"),b=$("button",s.id===active?"active":"",s.name),x=icon("×","Close sheet");b.onclick=()=>{active=s.id;paint()};b.oncontextmenu=e=>{e.preventDefault();sheetMenu(s,b)};x.onclick=()=>{if(sheets.length===1){say("At least one sheet must remain.",true);return}if(confirm("Close sheet '"+s.name+"'?")){sheets=sheets.filter(q=>q.id!==s.id);active=sheets[0].id;paint()}};x.className="pa-sheet-close";wrap.append(b,x);sheetsEl.append(wrap)});
@@ -97,8 +102,11 @@ function renderDock(tab,id){
  let grid=$("div","pa-visual-palette");palette.forEach(([type,glyph,label])=>{let b=$("button","pa-visual-icon");b.type="button";b.title=label;b.append($("span","pa-visual-glyph",glyph),$("span","pa-visual-label",label));b.onclick=()=>{let obj={id:Date.now()+Math.random(),type,group:"",measure:"",method:"sum",title:label,x:24+(current().items.length%2)*390,y:24+Math.floor(current().items.length/2)*320,w:350,h:280,fields:{},format:{}};current().items.push(obj);paint();renderDock("visuals",obj.id)};grid.append(b)});dockBody.append(grid);
  let v=current().items.find(x=>x.id===id)||current().items.at(-1);if(!v)return;
  dockBody.append($("hr","pa-divider"),$("strong","","Selected visual · "+(v.title||v.type)));
- const wells={bar:[["category","X-axis"],["value","Y-axis"],["legend","Legend"],["tooltips","Tooltips"]],column:[["category","X-axis"],["value","Y-axis"],["legend","Legend"],["tooltips","Tooltips"]],line:[["category","X-axis"],["value","Y-axis"],["legend","Legend"],["tooltips","Tooltips"]],area:[["category","X-axis"],["value","Y-axis"],["legend","Legend"],["tooltips","Tooltips"]],donut:[["legend","Legend"],["value","Values"],["tooltips","Tooltips"]],pie:[["legend","Legend"],["value","Values"],["tooltips","Tooltips"]],waterfall:[["category","Category"],["value","Y-axis"],["breakdown","Breakdown"],["tooltips","Tooltips"]],map:[["location","Location"],["legend","Legend"],["size","Size"],["latitude","Latitude"],["longitude","Longitude"],["tooltips","Tooltips"]],scatter:[["x","X-axis"],["y","Y-axis"],["size","Size"],["legend","Legend"],["tooltips","Tooltips"]],table:[["columns","Columns"]],kpi:[["value","Value"],["trend","Trend axis"],["target","Target"],["tooltips","Tooltips"]]};
- v.fields=v.fields||{};let available=headers.map(h=>[h,h]);(wells[v.type]||wells.bar).forEach(([key,label])=>{let select=sel([["","Add data fields here"],...available]);select.value=v.fields[key]||"";let box=field(label,select);box.classList.add("pa-field-well");box.ondragover=e=>e.preventDefault();box.ondrop=e=>{e.preventDefault();let h=e.dataTransfer.getData("application/x-mechnar-field")||e.dataTransfer.getData("text/plain");if(headers.includes(h)){v.fields[key]=h;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id);say(h+" assigned to "+label)}};select.onchange=()=>{v.fields[key]=select.value;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id)};dockBody.append(box)});
+ const visualTypes=[["bar","Clustered bar"],["column","Clustered column"],["line","Line chart"],["area","Area chart"],["pie","Pie chart"],["donut","Donut chart"],["waterfall","Waterfall chart"],["map","Map"],["scatter","Scatter chart"],["table","Table"],["kpi","Card / KPI"]];
+ const visualSelect=sel(visualTypes);visualSelect.value=v.type;visualSelect.onchange=()=>{v.type=visualSelect.value;v.title=visualTypes.find(x=>x[0]===v.type)?.[1]||v.type;paint();renderDock("visuals",v.id)};
+ dockBody.append(field("VISUAL TYPE",visualSelect));
+ const wells=[["category","Category"],["value","Values"],["legend","Legend"],["x","X-axis"],["y","Y-axis"],["location","Location"],["latitude","Latitude"],["longitude","Longitude"],["size","Size"],["breakdown","Breakdown"],["trend","Trend axis"],["target","Target"],["columns","Table columns"],["tooltips","Tooltips"]];
+ v.fields=v.fields||{};let available=headers.map(h=>[h,h]);wells.forEach(([key,label])=>{let select=sel([["","Add data fields here"],...available]);select.value=v.fields[key]||"";let box=field(label,select);box.classList.add("pa-field-well");box.ondragover=e=>e.preventDefault();box.ondrop=e=>{e.preventDefault();let h=e.dataTransfer.getData("application/x-mechnar-field")||e.dataTransfer.getData("text/plain");if(headers.includes(h)){v.fields[key]=h;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id);say(h+" assigned to "+label)}};select.onchange=()=>{v.fields[key]=select.value;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id)};dockBody.append(box)});
  let method=sel([["sum","Sum"],["count","Count"],["average","Average"]]);method.value=v.method||"sum";method.onchange=()=>{v.method=method.value;paint()};dockBody.append(field("AGGREGATION",method));
  dockBody.append(btn("Format",()=>openVisualFormat(v)),btn("Remove visual",()=>{current().items=current().items.filter(x=>x.id!==v.id);paint();renderDock("visuals")}));
 }function openVisualFormat(v){
