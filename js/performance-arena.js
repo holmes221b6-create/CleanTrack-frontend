@@ -1,7 +1,7 @@
 (()=>{"use strict";const $=(t,c,x)=>{let n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=x;return n},api=()=>window.CleanTrackApi;
 function render(host){
 const root=$("section","pa-root"),top=$("header","pa-top"),brand=$("div","pa-brand"),title=$("input","pa-report-name"),team=$("span","pa-team-name"),actions=$("div","pa-top-actions"),status=$("span","pa-status","Ready"),refresh=icon("↻","Refresh data"),share=btn("↗ Share"),publish=btn("⇧ Publish"),close=icon("×","Close Performance Arena");
-title.value="Untitled performance analysis";brand.append($("small","pa-kicker","MECHNAR · PERFORMANCE ARENA"),title,team);actions.append(status,refresh,share,publish,close);top.append(brand,actions);root.append(top);
+title.value="Performance Arena";title.setAttribute("aria-label","Performance Arena report name");title.title="Performance Arena";brand.append(title,team);actions.append(status,refresh,share,publish,close);top.append(brand,actions);root.append(top);
 const mainTabs=$("nav","pa-main-tabs"),ribbon=$("section","pa-ribbon"),ribbonTitle=$("div","pa-ribbon-title"),ribbonBody=$("div","pa-ribbon-body");ribbon.append(ribbonTitle,ribbonBody);root.append(mainTabs,ribbon);
 const source=sel([["operations","Operations"],["reviews","Completion & reviews"],["personnel","Personnel"],["performance","Team performance"],["locations","Locations"],["zones","Zones"]]),from=$("input","pa-control"),to=$("input","pa-control"),staff=sel([]),location=sel([]),zone=sel([]),state=sel([]),optype=sel([]),file=$("input","");file.type="file";file.accept=".csv,.tsv";file.multiple=false;file.hidden=true;
 let d=new Date(),dt=x=>new Date(x).toISOString().slice(0,10);from.type=to.type="date";to.value=dt(d);from.value=dt(new Date(d-29*86400000));
