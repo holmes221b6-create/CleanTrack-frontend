@@ -55,10 +55,12 @@ function paint(){
   }
  }
  card.append(body);
- let start=null,origin=null;head.style.cursor="move";head.onpointerdown=e=>{if(e.target.closest("button,input"))return;start={x:e.clientX,y:e.clientY};origin={x:v.x||0,y:v.y||0};head.setPointerCapture(e.pointerId)};
- head.onpointermove=e=>{if(!start)return;v.x=Math.max(0,origin.x+e.clientX-start.x);v.y=Math.max(0,origin.y+e.clientY-start.y);card.style.left=v.x+"px";card.style.top=v.y+"px";gridHeight()};
- head.onpointerup=head.onpointercancel=()=>{start=null;saveLocal()};
- const ro=new ResizeObserver(entries=>{for(const en of entries){v.w=Math.round(en.contentRect.width);v.h=Math.round(en.contentRect.height);gridHeight();saveLocal()}});ro.observe(card);
+ let moveStart=null,moveOrigin=null;head.style.cursor="move";head.onpointerdown=e=>{if(e.target.closest("button,input"))return;moveStart={x:e.clientX,y:e.clientY};moveOrigin={x:v.x||0,y:v.y||0};head.setPointerCapture(e.pointerId)};
+ head.onpointermove=e=>{if(!moveStart)return;v.x=Math.max(0,moveOrigin.x+e.clientX-moveStart.x);v.y=Math.max(0,moveOrigin.y+e.clientY-moveStart.y);card.style.left=v.x+"px";card.style.top=v.y+"px";gridHeight()};
+ head.onpointerup=head.onpointercancel=()=>{if(moveStart)saveLocal();moveStart=null};
+ const directions=["n","s","e","w","ne","nw","se","sw"];
+ directions.forEach(dir=>{let handle=$("button","pa-resize-handle pa-resize-"+dir);handle.type="button";handle.setAttribute("aria-label","Resize visual "+dir);handle.title="Drag to resize";handle.onpointerdown=e=>{e.preventDefault();e.stopPropagation();card.classList.add("pa-resizing");let initial={x:e.clientX,y:e.clientY,left:v.x||0,top:v.y||0,width:card.offsetWidth,height:card.offsetHeight};handle.setPointerCapture(e.pointerId);handle.onpointermove=ev=>{if(!handle.hasPointerCapture(ev.pointerId))return;let dx=ev.clientX-initial.x,dy=ev.clientY-initial.y,w=initial.width,h=initial.height,x=initial.left,y=initial.top;if(dir.includes("e"))w=initial.width+dx;if(dir.includes("s"))h=initial.height+dy;if(dir.includes("w")){w=initial.width-dx;x=initial.left+dx}if(dir.includes("n")){h=initial.height-dy;y=initial.top+dy}w=Math.max(180,w);h=Math.max(150,h);if(dir.includes("w")&&w===180)x=initial.left+initial.width-180;if(dir.includes("n")&&h===150)y=initial.top+initial.height-150;v.x=Math.max(0,x);v.y=Math.max(0,y);v.w=Math.round(w);v.h=Math.round(h);card.style.left=v.x+"px";card.style.top=v.y+"px";card.style.width=v.w+"px";card.style.height=v.h+"px";gridHeight()};const finish=()=>{card.classList.remove("pa-resizing");saveLocal();handle.onpointermove=null;handle.onpointerup=null;handle.onpointercancel=null};handle.onpointerup=finish;handle.onpointercancel=finish};card.append(handle)});
+ const ro=new ResizeObserver(entries=>{if(card.classList.contains("pa-resizing"))return;for(const en of entries){v.w=Math.round(en.contentRect.width);v.h=Math.round(en.contentRect.height);gridHeight();saveLocal()}});ro.observe(card);
  function gridHeight(){grid.style.minHeight=Math.max(560,(v.y||0)+(card.offsetHeight||v.h||280)+30)+"px"}
  return card;
 }
