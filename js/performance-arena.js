@@ -21,23 +21,20 @@ function nums(){return headers.filter(h=>rows.some(r=>r[h]!==""&&Number.isFinite
 async function load(){try{if(!api())throw Error("MECHNAR data service unavailable");if(from.value>to.value)throw Error("Start date must be before end date");say("Loading assigned-team records…");if(!opts){opts=await api().get("reports/supervisor/options");team.textContent="TEAM · "+(opts.team?.name||"Assigned team");fill(staff,opts.staff,"All personnel");fill(location,opts.locations,"All locations");fill(zone,opts.zones,"All zones");fill(optype,opts.operation_types,"All operation types")}let d=await api().post("reports/supervisor/preview",payload());headers=d.headers||[];sourceName=source.options[source.selectedIndex]?.text||"Team data";sourceRecordCount=d.row_count||d.rows?.length||0;rows=(d.rows||[]).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]])));rawRows=rows.map(r=>({...r}));loaded=true;imported=false;state.replaceChildren(new Option("All statuses",""));(source.value==="operations"?["pending","in progress","submitted","completed","approved","rejected","overdue"]:source.value==="reviews"?["submitted","approved","rejected"]:["active","inactive"]).forEach(x=>state.add(new Option(x,x)));applyTransforms();say((d.row_count||0)+" matching records loaded · "+rows.length+" preview rows"+(d.preview_truncated?" (preview limit)":""));paint();renderDock("data")}catch(e){say(e.message||"Could not load team data",true);headers=[];rows=[];loaded=false;paint()}}
 function fill(s,list,label){let old=s.value;s.replaceChildren(new Option(label,""));(list||[]).forEach(x=>s.add(new Option(x.name,String(x.id))));if([...s.options].some(x=>x.value===old))s.value=old}
 function aggregate(v){
- const f=v.fields||{};
- const group=f.category||f.legend||f.location||f.x||v.group||"";
- const measure=f.value||f.y||f.size||v.measure||"";
- const records=filtered(),buckets=new Map();
- records.forEach((row,index)=>{
-  const label=group?String(row[group]??"Unspecified"):("Record "+(index+1));
-  let value;
-  if(v.method==="count"||!measure)value=1;
-  else {const raw=row[measure];if(raw===null||raw===undefined||String(raw).trim()===""||String(raw).trim()==="—")return;value=Number(String(raw).replace(/,/g,"").replace(/%$/,""))}
-  if(!Number.isFinite(value))return;
-  const bucket=buckets.get(label)||{sum:0,count:0};bucket.sum+=value;bucket.count++;buckets.set(label,bucket);
- });
- let result=[...buckets].map(([label,b])=>({label,value:v.method==="average"&&measure?b.sum/Math.max(1,b.count):b.sum}));
- if(!group&&measure&&["pie","donut","bar","column","line","area","waterfall"].includes(v.type)){
-  result=records.map((row,i)=>({label:String(row[measure]??("Record "+(i+1))),value:1})).filter(x=>x.label!=="—").slice(0,40);
+ const f=v.fields||{},group=f.category||f.legend||f.location||f.x||"",measure=f.value||f.y||f.size||"";
+ const records=filtered(),buckets=new Map(),out=[];
+ const numeric=(raw)=>{if(raw===null||raw===undefined)return NaN;const s=String(raw).trim();if(!s||s==="—"||s==="-"||s.toLowerCase()==="n/a")return NaN;return Number(s.replace(/,/g,"").replace(/%$/,""))};
+ if(!group&&measure){
+  records.forEach((row,i)=>{const n=v.method==="count"?1:numeric(row[measure]);if(Number.isFinite(n))out.push({label:"Record "+(i+1),value:n})});
+  return out.slice(0,40);
  }
- return result.slice(0,40);
+ records.forEach(row=>{
+  const label=group?String(row[group]??"Unspecified"):"Total";
+  const n=v.method==="count"||!measure?1:numeric(row[measure]);
+  if(!Number.isFinite(n))return;
+  const x=buckets.get(label)||{sum:0,count:0};x.sum+=n;x.count++;buckets.set(label,x);
+ });
+ return [...buckets].map(([label,x])=>({label,value:v.method==="average"&&measure?x.sum/Math.max(1,x.count):x.sum})).slice(0,40);
 }
 function paint(){
  sheetsEl.replaceChildren();sheets.forEach(s=>{let wrap=$("div","pa-sheet-wrap"),b=$("button",s.id===active?"active":"",s.name),x=icon("×","Close sheet");b.onclick=()=>{active=s.id;paint()};b.oncontextmenu=e=>{e.preventDefault();sheetMenu(s,b)};x.onclick=()=>{if(sheets.length===1){say("At least one sheet must remain.",true);return}if(confirm("Close sheet '"+s.name+"'?")){sheets=sheets.filter(q=>q.id!==s.id);active=sheets[0].id;paint()}};x.className="pa-sheet-close";wrap.append(b,x);sheetsEl.append(wrap)});
@@ -69,7 +66,24 @@ function paint(){
    else if(v.type==="donut"||v.type==="pie"){let total=data.reduce((a,x)=>a+x.value,0),parts=[],cursor=0;data.forEach((x,i)=>{let end=cursor+(total?x.value/total*100:0);parts.push("var(--pa-slice-"+(i%8)+") "+cursor+"% "+end+"%");cursor=end});let ring=$("div",v.type==="donut"?"pa-donut":"pa-pie");ring.style.background="conic-gradient("+(parts.length?parts.join(","):"var(--pa-line) 0 100%")+")";if(v.type==="donut")ring.append($("b","",String(Number(total.toFixed(2)))));body.append(ring);data.forEach((x,i)=>{let l=$("p","pa-legend",x.label+" · "+Number(x.value.toFixed(2)));l.style.setProperty("--pa-legend-index",i%8);body.append(l)})}
    else if(v.type==="waterfall"){data.slice().reverse().forEach(x=>{let r=$("div","pa-waterfall-row"),track=$("span","pa-bar-track"),fill=$("i","");fill.style.width=Math.abs(x.value)/max*100+"%";track.append(fill);r.append($("span","pa-bar-label",x.label),track,$("b","",String(Number(x.value.toFixed(2)))));body.append(r)})}
    else if(v.type==="map"){let points=filtered().map(r=>({lat:Number(r[v.latitude]),lon:Number(r[v.longitude]),label:String(r[v.group]??"Location"),value:v.measure?Number(r[v.measure]):1})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180);if(points.length){let minLat=Math.min(...points.map(p=>p.lat)),maxLat=Math.max(...points.map(p=>p.lat)),minLon=Math.min(...points.map(p=>p.lon)),maxLon=Math.max(...points.map(p=>p.lon));let svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox","0 0 600 320");svg.setAttribute("class","pa-map-svg");points.forEach(p=>{let c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",35+(p.lon-minLon)/(maxLon-minLon||1)*530);c.setAttribute("cy",285-(p.lat-minLat)/(maxLat-minLat||1)*250);c.setAttribute("r",7);c.setAttribute("class","pa-map-point");let title=document.createElementNS("http://www.w3.org/2000/svg","title");title.textContent=p.label;c.append(title);svg.append(c)});body.append(svg)}else body.append($("p","pa-map-empty","No valid coordinate pairs found in the selected records."))}
-   else{data.forEach(x=>{let r=$("div","pa-bar-row"),track=$("span","pa-bar-track"),fill=$("i","");fill.style.width=Math.abs(x.value)/max*100+"%";track.append(fill);r.append($("span","pa-bar-label",x.label),track,$("b","",String(Number(x.value.toFixed(2)))));body.append(r)})}
+   else{
+ const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox","0 0 640 300");svg.setAttribute("preserveAspectRatio","xMidYMid meet");svg.classList.add("pa-data-chart");
+ const NS="http://www.w3.org/2000/svg",el=(tag,attrs)=>{const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,val])=>n.setAttribute(k,String(val)));svg.append(n);return n};
+ const left=54,right=620,top=22,bottom=238,w=right-left,h=bottom-top,step=w/Math.max(1,data.length);
+ [0,.25,.5,.75,1].forEach(t=>{const y=bottom-t*h;el("line",{x1:left,y1:y,x2:right,y2:y,class:"pa-chart-gridline"});el("text",{x:left-8,y:y+4,"text-anchor":"end",class:"pa-chart-tick"},{}).textContent=String(Number((max*t).toFixed(1)))});
+ if(v.type==="line"||v.type==="area"||v.type==="scatter"){
+  const pts=data.map((x,i)=>({x:left+step*(i+.5),y:bottom-(x.value/max)*h,label:x.label,value:x.value}));
+  if(v.type==="area"&&pts.length){const d="M "+pts[0].x+" "+bottom+" L "+pts.map(p=>p.x+" "+p.y).join(" L ")+" L "+pts[pts.length-1].x+" "+bottom+" Z";el("path",{d,class:"pa-chart-area"})}
+  if(v.type==="line"&&pts.length)el("polyline",{points:pts.map(p=>p.x+","+p.y).join(" "),class:"pa-chart-line"});
+  pts.forEach(p=>{el("circle",{cx:p.x,cy:p.y,r:v.type==="scatter"?5:4,class:"pa-chart-point"});const t=el("title",{});t.textContent=p.label+": "+p.value});
+ }else{
+  data.forEach((x,i)=>{const bw=Math.max(5,step*(v.type==="bar"?.62:.58)),bh=Math.abs(x.value)/max*h;
+   if(v.type==="bar"){const y=top+i*Math.min(32,h/Math.max(1,data.length));const rect=el("rect",{x:left,y,width:Math.abs(x.value)/max*(w-90),height:Math.max(8,Math.min(22,h/Math.max(1,data.length)-5)),rx:3,class:"pa-chart-bar"});const title=el("title",{});title.textContent=x.label+": "+x.value;el("text",{x:left-4,y:y+15,"text-anchor":"end",class:"pa-chart-label"}).textContent=x.label.slice(0,12)}
+   else{const x0=left+step*i+(step-bw)/2,y=bottom-bh;const rect=el("rect",{x:x0,y,width:bw,height:bh,rx:3,class:"pa-chart-bar"});const title=el("title",{});title.textContent=x.label+": "+x.value;el("text",{x:x0+bw/2,y:bottom+18,"text-anchor":"middle",class:"pa-chart-label"}).textContent=x.label.slice(0,12)}
+  });
+ }
+ body.append(svg);
+}
   }
  }
  card.append(body);
