@@ -26,7 +26,8 @@ function addVisualField(v,h,role){
  v.fields=v.fields||{};
  const values=new Set(rows.map(r=>r[h]).filter(x=>x!==null&&x!==undefined&&String(x).trim()!==""));
  const numeric=values.size>0&&[...values].every(x=>Number.isFinite(Number(String(x).replace(/,/g,"").replace(/%$/,"").trim())));
- role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):numeric?(fieldList(v.fields.value).length?"y":"value"):(fieldList(v.fields.category).length?"legend":"category"));
+ const semanticMulti=["skills","qualifications"].includes(h.toLowerCase());
+ role=role||(v.type==="table"?"columns":v.type==="map"?(numeric?(fieldList(v.fields.latitude).length?"longitude":"latitude"):"location"):semanticMulti?(fieldList(v.fields.category).length?"value":"category"):numeric?(fieldList(v.fields.value).length?"y":"value"):(fieldList(v.fields.category).length?"legend":"category"));
  const list=fieldList(v.fields[role]);if(!list.includes(h))list.push(h);v.fields[role]=list;
  v.group=fieldList(v.fields.category)[0]||fieldList(v.fields.legend)[0]||fieldList(v.fields.location)[0]||fieldList(v.fields.x)[0]||"";
  v.measure=fieldList(v.fields.value)[0]||fieldList(v.fields.y)[0]||fieldList(v.fields.size)[0]||"";
@@ -37,17 +38,30 @@ function selectedVisual(){return current().items.find(x=>x.id===activeVisualId)|
 function aggregate(v){
  const f=v.fields||{},pick=k=>fieldList(f[k]),groups=[...new Set([...pick("category"),...pick("legend"),...pick("location"),...pick("x")])],measures=[...new Set([...pick("value"),...pick("y"),...pick("size")])];
  const records=filtered(),toNum=raw=>{if(raw===null||raw===undefined)return NaN;let s=String(raw).trim().replace(/,/g,"").replace(/%$/,"");if(!s||["—","-","n/a","null"].includes(s.toLowerCase()))return NaN;let n=Number(s);return Number.isFinite(n)?n:NaN};
- const buckets=new Map();
+ const skillField=measures.find(k=>k.toLowerCase()==="skills"),qualField=measures.find(k=>k.toLowerCase()==="qualifications"),dimensionMulti=groups.find(k=>["skills","qualifications"].includes(k.toLowerCase()));
+ if(dimensionMulti&&groups.some(k=>["skills","qualifications"].includes(k.toLowerCase())&&k!==dimensionMulti))return [];
+ const buckets=new Map(),add=(label,value=1)=>{const key=String(label||"Unspecified");const b=buckets.get(key)||{sum:0,count:0};b.sum+=value;b.count++;buckets.set(key,b)};
+ const tokens=value=>[...new Set(String(value||"").split(/[,;|\n]+/).map(x=>x.trim()).filter(Boolean))];
  records.forEach(r=>{
+  if(dimensionMulti){
+   const items=tokens(r[dimensionMulti]);items.forEach(item=>{const label=groups.filter(k=>k!==dimensionMulti).map(k=>String(r[k]??"Unspecified")).concat(item).join(" · ")||item;add(label,1)});return;
+  }
   const label=groups.length?groups.map(k=>String(r[k]??"Unspecified")).join(" · "):"All records";
-  let b=buckets.get(label);if(!b){b={sum:0,count:0,valid:0};buckets.set(label,b)}
-  if(v.method==="count"){b.sum+=1;b.count++;b.valid++;return}
-  if(!measures.length){b.sum+=1;b.count++;b.valid++;return}
-  const nums=measures.map(k=>toNum(r[k])).filter(Number.isFinite);
-  if(!nums.length)return;
-  const n=nums.reduce((x,y)=>x+y,0);b.sum+=n;b.count++;b.valid++;
+  if(skillField||qualField){const selected=skillField||qualField;const n=tokens(r[selected]).length;if(n)add(label,n);return}
+  if(v.method==="count"||!measures.length){add(label,1);return}
+  const nums=measures.map(k=>toNum(r[k])).filter(Number.isFinite);if(!nums.length)return;
+  add(label,nums.reduce((x,y)=>x+y,0));
  });
- return [...buckets].filter(([,b])=>b.valid>0).map(([label,b])=>({label,value:v.method==="average"?b.sum/b.count:b.sum,count:b.count})).sort((x,y)=>Math.abs(y.value)-Math.abs(x.value)).slice(0,100);
+ return [...buckets].map(([label,b])=>({label,value:v.method==="average"?b.sum/Math.max(1,b.count):b.sum,count:b.count})).sort((x,y)=>Math.abs(y.value)-Math.abs(x.value)).slice(0,100);
+}
+function visualContextWarning(v){
+ const f=v.fields||{},g=[...fieldList(f.category),...fieldList(f.legend),...fieldList(f.location),...fieldList(f.x)],m=[...fieldList(f.value),...fieldList(f.y),...fieldList(f.size)];
+ const hasSkills=[...g,...m].some(x=>x.toLowerCase()==="skills"),hasQual=[...g,...m].some(x=>x.toLowerCase()==="qualifications");
+ if(hasSkills&&hasQual)return "Skills and qualifications are separate multi-value attributes. They cannot be compared as if they were the same measure. Build separate visuals for each.";
+ if(!g.length&&!m.length)return "Add a category or measure to populate this visual.";
+ if((v.type==="pie"||v.type==="donut")&&!g.length)return "Add a category such as Staff member, Skills or Location. The chart needs groups to calculate meaningful proportions.";
+ if(m.length&&m.some(x=>["skills","qualifications"].includes(x.toLowerCase()))&&!g.length)return "Add a meaningful grouping field. For example, Staff member + Skills shows each person's skill count; Skills alone shows the share of each skill.";
+ return "";
 }
 function paint(){
  sheetsEl.replaceChildren();sheets.forEach(s=>{let wrap=$("div","pa-sheet-wrap"),b=$("button",s.id===active?"active":"",s.name),x=icon("×","Close sheet");b.onclick=()=>{active=s.id;paint()};b.oncontextmenu=e=>{e.preventDefault();sheetMenu(s,b)};x.onclick=()=>{if(sheets.length===1){say("At least one sheet must remain.",true);return}if(confirm("Close sheet '"+s.name+"'?")){sheets=sheets.filter(q=>q.id!==s.id);active=sheets[0].id;paint()}};x.className="pa-sheet-close";wrap.append(b,x);sheetsEl.append(wrap)});
@@ -87,7 +101,7 @@ function paint(){
  fieldMap={...fieldMap,category:firstField("category"),legend:firstField("legend"),location:firstField("location"),x:firstField("x"),y:firstField("y"),value:firstField("value"),size:firstField("size"),latitude:firstField("latitude"),longitude:firstField("longitude"),columns:fieldList(fieldMap.columns)};
   if(v.type==="map"){let lat=fieldMap.latitude||v.latitude,lon=fieldMap.longitude||v.longitude;if(lat&&lon){v.latitude=lat;v.longitude=lon}else{body.append($("p","pa-map-empty",fieldMap.location?"Location field selected. Add latitude and longitude fields to plot these records.":"Add a Location field, or latitude and longitude fields, in the field wells."))}}
   if(v.type!=="map"||v.latitude&&v.longitude){
-   let data=aggregate(v),max=Math.max(1,...data.map(x=>Math.abs(x.value)));if(!data.length){body.append($("p","pa-map-empty","No numeric values available for this field combination. Choose a category and a numeric measure, or use Count."))}
+   let warning=visualContextWarning(v),data=warning?[]:aggregate(v),max=Math.max(1,...data.map(x=>Math.abs(x.value)));if(warning){body.append($("p","pa-map-empty",warning))}else if(!data.length){body.append($("p","pa-map-empty","No matching organisation records for this field combination. Check the selected filters and fields."))}
    if(v.type==="kpi"){body.append($("strong","pa-kpi",String(data.reduce((a,x)=>a+x.value,0))))}
    else if(v.type==="table"){let t=$("table","pa-table"),h=$("tr","");(fieldList(fieldMap.columns).length?fieldList(fieldMap.columns):headers).forEach(k=>h.append($("th","",k)));t.append(h);filtered().slice(0,100).forEach(row=>{let tr=$("tr","");(fieldList(fieldMap.columns).length?fieldList(fieldMap.columns):headers).forEach(k=>tr.append($("td","",String(row[k]??""))));t.append(tr)});body.append(t)}
    else if(v.type==="donut"||v.type==="pie"){let total=data.reduce((a,x)=>a+x.value,0),parts=[],cursor=0;data.forEach((x,i)=>{let end=cursor+(total?x.value/total*100:0);parts.push("var(--pa-slice-"+(i%8)+") "+cursor+"% "+end+"%");cursor=end});const palette=["#7950a8","#b58bd8","#6d86c5","#4f9d91","#d59a54","#c66c83","#7198a9","#9a9a62"];let cursorPct=0;const positiveTotal=data.reduce((sum,x)=>sum+Math.max(0,x.value),0);const slices=data.map((x,i)=>{const start=cursorPct;cursorPct+=positiveTotal>0?Math.max(0,x.value)/positiveTotal*100:0;return palette[i%palette.length]+" "+start+"% "+cursorPct+"%"});let ring=$("div",v.type==="donut"?"pa-donut":"pa-pie");ring.style.background="conic-gradient("+(slices.length?slices.join(","):"var(--pa-line) 0 100%")+")";if(v.type==="donut")ring.append($("b","",String(Number(total.toFixed(2)))));body.append(ring);data.forEach((x,i)=>{let pct=positiveTotal>0?Math.max(0,x.value)/positiveTotal*100:0;let l=$("p","pa-legend",x.label+" · "+Number(x.value.toFixed(2))+" · "+pct.toFixed(1)+"%");l.style.setProperty("--pa-legend-index",i%8);l.style.setProperty("--pa-legend-color",palette[i%palette.length]);body.append(l)})}
