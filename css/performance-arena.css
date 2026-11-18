@@ -101,3 +101,7 @@
 .pa-data-connection .pa-field{margin:0}
 .pa-data-connect-btn{width:100%;justify-content:center;background:var(--pa-accent);color:white;border-color:var(--pa-accent);min-height:36px}
 .pa-data-connect-btn:hover{filter:brightness(1.08)}
+
+.pa-visual.pa-drop-target{outline:2px dashed var(--pa-accent);outline-offset:3px;background:color-mix(in srgb,var(--pa-accent) 7%,var(--pa-panel))}
+.pa-field-item[draggable=true]{cursor:grab}
+.pa-field-item[draggable=true]:active{cursor:grabbing}
