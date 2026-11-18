@@ -994,6 +994,15 @@
       return;
     }
 
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "performance") {
+      if (window.MechnarPerformanceArena && typeof window.MechnarPerformanceArena.render === "function") {
+        window.MechnarPerformanceArena.render(pageContent);
+      } else {
+        pageContent.textContent = "Performance Arena could not load. Refresh the application and try again.";
+      }
+      return;
+    }
+
     if (String(user?.role || "").toLowerCase() === "supervisor" &&
         ["reviews", "sites", "performance"].includes(pageId)) {
       const descriptions = {
