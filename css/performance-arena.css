@@ -122,3 +122,14 @@
 .pa-chart-line{fill:none;stroke:var(--pa-accent);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 .pa-chart-area{fill:var(--pa-accent);opacity:.18}
 .pa-chart-point{fill:var(--pa-accent);stroke:var(--pa-panel);stroke-width:2}
+
+/* Performance Arena: fixed visual cards; no native resize grips or movement controls. */
+.pa-visual-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;transform:none!important;width:100%!important;min-height:560px}
+.pa-visual{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;min-height:280px!important;resize:none!important;overflow:hidden!important}
+.pa-visual-body{min-width:0;overflow:auto}
+.pa-pie,.pa-donut{width:150px;height:150px;border-radius:50%;margin:8px auto 14px;display:grid;place-items:center;position:relative;flex:none}
+.pa-pie{border:1px solid var(--pa-line)}
+.pa-donut:before{content:"";position:absolute;inset:24px;border-radius:50%;background:var(--pa-panel)}
+.pa-donut b{position:relative;z-index:1}
+.pa-legend:before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--pa-legend-color,var(--pa-accent));margin-right:7px}
+@media(max-width:720px){.pa-visual-grid{grid-template-columns:1fr!important}}
