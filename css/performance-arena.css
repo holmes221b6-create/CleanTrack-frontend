@@ -45,3 +45,12 @@
 .pa-canvas{position:relative;min-height:550px}
 .pa-view-empty{min-height:500px;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--pa-muted);font-size:13px;font-weight:600;letter-spacing:.01em}
 .pa-visual-grid:has(>.pa-view-empty){display:flex;align-items:center;justify-content:center;min-height:500px;width:100%;transform:none}
+
+/* Professional BI ribbon: icon above concise label; descriptions appear only on hover */
+.pa-ribbon-body{align-items:stretch;gap:5px;padding:5px 8px 7px;flex-wrap:wrap}
+.pa-ribbon-action{min-width:76px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 9px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pa-text);cursor:pointer;transition:background .15s,border-color .15s}
+.pa-ribbon-action:hover{background:color-mix(in srgb,var(--pa-accent) 10%,var(--pa-panel));border-color:var(--pa-line)}
+.pa-ribbon-action:focus-visible{outline:2px solid var(--pa-accent);outline-offset:1px}
+.pa-ribbon-icon{display:grid;place-items:center;min-height:27px;font-size:22px;line-height:1;color:var(--pa-accent)}
+.pa-ribbon-label{font-size:10px;font-weight:600;line-height:1.2;text-align:center;white-space:nowrap;color:var(--pa-text)}
+.pa-ribbon-action small{display:none!important}
