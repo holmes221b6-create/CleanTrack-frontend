@@ -54,3 +54,5 @@
 .pa-ribbon-icon{display:grid;place-items:center;min-height:27px;font-size:22px;line-height:1;color:var(--pa-accent)}
 .pa-ribbon-label{font-size:10px;font-weight:600;line-height:1.2;text-align:center;white-space:nowrap;color:var(--pa-text)}
 .pa-ribbon-action small{display:none!important}
+
+.pa-arena-title{margin:0;color:var(--pa-text);font-size:22px;line-height:1.2;font-weight:750;letter-spacing:-.025em}
