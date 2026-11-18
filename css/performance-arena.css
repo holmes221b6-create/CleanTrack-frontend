@@ -93,3 +93,11 @@
 .pa-resize-se{right:-6px;bottom:-6px;cursor:nwse-resize}
 .pa-resize-sw{left:-6px;bottom:-6px;cursor:nesw-resize}
 @media(hover:none){.pa-resize-handle{opacity:1}}
+
+/* Native MECHNAR data-source connection in the Data pane */
+.pa-data-connection{display:grid;gap:9px;padding:12px;margin:0 0 12px;border:1px solid var(--pa-line);background:var(--pa-panel)}
+.pa-data-connection-title{font-size:11px;letter-spacing:.08em;color:var(--pa-accent)}
+.pa-data-connection-note{font-size:11px;line-height:1.5;color:var(--pa-muted);margin:0}
+.pa-data-connection .pa-field{margin:0}
+.pa-data-connect-btn{width:100%;justify-content:center;background:var(--pa-accent);color:white;border-color:var(--pa-accent);min-height:36px}
+.pa-data-connect-btn:hover{filter:brightness(1.08)}
