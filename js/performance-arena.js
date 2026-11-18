@@ -22,19 +22,11 @@ async function load(){try{if(!api())throw Error("MECHNAR data service unavailabl
 function fill(s,list,label){let old=s.value;s.replaceChildren(new Option(label,""));(list||[]).forEach(x=>s.add(new Option(x.name,String(x.id))));if([...s.options].some(x=>x.value===old))s.value=old}
 function aggregate(v){
  const f=v.fields||{},group=f.category||f.legend||f.location||f.x||"",measure=f.value||f.y||f.size||"";
- const records=filtered(),buckets=new Map(),out=[];
- const numeric=(raw)=>{if(raw===null||raw===undefined)return NaN;const s=String(raw).trim();if(!s||s==="—"||s==="-"||s.toLowerCase()==="n/a")return NaN;return Number(s.replace(/,/g,"").replace(/%$/,""))};
- if(!group&&measure){
-  records.forEach((row,i)=>{const n=v.method==="count"?1:numeric(row[measure]);if(Number.isFinite(n))out.push({label:"Record "+(i+1),value:n})});
-  return out.slice(0,40);
- }
- records.forEach(row=>{
-  const label=group?String(row[group]??"Unspecified"):"Total";
-  const n=v.method==="count"||!measure?1:numeric(row[measure]);
-  if(!Number.isFinite(n))return;
-  const x=buckets.get(label)||{sum:0,count:0};x.sum+=n;x.count++;buckets.set(label,x);
- });
- return [...buckets].map(([label,x])=>({label,value:v.method==="average"&&measure?x.sum/Math.max(1,x.count):x.sum})).slice(0,40);
+ const records=filtered(),numeric=raw=>{if(raw===null||raw===undefined)return NaN;const s=String(raw).trim().replace(/,/g,"").replace(/%$/,"");if(!s||["—","-","n/a"].includes(s.toLowerCase()))return NaN;const n=Number(s);return Number.isFinite(n)?n:NaN};
+ if(!group&&measure)return records.map((r,i)=>({label:String(r[f.tooltips]||r[f.columns]||("Record "+(i+1))),value:v.method==="count"?1:numeric(r[measure])})).filter(x=>Number.isFinite(x.value)).slice(0,60);
+ const buckets=new Map();
+ records.forEach((r,i)=>{const label=group?String(r[group]??"Unspecified"):String(r[f.columns]||"All records");const n=measure&&v.method!=="count"?numeric(r[measure]):1;if(!Number.isFinite(n))return;const b=buckets.get(label)||{sum:0,count:0};b.sum+=n;b.count++;buckets.set(label,b)});
+ return [...buckets].map(([label,b])=>({label,value:v.method==="average"&&measure?b.sum/Math.max(1,b.count):b.sum})).slice(0,60);
 }
 function paint(){
  sheetsEl.replaceChildren();sheets.forEach(s=>{let wrap=$("div","pa-sheet-wrap"),b=$("button",s.id===active?"active":"",s.name),x=icon("×","Close sheet");b.onclick=()=>{active=s.id;paint()};b.oncontextmenu=e=>{e.preventDefault();sheetMenu(s,b)};x.onclick=()=>{if(sheets.length===1){say("At least one sheet must remain.",true);return}if(confirm("Close sheet '"+s.name+"'?")){sheets=sheets.filter(q=>q.id!==s.id);active=sheets[0].id;paint()}};x.className="pa-sheet-close";wrap.append(b,x);sheetsEl.append(wrap)});
@@ -87,13 +79,7 @@ function paint(){
   }
  }
  card.append(body);
- let moveStart=null,moveOrigin=null;head.style.cursor="move";head.onpointerdown=e=>{if(e.target.closest("button,input"))return;moveStart={x:e.clientX,y:e.clientY};moveOrigin={x:v.x||0,y:v.y||0};head.setPointerCapture(e.pointerId)};
- head.onpointermove=e=>{if(!moveStart)return;v.x=Math.max(0,moveOrigin.x+e.clientX-moveStart.x);v.y=Math.max(0,moveOrigin.y+e.clientY-moveStart.y);card.style.left=v.x+"px";card.style.top=v.y+"px";gridHeight()};
- head.onpointerup=head.onpointercancel=()=>{if(moveStart)saveLocal();moveStart=null};
- const directions=["n","s","e","w","ne","nw","se","sw"];
- directions.forEach(dir=>{let handle=$("button","pa-resize-handle pa-resize-"+dir);handle.type="button";handle.setAttribute("aria-label","Resize visual "+dir);handle.title="Drag to resize";handle.onpointerdown=e=>{e.preventDefault();e.stopPropagation();card.classList.add("pa-resizing");let initial={x:e.clientX,y:e.clientY,left:v.x||0,top:v.y||0,width:card.offsetWidth,height:card.offsetHeight};handle.setPointerCapture(e.pointerId);handle.onpointermove=ev=>{if(!handle.hasPointerCapture(ev.pointerId))return;let dx=ev.clientX-initial.x,dy=ev.clientY-initial.y,w=initial.width,h=initial.height,x=initial.left,y=initial.top;if(dir.includes("e"))w=initial.width+dx;if(dir.includes("s"))h=initial.height+dy;if(dir.includes("w")){w=initial.width-dx;x=initial.left+dx}if(dir.includes("n")){h=initial.height-dy;y=initial.top+dy}w=Math.max(180,w);h=Math.max(150,h);if(dir.includes("w")&&w===180)x=initial.left+initial.width-180;if(dir.includes("n")&&h===150)y=initial.top+initial.height-150;v.x=Math.max(0,x);v.y=Math.max(0,y);v.w=Math.round(w);v.h=Math.round(h);card.style.left=v.x+"px";card.style.top=v.y+"px";card.style.width=v.w+"px";card.style.height=v.h+"px";gridHeight()};const finish=()=>{card.classList.remove("pa-resizing");saveLocal();handle.onpointermove=null;handle.onpointerup=null;handle.onpointercancel=null};handle.onpointerup=finish;handle.onpointercancel=finish};card.append(handle)});
- const ro=new ResizeObserver(entries=>{if(card.classList.contains("pa-resizing"))return;for(const en of entries){v.w=Math.round(en.contentRect.width);v.h=Math.round(en.contentRect.height);gridHeight();saveLocal()}});ro.observe(card);
- function gridHeight(){grid.style.minHeight=Math.max(560,(v.y||0)+(card.offsetHeight||v.h||280)+30)+"px"}
+ // Visuals remain fixed on the report canvas; no move slider, drag-to-move, or resize handles.
  return card;
 }
 function saveLocal(){try{localStorage.setItem(storageKey(),JSON.stringify({sheets,active}))}catch(_){}}
@@ -120,7 +106,7 @@ function renderDock(tab,id){
  const visualSelect=sel(visualTypes);visualSelect.value=v.type;visualSelect.onchange=()=>{v.type=visualSelect.value;v.title=visualTypes.find(x=>x[0]===v.type)?.[1]||v.type;paint();renderDock("visuals",v.id)};
  dockBody.append(field("VISUAL TYPE",visualSelect));
  const wells=[["category","Category"],["value","Values"],["legend","Legend"],["x","X-axis"],["y","Y-axis"],["location","Location"],["latitude","Latitude"],["longitude","Longitude"],["size","Size"],["breakdown","Breakdown"],["trend","Trend axis"],["target","Target"],["columns","Table columns"],["tooltips","Tooltips"]];
- v.fields=v.fields||{};let available=headers.map(h=>[h,h]);wells.forEach(([key,label])=>{let select=sel([["","Add data fields here"],...available]);select.value=v.fields[key]||"";let box=field(label,select);box.classList.add("pa-field-well");box.ondragover=e=>e.preventDefault();box.ondrop=e=>{e.preventDefault();let h=e.dataTransfer.getData("application/x-mechnar-field")||e.dataTransfer.getData("text/plain");if(headers.includes(h)){v.fields[key]=h;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id);say(h+" assigned to "+label)}};select.onchange=()=>{v.fields[key]=select.value;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id)};dockBody.append(box)});
+ v.fields=v.fields||{};let available=headers.map(h=>[h,h]);wells.forEach(([key,label])=>{let select=sel([["","Add data fields here"],...available]);select.value=v.fields[key]||"";let box=field(label,select);box.classList.add("pa-field-well");box.ondragover=e=>e.preventDefault();box.ondrop=e=>{e.preventDefault();let h=e.dataTransfer.getData("application/x-mechnar-field")||e.dataTransfer.getData("text/plain");if(headers.includes(h)){v.fields[key]=h;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";paint();renderDock("visuals",v.id);say(h+" assigned to "+label)}};select.onchange=()=>{v.fields[key]=select.value;v.group=v.fields.category||v.fields.legend||v.fields.location||v.fields.x||"";v.measure=v.fields.value||v.fields.y||v.fields.size||"";saveLocal();paint();renderDock("visuals",v.id);say(select.value?select.value+" loaded into "+label:"Removed field from "+label)};dockBody.append(box)});
  let method=sel([["sum","Sum"],["count","Count"],["average","Average"]]);method.value=v.method||"sum";method.onchange=()=>{v.method=method.value;paint()};dockBody.append(field("AGGREGATION",method));
  dockBody.append(btn("Format",()=>openVisualFormat(v)),btn("Remove visual",()=>{current().items=current().items.filter(x=>x.id!==v.id);paint();renderDock("visuals")}));
 }function openVisualFormat(v){
