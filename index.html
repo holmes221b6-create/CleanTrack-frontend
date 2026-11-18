@@ -269,6 +269,23 @@ html[data-theme="light"] body .ct-splash-logo {
     <link rel="stylesheet" href="css/instant-page-frame.css?v=20261117-instant-frame-v1">
     <link rel="stylesheet" href="css/team-theme-sync.css?v=20261117-account-wide-theme-v2">
 
+<style id="mechnar-launch-splash-mark-consistency">
+/* Use the standalone emblem, never the horizontal lockup, at the splash mark. */
+#cleantrack-launch-splash .ct-splash-mark {
+  width:104px!important;min-width:104px!important;height:104px!important;
+  min-height:104px!important;flex:0 0 104px!important;overflow:visible!important;
+  background:transparent!important;
+}
+#cleantrack-launch-splash img.ct-splash-logo {
+  display:block!important;width:104px!important;min-width:104px!important;
+  max-width:104px!important;height:104px!important;min-height:104px!important;
+  max-height:104px!important;object-fit:contain!important;object-position:center!important;
+  opacity:1!important;transform:none!important;mix-blend-mode:normal!important;
+}
+html[data-theme="light"] #cleantrack-launch-splash img.ct-splash-logo {
+  filter:drop-shadow(0 3px 12px rgba(80,54,125,.18))!important;
+}
+</style>
 <style id="mechnar-launch-splash-theme-final">
 html[data-theme="light"] #cleantrack-launch-splash{
  background:#fff!important;color:#182536!important;
@@ -291,7 +308,7 @@ html[data-theme="light"] #cleantrack-launch-splash .ct-splash-owner{color:#66778
 
 <body>
     <script>window.__MECHNAR_SPLASH_STARTED_AT__ = Date.now();</script>
-    <div id="cleantrack-launch-splash" role="status" aria-label="Starting MECHNAR"><div class="ct-splash-mark" aria-hidden="true"><img class="ct-splash-logo" src="assets/omnix-mark.svg?v=3" alt="" decoding="sync" fetchpriority="high"></div><div class="ct-splash-wordmark" aria-hidden="true">MECHNAR</div><div class="ct-splash-owner">INTELLIGENCE · OPERATIONS · SYSTEMS</div></div>
+    <div id="cleantrack-launch-splash" role="status" aria-label="Starting MECHNAR"><div class="ct-splash-mark" aria-hidden="true"><img class="ct-splash-logo" src="assets/omnix-mark.svg?v=4" alt="" decoding="sync" fetchpriority="high"></div><div class="ct-splash-wordmark" aria-hidden="true">MECHNAR</div><div class="ct-splash-owner">INTELLIGENCE · OPERATIONS · SYSTEMS</div></div>
     <script>(function(){var splash=document.getElementById("cleantrack-launch-splash");if(splash){window.setTimeout(function(){splash.classList.add("is-hidden");window.setTimeout(function(){if(splash.isConnected)splash.remove();},450);},3200);}})();</script>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
