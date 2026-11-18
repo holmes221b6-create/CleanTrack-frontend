@@ -111,3 +111,6 @@
 .pa-field-well:has(select:focus){outline:1px solid var(--pa-accent)}
 .pa-field-item[draggable=true]{cursor:grab}
 .pa-visual.pa-drop-target{outline:0}
+
+.pa-field-well{min-height:48px;border:1px dashed var(--pa-accent);padding:7px;border-radius:6px}
+.pa-field-well select{width:100%;min-height:34px}
