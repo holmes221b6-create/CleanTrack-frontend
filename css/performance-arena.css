@@ -160,3 +160,11 @@
 .pa-visual-body td,.pa-visual-body th{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pa-visual-body .pa-map-svg{width:100%;height:100%;min-height:0}
 .pa-visual-body .pa-donut,.pa-visual-body .pa-pie{max-width:100%;max-height:100%;}
+
+/* Center the chart/diagram inside its visual frame. */
+.pa-visual-body{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;text-align:center!important;overflow:hidden!important;min-height:0!important}
+.pa-visual-body>.pa-data-chart{flex:1 1 auto!important;min-height:0!important;max-height:100%!important;width:100%!important;align-self:center!important}
+.pa-visual-body>.pa-blank-visual,.pa-visual-body>.pa-map-svg{flex:1 1 auto!important;min-height:0!important;max-height:100%!important;width:100%!important;align-self:center!important}
+.pa-visual-body>.pa-table,.pa-visual-body>.pa-kpi,.pa-visual-body>.pa-map-empty{margin:auto!important;max-width:100%!important}
+.pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{margin:auto!important}
+.pa-visual-body>.pa-legend{flex:0 0 auto!important;justify-content:center!important;max-width:100%!important}
