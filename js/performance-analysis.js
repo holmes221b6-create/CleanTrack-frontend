@@ -46,18 +46,18 @@ async function render(root){
  '<section class="paa-section"><div class="paa-section-head"><div><p>05 · PERFORMANCE HISTORY</p><h3>Progress over time</h3></div></div>'+table(["Period","Operations","Completed","Completion","On time","Approval","Overdue","Score"],histRows)+'</section>'+
  '<section class="paa-section"><div class="paa-section-head"><div><p>06 · PERFORMANCE GOALS</p><h3>Measurable next steps</h3></div></div><div class="paa-goals">'+goals.map((g,i)=>'<article><span>GOAL '+(i+1)+'</span><h4>'+esc(g[1])+'</h4><p>Current baseline: '+esc(g[2])+'</p><small>'+esc(g[3])+'</small></article>').join("")+'</div><p class="paa-note">Goals are generated from this historical baseline; they are recommendations, not persisted targets or completion tracking.</p></section>'+
  '<section class="paa-section"><div class="paa-section-head"><div><p>METHODOLOGY & DATA COVERAGE</p><h3>How rankings are calculated</h3></div></div><p class="paa-note">'+esc(data.methodology)+'</p><p class="paa-note">No attendance model is connected to this analysis. Attendance ranking is deliberately not fabricated. Team-level comparisons are aggregates; Supervisor individual detail is restricted to their own team.</p></section>';
+ document.querySelectorAll(".paa-ranking-overlay").forEach(node=>node.remove());
  const rankingOverlay=document.createElement("div");
  rankingOverlay.className="paa-ranking-overlay";
  rankingOverlay.hidden=true;
  rankingOverlay.innerHTML='<section class="paa-ranking-dialog" role="dialog" aria-modal="true" aria-labelledby="paa-ranking-title"><header><div><p>02 · PERFORMANCE RANKINGS</p><h2 id="paa-ranking-title">Comparative rankings</h2></div><button type="button" class="paa-ranking-close" aria-label="Close comparative rankings">×</button></header><div class="paa-ranking-content"></div></section>';
- root.appendChild(rankingOverlay);
  rankingOverlay.querySelector(".paa-ranking-content").innerHTML=rankingPanel;
- const closeRankings=()=>{rankingOverlay.hidden=true;document.body.classList.remove("paa-ranking-open");};
- root.querySelector("#paa-open-rankings").onclick=()=>{rankingOverlay.hidden=false;document.body.classList.add("paa-ranking-open");rankingOverlay.querySelector(".paa-ranking-close").focus();};
+ document.body.appendChild(rankingOverlay);
+ const closeRankings=()=>{rankingOverlay.hidden=true;document.body.classList.remove("paa-ranking-open");document.removeEventListener("keydown",rankingEsc);};
+ root.querySelector("#paa-open-rankings").onclick=()=>{rankingOverlay.hidden=false;document.body.classList.add("paa-ranking-open");rankingOverlay.querySelector(".paa-ranking-content").scrollTop=0;rankingOverlay.querySelector(".paa-ranking-close").focus();document.addEventListener("keydown",rankingEsc);};
  rankingOverlay.querySelector(".paa-ranking-close").onclick=closeRankings;
  rankingOverlay.addEventListener("click",e=>{if(e.target===rankingOverlay)closeRankings();});
  const rankingEsc=e=>{if(e.key==="Escape"&&!rankingOverlay.hidden)closeRankings();};
- document.addEventListener("keydown",rankingEsc);
  body.hidden=false;status.hidden=true;
  body.querySelector("#paa-csv").onclick=()=>csvDownload(data);
  body.querySelector("#paa-pdf").onclick=()=>window.print();
