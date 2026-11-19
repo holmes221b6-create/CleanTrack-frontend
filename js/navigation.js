@@ -233,7 +233,7 @@
     const assigned = new Set();
     const groups = groupDefinitions.map(group => ({
       ...group,
-      items: menu.filter(item => group.pages.includes(item.id))
+      items: group.pages.map(id => menu.find(item => item.id === id)).filter(Boolean)
     })).filter(group => group.items.length);
 
     // Fail-safe for any future route: keep it visible in a final "More" section.
