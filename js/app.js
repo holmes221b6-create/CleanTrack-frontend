@@ -1333,10 +1333,19 @@
 
     // Render the landing page instead of the generic placeholder.
     if (["home", "workspace", "my-desk"].includes(pageId)) {
-      const intro = document.createElement("p");
       const userName = user?.name || user?.email || "there";
-      intro.textContent = `Welcome back, ${userName}.`;
-      pageContent.appendChild(intro);
+      const greetingKey = "mechnar.workspace-greeting-shown." + String(user?.id ?? user?.email ?? "current").toLowerCase();
+      let showWorkspaceGreeting = false;
+      try {
+        showWorkspaceGreeting = sessionStorage.getItem(greetingKey) !== "1";
+        if (showWorkspaceGreeting) sessionStorage.setItem(greetingKey, "1");
+      } catch (_) { showWorkspaceGreeting = true; }
+      if (showWorkspaceGreeting) {
+        const intro = document.createElement("p");
+        intro.textContent = `Welcome back, ${userName}.`;
+        intro.className = "workspace-login-greeting";
+        pageContent.appendChild(intro);
+      }
 
       const cards = [
         { id: "teams", title: "Teams", description: "View and manage teams." },
@@ -1636,6 +1645,11 @@
 
       try {
         await auth.logout();
+        try {
+          const user = auth.getCurrentUser?.();
+          const greetingKey = "mechnar.workspace-greeting-shown." + String(user?.id ?? user?.email ?? "current").toLowerCase();
+          sessionStorage.removeItem(greetingKey);
+        } catch (_) {}
       } catch (error) {
         showMessage(
           error.message || "There was a problem signing out.",
@@ -2030,6 +2044,10 @@ function bindNavigation() {
         });
 
         state.started = true;
+        try {
+          const greetingKey = "mechnar.workspace-greeting-shown." + String(user?.id ?? user?.email ?? "current").toLowerCase();
+          sessionStorage.removeItem(greetingKey);
+        } catch (_) {}
         showAuthenticatedLayout(user);
         showMessage("You are now signed in.", "success");
         maybeShowFirstSetup(user);
