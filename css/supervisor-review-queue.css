@@ -86,3 +86,29 @@ html[data-theme="light"] .ct-rq-search,html[data-theme="light"] .ct-rq-tabs,html
 @media(max-width:900px){.ct-rq-toolbar{grid-template-columns:minmax(0,1fr) auto}.ct-rq-search{grid-column:1/-1}.ct-rq-tabs{grid-column:1/-1}.ct-rq-filter-button{grid-column:1}.ct-rq-bulk-button{grid-column:2;grid-row:3}.ct-rq-tabs{overflow-x:auto}.ct-rq-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.ct-rq-toolbar{grid-template-columns:1fr auto}.ct-rq-filter-button{grid-column:1}.ct-rq-bulk-button{grid-column:2;grid-row:3;align-self:center}.ct-rq-filter-panel-grid{grid-template-columns:1fr}.ct-rq-filter-footer{display:grid;grid-template-columns:1fr 1fr}.ct-rq-row{align-items:stretch;flex-direction:column}.ct-rq-row-actions{justify-content:space-between}.ct-rq-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-rq-heading{flex-direction:column}.ct-rq-panel{width:100%;max-height:95dvh}.ct-rq-panel-head{padding:16px}.ct-rq-panel-body{padding:15px}.ct-rq-decision-actions{display:grid;grid-template-columns:1fr}.ct-rq-decision-actions button{width:100%}}
 @media(prefers-reduced-motion:reduce){.ct-rq-panel{animation:none}}
+
+
+/* Keep Bulk approve directly beneath the review controls. */
+.ct-rq-toolbar{
+  grid-template-columns:minmax(180px,1fr) auto auto;
+  row-gap:5px;
+}
+.ct-rq-bulk-button{
+  grid-column:1/-1;
+  grid-row:2;
+  justify-self:start;
+  margin-top:2px;
+}
+@media(max-width:900px){
+  .ct-rq-toolbar{grid-template-columns:minmax(0,1fr) auto;row-gap:5px}
+  .ct-rq-search{grid-column:1/-1;grid-row:1}
+  .ct-rq-tabs{grid-column:1/-1;grid-row:2}
+  .ct-rq-filter-button{grid-column:1;grid-row:3}
+  .ct-rq-bulk-button{grid-column:1/-1;grid-row:4;justify-self:start;margin-top:2px}
+}
+@media(max-width:620px){
+  .ct-rq-toolbar{grid-template-columns:minmax(0,1fr) auto}
+  .ct-rq-search,.ct-rq-tabs{grid-column:1/-1}
+  .ct-rq-filter-button{grid-column:1;grid-row:3}
+  .ct-rq-bulk-button{grid-column:1/-1;grid-row:4;justify-self:start}
+}
