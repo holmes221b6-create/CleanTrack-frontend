@@ -203,3 +203,12 @@
 .pa-visual-body>.pa-map-empty{margin:auto!important;font-size:9px!important;padding:2px!important}
 .pa-visual-body>.pa-table{width:100%!important;max-height:100%!important;font-size:9px!important}
 .pa-visual-body>.pa-kpi{margin:auto!important;font-size:clamp(24px,5vw,44px)!important;padding:0!important}
+
+/* Power BI-style visual placeholder: frame fills the visual body; glyph stays naturally proportioned and centred. */
+.pa-visual{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+.pa-visual-body{position:relative!important;display:flex!important;flex:1 1 auto!important;min-width:0!important;min-height:0!important;width:100%!important;height:auto!important;max-height:none!important;align-items:stretch!important;justify-content:stretch!important;overflow:hidden!important;padding:8px!important;gap:0!important}
+.pa-visual-body>.pa-blank-visual{display:flex!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-height:none!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;overflow:hidden!important}
+.pa-visual-body>.pa-blank-visual>svg{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+.pa-visual-body>.pa-data-chart,.pa-visual-body>.pa-map-svg{display:block!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;margin:0!important;object-fit:contain!important}
+.pa-visual-body>.pa-legend{display:block!important;flex:0 0 auto!important;max-width:100%!important;overflow:hidden!important}
+.pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{width:min(100%,220px)!important;height:auto!important;aspect-ratio:1/1!important;max-width:100%!important;max-height:100%!important;margin:auto!important;flex:0 1 auto!important}
