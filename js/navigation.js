@@ -226,7 +226,7 @@
       { id: "workspace", label: "Workspace", icon: "⌂", pages: ["home", "dashboard", "workspace", "my-desk"] },
       { id: "people-places", label: "People & Places", icon: "▦", pages: ["staff", "personnel", "invitations", "teams", "locations", "zones", "sites"] },
       { id: "operations", label: "Operations", icon: "☷", pages: ["operations", "inventory", "my-tasks", "my-history", "incident-reports", "reviews", "incidents", "inspections", "handovers"] },
-      { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "reports", "performance", "team-pulse", "announcements", "team-channel", "audit", "meetings", "org-settings", "billing"] }
+      { id: "insights-admin", label: "Insights & Admin", icon: "▥", pages: ["analytics", "performance", "performance-analysis", "reports", "team-pulse", "announcements", "team-channel", "audit", "meetings", "org-settings", "billing"] }
     ];
 
     const menuIds = new Set(menu.map(item => item.id));
