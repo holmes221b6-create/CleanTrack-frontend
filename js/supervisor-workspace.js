@@ -49,8 +49,15 @@
     const user = window.CleanTrackAuth?.getCurrentUser?.() || {};
     const name = user.name || data.supervisor?.name || "there";
     const firstKey = "mechnar.first-login." + String(user.id || "").toLowerCase();
+    const greetingKey = "mechnar.workspace-greeting-shown." + String(user.id || user.email || "current").toLowerCase();
     let firstLogin = false;
-    try { firstLogin = sessionStorage.getItem(firstKey) === "1"; sessionStorage.removeItem(firstKey); } catch (_) {}
+    let showWorkspaceGreeting = false;
+    try {
+      firstLogin = sessionStorage.getItem(firstKey) === "1";
+      if (firstLogin) sessionStorage.removeItem(firstKey);
+      showWorkspaceGreeting = sessionStorage.getItem(greetingKey) !== "1";
+      if (showWorkspaceGreeting) sessionStorage.setItem(greetingKey, "1");
+    } catch (_) { showWorkspaceGreeting = true; }
     const greeting = firstLogin ? "Welcome" : "Welcome back";
     const metrics = data.metrics;
     const operations = Array.isArray(data.operations) ? data.operations : [];
@@ -125,7 +132,7 @@
     root.innerHTML =
       '<div class="mw-shell">'+
         '<header class="mw-welcome"><div class="mw-welcome-copy"><div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>'+
-          '<h1>'+esc(greeting)+', '+esc(name)+'.</h1><p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team operations overview</p></div>'+
+          (showWorkspaceGreeting?'<h1>'+esc(greeting)+', '+esc(name)+'.</h1>':'')+'<p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team operations overview</p></div>'+
           '<div class="mw-header-actions"><button type="button" class="mw-calendar-trigger" data-mw-calendar-trigger aria-expanded="false">▦ Operations calendar</button><div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
         '<section class="mw-stat-grid" aria-label="Team operations summary">'+
           '<article class="mw-stat"><span>Total operations</span><strong>'+metrics.total_operations+'</strong></article>'+
