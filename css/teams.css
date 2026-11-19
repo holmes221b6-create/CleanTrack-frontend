@@ -1062,3 +1062,53 @@ html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-c
 html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-status,.ct-bi-pagebar){
  background:#f2f5f8!important;color:#52647a!important;
 }
+
+/* Native MECHNAR team performance overview — live operational analytics */
+.ct-team-performance-overview{display:flex;flex-direction:column;gap:22px}
+.ct-team-performance-header{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--border,rgba(150,140,170,.22))}
+.ct-team-performance-header h2{margin:4px 0 8px;font-size:clamp(22px,2.4vw,30px)}
+.ct-team-performance-header>div:first-child{max-width:650px}
+.ct-team-performance-controls{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.ct-team-performance-controls .ct-team-field{min-width:145px;margin:0}
+.ct-team-performance-controls .ct-team-field input{min-height:40px}
+.ct-team-performance-status{margin:0;font-size:12px}
+.ct-team-performance-content{display:flex;flex-direction:column;gap:18px}
+.ct-team-performance-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.ct-team-performance-kpi{min-width:0;padding:17px 18px;border:1px solid var(--border,rgba(150,140,170,.22));border-radius:12px;background:var(--surface,rgba(120,100,150,.055));display:flex;flex-direction:column;gap:7px}
+.ct-team-performance-kpi>span{font-size:12px;color:var(--muted,#9992a5)}
+.ct-team-performance-kpi>strong{font-size:clamp(22px,2.2vw,29px);line-height:1.15;color:var(--text,#f0edf5);overflow-wrap:anywhere}
+.ct-team-performance-kpi>small{font-size:11px;color:var(--muted,#9992a5);line-height:1.4}
+.ct-team-performance-kpi.is-warning{border-color:rgba(203,135,80,.45)}
+.ct-team-performance-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.8fr);gap:14px}
+.ct-team-performance-panel{min-width:0;padding:19px;border:1px solid var(--border,rgba(150,140,170,.22));border-radius:13px;background:var(--surface,rgba(120,100,150,.04))}
+.ct-team-performance-panel h3{margin:0 0 6px;font-size:17px}
+.ct-team-performance-panel>p{margin:0 0 16px;font-size:12px}
+.ct-team-performance-weekly{display:flex;flex-direction:column;gap:13px}
+.ct-team-performance-week{display:grid;grid-template-columns:95px minmax(0,1fr);gap:12px;align-items:center}
+.ct-team-performance-week-date{font-size:11px;color:var(--muted,#9992a5)}
+.ct-team-performance-bars{display:flex;flex-direction:column;gap:5px}
+.ct-team-performance-bar-row{display:grid;grid-template-columns:68px minmax(30px,1fr) 30px;gap:7px;align-items:center}
+.ct-team-performance-bar-row small{font-size:10px;color:var(--muted,#9992a5)}
+.ct-team-performance-bar-row b{font-size:11px;text-align:right}
+.ct-team-performance-bar-track,.ct-team-performance-status-track{height:8px;border-radius:20px;background:var(--border,rgba(150,140,170,.16));overflow:hidden}
+.ct-team-performance-bar-fill,.ct-team-performance-status-fill{display:block;height:100%;border-radius:20px;background:#9472c8;min-width:0}
+.ct-team-performance-bar-fill.completed{background:#4b9c80}
+.ct-team-performance-legend{display:flex;gap:16px;margin-top:15px;font-size:11px;color:var(--muted,#9992a5)}
+.ct-team-performance-legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#9472c8;margin-right:6px}
+.ct-team-performance-legend span.completed:before{background:#4b9c80}
+.ct-team-performance-status-row{display:grid;grid-template-columns:100px 36px minmax(35px,1fr);gap:10px;align-items:center;margin:15px 0}
+.ct-team-performance-status-label{font-size:12px;color:var(--muted,#9992a5)}
+.ct-team-performance-status-row strong{font-size:13px;text-align:right}
+.ct-team-performance-status-fill.completed{background:#4b9c80}
+.ct-team-performance-status-fill.pending{background:#9278c2}
+.ct-team-performance-status-fill.overdue{background:#c27a65}
+.ct-team-performance-status-fill.cancelled{background:#85808e}
+.ct-team-performance-empty{padding:20px 0}
+.ct-team-performance-table-wrap{width:100%;overflow:auto}
+.ct-team-performance-table{width:100%;border-collapse:collapse;min-width:760px}
+.ct-team-performance-table th,.ct-team-performance-table td{padding:12px 13px;border-bottom:1px solid var(--border,rgba(150,140,170,.18));text-align:left;font-size:12px;white-space:nowrap}
+.ct-team-performance-table th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted,#9992a5);font-weight:650}
+.ct-team-performance-table td:nth-child(2){font-weight:650;color:var(--text,#f0edf5)}
+.ct-team-performance-methodology{font-size:11px;line-height:1.6;color:var(--muted,#9992a5);margin:0}
+@media(max-width:900px){.ct-team-performance-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-team-performance-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.ct-team-performance-header{align-items:stretch}.ct-team-performance-controls{width:100%}.ct-team-performance-controls .ct-team-field{flex:1;min-width:125px}.ct-team-performance-controls button{width:100%}.ct-team-performance-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ct-team-performance-kpi{padding:13px}.ct-team-performance-panel{padding:14px}.ct-team-performance-week{grid-template-columns:75px minmax(0,1fr)}.ct-team-performance-status-row{grid-template-columns:80px 30px minmax(35px,1fr)}}
