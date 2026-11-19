@@ -9,18 +9,111 @@ const table=(headers,rows)=>'<div class="pa-analysis-table-wrap"><table class="p
 function csvDownload(data){
  const sections=[["Team rankings",["Rank","Team","Supervisor","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],data.teams.map(x=>[x.rank,x.team_name,x.supervisor,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.approval_rate,x.overdue_rate,x.score])],["Individual rankings",["Rank","Staff","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],data.individuals.map(x=>[x.rank,x.name,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.approval_rate,x.overdue_rate,x.score])],["Location rankings",["Rank","Location","Operations","Completed","Completion %","On time %","Score"],data.locations.map(x=>[x.rank,x.location_name,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.score])],["Operation type rankings",["Rank","Operation type","Operations","Completed","Completion %","On time %","Score"],data.operation_types.map(x=>[x.rank,x.operation_type,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.score])],["Role rankings",["Rank","Role","Operations","Completed","Completion %","On time %","Score"],(data.roles||[]).map(x=>[x.rank,x.role,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.score])],["Performance history",["Period","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],data.history.map(x=>[x.period,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.approval_rate,x.overdue_rate,x.score])]];
  const csv=sections.map(s=>s[0]+"\n"+s[1].join(",")+"\n"+s[2].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n")).join("\n\n");
- const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MECHNAR-performance-analysis.csv";a.click();URL.revokeObjectURL(url);
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MECHNAR-performance-analysis.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-async function render(root){
- root.innerHTML='<main class="pa-analysis"><header class="paa-heading"><div><p>ORGANISATION INTELLIGENCE</p><h2>Performance Analysis</h2><span>Evidence-based team performance, rankings and improvement planning.</span></div><div class="paa-header-actions"><label class="paa-export-select-label" for="paa-export-format">Export format</label><select id="paa-export-format" aria-label="Select export format"><option value="csv">CSV</option><option value="pdf">PDF</option></select><button class="paa-export-top" type="button" id="paa-export-top">Export</button><button class="paa-refresh" type="button">↻ Refresh</button></div></header><section class="paa-filters"><label>From<input type="date" id="paa-start"></label><label>To<input type="date" id="paa-end"></label><label>Team<select id="paa-team"><option value="">'+(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="admin"?"All organisation":"My team")+'</option></select></label><button id="paa-apply">Apply filters</button></section><div class="paa-status" role="status">Loading organisation performance…</div><div id="paa-body" hidden></div></main>';
+
+function reportSections(data){
+ const rows=(arr,fields)=>(arr||[]).map(x=>fields.map(k=>x[k]??""));
+ return [
+  {title:"Team rankings",headers:["Rank","Team","Supervisor","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],rows:rows(data.teams,["rank","team_name","supervisor","total_operations","completed","completion_rate","on_time_rate","approval_rate","overdue_rate","score"])},
+  {title:"Individual rankings",headers:["Rank","Staff","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],rows:rows(data.individuals,["rank","name","total_operations","completed","completion_rate","on_time_rate","approval_rate","overdue_rate","score"])},
+  {title:"Location rankings",headers:["Rank","Location","Operations","Completed","Completion %","On time %","Score"],rows:rows(data.locations,["rank","location_name","total_operations","completed","completion_rate","on_time_rate","score"])},
+  {title:"Operation type rankings",headers:["Rank","Operation type","Operations","Completed","Completion %","On time %","Score"],rows:rows(data.operation_types,["rank","operation_type","total_operations","completed","completion_rate","on_time_rate","score"])},
+  {title:"Role rankings",headers:["Rank","Role","Operations","Completed","Completion %","On time %","Score"],rows:rows(data.roles,["rank","role","total_operations","completed","completion_rate","on_time_rate","score"])},
+  {title:"Performance history",headers:["Period","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],rows:rows(data.history,["period","total_operations","completed","completion_rate","on_time_rate","approval_rate","overdue_rate","score"])}
+ ];
+}
+function buildReportCanvas(data){
+ const o=data.overview||{},sections=reportSections(data);
+ const overview=[["Total operations",o.total_operations??0],["Completed",o.completed??0],["Pending",o.pending??0],["Overdue",o.overdue??0],["Completion rate",pct(o.completion_rate)],["On-time rate",pct(o.on_time_rate)],["Approval rate",pct(o.approval_rate)],["Overdue rate",pct(o.overdue_rate)],["Average completion",o.average_completion_hours==null?"—":o.average_completion_hours+" hrs"],["Weighted workload",o.weighted_workload??0]];
+ const improvements=data.automated_improvements||[],notices=data.admin_improvements||[];
+ const count=sections.reduce((n,x)=>n+Math.max(1,x.rows.length)+2,0);
+ const c=document.createElement("canvas");c.width=1600;c.height=Math.max(1100,760+overview.length*48+count*43+(improvements.length+notices.length)*90);
+ const ctx=c.getContext("2d");ctx.fillStyle="#10111a";ctx.fillRect(0,0,c.width,c.height);
+ let y=92;
+ const text=(v,x,yy,size=23,color="#e9e5f2",weight="400")=>{ctx.fillStyle=color;ctx.font=weight+" "+size+"px Arial";ctx.fillText(String(v??"—"),x,yy);};
+ const line=yy=>{ctx.strokeStyle="#494157";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(72,yy);ctx.lineTo(1528,yy);ctx.stroke();};
+ text("MECHNAR",72,y,22,"#b7a2e4","bold");y+=58;text("Performance Analysis",72,y,42,"#ffffff","bold");y+=40;
+ text("Reporting period: "+(data.period?.start_date||"—")+" to "+(data.period?.end_date||"—"),72,y,20,"#bcb5ca");y+=45;line(y);y+=42;
+ text("PERFORMANCE OVERVIEW",72,y,21,"#b7a2e4","bold");y+=38;
+ overview.forEach((v,i)=>{const col=i%2,row=Math.floor(i/2);text(v[0],72+col*740,y+row*47,18,"#bcb5ca");text(v[1],410+col*740,y+row*47,21,"#ffffff","bold");});
+ y+=Math.ceil(overview.length/2)*54+26;line(y);y+=40;
+ for(const sec of sections){
+  text(sec.title.toUpperCase(),72,y,21,"#b7a2e4","bold");y+=36;
+  if(!sec.rows.length){text("No recorded data for this period.",82,y,17,"#bcb5ca");y+=38;continue;}
+  const colW=1456/sec.headers.length;
+  sec.headers.forEach((h,i)=>text(h,72+i*colW,y,14,"#c8b8e8","bold"));y+=29;
+  sec.rows.forEach(row=>{row.forEach((v,i)=>text(String(v??"—").slice(0,26),72+i*colW,y,14,"#e9e5f2"));y+=31;});
+  y+=20;line(y);y+=36;
+ }
+ if(notices.length||improvements.length){
+  text("AREAS FOR IMPROVEMENT",72,y,21,"#b7a2e4","bold");y+=38;
+  [...notices.map(x=>({title:x.title,body:x.message,tag:"ADMIN GUIDANCE"})),...improvements.map(x=>({title:x.title,body:x.evidence+" — "+x.action,tag:x.priority||"RECOMMENDATION"}))].forEach(x=>{
+   text(x.tag+" · "+x.title,82,y,17,"#ffffff","bold");y+=26;
+   const words=String(x.body||"").split(/\s+/);let lineText="";
+   for(const w of words){const next=lineText?lineText+" "+w:w;if(ctx.measureText(next).width>1390){text(lineText,95,y,15,"#c9c3d4");y+=24;lineText=w;}else lineText=next;}
+   if(lineText){text(lineText,95,y,15,"#c9c3d4");y+=24;}y+=14;
+  });
+ }
+ return c;
+}
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function imageDownload(data){
+ const canvas=buildReportCanvas(data);
+ canvas.toBlob(blob=>{if(blob)downloadBlob(blob,"MECHNAR-performance-analysis.png");else alert("The image export could not be generated in this browser.");},"image/png");
+}
+async function pdfDownload(data){
+ const source=buildReportCanvas(data),pageW=842,pageH=595,sliceH=Math.floor(source.width*pageH/pageW),pages=[];
+ for(let top=0;top<source.height;top+=sliceH){
+  const h=Math.min(sliceH,source.height-top),part=document.createElement("canvas");part.width=source.width;part.height=h;
+  part.getContext("2d").drawImage(source,0,top,source.width,h,0,0,source.width,h);
+  const blob=await new Promise(resolve=>part.toBlob(resolve,"image/jpeg",.92));
+  if(!blob)throw new Error("PDF page image could not be generated.");
+  pages.push({bytes:new Uint8Array(await blob.arrayBuffer()),height:h});
+ }
+ const enc=new TextEncoder(),chunks=[],offsets=[];let length=0;
+ const add=b=>{chunks.push(b);length+=b.length;};
+ const str=t=>enc.encode(t);
+ const pageIds=pages.map((_,i)=>3+i*3),objects=[];
+ objects.push([1,str("<< /Type /Catalog /Pages 2 0 R >>")]);
+ objects.push([2,str("<< /Type /Pages /Kids ["+pageIds.map(id=>id+" 0 R").join(" ")+"] /Count "+pages.length+" >>")]);
+ pages.forEach((page,i)=>{
+  const p=pageIds[i],im=p+1,co=p+2;
+  objects.push([p,str("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+pageW+" "+pageH+"] /Resources << /XObject << /Im0 "+im+" 0 R >> >> /Contents "+co+" 0 R >>")]);
+  objects.push([im,{dict:str("<< /Type /XObject /Subtype /Image /Width "+source.width+" /Height "+page.height+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+page.bytes.length+" >>"),stream:page.bytes}]);
+  const cmd=str("q "+pageW+" 0 0 "+pageH+" 0 0 cm /Im0 Do Q");
+  objects.push([co,{dict:str("<< /Length "+cmd.length+" >>"),stream:cmd}]);
+ });
+ add(str("%PDF-1.4\n%MECHNAR\n"));
+ for(const [id,obj] of objects){
+  offsets[id]=length;add(str(id+" 0 obj\n"));
+  if(obj instanceof Uint8Array){add(obj);add(str("\nendobj\n"));}
+  else{add(obj.dict);add(str("\nstream\n"));add(obj.stream);add(str("\nendstream\nendobj\n"));}
+ }
+ const xref=length,size=objects.length+1;add(str("xref\n0 "+size+"\n0000000000 65535 f \n"));
+ for(let id=1;id<size;id++)add(str(String(offsets[id]).padStart(10,"0")+" 00000 n \n"));
+ add(str("trailer\n<< /Size "+size+" /Root 1 0 R >>\nstartxref\n"+xref+"\n%%EOF"));
+ downloadBlob(new Blob(chunks,{type:"application/pdf"}),"MECHNAR-performance-analysis.pdf");
+}
+\nasync function render(root){\n let currentData=null;
+ root.innerHTML='<main class="pa-analysis"><header class="paa-heading"><div><p>ORGANISATION INTELLIGENCE</p><h2>Performance Analysis</h2><span>Evidence-based team performance, rankings and improvement planning.</span></div><div class="paa-header-actions"><label class="paa-export-select-label" for="paa-export-format">Export format</label><select id="paa-export-format" aria-label="Select export format"><option value="csv">CSV</option><option value="pdf">PDF</option><option value="png">Image (PNG)</option></select><button class="paa-export-top" type="button" id="paa-export-top">Export</button><button class="paa-refresh" type="button">↻ Refresh</button></div></header><section class="paa-filters"><label>From<input type="date" id="paa-start"></label><label>To<input type="date" id="paa-end"></label><label>Team<select id="paa-team"><option value="">'+(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="admin"?"All organisation":"My team")+'</option></select></label><button id="paa-apply">Apply filters</button></section><div class="paa-status" role="status">Loading organisation performance…</div><div id="paa-body" hidden></div></main>';
  const start=root.querySelector("#paa-start"),end=root.querySelector("#paa-end"),team=root.querySelector("#paa-team"),status=root.querySelector(".paa-status"),body=root.querySelector("#paa-body");
-  root.querySelector("#paa-export-top").onclick=()=>{const format=root.querySelector("#paa-export-format").value;if(format==="csv")csvDownload(data);else window.print();};
+  root.querySelector("#paa-export-top").onclick=async()=>{
+   if(!currentData){status.textContent="Load performance data before exporting.";return;}
+   const button=root.querySelector("#paa-export-top"),format=root.querySelector("#paa-export-format").value;
+   button.disabled=true;button.textContent="Preparing…";
+   try{if(format==="csv")csvDownload(currentData);else if(format==="pdf")await pdfDownload(currentData);else if(format==="png")imageDownload(currentData);}
+   catch(error){console.error("Performance export failed:",error);status.textContent="Export failed. Please try again.";status.hidden=false;}
+   finally{button.disabled=false;button.textContent="Export";}
+  };
  const today=new Date(),prior=new Date(today);prior.setDate(today.getDate()-29);const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);start.value=iso(prior);end.value=iso(today);
  async function load(){
  status.textContent="Loading recorded performance…";status.hidden=false;body.hidden=true;
  try{
  const q=new URLSearchParams({start_date:start.value,end_date:end.value});if(team.value)q.set("team_id",team.value);
- const data=await API.get("analytics/performance-analysis?"+q.toString());
+ const data=await API.get("analytics/performance-analysis?"+q.toString());\n  currentData=data;
  if(!team.dataset.ready){(data.teams||[]).forEach(t=>{const o=document.createElement("option");o.value=t.team_id;o.textContent=t.team_name;team.appendChild(o);});if(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"){team.disabled=true;team.options[0].textContent="All teams · aggregate comparison";}team.dataset.ready="1";}
  const o=data.overview||{},own=(data.teams||[]).find(t=>t.team_id===data.scope?.own_team_id)||null;
  const summary=String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"?o: o;
