@@ -81,3 +81,12 @@
 .paa-history-content .paa-section{border:0!important;padding:0!important;background:transparent!important}
 .paa-history-content .paa-section-head{align-items:flex-start!important;flex-wrap:wrap!important}
 @media(max-width:650px){.paa-history-overlay{padding:8px!important}.paa-history-dialog{width:100%!important;height:94dvh!important;max-height:94dvh!important}.paa-history-content{padding:14px!important}.paa-history-launch .paa-section-head{align-items:flex-start;flex-direction:column}}
+
+/* Measurable next steps are displayed in a dedicated centred panel. */
+.paa-goals-overlay[hidden]{display:none!important}
+.paa-goals-overlay{position:fixed!important;inset:0!important;z-index:2147483003!important;width:100vw!important;height:100vh!important;height:100dvh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;box-sizing:border-box!important;background:rgba(5,5,10,.82)!important;backdrop-filter:blur(6px);overflow:hidden!important}
+.paa-goals-dialog{width:min(1100px,95vw)!important;height:min(82vh,850px)!important;height:min(82dvh,850px)!important;max-height:calc(100dvh - 40px)!important}
+.paa-goals-content{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow:auto!important;overscroll-behavior:contain!important;scrollbar-gutter:stable!important;padding:22px!important;box-sizing:border-box!important}
+.paa-goals-content .paa-section{border:0!important;padding:0!important;background:transparent!important}
+.paa-goals-content .paa-section-head{align-items:flex-start!important;flex-wrap:wrap!important}
+@media(max-width:650px){.paa-goals-overlay{padding:8px!important}.paa-goals-dialog{width:100%!important;height:94dvh!important;max-height:94dvh!important}.paa-goals-content{padding:14px!important}.paa-goals-launch .paa-section-head{align-items:flex-start;flex-direction:column}}
