@@ -157,3 +157,38 @@ html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-colo
   overscroll-behavior-y:contain!important;
   scrollbar-width:thin!important;
 }
+
+
+/* Keep every message at its natural height so long conversations overflow and scroll. */
+#mechnar-personnel-overlay .mp-main{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:100%!important;
+}
+#mechnar-personnel-overlay .mp-chat{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:100%!important;
+}
+#mechnar-personnel-overlay .mp-messages{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:0!important;
+  max-height:none!important;
+  overflow-y:scroll!important;
+  overflow-x:hidden!important;
+  justify-content:flex-start!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(174,139,220,.72) rgba(120,100,145,.12)!important;
+}
+#mechnar-personnel-overlay .mp-messages>.mp-bubble{
+  flex:0 0 auto!important;
+  min-height:max-content!important;
+}
+#mechnar-personnel-overlay .mp-messages::-webkit-scrollbar{width:9px!important}
+#mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-track{background:rgba(120,100,145,.12)!important}
+#mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-thumb{background:rgba(174,139,220,.72)!important;border-radius:8px!important}
+#mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-thumb:hover{background:rgba(194,164,231,.95)!important}
