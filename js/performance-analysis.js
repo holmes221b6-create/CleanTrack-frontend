@@ -97,7 +97,8 @@ async function pdfDownload(data){
  add(str("trailer\n<< /Size "+size+" /Root 1 0 R >>\nstartxref\n"+xref+"\n%%EOF"));
  downloadBlob(new Blob(chunks,{type:"application/pdf"}),"MECHNAR-performance-analysis.pdf");
 }
-\nasync function render(root){\n let currentData=null;
+async function render(root){
+ let currentData=null;
  root.innerHTML='<main class="pa-analysis"><header class="paa-heading"><div><p>ORGANISATION INTELLIGENCE</p><h2>Performance Analysis</h2><span>Evidence-based team performance, rankings and improvement planning.</span></div><div class="paa-header-actions"><label class="paa-export-select-label" for="paa-export-format">Export format</label><select id="paa-export-format" aria-label="Select export format"><option value="csv">CSV</option><option value="pdf">PDF</option><option value="png">Image (PNG)</option></select><button class="paa-export-top" type="button" id="paa-export-top">Export</button><button class="paa-refresh" type="button">↻ Refresh</button></div></header><section class="paa-filters"><label>From<input type="date" id="paa-start"></label><label>To<input type="date" id="paa-end"></label><label>Team<select id="paa-team"><option value="">'+(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="admin"?"All organisation":"My team")+'</option></select></label><button id="paa-apply">Apply filters</button></section><div class="paa-status" role="status">Loading organisation performance…</div><div id="paa-body" hidden></div></main>';
  const start=root.querySelector("#paa-start"),end=root.querySelector("#paa-end"),team=root.querySelector("#paa-team"),status=root.querySelector(".paa-status"),body=root.querySelector("#paa-body");
   root.querySelector("#paa-export-top").onclick=async()=>{
@@ -113,7 +114,8 @@ async function pdfDownload(data){
  status.textContent="Loading recorded performance…";status.hidden=false;body.hidden=true;
  try{
  const q=new URLSearchParams({start_date:start.value,end_date:end.value});if(team.value)q.set("team_id",team.value);
- const data=await API.get("analytics/performance-analysis?"+q.toString());\n  currentData=data;
+ const data=await API.get("analytics/performance-analysis?"+q.toString());
+  currentData=data;
  if(!team.dataset.ready){(data.teams||[]).forEach(t=>{const o=document.createElement("option");o.value=t.team_id;o.textContent=t.team_name;team.appendChild(o);});if(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"){team.disabled=true;team.options[0].textContent="All teams · aggregate comparison";}team.dataset.ready="1";}
  const o=data.overview||{},own=(data.teams||[]).find(t=>t.team_id===data.scope?.own_team_id)||null;
  const summary=String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"?o: o;
