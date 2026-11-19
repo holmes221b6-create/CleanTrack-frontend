@@ -862,7 +862,65 @@
     return sequence;
   }
 
+  let performanceArenaOverlay = null;
+  let performanceArenaOpenToken = 0;
+  let performanceArenaPreviousPage = null;
+
+  function closePerformanceArenaOverlay() {
+    performanceArenaOpenToken++;
+    if (performanceArenaOverlay) performanceArenaOverlay.remove();
+    performanceArenaOverlay = null;
+    const previous = performanceArenaPreviousPage || "workspace";
+    performanceArenaPreviousPage = null;
+    if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage(previous);
+  }
+
+  async function openPerformanceArenaOverlay() {
+    if (performanceArenaOverlay) performanceArenaOverlay.remove();
+    const token = ++performanceArenaOpenToken;
+    const overlay = document.createElement("section");
+    overlay.id = "mechnar-performance-arena-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "Performance Arena");
+    overlay.innerHTML = '<header class="pa-fullscreen-top"><span class="pa-fullscreen-brand">Performance Arena</span><button type="button" class="pa-fullscreen-close" aria-label="Back to global pages" title="Back to global pages">×</button></header><div class="pa-fullscreen-loading" role="status" aria-live="polite"><span class="pa-fullscreen-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Performance Arena</small></div><div class="pa-fullscreen-content" hidden></div>';
+    document.body.appendChild(overlay);
+    performanceArenaOverlay = overlay;
+    overlay.querySelector(".pa-fullscreen-close").addEventListener("click", closePerformanceArenaOverlay);
+    const onEscape = event => { if (event.key === "Escape" && performanceArenaOverlay === overlay) closePerformanceArenaOverlay(); };
+    overlay.addEventListener("keydown", onEscape);
+    window.setTimeout(() => {
+      if (token !== performanceArenaOpenToken || performanceArenaOverlay !== overlay) return;
+      const loading = overlay.querySelector(".pa-fullscreen-loading");
+      const content = overlay.querySelector(".pa-fullscreen-content");
+      loading.remove();
+      content.hidden = false;
+      if (window.MechnarPerformanceArena && typeof window.MechnarPerformanceArena.render === "function") {
+        window.MechnarPerformanceArena.render(content);
+      } else {
+        content.textContent = "Performance Arena could not load. Refresh the application and try again.";
+      }
+      overlay.querySelector(".pa-fullscreen-close").focus();
+    }, 1800);
+  }
+
   async function renderPage(pageId) {
+    const previousPage = state.currentPage;
+    if (pageId === "performance" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
+      if (previousPage && previousPage !== "performance") performanceArenaPreviousPage = previousPage;
+      state.currentPage = pageId;
+      const menuElement = getElement("workspace-navigation");
+      if (menuElement && window.CleanTrackNavigation) window.CleanTrackNavigation.renderMenu(menuElement);
+      if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
+      openPerformanceArenaOverlay();
+      return;
+    }
+    if (pageId !== "performance" && performanceArenaOverlay) {
+      performanceArenaOverlay.remove();
+      performanceArenaOverlay = null;
+      performanceArenaOpenToken++;
+      performanceArenaPreviousPage = null;
+    }
     state.currentPage = pageId;
 
     const pageTitle = getElement("page-title");
