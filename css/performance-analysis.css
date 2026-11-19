@@ -31,3 +31,6 @@
 .paa-header-actions select{min-height:37px;min-width:100px;padding:7px 10px;border:1px solid var(--ct-border,#484253);border-radius:7px;background:var(--ct-input,var(--card-bg,#171923));color:var(--text)}
 .paa-header-actions .paa-export-top{border:1px solid #75639c;border-radius:7px;padding:9px 16px;background:#51416f;color:#fff;cursor:pointer}
 @media(max-width:650px){.paa-heading{width:100%}.paa-header-actions{width:100%;justify-content:flex-start}}
+
+/* Keep the export format control compact and medium-sized. */
+.paa-header-actions select#paa-export-format{width:130px!important;min-width:130px!important;max-width:130px!important;flex:0 0 130px!important}
