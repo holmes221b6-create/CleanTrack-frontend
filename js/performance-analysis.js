@@ -20,7 +20,7 @@ async function render(root){
  try{
  const q=new URLSearchParams({start_date:start.value,end_date:end.value});if(team.value)q.set("team_id",team.value);
  const data=await API.get("analytics/performance-analysis?"+q.toString());
- if(!team.dataset.ready){(data.teams||[]).forEach(t=>{const o=document.createElement("option");o.value=t.team_id;o.textContent=t.team_name;team.appendChild(o);});team.dataset.ready="1";}
+ if(!team.dataset.ready){(data.teams||[]).forEach(t=>{const o=document.createElement("option");o.value=t.team_id;o.textContent=t.team_name;team.appendChild(o);});if(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"){team.disabled=true;team.options[0].textContent="All teams · aggregate comparison";}team.dataset.ready="1";}
  const o=data.overview||{},own=(data.teams||[]).find(t=>t.team_id===data.scope?.own_team_id)||null;
  const summary=String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"?o: o;
  const improvement=(data.automated_improvements||[]).map(x=>'<article class="paa-improvement"><span class="paa-priority">'+esc(x.priority)+'</span><h4>'+esc(x.title)+'</h4><p>'+esc(x.evidence)+'</p><small>'+esc(x.action)+'</small></article>').join("");
