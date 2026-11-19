@@ -591,70 +591,101 @@ async function renderSupervisorTeams(container){
   if(!data.zones?.length)zoneList.append(el("span","ct-team-muted","No zones assigned."));
   zones.append(zoneList);areaGrid.append(loc,zones);areas.append(areaGrid);locationsPage.append(areas);
 
-  const perf=el("section","ct-team-supervisor-page-section ct-bi-workspace"),head=el("div","ct-bi-topbar"),title=el("div","ct-bi-brand");
-  title.append(el("p","ct-team-eyebrow","TEAM INTELLIGENCE"),el("h2","","Performance report studio"));
-  const reportName=el("input","ct-team-input");reportName.value="Team performance";reportName.setAttribute("aria-label","Report name");
-  const get=button("＋ Get data","ct-team-btn ct-team-btn--primary"),transform=button("Transform data","ct-team-btn"),refresh=button("↻ Refresh","ct-team-btn"),save=button("Save report","ct-team-btn"),exportData=button("Export CSV","ct-team-btn"),file=el("input","");file.type="file";file.accept=".csv,.json,.xlsx,.xls,.pdf";file.hidden=true;
-  const actions=el("div","ct-bi-actions");actions.append(get,transform,refresh,save,exportData,file);head.append(title,reportName,actions);perf.append(head);
-  const biStatus=el("div","ct-bi-status","Loading team analytics…");perf.append(biStatus);
-  const ribbon=el("div","ct-bi-ribbon"),ribbonTabs=el("div","ct-bi-ribbon-tabs"),ribbonTools=el("div","ct-bi-ribbon-tools");
-  const reportTab=button("Report","ct-bi-ribbon-tab is-active"),dataTabTop=button("Data","ct-bi-ribbon-tab"),viewTab=button("View","ct-bi-ribbon-tab");
-  [reportTab,dataTabTop,viewTab].forEach(x=>ribbonTabs.append(x));
-  const dataMenu=el("div","ct-bi-getdata-menu");dataMenu.hidden=true;
-  [["Excel workbook",".xlsx,.xls"],["CSV file",".csv"],["JSON file",".json"],["PDF document",".pdf"]].forEach(([label,accept])=>dataMenu.append(button(label,"ct-bi-getdata-option",()=>{file.accept=accept;file.click();dataMenu.hidden=true})));
-  const getDataTool=button("＋ Get data","ct-bi-ribbon-tool",()=>{dataMenu.hidden=!dataMenu.hidden});
-  const transformTool=button("⇄ Transform data","ct-bi-ribbon-tool",()=>transform.click());
-  const refreshTool=button("↻ Refresh","ct-bi-ribbon-tool",()=>refresh.click());
-  const addTool=button("▥ New visual","ct-bi-ribbon-tool",()=>addVisual.click());
-  const saveTool=button("▣ Save report","ct-bi-ribbon-tool",()=>save.click());
-  const exportTool=button("⇩ Export CSV","ct-bi-ribbon-tool",()=>exportData.click());
-  // Build the wrapper before attaching Get data to the toolbar. Moving an
-  // already-attached child into the wrapper detaches it, so replaceChild then
-  // throws NotFoundError and aborts the entire Supervisor workspace render.
-  const getDataWrap=el("div","ct-bi-getdata-wrap");
-  getDataWrap.append(getDataTool,dataMenu);
-  ribbonTools.append(getDataWrap,transformTool,refreshTool,addTool,saveTool,exportTool);
-  ribbon.append(ribbonTabs,ribbonTools);perf.insertBefore(ribbon,biStatus);
-  const reportNav=button("▥ Report","ct-bi-ribbon-tool ct-bi-nav-tool is-active",()=>{reportNav.classList.add("is-active");dataNav.classList.remove("is-active");togglePane("visuals")});
-   const dataNav=button("▦ Data","ct-bi-ribbon-tool ct-bi-nav-tool",()=>{dataNav.classList.add("is-active");reportNav.classList.remove("is-active");togglePane("data")});
-   ribbonTools.append(reportNav,dataNav);
-  let presenting=false;const exitPresentation=button("×","ct-bi-presentation-close",()=>setPresentation(false));exitPresentation.hidden=true;exitPresentation.setAttribute("aria-label","Exit presentation and return to Performance");exitPresentation.title="Exit presentation";
-  function setPresentation(on){presenting=on;perf.classList.toggle("is-presentation",on);exitPresentation.hidden=!on;viewTab.classList.toggle("is-active",on);reportTab.classList.toggle("is-active",!on);if(on)biStatus.textContent="Presentation view · press Escape to exit";else biStatus.textContent="Report editing view"}
-  viewTab.addEventListener("click",()=>setPresentation(!presenting));reportTab.addEventListener("click",()=>setPresentation(false));perf.append(exitPresentation);
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&presenting)setPresentation(false)});
-
-  const endDate=new Date(),startDate=new Date(endDate);startDate.setDate(startDate.getDate()-55);const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-  const state={rows:[],columns:[],source:"MECHNAR team performance",filters:{},hidden:new Set(),data:null,visuals:[{id:1,type:"bar",dimension:"name",measure:"score"}],active:1};
-  const layout=el("div","ct-bi-layout"),canvasArea=el("section","ct-bi-canvas-area"),canvasHead=el("div","ct-bi-canvas-head"),canvasTitle=el("span","","Report canvas"),canvasMeta=el("span","ct-team-muted","Select a visual to configure it");canvasHead.append(canvasTitle,canvasMeta);
-  const kpis=el("div","ct-bi-kpis"),canvas=el("div","ct-bi-canvas"),addVisual=button("＋ Add visual","ct-team-btn ct-team-btn--primary",()=>{const v={id:Date.now(),type:"bar",dimension:state.columns.find(k=>!state.rows.some(r=>typeof r[k]==="number"))||state.columns[0]||"name",measure:state.columns.find(k=>state.rows.some(r=>typeof r[k]==="number"))||"score"};state.visuals.push(v);state.active=v.id;renderSide();draw()}),pagebar=el("div","ct-bi-pagebar");canvasHead.append(addVisual);pagebar.append(el("span","","Report page 1"),el("span","ct-team-muted","Team performance"));canvasArea.append(canvasHead,kpis,canvas,pagebar);
-  const dock=el("aside","ct-bi-dock"),filterRail=el("nav","ct-bi-filter-rail"),filterTab=button("Filters","ct-bi-vertical-tab",()=>togglePane("filters")),visualTab=button("Visualizations","ct-bi-pane-tab is-active",()=>togglePane("visuals")),dataTab=button("Data","ct-bi-pane-tab",()=>togglePane("data")),pane=el("div","ct-bi-pane"),dockTitle=el("div","ct-bi-dock-title","Visualizations"),filterPanel=el("section","ct-bi-side-section"),visualPanel=el("section","ct-bi-side-section"),dataPanel=el("section","ct-bi-side-section");
-  let activePane="visuals";function togglePane(name){activePane=name;dockTitle.textContent=name==="filters"?"Filters":name==="data"?"Data":"Visualizations";filterPanel.hidden=name!=="filters";visualPanel.hidden=name!=="visuals";dataPanel.hidden=name!=="data";visualTab.classList.toggle("is-active",name==="visuals");dataTab.classList.toggle("is-active",name==="data")}
-  filterRail.append(filterTab,visualTab,dataTab);pane.append(dockTitle,filterPanel,visualPanel,dataPanel);dock.append(filterRail,pane);layout.append(canvasArea,dock);perf.append(layout);togglePane("visuals");
-  const trend=el("section","ct-bi-trend-strip");trend.append(el("strong","","Performance trend"));perf.append(trend);
-  function parseCsv(text){const lines=text.split(/\r?\n/).filter(Boolean),split=line=>{const out=[];let v="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'&&q&&line[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===","&&!q){out.push(v);v=""}else v+=c}out.push(v);return out};const h=split(lines.shift()||"");return lines.map(line=>{const a=split(line),o={};h.forEach((k,i)=>{const v=a[i]??"";o[k]=v.trim()!==""&&Number.isFinite(Number(v))?Number(v):v});return o})}
-  function visible(){return state.rows.filter(r=>Object.entries(state.filters).every(([k,v])=>!v||String(r[k]??"").toLowerCase().includes(v.toLowerCase())))}
-  const metric=(r,k)=>Number(r[k])||0;
-  function svg(tag,attrs,label){const n=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));if(label!==undefined)n.textContent=label;return n}
-  function icon(type){const n=svg("svg",{viewBox:"0 0 34 26","aria-hidden":"true"});if(type==="pie"||type==="donut"){n.append(svg("circle",{cx:13,cy:13,r:10,class:"ct-bi-icon-ring"}),svg("path",{d:"M13 3 A10 10 0 0 1 23 13 L13 13 Z",class:"ct-bi-icon-fill"}));if(type==="donut")n.append(svg("circle",{cx:13,cy:13,r:4,class:"ct-bi-icon-hole"}))}else if(type==="line"||type==="area"){n.append(svg("polyline",{points:"2,21 10,13 17,16 29,4",class:"ct-bi-icon-line"}));if(type==="area")n.append(svg("polygon",{points:"2,21 10,13 17,16 29,4 29,24 2,24",class:"ct-bi-icon-area"}))}else if(type==="scatter"){[[5,20],[10,11],[16,16],[22,6],[28,12]].forEach(([x,y])=>n.append(svg("circle",{cx:x,cy:y,r:2.5,class:"ct-bi-icon-fill"})))}else if(type==="table"){[0,1,2].forEach(i=>n.append(svg("line",{x1:3,y1:5+i*8,x2:30,y2:5+i*8,class:"ct-bi-icon-line"})));n.append(svg("line",{x1:12,y1:3,x2:12,y2:24,class:"ct-bi-icon-line"}))}else{[0,1,2,3].forEach(v=>n.append(svg("rect",{x:3+v*8,y:22-[8,14,19,11][v],width:5,height:[8,14,19,11][v],rx:1,class:"ct-bi-icon-fill"})))}return n}
-  function chart(rows,type,dim,measure){const c=svg("svg",{viewBox:"0 0 760 310",role:"img","aria-label":type+" chart"});if(!rows.length){c.append(svg("text",{x:24,y:38,class:"ct-bi-axis"},"No records match these filters"));return c}const vals=rows.map(r=>metric(r,measure)),max=Math.max(1,...vals),sum=vals.reduce((a,b)=>a+Math.max(0,b),0)||1,base=260,left=54,step=670/rows.length;for(let i=0;i<=4;i++){const y=32+i*55;c.append(svg("line",{x1:left,y1:y,x2:730,y2:y,class:"ct-bi-grid"}));c.append(svg("text",{x:8,y:y+4,class:"ct-bi-axis"},String(Math.round(max*(4-i)/4))))}
-   if(type==="pie"||type==="donut"){let angle=-Math.PI/2;const cx=190,cy=145,r=105;rows.slice(0,12).forEach((row,i)=>{const v=Math.max(0,vals[i]),next=angle+v/sum*Math.PI*2,x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle),x2=cx+r*Math.cos(next),y2=cy+r*Math.sin(next),d="M "+cx+" "+cy+" L "+x1+" "+y1+" A "+r+" "+r+" 0 "+(next-angle>Math.PI?1:0)+" 1 "+x2+" "+y2+" Z";c.append(svg("path",{d,class:"ct-bi-slice slice-"+(i%8)}));angle=next;c.append(svg("text",{x:330,y:42+i*22,class:"ct-bi-axis"},String(row[dim]??"Item")+" · "+v))});if(type==="donut"){c.append(svg("circle",{cx,cy,r:61,class:"ct-bi-donut-hole"}));c.append(svg("text",{x:cx,y:cy+5,"text-anchor":"middle",class:"ct-bi-donut-total"},String(Math.round(sum))))}}
-   else{const points=[];rows.slice(0,45).forEach((row,i)=>{const x=left+(i+.5)*step,y=base-vals[i]/max*210;points.push(x+","+y);if(type==="bar"||type==="column")c.append(svg("rect",{x:x-Math.min(22,step*.3),y,width:Math.max(5,Math.min(44,step*.6)),height:base-y,rx:4,class:"ct-bi-bar slice-"+(i%8)}));else if(type==="scatter")c.append(svg("circle",{cx:x,cy:y,r:5,class:"ct-bi-dot"}));else c.append(svg("circle",{cx:x,cy:y,r:4,class:"ct-bi-dot"}));if(type==="bar")c.append(svg("text",{x:Math.min(725,x+8),y:y-5,class:"ct-bi-axis"},String(row[dim]??"").slice(0,14)));else c.append(svg("text",{x,y:286,"text-anchor":"middle",class:"ct-bi-axis"},String(row[dim]??"").slice(0,12)))});if((type==="line"||type==="area")&&points.length>1){if(type==="area")c.append(svg("polygon",{points:left+","+base+" "+points.join(" ")+" 728,"+base,class:"ct-bi-area"}));c.append(svg("polyline",{points:points.join(" "),class:"ct-bi-line"}))}}return c}
-  function draw(){canvas.replaceChildren();const rows=visible();canvasMeta.textContent=rows.length+" records · "+state.source;state.visuals.forEach(v=>{const card=el("article","ct-bi-visual-card"+(v.id===state.active?" is-selected":""));card.draggable=true;card.dataset.visualId=String(v.id);card.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",String(v.id));e.dataTransfer.effectAllowed="move"});card.addEventListener("dragover",e=>{e.preventDefault();card.classList.add("is-drop-target")});card.addEventListener("dragleave",()=>card.classList.remove("is-drop-target"));card.addEventListener("drop",e=>{e.preventDefault();card.classList.remove("is-drop-target");const from=state.visuals.findIndex(x=>String(x.id)===e.dataTransfer.getData("text/plain")),to=state.visuals.findIndex(x=>x.id===v.id);if(from<0||to<0||from===to)return;const [moved]=state.visuals.splice(from,1);state.visuals.splice(to,0,moved);draw()});card.addEventListener("click",()=>{state.active=v.id;renderSide();draw()});const bar=el("div","ct-bi-visual-card-head");bar.append(el("strong","",v.type.toUpperCase()+" · "+v.measure),button("×","ct-bi-remove",e=>{e.stopPropagation();state.visuals=state.visuals.filter(x=>x.id!==v.id);if(!state.visuals.length)state.visuals.push({id:Date.now(),type:"bar",dimension:state.columns[0]||"name",measure:"score"});state.active=state.visuals[0].id;renderSide();draw()}));card.append(bar,v.type==="table"?makeTable(rows):chart(rows,v.type,v.dimension,v.measure));canvas.append(card)})}
-  function makeTable(rows){const wrap=el("div","ct-bi-data-table-wrap"),table=el("table","ct-bi-data-table"),cols=state.columns.filter(k=>!state.hidden.has(k)),tr=el("tr"),thead=el("thead");cols.forEach(k=>tr.append(el("th","",k)));thead.append(tr);table.append(thead);const body=el("tbody");rows.slice(0,100).forEach(r=>{const row=el("tr");cols.forEach(k=>row.append(el("td","",r[k]??"—")));body.append(row)});table.append(body);wrap.append(table);return wrap}
-  function renderSide(){filterPanel.replaceChildren();visualPanel.replaceChildren();dataPanel.replaceChildren();filterPanel.append(el("h3","","Filters"),button("Clear all","ct-bi-clear",()=>{state.filters={};renderSide();draw()}));state.columns.slice(0,12).forEach(k=>{const l=el("label","ct-bi-side-field");l.append(el("span","",k));const input=el("input","ct-team-input");input.placeholder="Contains…";input.value=state.filters[k]||"";input.addEventListener("input",()=>{state.filters[k]=input.value;draw()});l.append(input);filterPanel.append(l)});
-   visualPanel.append(el("h3","","Visualisations"));const gallery=el("div","ct-bi-gallery");[["bar","Bar"],["column","Column"],["line","Line"],["area","Area"],["pie","Pie"],["donut","Donut"],["scatter","Scatter"],["table","Table"]].forEach(([type,label])=>{const b=button("","ct-bi-gallery-item"+(state.visuals.find(v=>v.id===state.active)?.type===type?" is-active":""),()=>{let v=state.visuals.find(x=>x.id===state.active);if(!v){v={id:Date.now(),dimension:state.columns[0]||"name",measure:"score"};state.visuals.push(v);state.active=v.id}v.type=type;renderSide();draw()});b.append(icon(type),el("span","",label));gallery.append(b)});visualPanel.append(gallery);
-   const current=state.visuals.find(v=>v.id===state.active)||state.visuals[0],numeric=state.columns.filter(k=>state.rows.some(r=>typeof r[k]==="number")),dimensions=state.columns.filter(k=>!numeric.includes(k));const select=(label,values,currentValue,fn)=>{const l=el("label","ct-bi-side-field");l.append(el("span","",label));const s=el("select","ct-team-input");values.forEach(v=>{const o=el("option","",v);o.value=v;s.append(o)});s.value=currentValue;if(!s.value&&values.length)s.value=values[0];s.addEventListener("change",()=>{fn(s.value);draw()});l.append(s);return l};if(current)visualPanel.append(select("Category / axis",dimensions,current.dimension,v=>current.dimension=v),select("Values / measure",[...numeric,"score","assigned","completed","completion_rate","on_time_rate","overdue_rate"].filter((v,i,a)=>a.indexOf(v)===i),current.measure,v=>current.measure=v));
-   dataPanel.append(el("h3","","Data / fields"),el("p","ct-team-muted",state.source+" · "+state.rows.length+" rows"));state.columns.forEach(k=>{const l=el("label","ct-bi-field-row"),cb=el("input");cb.type="checkbox";cb.checked=!state.hidden.has(k);cb.addEventListener("change",()=>{if(cb.checked)state.hidden.delete(k);else state.hidden.add(k);draw()});l.append(cb,el("span","",k),el("small","ct-team-muted",state.rows.some(r=>typeof r[k]==="number")?"123":"ABC"));dataPanel.append(l)})}
-  function renderKpis(){kpis.replaceChildren();const members=state.rows,assigned=members.reduce((n,m)=>n+metric(m,"assigned"),0),completed=members.reduce((n,m)=>n+metric(m,"completed"),0);[["Team members",members.length],["Assigned operations",assigned],["Completed operations",completed],["Team completion",t.completion_rate==null?"—":t.completion_rate+"%"],["Overdue",t.overdue_operation_count??"—"],["Organisation rank",state.data?.team_organization_rank?"#"+state.data.team_organization_rank:"—"]].forEach(([label,value])=>{const tile=el("div","ct-bi-kpi");tile.append(el("small","",label),el("strong","",value));kpis.append(tile)})}
-  function renderTrend(){trend.replaceChildren(el("strong","","Performance trend"));const series=data.performance||[];if(!series.length){trend.append(el("span","ct-team-muted","No weekly history available."));return}series.slice(-8).forEach(w=>{const row=el("div","ct-bi-trend-chip");row.append(el("span","",date(w.week_start)),el("strong","",String(w.tasks_completed??0)+" completed"),el("small","",w.compliance_rate==null?"On-time —":"On-time "+w.compliance_rate+"%"));trend.append(row)})}
-  function setRows(rows,name){state.rows=rows||[];state.columns=state.rows.length?Object.keys(state.rows[0]):[];state.source=name;state.filters={};state.hidden=new Set();const dim=state.columns.find(k=>state.rows.some(r=>typeof r[k]!=="number"))||state.columns[0]||"name",measure=state.columns.find(k=>state.rows.some(r=>typeof r[k]==="number"))||"score";state.visuals=[{id:1,type:"bar",dimension:dim,measure}];state.active=1;renderSide();draw();biStatus.textContent="Data source: "+name+" · "+state.rows.length+" records"}
-  async function loadLive(){biStatus.textContent="Loading team analytics…";try{const result=await API.get("teams/supervisor/performance?start_date="+iso(startDate)+"&end_date="+iso(endDate));state.data=result;const members=(result.members||[]).map(m=>({...m,score:Number(m.score)||0,assigned:Number(m.assigned)||0,completed:Number(m.completed)||0,completion_rate:Number(m.completion_rate)||0,on_time_rate:Number(m.on_time_rate)||0,overdue_rate:Number(m.overdue_rate)||0}));setRows(members,"MECHNAR · Team performance");renderKpis();renderTrend();biStatus.textContent=(result.methodology||"Based on recorded team operations and reviews")+" · "+members.length+" staff records"}catch(e){biStatus.textContent=e.message||"Unable to load team performance";renderKpis();renderTrend()}}
-  get.addEventListener("click",()=>{dataMenu.hidden=!dataMenu.hidden});file.addEventListener("change",async()=>{dataMenu.hidden=true;const f=file.files?.[0];if(!f)return;try{const ext=f.name.split(".").pop().toLowerCase();let rows;if(ext==="csv")rows=parseCsv(await f.text());else if(ext==="json"){const j=JSON.parse(await f.text());rows=Array.isArray(j)?j:(j.rows||j.data||[])}else if(["xlsx","xls"].includes(ext)){if(!window.XLSX)throw Error("Excel reader is not loaded; export the sheet as CSV first.");const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""})}else if(ext==="pdf")throw Error("PDF table extraction is not enabled yet; export its table as CSV or XLSX.");if(!rows?.length)throw Error("No table rows found.");setRows(rows,f.name);renderKpis()}catch(e){biStatus.textContent=e.message||"Could not import file"}finally{file.value=""}});
-  transform.addEventListener("click",()=>{perf.querySelector(".ct-bi-transform-panel")?.remove();const panel=el("div","ct-bi-transform-panel");panel.append(el("h3","","Transform data"),el("p","ct-team-muted","Edit this imported analytics dataset. Changes stay separate from operational records."));const edits=new Map();state.columns.forEach(k=>{const row=el("div","ct-bi-transform-row"),keep=el("input","");keep.type="checkbox";keep.checked=true;const name=el("input","ct-team-input");name.value=k;name.setAttribute("aria-label","Rename "+k);edits.set(k,{keep,name});row.append(keep,name);panel.append(row)});const filterLabel=el("label","ct-bi-transform-filter");filterLabel.append(el("span","","Remove rows where a field contains"));const filterField=el("select","ct-team-input"),filterValue=el("input","ct-team-input");filterValue.placeholder="Value to exclude";state.columns.forEach(k=>{const o=el("option","",k);o.value=k;filterField.append(o)});filterLabel.append(filterField,filterValue);panel.append(filterLabel);panel.append(button("Apply changes","ct-team-btn ct-team-btn--primary",()=>{const mapping=state.columns.filter(k=>edits.get(k).keep.checked).map(k=>[k,edits.get(k).name.value.trim()||k]);const dropField=filterField.value,needle=filterValue.value.trim().toLowerCase();state.rows=state.rows.filter(r=>!needle||!String(r[dropField]??"").toLowerCase().includes(needle)).map(r=>Object.fromEntries(mapping.map(([oldKey,newKey])=>[newKey,r[oldKey]])));state.columns=mapping.map(x=>x[1]);state.hidden.clear();state.source+=" · transformed";panel.remove();renderSide();draw();renderKpis();biStatus.textContent="Transformations applied to the imported analytics copy."}),button("Cancel","ct-team-btn",()=>panel.remove()));perf.insertBefore(panel,layout)});
-  refresh.addEventListener("click",loadLive);save.addEventListener("click",()=>{const key="mechnar.bi."+userKey();let list=[];try{list=JSON.parse(localStorage.getItem(key)||"[]")}catch(_){}const item={name:reportName.value||"Team performance",visuals:state.visuals,filters:state.filters};list=[item,...list.filter(x=>x.name!==item.name)].slice(0,25);localStorage.setItem(key,JSON.stringify(list));biStatus.textContent="Report layout saved in this browser."});
-  exportData.addEventListener("click",()=>{const rows=visible(),cols=state.columns.filter(k=>!state.hidden.has(k)),q=v=>'"'+String(v??"").replaceAll('"','""')+'"',content=[cols.map(q).join(","),...rows.map(r=>cols.map(k=>q(r[k])).join(","))].join("\r\n"),blob=new Blob([content],{type:"text/csv"}),url=URL.createObjectURL(blob),a=el("a");a.href=url;a.download=(reportName.value||"team-performance")+".csv";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)});
-  renderSide();loadLive();
-performancePage.append(perf);
+  const perf=el("section","ct-team-supervisor-page-section ct-team-performance-overview");
+  const perfHeader=el("div","ct-team-performance-header");
+  const perfIntro=el("div","");
+  perfIntro.append(el("p","ct-team-eyebrow","TEAM INTELLIGENCE"),el("h2","","Team Performance Overview"),el("p","ct-team-muted","A live view of operational delivery, workload, punctuality and individual contribution for your assigned team."));
+  const dateControls=el("div","ct-team-performance-controls");
+  const endInput=input(iso(new Date()),"end_date","date"),startDefault=new Date();startDefault.setDate(startDefault.getDate()-55);
+  const startInput=input(iso(startDefault),"start_date","date");
+  const refreshPerformance=button("Refresh","ct-team-btn ct-team-btn--primary");
+  dateControls.append(field("From",startInput),field("To",endInput),refreshPerformance);
+  perfHeader.append(perfIntro,dateControls);perf.append(perfHeader);
+  const perfStatus=el("p","ct-team-muted ct-team-performance-status","Loading real team performance…");
+  const perfContent=el("div","ct-team-performance-content");
+  perf.append(perfStatus,perfContent);performancePage.append(perf);
+  const pct=v=>v===null||v===undefined||!Number.isFinite(Number(v))?"—":Number(v).toFixed(1)+"%";
+  const number=v=>Number(v||0).toLocaleString();
+  function performanceMetric(label,value,note,warning){
+   const item=el("article","ct-team-performance-kpi"+(warning?" is-warning":""));
+   item.append(el("span","",label),el("strong","",value===null||value===undefined?"—":String(value)));
+   if(note)item.append(el("small","",note));return item;
+  }
+  function renderPerformance(result){
+   perfContent.replaceChildren();
+   const overview=result.team_overview||{},members=(result.members||[]).slice();
+   const ranked=members.filter(m=>m.score!==null&&m.score!==undefined).sort((a,b)=>Number(b.score)-Number(a.score));
+   const summary=el("div","ct-team-performance-kpis");
+   [
+    ["Operations",number(overview.total_operations),"Recorded in selected period"],
+    ["Completed",number(overview.completed),"Completed operations"],
+    ["Pending",number(overview.pending),"Still in progress or awaiting action"],
+    ["Overdue",number(overview.overdue),"Open and past due",Number(overview.overdue)>0],
+    ["Completion rate",pct(overview.completion_rate),"Workload-weighted"],
+    ["On-time rate",pct(overview.on_time_rate),"Of completed operations with due dates"],
+    ["Team performance score",overview.score==null?"Insufficient data":Number(overview.score).toFixed(1)+"/100","Difficulty-weighted composite"]
+   ].forEach(x=>summary.append(performanceMetric(...x)));
+   perfContent.append(summary);
+   const split=el("div","ct-team-performance-grid");
+   const trendPanel=el("section","ct-team-performance-panel");
+   trendPanel.append(el("h3","","Weekly delivery trend"),el("p","ct-team-muted","Actual operations created and completed each week."));
+   const weekly=result.weekly_trend||[];
+   if(!weekly.length)trendPanel.append(el("p","ct-team-performance-empty","No weekly operation history is available for this period."));
+   else{
+    const chart=el("div","ct-team-performance-weekly");
+    const max=Math.max(1,...weekly.map(w=>Math.max(Number(w.created)||0,Number(w.completed)||0)));
+    weekly.forEach(w=>{
+     const row=el("div","ct-team-performance-week");
+     row.append(el("span","ct-team-performance-week-date",date(w.week_start)));
+     const bars=el("div","ct-team-performance-bars");
+     [["Created",w.created,"created"],["Completed",w.completed,"completed"]].forEach(([label,val,kind])=>{
+      const line=el("div","ct-team-performance-bar-row");line.append(el("small","",label));
+      const track=el("div","ct-team-performance-bar-track"),fill=el("span","ct-team-performance-bar-fill "+kind);
+      fill.style.width=Math.max(0,Math.min(100,(Number(val)||0)/max*100))+"%";track.append(fill);
+      line.append(track,el("b","",number(val)));bars.append(line);
+     });
+     row.append(bars);chart.append(row);
+    });
+    trendPanel.append(chart);
+    const legend=el("div","ct-team-performance-legend");legend.append(el("span","created","Created"),el("span","completed","Completed"));trendPanel.append(legend);
+   }
+   const breakdown=el("section","ct-team-performance-panel");
+   breakdown.append(el("h3","","Operational health"),el("p","ct-team-muted","Selected-period distribution from recorded team operations."));
+   const total=Number(overview.total_operations)||0;
+   [["Completed",overview.completed,"completed"],["Pending",overview.pending,"pending"],["Overdue",overview.overdue,"overdue"],["Cancelled",overview.cancelled,"cancelled"]].forEach(([label,val,kind])=>{
+    const row=el("div","ct-team-performance-status-row");row.append(el("div","ct-team-performance-status-label",label),el("strong","",number(val)));
+    const track=el("div","ct-team-performance-status-track"),fill=el("span","ct-team-performance-status-fill "+kind);
+    fill.style.width=(total?Math.max(0,Math.min(100,Number(val||0)/total*100)):0)+"%";track.append(fill);row.append(track);breakdown.append(row);
+   });
+   split.append(trendPanel,breakdown);perfContent.append(split);
+   const people=el("section","ct-team-performance-panel ct-team-performance-people");
+   people.append(el("h3","","Individual team contribution"),el("p","ct-team-muted","Ranked using workload-adjusted completion, punctuality and overdue avoidance. Staff identities are limited to your own team."));
+   const tableWrap=el("div","ct-team-performance-table-wrap"),tbl=el("table","ct-team-performance-table"),thead=el("thead"),hr=el("tr");
+   ["Rank","Staff member","Assigned","Completed","Completion","On time","Overdue","Score"].forEach(h=>hr.append(el("th","",h)));
+   thead.append(hr);tbl.append(thead);const tbody=el("tbody");
+   members.sort((a,b)=>{if(a.score==null&&b.score!=null)return 1;if(a.score!=null&&b.score==null)return -1;return Number(b.score||-1)-Number(a.score||-1)||String(a.name||"").localeCompare(String(b.name||""))});
+   members.forEach(m=>{
+    const rank=m.score==null?"—":"#"+(ranked.findIndex(x=>String(x.id)===String(m.id))+1);
+    const tr=el("tr");[rank,m.name,number(m.assigned),number(m.completed),pct(m.completion_rate),pct(m.on_time_rate),pct(m.overdue_rate),m.score==null?"Insufficient data":Number(m.score).toFixed(1)].forEach(v=>tr.append(el("td","",v)));tbody.append(tr);
+   });
+   if(!members.length){const tr=el("tr"),td=el("td","ct-team-muted","No staff performance records for this reporting period.");td.colSpan=8;tr.append(td);tbody.append(tr)}
+   tbl.append(tbody);tableWrap.append(tbl);people.append(tableWrap);perfContent.append(people);
+   perfContent.append(el("p","ct-team-performance-methodology",result.methodology||"Metrics are calculated from recorded team operations. No attendance or unrecorded activity is inferred."));
+   perfStatus.textContent="Live team data · "+(result.period?.start_date||startInput.value)+" to "+(result.period?.end_date||endInput.value)+" · "+members.length+" staff records";
+  }
+  let performanceLoading=false;
+  async function loadTeamPerformance(){
+   if(performanceLoading)return;
+   if(!startInput.value||!endInput.value||startInput.value>endInput.value){perfStatus.textContent="Choose a valid reporting date range.";return}
+   performanceLoading=true;refreshPerformance.disabled=true;perfStatus.textContent="Loading live team performance…";
+   try{
+    const result=await API.get("teams/supervisor/performance?start_date="+encodeURIComponent(startInput.value)+"&end_date="+encodeURIComponent(endInput.value));
+    renderPerformance(result);
+   }catch(error){perfContent.replaceChildren(el("p","ct-team-error",error.message||"Unable to load team performance."));perfStatus.textContent="Team performance could not be loaded."}
+   finally{performanceLoading=false;refreshPerformance.disabled=false}
+  }
+  refreshPerformance.addEventListener("click",loadTeamPerformance);
+  loadTeamPerformance();
   const activity=el("section","ct-team-supervisor-page-section"),activityHead=el("div","ct-team-supervisor-sectionhead"),activityTitle=el("div","");
   activityTitle.append(el("p","ct-team-eyebrow","TEAM HISTORY"),el("h2","","Recent team activity"));
   activityHead.append(activityTitle,button("View team activity →","ct-team-btn ct-team-btn--quiet",()=>openSupervisorPanel("activity",data)));
