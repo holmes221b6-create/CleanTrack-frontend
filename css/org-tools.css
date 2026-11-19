@@ -276,3 +276,9 @@
  .mt-toolbar ~ .mt-content .mt-stats{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(max-width:1100px){.mt-toolbar ~ .mt-content .mt-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.mt-toolbar{align-items:stretch;flex-direction:column}.mt-toolbar>.mt-input{max-width:none}.mt-toolbar-actions{justify-content:flex-start}}
 @media(max-width:700px){.mt-toolbar ~ .mt-content .mt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.mt-inventory-tabs{flex-wrap:nowrap}.mt-toolbar-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.mt-toolbar-actions .mt-btn{width:100%}}
+
+/* Keep the Inventory section switcher at the bottom of the same page. */
+.mt-inventory-page{display:flex;flex-direction:column;min-width:0}
+.mt-inventory-page>.mt-toolbar{order:1}
+.mt-inventory-page>.mt-content{order:2}
+.mt-inventory-page>.mt-inventory-tabs{order:3;margin:24px 0 0;padding:14px 0 0;border-top:1px solid var(--border,#39313f);border-bottom:0}
