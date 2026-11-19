@@ -253,3 +253,15 @@
 #mechnar-performance-arena-overlay .pa-fullscreen-content>.performance-arena-page,#mechnar-performance-arena-overlay .pa-fullscreen-content>.pa-page{flex:1 1 auto;min-width:0;min-height:0;width:100%;max-width:none}
 @keyframes paFullscreenSpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#mechnar-performance-arena-overlay .pa-fullscreen-spinner{animation-duration:2.4s}}
+
+
+/* Make the Arena's actual application root occupy the entire overlay, not a nested half-width content column. */
+#mechnar-performance-arena-overlay .pa-fullscreen-content{display:block!important;flex:1 1 0!important;width:100%!important;max-width:none!important;height:auto!important;min-width:0!important;min-height:0!important;padding:0!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-fullscreen-content>.pa-root{display:grid!important;grid-template-rows:auto auto auto minmax(0,1fr) auto!important;width:100%!important;max-width:none!important;min-width:0!important;height:100%!important;min-height:0!important;margin:0!important;padding:12px 16px 8px!important;gap:0!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace{display:grid!important;grid-template-columns:minmax(0,1fr) 310px!important;width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;min-width:0!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-stage{width:100%!important;min-width:0!important;min-height:0!important;height:100%!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-dock{width:100%!important;min-width:0!important;min-height:0!important;height:100%!important}
+#mechnar-performance-arena-overlay .pa-root .pa-canvas{flex:1 1 0!important;min-height:0!important;height:100%!important;overflow:auto!important}
+#mechnar-performance-arena-overlay .pa-root .pa-dock-body{max-height:none!important;flex:1 1 auto!important;min-height:0!important}
+@media(max-width:850px){#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr) 260px!important}}
+@media(max-width:720px){#mechnar-performance-arena-overlay .pa-root{overflow:auto!important;height:auto!important;min-height:100%!important;grid-template-rows:auto auto auto minmax(600px,1fr) auto!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(420px,1fr) auto!important;overflow:visible!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-dock{height:auto!important;max-height:45vh!important}}
