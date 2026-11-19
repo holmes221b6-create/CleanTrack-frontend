@@ -31,7 +31,7 @@ async function renderInventory(container){
  toolbar.append(toolbarActions);root.append(toolbar);
  const tabs=$("nav","mt-inventory-tabs"),content=$("div","mt-content");let activeContent=content;root.append(tabs,content);
  const views=[["overview","Overview"],["items","Items & assets"],["procurement","Procurement"],["stock","Stock control"],["locations","Locations"],["transfers","Transfers"],["requests","Requests"],["maintenance","Maintenance"],["analytics","Analytics"],["forecast","Forecast"],["history","Movement history"]];
- views.forEach(([id,label])=>{const b=btn(label,()=>{if(id==="overview"){state.view=id;activeContent=content;draw()}else openViewPanel(id,label)});b.dataset.view=id;tabs.append(b)});
+ views.forEach(([id,label])=>{const b=btn(label,()=>openViewPanel(id,label));b.dataset.view=id;tabs.append(b)});
  async function load(){
   activeContent.replaceChildren($("p","mt-muted","Synchronising inventory records…"));
   try{
