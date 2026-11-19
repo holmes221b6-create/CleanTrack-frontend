@@ -862,6 +862,57 @@
     return sequence;
   }
 
+  let personnelOverlay = null;
+  let personnelOpenToken = 0;
+  let personnelPreviousPage = null;
+
+  function closePersonnelOverlay() {
+    personnelOpenToken++;
+    if (personnelOverlay) personnelOverlay.remove();
+    personnelOverlay = null;
+    const previous = personnelPreviousPage || "workspace";
+    personnelPreviousPage = null;
+    if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage(previous);
+  }
+
+  async function openPersonnelOverlay() {
+    if (personnelOverlay) personnelOverlay.remove();
+    const token = ++personnelOpenToken;
+    const overlay = document.createElement("section");
+    overlay.id = "mechnar-personnel-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "Personnel");
+    overlay.innerHTML = '<header class="mn-personnel-top"><span>Personnel</span><button type="button" class="mn-personnel-close" aria-label="Close Personnel" title="Close">×</button></header><div class="mn-personnel-loading" role="status" aria-live="polite"><span class="mn-personnel-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Personnel</small></div><div class="mn-personnel-content" hidden></div>';
+    const style = document.createElement("style");
+    style.dataset.mechnarPersonnelOverlay = "true";
+    style.textContent = '#mechnar-personnel-overlay{position:fixed!important;inset:0!important;z-index:2147483001!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-personnel-overlay .mn-personnel-top{height:54px;min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015);font-size:15px;font-weight:650}#mechnar-personnel-overlay .mn-personnel-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-personnel-overlay .mn-personnel-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}#mechnar-personnel-overlay .mn-personnel-spinner{width:42px;height:42px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:mnPersonnelSpin .82s linear infinite}#mechnar-personnel-overlay .mn-personnel-loading strong{font-size:15px;font-weight:600}#mechnar-personnel-overlay .mn-personnel-loading small{font-size:12px;opacity:.65}#mechnar-personnel-overlay .mn-personnel-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;height:calc(100% - 54px);overflow:auto;padding:0}#mechnar-personnel-overlay .mn-personnel-content[hidden]{display:none!important}#mechnar-personnel-overlay .mn-personnel-content>*{max-width:none!important}@keyframes mnPersonnelSpin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){#mechnar-personnel-overlay .mn-personnel-spinner{animation-duration:2.4s}}';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+    personnelOverlay = overlay;
+    overlay.querySelector(".mn-personnel-close").addEventListener("click", closePersonnelOverlay);
+    const onEscape = event => { if (event.key === "Escape" && personnelOverlay === overlay) closePersonnelOverlay(); };
+    overlay.addEventListener("keydown", onEscape);
+    window.setTimeout(async () => {
+      if (token !== personnelOpenToken || personnelOverlay !== overlay) return;
+      const loading = overlay.querySelector(".mn-personnel-loading");
+      const content = overlay.querySelector(".mn-personnel-content");
+      loading.remove();
+      content.hidden = false;
+      try {
+        if (window.MechnarPersonnel && typeof window.MechnarPersonnel.render === "function") {
+          await window.MechnarPersonnel.render(content);
+        } else {
+          content.textContent = "Personnel could not load. Refresh the application and try again.";
+        }
+      } catch (error) {
+        content.textContent = "Personnel could not load. Refresh the application and try again.";
+        console.error("Personnel panel failed to load:", error);
+      }
+      if (token === personnelOpenToken && personnelOverlay === overlay) overlay.querySelector(".mn-personnel-close").focus();
+    }, 1800);
+  }
+
   let performanceArenaOverlay = null;
   let performanceArenaOpenToken = 0;
   let performanceArenaPreviousPage = null;
@@ -906,6 +957,21 @@
 
   async function renderPage(pageId) {
     const previousPage = state.currentPage;
+    if (pageId === "personnel" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
+      if (previousPage && previousPage !== "personnel") personnelPreviousPage = previousPage;
+      state.currentPage = pageId;
+      const menuElement = getElement("workspace-navigation");
+      if (menuElement && window.CleanTrackNavigation) window.CleanTrackNavigation.renderMenu(menuElement);
+      if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
+      openPersonnelOverlay();
+      return;
+    }
+    if (pageId !== "personnel" && personnelOverlay) {
+      personnelOverlay.remove();
+      personnelOverlay = null;
+      personnelOpenToken++;
+      personnelPreviousPage = null;
+    }
     if (pageId === "performance" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
       if (previousPage && previousPage !== "performance") performanceArenaPreviousPage = previousPage;
       state.currentPage = pageId;
