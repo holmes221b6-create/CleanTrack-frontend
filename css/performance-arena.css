@@ -227,3 +227,12 @@
 .pa-visual-body{justify-content:flex-start!important;align-items:center!important;padding:0 6px 4px!important;gap:2px!important}
 .pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{margin:0 auto 3px!important}
 .pa-visual-body>.pa-blank-visual{margin-top:0!important}
+
+
+/* Center the visual content within its frame, independently of the top controls. */
+.pa-visual-body{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:0!important;width:100%!important;height:auto!important;overflow:hidden!important;padding:8px!important;gap:5px!important;box-sizing:border-box!important}
+.pa-visual-body>.pa-blank-visual{display:flex!important;flex:1 1 auto!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important}
+.pa-visual-body>.pa-blank-visual>svg{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+.pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{align-self:center!important;margin:0 auto!important;flex:0 1 auto!important}
+.pa-visual-body>.pa-data-chart,.pa-visual-body>.pa-map-svg{align-self:center!important;margin:auto!important}
+.pa-visual-body>.pa-legend{align-self:center!important;margin:0 auto!important}
