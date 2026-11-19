@@ -190,3 +190,16 @@
 .pa-visual-body>.pa-legend{font-size:clamp(8px,1vw,10px)!important;line-height:1.1!important;margin:0!important;padding:1px 0!important;flex:0 0 auto!important}
 .pa-visual-body>.pa-map-svg{width:100%!important;height:100%!important;flex:1 1 100%!important;min-height:0!important;max-height:100%!important}
 .pa-visual-body>.pa-map-empty{font-size:9px!important;line-height:1.2!important;margin:2px auto!important;padding:2px!important}
+
+/* Final chart-first layout: use the full frame for the graphic, suppress space-consuming legends. */
+.pa-visual{display:flex!important;flex-direction:column!important;overflow:hidden!important;min-height:0!important}
+.pa-visual-head{flex:0 0 30px!important;min-height:30px!important;padding:3px 7px!important}
+.pa-visual-body{display:flex!important;flex:1 1 0!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:2px!important;gap:0!important}
+.pa-visual-body>.pa-data-chart,.pa-visual-body>.pa-blank-visual,.pa-visual-body>.pa-map-svg{display:block!important;flex:1 1 0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;margin:0!important;padding:0!important}
+.pa-visual-body>.pa-data-chart{preserveAspectRatio: none!important}
+.pa-visual-body>.pa-blank-visual svg{display:block!important;width:100%!important;height:100%!important;max-height:100%!important}
+.pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{display:block!important;flex:0 0 auto!important;width:min(100%,calc(100vh - 220px))!important;height:auto!important;max-width:100%!important;max-height:100%!important;aspect-ratio:1!important;margin:auto!important}
+.pa-visual-body>.pa-legend{display:none!important}
+.pa-visual-body>.pa-map-empty{margin:auto!important;font-size:9px!important;padding:2px!important}
+.pa-visual-body>.pa-table{width:100%!important;max-height:100%!important;font-size:9px!important}
+.pa-visual-body>.pa-kpi{margin:auto!important;font-size:clamp(24px,5vw,44px)!important;padding:0!important}
