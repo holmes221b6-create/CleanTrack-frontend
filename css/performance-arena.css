@@ -265,3 +265,31 @@
 #mechnar-performance-arena-overlay .pa-root .pa-dock-body{max-height:none!important;flex:1 1 auto!important;min-height:0!important}
 @media(max-width:850px){#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr) 260px!important}}
 @media(max-width:720px){#mechnar-performance-arena-overlay .pa-root{overflow:auto!important;height:auto!important;min-height:100%!important;grid-template-rows:auto auto auto minmax(600px,1fr) auto!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(420px,1fr) auto!important;overflow:visible!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-dock{height:auto!important;max-height:45vh!important}}
+
+
+/* Compact the Arena chrome and lock the report workspace to the viewport. */
+#mechnar-performance-arena-overlay .pa-root{grid-template-rows:48px 36px 76px minmax(0,1fr) 36px!important;padding:7px 12px 4px!important;gap:0!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-top{height:48px!important;min-height:48px!important;padding:2px 4px!important;gap:8px!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-brand{display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important}
+#mechnar-performance-arena-overlay .pa-root .pa-arena-title{font-size:17px!important;line-height:1.1!important;white-space:nowrap!important}
+#mechnar-performance-arena-overlay .pa-root .pa-arena-description{font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:460px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-team-name{font-size:9px!important;white-space:nowrap!important}
+#mechnar-performance-arena-overlay .pa-root .pa-top-actions{gap:5px!important;flex-wrap:nowrap!important}
+#mechnar-performance-arena-overlay .pa-root .pa-btn,#mechnar-performance-arena-overlay .pa-root .pa-icon{min-height:27px!important;height:27px!important;padding:3px 7px!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-main-tabs{height:36px!important;min-height:36px!important;align-items:center!important;padding:0 5px!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-main-tab{height:35px!important;padding:7px 13px!important;font-size:11px!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-ribbon{height:76px!important;min-height:76px!important;max-height:76px!important;padding:4px 8px!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-ribbon-title{font-size:9px!important;margin:0 0 2px!important;line-height:12px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-ribbon-body{min-height:0!important;height:54px!important;max-height:54px!important;align-items:center!important;gap:3px!important;padding:0!important;flex-wrap:nowrap!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-ribbon-action{min-width:66px!important;min-height:48px!important;height:48px!important;padding:3px 6px!important;gap:3px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-ribbon-icon{min-height:19px!important;height:19px!important;font-size:17px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-ribbon-label{font-size:9px!important;line-height:1.1!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-rows:minmax(0,1fr)!important;grid-template-columns:minmax(0,1fr) 300px!important;gap:8px!important;padding-top:6px!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-stage-head{height:34px!important;min-height:34px!important;padding:2px 8px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-canvas{height:100%!important;min-height:0!important;max-height:100%!important;padding:10px!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-visual-grid{min-height:0!important;height:100%!important;max-height:100%!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-bottom{height:36px!important;min-height:36px!important;max-height:36px!important;margin:4px 0 0!important;padding:2px 8px!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-root .pa-bottom .pa-sheet-wrap>button:first-child{padding:5px 9px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-dock-body{overflow:auto!important;min-height:0!important}
+@media(max-width:900px){#mechnar-performance-arena-overlay .pa-root{grid-template-rows:48px 36px 76px minmax(0,1fr) 36px!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr) 250px!important}}
+@media(max-width:720px){#mechnar-performance-arena-overlay .pa-root{grid-template-rows:auto 36px 76px minmax(360px,1fr) 36px!important;overflow:auto!important;height:100%!important}#mechnar-performance-arena-overlay .pa-root>.pa-top{height:auto!important;min-height:48px!important;flex-direction:row!important}#mechnar-performance-arena-overlay .pa-root .pa-arena-description,#mechnar-performance-arena-overlay .pa-root .pa-team-name{display:none!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(320px,1fr) auto!important;overflow:auto!important}#mechnar-performance-arena-overlay .pa-root .pa-canvas{overflow:auto!important}}
