@@ -148,3 +148,15 @@
 .pa-visual-resize-grip:after{content:"";position:absolute;right:3px;bottom:3px;width:9px;height:9px;border-right:2px solid var(--pa-muted);border-bottom:2px solid var(--pa-muted)}
 .pa-visual::-webkit-scrollbar,.pa-visual-body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 .pa-visual,.pa-visual-body{scrollbar-width:none!important;-ms-overflow-style:none!important}
+
+/* Visuals fit their frame: no internal scrolling. */
+.pa-visual{overflow:hidden!important}
+.pa-visual-body{overflow:hidden!important;height:auto!important;flex:1 1 auto;min-height:0;padding:8px}
+.pa-visual-body .pa-data-chart{width:100%;height:100%;min-height:0;max-height:100%;display:block}
+.pa-visual-body .pa-blank-visual{height:100%;min-height:0;overflow:hidden;display:grid;place-items:center}
+.pa-visual-body .pa-blank-visual svg{width:100%;height:100%;max-height:100%;}
+.pa-visual-body .pa-table-wrap{width:100%;height:100%;overflow:hidden}
+.pa-visual-body table{width:100%;table-layout:fixed}
+.pa-visual-body td,.pa-visual-body th{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pa-visual-body .pa-map-svg{width:100%;height:100%;min-height:0}
+.pa-visual-body .pa-donut,.pa-visual-body .pa-pie{max-width:100%;max-height:100%;}
