@@ -121,3 +121,39 @@ html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-colo
  #mechnar-personnel-overlay .mp-rail{min-height:0!important;border-right:0!important;border-bottom:1px solid var(--border,#343440)!important}
  #mechnar-personnel-overlay .mp-main{min-height:0!important;height:100%!important}
 }
+
+
+/* Conversation history must own a constrained, scrollable viewport. */
+#mechnar-personnel-overlay .mn-personnel-content,
+#mechnar-personnel-overlay .mn-personnel-content>.mp-shell,
+#mechnar-personnel-overlay .mp-shell>.mp-main,
+#mechnar-personnel-overlay .mp-main>.mp-chat{
+  min-height:0!important;
+  height:100%!important;
+  max-height:100%!important;
+}
+#mechnar-personnel-overlay .mn-personnel-content>.mp-shell{
+  flex:1 1 0!important;
+  grid-template-rows:minmax(0,1fr)!important;
+}
+#mechnar-personnel-overlay .mp-main>.mp-chat{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+#mechnar-personnel-overlay .mp-chat>.mp-chat-head,
+#mechnar-personnel-overlay .mp-chat>.mp-composer{
+  flex:0 0 auto!important;
+}
+#mechnar-personnel-overlay .mp-chat>.mp-messages{
+  display:flex!important;
+  flex:1 1 0!important;
+  height:0!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow-y:scroll!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-width:thin!important;
+}
