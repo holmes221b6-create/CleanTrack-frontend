@@ -595,6 +595,7 @@ async function renderSupervisorTeams(container){
   const perfHeader=el("div","ct-team-performance-header");
   const perfIntro=el("div","");
   perfIntro.append(el("p","ct-team-eyebrow","TEAM INTELLIGENCE"),el("h2","","Team Performance Overview"),el("p","ct-team-muted","A live view of operational delivery, workload, punctuality and individual contribution for your assigned team."));
+  const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   const dateControls=el("div","ct-team-performance-controls");
   const endInput=input(iso(new Date()),"end_date","date"),startDefault=new Date();startDefault.setDate(startDefault.getDate()-55);
   const startInput=input(iso(startDefault),"start_date","date");
