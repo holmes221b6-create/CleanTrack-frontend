@@ -1,0 +1,55 @@
+(function(){
+"use strict";
+const API=window.CleanTrackApi;
+const esc=v=>String(v??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct=v=>v==null?"—":Number(v).toFixed(1)+"%";
+const num=v=>Number(v||0).toLocaleString();
+const metric=(label,value,sub="")=>'<div class="pa-metric"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong><small>'+esc(sub)+'</small></div>';
+const table=(headers,rows)=>'<div class="pa-analysis-table-wrap"><table class="pa-analysis-table"><thead><tr>'+headers.map(x=>'<th>'+esc(x)+'</th>').join("")+'</tr></thead><tbody>'+(rows.length?rows.map(r=>'<tr>'+r.map(x=>'<td>'+esc(x??"—")+'</td>').join("")+'</tr>').join(""):'<tr><td colspan="'+headers.length+'" class="pa-empty">No recorded data for this period.</td></tr>')+'</tbody></table></div>';
+function csvDownload(data){
+ const sections=[["Team rankings",["Rank","Team","Supervisor","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],data.teams.map(x=>[x.rank,x.team_name,x.supervisor,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.approval_rate,x.overdue_rate,x.score])],["Individual rankings",["Rank","Staff","Operations","Completed","Completion %","On time %","Approval %","Overdue %","Score"],data.individuals.map(x=>[x.rank,x.name,x.total_operations,x.completed,x.completion_rate,x.on_time_rate,x.approval_rate,x.overdue_rate,x.score])]];
+ const csv=sections.map(s=>s[0]+"\n"+s[1].join(",")+"\n"+s[2].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n")).join("\n\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MECHNAR-performance-analysis.csv";a.click();URL.revokeObjectURL(url);
+}
+async function render(root){
+ root.innerHTML='<main class="pa-analysis"><header class="paa-heading"><div><p>ORGANISATION INTELLIGENCE</p><h2>Performance Analysis</h2><span>Evidence-based team performance, rankings and improvement planning.</span></div><button class="paa-refresh" type="button">↻ Refresh</button></header><section class="paa-filters"><label>From<input type="date" id="paa-start"></label><label>To<input type="date" id="paa-end"></label><label>Team<select id="paa-team"><option value="">'+(String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="admin"?"All organisation":"My team")+'</option></select></label><button id="paa-apply">Apply filters</button></section><div class="paa-status" role="status">Loading organisation performance…</div><div id="paa-body" hidden></div></main>';
+ const start=root.querySelector("#paa-start"),end=root.querySelector("#paa-end"),team=root.querySelector("#paa-team"),status=root.querySelector(".paa-status"),body=root.querySelector("#paa-body");
+ const today=new Date(),prior=new Date(today);prior.setDate(today.getDate()-29);const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);start.value=iso(prior);end.value=iso(today);
+ async function load(){
+ status.textContent="Loading recorded performance…";status.hidden=false;body.hidden=true;
+ try{
+ const q=new URLSearchParams({start_date:start.value,end_date:end.value});if(team.value)q.set("team_id",team.value);
+ const data=await API.get("analytics/performance-analysis?"+q.toString());
+ if(!team.dataset.ready){(data.teams||[]).forEach(t=>{const o=document.createElement("option");o.value=t.team_id;o.textContent=t.team_name;team.appendChild(o);});team.dataset.ready="1";}
+ const o=data.overview||{},own=(data.teams||[]).find(t=>t.team_id===data.scope?.own_team_id)||null;
+ const summary=String(window.CleanTrackAuth?.getCurrentUser()?.role||"").toLowerCase()==="supervisor"?o: o;
+ const improvement=(data.automated_improvements||[]).map(x=>'<article class="paa-improvement"><span class="paa-priority">'+esc(x.priority)+'</span><h4>'+esc(x.title)+'</h4><p>'+esc(x.evidence)+'</p><small>'+esc(x.action)+'</small></article>').join("");
+ const notices=(data.admin_improvements||[]).map(x=>'<article class="paa-notice"><b>'+esc(x.title)+'</b><p>'+esc(x.message)+'</p><small>'+esc(x.severity)+' · Admin guidance</small></article>').join("");
+ const teamRows=(data.teams||[]).map(x=>[x.rank??"—",x.team_name,x.supervisor,x.total_operations,x.completed,pct(x.completion_rate),pct(x.on_time_rate),pct(x.approval_rate),pct(x.overdue_rate),x.score??"Insufficient data"]);
+ const peopleRows=(data.individuals||[]).map(x=>[x.rank??"—",x.name,x.total_operations,x.completed,pct(x.completion_rate),pct(x.on_time_rate),pct(x.approval_rate),pct(x.overdue_rate),x.score??"Insufficient data"]);
+ const locationRows=(data.locations||[]).map(x=>[x.rank??"—",x.location_name,x.total_operations,x.completed,pct(x.completion_rate),pct(x.on_time_rate),x.score??"Insufficient data"]);
+ const typeRows=(data.operation_types||[]).map(x=>[x.rank??"—",x.operation_type,x.total_operations,x.completed,pct(x.completion_rate),pct(x.on_time_rate),x.score??"Insufficient data"]);
+ const histRows=(data.history||[]).map(x=>[x.period,x.total_operations,x.completed,pct(x.completion_rate),pct(x.on_time_rate),pct(x.approval_rate),pct(x.overdue_rate),x.score??"Insufficient data"]);
+ const goals=[];
+ if(o.completion_rate!=null&&o.completion_rate<90)goals.push(["Completion","Reach 90% completion",pct(o.completion_rate),"Review the open-operation queue each shift; redistribute aged work."]);
+ if(o.on_time_rate!=null&&o.on_time_rate<90)goals.push(["Punctuality","Reach 90% on-time completion",pct(o.on_time_rate),"Review due dates and rebalance high-effort assignments before shift start."]);
+ if(o.approval_rate!=null&&o.approval_rate<95)goals.push(["Approval quality","Reach 95% approval",pct(o.approval_rate),"Review rejection feedback and verify completion criteria before submission."]);
+ if(o.overdue_rate!=null&&o.overdue_rate>5)goals.push(["Overdue control","Bring overdue rate below 5%",pct(o.overdue_rate),"Create a daily overdue review and escalate blocked operations."]);
+ if(!goals.length)goals.push(["Maintain","Maintain current performance","No threshold breach detected","Keep weekly reviews and compare the next period against this baseline."]);
+ body.innerHTML=
+ '<section class="paa-section"><div class="paa-section-head"><div><p>01 · TEAM OVERVIEW</p><h3>'+(data.scope?.role==="Supervisor"?(own?.team_name||"Your team"):"Organisation overview")+'</h3></div><span class="paa-period">'+esc(data.period.start_date)+' — '+esc(data.period.end_date)+'</span></div><div class="paa-metrics">'+metric("Operations",num(o.total_operations),"Created in selected period")+metric("Completed",num(o.completed),pct(o.completion_rate)+" completion")+metric("Pending",num(o.pending),"Not completed or cancelled")+metric("Overdue",num(o.overdue),pct(o.overdue_rate)+" of operations")+metric("On-time rate",pct(o.on_time_rate),"Completed operations with due dates")+metric("Approval rate",pct(o.approval_rate),"Reviewed operations")+metric("Avg. completion",o.average_completion_hours==null?"—":o.average_completion_hours+" hrs","Recorded completion duration")+metric("Weighted workload",num(o.weighted_workload),"Estimated minutes × priority")+'</div></section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>02 · PERFORMANCE RANKINGS</p><h3>Comparative rankings</h3></div></div><h4>Team rankings</h4>'+table(["Rank","Team","Supervisor","Operations","Completed","Completion","On time","Approval","Overdue","Score"],teamRows)+'<h4>Individual staff · '+(own?.team_name||"Selected team")+'</h4>'+table(["Rank","Staff","Operations","Completed","Completion","On time","Approval","Overdue","Score"],peopleRows)+'<div class="paa-two-col"><div><h4>Location-wise rankings</h4>'+table(["Rank","Location","Operations","Completed","Completion","On time","Score"],locationRows)+'</div><div><h4>Operation-type rankings</h4>'+table(["Rank","Operation type","Operations","Completed","Completion","On time","Score"],typeRows)+'</div></div><p class="paa-note">Role and attendance rankings are shown only when the organisation has reliable source records. '+esc(data.attendance?.message||"Attendance data is not connected.")+'</p></section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>03 · AREAS FOR IMPROVEMENT</p><h3>Guidance and evidence-based actions</h3></div></div>'+(notices?'<h4>Published by Admin</h4><div class="paa-guidance">'+notices+'</div>':'<p class="paa-note">No published Admin improvement guidance is assigned to this team.</p>')+'<h4>Automated suggestions from recorded performance</h4><div class="paa-guidance">'+(improvement||'<p class="paa-note">Not enough recorded data to generate suggestions.</p>')+'</div></section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>04 · PERFORMANCE EXPORT</p><h3>Export this analysis</h3></div></div><p class="paa-note">Exports use the current date and team filters. CSV includes team and individual ranking tables. PDF uses the browser print dialog.</p><div class="paa-actions"><button id="paa-csv">Export CSV</button><button id="paa-pdf">Export / Save as PDF</button></div></section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>05 · PERFORMANCE HISTORY</p><h3>Progress over time</h3></div></div>'+table(["Period","Operations","Completed","Completion","On time","Approval","Overdue","Score"],histRows)+'</section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>06 · PERFORMANCE GOALS</p><h3>Measurable next steps</h3></div></div><div class="paa-goals">'+goals.map((g,i)=>'<article><span>GOAL '+(i+1)+'</span><h4>'+esc(g[1])+'</h4><p>Current baseline: '+esc(g[2])+'</p><small>'+esc(g[3])+'</small></article>').join("")+'</div><p class="paa-note">Goals are generated from this historical baseline; they are recommendations, not persisted targets or completion tracking.</p></section>'+
+ '<section class="paa-section"><div class="paa-section-head"><div><p>METHODOLOGY & DATA COVERAGE</p><h3>How rankings are calculated</h3></div></div><p class="paa-note">'+esc(data.methodology)+'</p><p class="paa-note">No attendance model is connected to this analysis. Attendance ranking is deliberately not fabricated. Team-level comparisons are aggregates; Supervisor individual detail is restricted to their own team.</p></section>';
+ body.hidden=false;status.hidden=true;
+ body.querySelector("#paa-csv").onclick=()=>csvDownload(data);
+ body.querySelector("#paa-pdf").onclick=()=>window.print();
+ }catch(e){status.textContent=e?.message||"Performance data could not be loaded. Check your connection and try again.";status.classList.add("is-error");}
+ }
+ root.querySelector("#paa-apply").onclick=load;root.querySelector(".paa-refresh").onclick=load;await load();
+}
+window.MechnarPerformanceAnalysis={render};
+})();
