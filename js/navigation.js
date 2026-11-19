@@ -52,6 +52,7 @@
       { id: "team-channel", label: "Team Channel", icon: "▤" },
       { id: "meetings", label: "Meetings", icon: "◉" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
+      { id: "performance-analysis", label: "Performance Analysis", icon: "◫" },
       { id: "reports", label: "Reports", icon: "▧" },
       { id: "settings", label: "Settings", icon: "⚙" }
     ],
