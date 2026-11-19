@@ -139,7 +139,7 @@ async function render(root){
  '<section class="paa-section paa-ranking-launch"><div class="paa-section-head"><div><p>PERFORMANCE RANKINGS</p><h3>Comparative rankings</h3><span class="paa-note">Explore team, individual, location, operation-type and role comparisons in a separate workspace.</span></div><button type="button" id="paa-open-rankings">Open comparative rankings ↗</button></div></section>'+
   '<section class="paa-section paa-improvement-launch"><div class="paa-section-head"><h3>Areas for Improvement</h3><button type="button" id="paa-open-improvements">Open</button></div></section>'+
  '<section class="paa-section paa-history-launch"><div class="paa-section-head"><div><p>PERFORMANCE HISTORY</p><h3>Progress over time</h3><span class="paa-note">Review historical performance trends in a separate panel.</span></div><button type="button" id="paa-open-history">Open performance history ↗</button></div></section>'+
- '<section class="paa-section"><div class="paa-section-head"><div><p>PERFORMANCE GOALS</p><h3>Measurable next steps</h3></div></div><div class="paa-goals">'+goals.map((g,i)=>'<article><span>GOAL</span><h4>'+esc(g[1])+'</h4><p>Current baseline: '+esc(g[2])+'</p><small>'+esc(g[3])+'</small></article>').join("")+'</div><p class="paa-note">Goals are generated from this historical baseline; they are recommendations, not persisted targets or completion tracking.</p></section>'+
+ '<section class="paa-section paa-goals-launch"><div class="paa-section-head"><div><p>PERFORMANCE GOALS</p><h3>Measurable next steps</h3><span class="paa-note">Review data-based development recommendations in a separate panel.</span></div><button type="button" id="paa-open-goals">Open measurable next steps ↗</button></div></section>'+
  '<section class="paa-section"><div class="paa-section-head"><div><p>METHODOLOGY & DATA COVERAGE</p><h3>How rankings are calculated</h3></div></div><p class="paa-note">'+esc(data.methodology)+'</p><p class="paa-note">No attendance model is connected to this analysis. Attendance ranking is deliberately not fabricated. Team-level comparisons are aggregates; Supervisor individual detail is restricted to their own team.</p></section>';
  document.querySelectorAll(".paa-ranking-overlay").forEach(node=>node.remove());
  const rankingOverlay=document.createElement("div");
@@ -164,6 +164,18 @@ async function render(root){
  historyOverlay.querySelector(".paa-history-close").onclick=closeHistory;
  historyOverlay.addEventListener("click",e=>{if(e.target===historyOverlay)closeHistory();});
  const historyEsc=e=>{if(e.key==="Escape"&&!historyOverlay.hidden)closeHistory();};
+
+ const goalsOverlay=document.createElement("div");
+ goalsOverlay.className="paa-goals-overlay";
+ goalsOverlay.hidden=true;
+ goalsOverlay.innerHTML='<section class="paa-ranking-dialog paa-goals-dialog" role="dialog" aria-modal="true" aria-labelledby="paa-goals-title"><header><div><p>PERFORMANCE DEVELOPMENT</p><h2 id="paa-goals-title">Measurable Next Steps</h2></div><button type="button" class="paa-ranking-close paa-goals-close" aria-label="Close measurable next steps">×</button></header><div class="paa-goals-content"></div></section>';
+ goalsOverlay.querySelector(".paa-goals-content").innerHTML='<section class="paa-section"><div class="paa-section-head"><div><p>BASED ON SELECTED REPORTING PERIOD</p><h3>Recommended performance targets</h3><span class="paa-period">'+esc(data.period.start_date)+' — '+esc(data.period.end_date)+'</span></div></div><div class="paa-goals">'+goals.map(g=>'<article><span>GOAL</span><h4>'+esc(g[1])+'</h4><p>Current baseline: '+esc(g[2])+'</p><small>'+esc(g[3])+'</small></article>').join("")+'</div><p class="paa-note">These recommendations are generated from historical performance data. They are not persisted targets and do not represent tracked progress.</p></section>';
+ document.body.appendChild(goalsOverlay);
+ const closeGoals=()=>{goalsOverlay.hidden=true;document.body.classList.remove("paa-goals-open");document.removeEventListener("keydown",goalsEsc);};
+ root.querySelector("#paa-open-goals").onclick=()=>{goalsOverlay.hidden=false;document.body.classList.add("paa-goals-open");goalsOverlay.querySelector(".paa-goals-content").scrollTop=0;goalsOverlay.querySelector(".paa-goals-close").focus();document.addEventListener("keydown",goalsEsc);};
+ goalsOverlay.querySelector(".paa-goals-close").onclick=closeGoals;
+ goalsOverlay.addEventListener("click",e=>{if(e.target===goalsOverlay)closeGoals();});
+ const goalsEsc=e=>{if(e.key==="Escape"&&!goalsOverlay.hidden)closeGoals();};
 
  const improvementOverlay=document.createElement("div");
  improvementOverlay.className="paa-improvement-overlay";
