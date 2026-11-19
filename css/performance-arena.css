@@ -236,3 +236,20 @@
 .pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{align-self:center!important;margin:0 auto!important;flex:0 1 auto!important}
 .pa-visual-body>.pa-data-chart,.pa-visual-body>.pa-map-svg{align-self:center!important;margin:auto!important}
 .pa-visual-body>.pa-legend{align-self:center!important;margin:0 auto!important}
+
+
+/* Full-page Performance Arena workspace overlay. */
+#mechnar-performance-arena-overlay{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100vh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}
+#mechnar-performance-arena-overlay .pa-fullscreen-top{height:54px;min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015)}
+#mechnar-performance-arena-overlay .pa-fullscreen-brand{font-size:15px;font-weight:650;letter-spacing:.02em}
+#mechnar-performance-arena-overlay .pa-fullscreen-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}
+#mechnar-performance-arena-overlay .pa-fullscreen-close:hover{background:rgba(150,120,190,.16)}
+#mechnar-performance-arena-overlay .pa-fullscreen-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+#mechnar-performance-arena-overlay .pa-fullscreen-spinner{width:42px;height:42px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:paFullscreenSpin .82s linear infinite}
+#mechnar-performance-arena-overlay .pa-fullscreen-loading strong{font-size:15px;font-weight:600}
+#mechnar-performance-arena-overlay .pa-fullscreen-loading small{font-size:12px;opacity:.65}
+#mechnar-performance-arena-overlay .pa-fullscreen-content{display:flex;flex:1 1 auto;min-width:0;min-height:0;width:100%;height:calc(100% - 54px);overflow:auto}
+#mechnar-performance-arena-overlay .pa-fullscreen-content[hidden]{display:none!important}
+#mechnar-performance-arena-overlay .pa-fullscreen-content>.performance-arena-page,#mechnar-performance-arena-overlay .pa-fullscreen-content>.pa-page{flex:1 1 auto;min-width:0;min-height:0;width:100%;max-width:none}
+@keyframes paFullscreenSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#mechnar-performance-arena-overlay .pa-fullscreen-spinner{animation-duration:2.4s}}
