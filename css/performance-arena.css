@@ -178,3 +178,15 @@
 .pa-visual-body>.pa-table td,.pa-visual-body>.pa-table th{padding:4px 6px!important;font-size:9px!important}
 .pa-visual-body>.pa-kpi{font-size:30px!important;padding:8px!important}
 .pa-visual-body>.pa-blank-visual svg{max-height:none!important}
+
+/* Make chart graphics fully visible and larger inside the visual frame. */
+.pa-visual-body{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:3px!important;padding:4px!important;min-height:0!important;height:auto!important;flex:1 1 auto!important;overflow:hidden!important}
+.pa-visual-body>.pa-data-chart{width:100%!important;height:100%!important;flex:1 1 100%!important;min-height:0!important;max-height:100%!important;object-fit:contain!important}
+.pa-visual-body>.pa-blank-visual{width:100%!important;height:100%!important;flex:1 1 100%!important;min-height:0!important;max-height:100%!important;padding:0!important}
+.pa-visual-body>.pa-blank-visual svg{width:100%!important;height:100%!important;max-height:100%!important;object-fit:contain!important}
+.pa-visual-body>.pa-donut,.pa-visual-body>.pa-pie{width:min(72%,220px)!important;max-width:100%!important;aspect-ratio:1/1!important;height:auto!important;flex:0 0 auto!important;margin:2px auto!important}
+.pa-visual-body>.pa-donut:before{inset:22%!important}
+.pa-visual-body>.pa-donut b{font-size:clamp(10px,1.2vw,15px)!important}
+.pa-visual-body>.pa-legend{font-size:clamp(8px,1vw,10px)!important;line-height:1.1!important;margin:0!important;padding:1px 0!important;flex:0 0 auto!important}
+.pa-visual-body>.pa-map-svg{width:100%!important;height:100%!important;flex:1 1 100%!important;min-height:0!important;max-height:100%!important}
+.pa-visual-body>.pa-map-empty{font-size:9px!important;line-height:1.2!important;margin:2px auto!important;padding:2px!important}
