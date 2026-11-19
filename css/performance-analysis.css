@@ -32,5 +32,43 @@
 .paa-header-actions .paa-export-top{border:1px solid #75639c;border-radius:7px;padding:9px 16px;background:#51416f;color:#fff;cursor:pointer}
 @media(max-width:650px){.paa-heading{width:100%}.paa-header-actions{width:100%;justify-content:flex-start}}
 
-/* Keep the export format control compact and medium-sized. */
-.paa-header-actions select#paa-export-format{width:130px!important;min-width:130px!important;max-width:130px!important;flex:0 0 130px!important}
+
+/* Export format: compact medium control, with explicit sizing after global form styles. */
+#page-content .pa-analysis .paa-heading .paa-header-actions{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:9px!important;
+  flex-wrap:nowrap!important;
+  min-width:0!important;
+}
+#page-content .pa-analysis .paa-heading .paa-header-actions label.paa-export-select-label{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  white-space:nowrap!important;
+}
+#page-content .pa-analysis .paa-heading .paa-header-actions select#paa-export-format{
+  display:inline-block!important;
+  box-sizing:border-box!important;
+  flex:0 0 112px!important;
+  width:112px!important;
+  min-width:112px!important;
+  max-width:112px!important;
+  min-height:37px!important;
+  height:37px!important;
+  padding:7px 28px 7px 10px!important;
+  margin:0!important;
+}
+#page-content .pa-analysis .paa-heading .paa-header-actions #paa-export-top,
+#page-content .pa-analysis .paa-heading .paa-header-actions .paa-refresh{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+@media(max-width:760px){
+  #page-content .pa-analysis .paa-heading .paa-header-actions{
+    flex-wrap:wrap!important;
+    justify-content:flex-start!important;
+  }
+}
