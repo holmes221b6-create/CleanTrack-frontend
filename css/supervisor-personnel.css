@@ -103,3 +103,21 @@ html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-colo
 @media(max-width:600px){.mp-rail-actions{gap:5px}.mp-my-profile{padding:0 8px;font-size:9px}.mp-own-profile-overlay{padding:10px}.mp-own-profile-panel{max-height:94vh}.mp-own-profile-head,.mp-own-profile-form{padding:17px}.mp-own-profile-grid{grid-template-columns:1fr}.mp-own-profile-field:has(textarea){grid-column:auto}}
 
 .mp-own-profile-qualifications{margin-top:19px;padding-top:16px;border-top:1px solid #34303d}.mp-own-profile-qualification-head{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.mp-own-profile-qualification-head strong{font-size:12px}.mp-own-profile-qualification-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mp-own-profile-qualification-form input[type=file]{grid-column:1/-1;font-size:10px}.mp-own-profile-qualification-form button{justify-self:start}.mp-own-profile-qualification-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}.mp-own-profile-qualification-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid #34303d;border-radius:9px;background:#121119}.mp-own-profile-qualification-row strong,.mp-own-profile-qualification-row small{display:block}.mp-own-profile-qualification-row strong{font-size:10px}.mp-own-profile-qualification-row small{margin-top:4px;font-size:9px}.mp-own-profile-qualification-remove{border:0;background:transparent;color:#d7a3ac;font:inherit;font-size:9px;cursor:pointer}@media(max-width:600px){.mp-own-profile-qualification-form{grid-template-columns:1fr}.mp-own-profile-qualification-form input[type=file]{grid-column:auto}}
+
+
+/* Full-height Personnel workspace: independent scrolling for people and conversations. */
+#mechnar-personnel-overlay .mn-personnel-content{display:flex!important;flex-direction:column!important;overflow:hidden!important;min-height:0!important;height:auto!important;padding:0!important}
+#mechnar-personnel-overlay .mn-personnel-content>.mp-page-toolbar{flex:0 0 auto!important;margin:0!important;padding:9px 18px!important}
+#mechnar-personnel-overlay .mn-personnel-content>.mp-shell{display:grid!important;grid-template-columns:minmax(300px,360px) minmax(0,1fr)!important;flex:1 1 0!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow:hidden!important}
+#mechnar-personnel-overlay .mp-rail{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important}
+#mechnar-personnel-overlay .mp-contact-list{flex:1 1 0!important;min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-gutter:stable}
+#mechnar-personnel-overlay .mp-main{position:relative!important;display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+#mechnar-personnel-overlay .mp-chat,#mechnar-personnel-overlay .mp-profile{display:flex!important;flex:1 1 0!important;flex-direction:column!important;min-width:0!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+#mechnar-personnel-overlay .mp-messages{flex:1 1 0!important;min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-gutter:stable}
+#mechnar-personnel-overlay .mp-profile-body,#mechnar-personnel-overlay .mp-info-scroll,#mechnar-personnel-overlay .mp-profile-detail-panel .mp-info-scroll{flex:1 1 0!important;min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+#mechnar-personnel-overlay .mp-composer{flex:0 0 auto!important}
+@media(max-width:760px){
+ #mechnar-personnel-overlay .mn-personnel-content>.mp-shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(190px,38%) minmax(0,1fr)!important}
+ #mechnar-personnel-overlay .mp-rail{min-height:0!important;border-right:0!important;border-bottom:1px solid var(--border,#343440)!important}
+ #mechnar-personnel-overlay .mp-main{min-height:0!important;height:100%!important}
+}
