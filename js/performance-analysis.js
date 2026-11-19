@@ -138,7 +138,7 @@ async function render(root){
  '<section class="paa-section"><div class="paa-section-head"><div><p>TEAM OVERVIEW</p><h3>'+(data.scope?.role==="Supervisor"?(own?.team_name||"Your team"):"Organisation overview")+'</h3></div><span class="paa-period">'+esc(data.period.start_date)+' — '+esc(data.period.end_date)+'</span></div><div class="paa-metrics">'+metric("Operations",num(o.total_operations),"Created in selected period")+metric("Completed",num(o.completed),pct(o.completion_rate)+" completion")+metric("Pending",num(o.pending),"Not completed or cancelled")+metric("Overdue",num(o.overdue),pct(o.overdue_rate)+" of operations")+metric("On-time rate",pct(o.on_time_rate),"Completed operations with due dates")+metric("Approval rate",pct(o.approval_rate),"Reviewed operations")+metric("Avg. completion",o.average_completion_hours==null?"—":o.average_completion_hours+" hrs","Recorded completion duration")+metric("Weighted workload",num(o.weighted_workload),"Estimated minutes × priority")+'</div></section>'+
  '<section class="paa-section paa-ranking-launch"><div class="paa-section-head"><div><p>PERFORMANCE RANKINGS</p><h3>Comparative rankings</h3><span class="paa-note">Explore team, individual, location, operation-type and role comparisons in a separate workspace.</span></div><button type="button" id="paa-open-rankings">Open comparative rankings ↗</button></div></section>'+
   '<section class="paa-section paa-improvement-launch"><div class="paa-section-head"><h3>Areas for Improvement</h3><button type="button" id="paa-open-improvements">Open</button></div></section>'+
- '<section class="paa-section"><div class="paa-section-head"><div><p>PERFORMANCE HISTORY</p><h3>Progress over time</h3></div></div>'+table(["Period","Operations","Completed","Completion","On time","Approval","Overdue","Score"],histRows)+'</section>'+
+ '<section class="paa-section paa-history-launch"><div class="paa-section-head"><div><p>PERFORMANCE HISTORY</p><h3>Progress over time</h3><span class="paa-note">Review historical performance trends in a separate panel.</span></div><button type="button" id="paa-open-history">Open performance history ↗</button></div></section>'+
  '<section class="paa-section"><div class="paa-section-head"><div><p>PERFORMANCE GOALS</p><h3>Measurable next steps</h3></div></div><div class="paa-goals">'+goals.map((g,i)=>'<article><span>GOAL</span><h4>'+esc(g[1])+'</h4><p>Current baseline: '+esc(g[2])+'</p><small>'+esc(g[3])+'</small></article>').join("")+'</div><p class="paa-note">Goals are generated from this historical baseline; they are recommendations, not persisted targets or completion tracking.</p></section>'+
  '<section class="paa-section"><div class="paa-section-head"><div><p>METHODOLOGY & DATA COVERAGE</p><h3>How rankings are calculated</h3></div></div><p class="paa-note">'+esc(data.methodology)+'</p><p class="paa-note">No attendance model is connected to this analysis. Attendance ranking is deliberately not fabricated. Team-level comparisons are aggregates; Supervisor individual detail is restricted to their own team.</p></section>';
  document.querySelectorAll(".paa-ranking-overlay").forEach(node=>node.remove());
@@ -153,6 +153,18 @@ async function render(root){
  rankingOverlay.querySelector(".paa-ranking-close").onclick=closeRankings;
  rankingOverlay.addEventListener("click",e=>{if(e.target===rankingOverlay)closeRankings();});
  const rankingEsc=e=>{if(e.key==="Escape"&&!rankingOverlay.hidden)closeRankings();};
+ const historyOverlay=document.createElement("div");
+ historyOverlay.className="paa-history-overlay";
+ historyOverlay.hidden=true;
+ historyOverlay.innerHTML='<section class="paa-ranking-dialog paa-history-dialog" role="dialog" aria-modal="true" aria-labelledby="paa-history-title"><header><div><p>PERFORMANCE TRENDS</p><h2 id="paa-history-title">Performance History</h2></div><button type="button" class="paa-ranking-close paa-history-close" aria-label="Close performance history">×</button></header><div class="paa-history-content"></div></section>';
+ historyOverlay.querySelector(".paa-history-content").innerHTML='<section class="paa-section"><div class="paa-section-head"><div><p>SELECTED REPORTING PERIOD</p><h3>Progress over time</h3><span class="paa-period">'+esc(data.period.start_date)+' — '+esc(data.period.end_date)+'</span></div></div>'+table(["Period","Operations","Completed","Completion","On time","Approval","Overdue","Score"],histRows)+'</section>';
+ document.body.appendChild(historyOverlay);
+ const closeHistory=()=>{historyOverlay.hidden=true;document.body.classList.remove("paa-history-open");document.removeEventListener("keydown",historyEsc);};
+ root.querySelector("#paa-open-history").onclick=()=>{historyOverlay.hidden=false;document.body.classList.add("paa-history-open");historyOverlay.querySelector(".paa-history-content").scrollTop=0;historyOverlay.querySelector(".paa-history-close").focus();document.addEventListener("keydown",historyEsc);};
+ historyOverlay.querySelector(".paa-history-close").onclick=closeHistory;
+ historyOverlay.addEventListener("click",e=>{if(e.target===historyOverlay)closeHistory();});
+ const historyEsc=e=>{if(e.key==="Escape"&&!historyOverlay.hidden)closeHistory();};
+
  const improvementOverlay=document.createElement("div");
  improvementOverlay.className="paa-improvement-overlay";
  improvementOverlay.hidden=true;
