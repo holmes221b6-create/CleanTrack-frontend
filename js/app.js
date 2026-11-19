@@ -951,6 +951,15 @@
     // Re-apply the signed-in user's display preference as routes change.
     if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
 
+    if (pageId === "performance-analysis" && String(user?.role || "").toLowerCase() === "supervisor") {
+      if (window.MechnarPerformanceAnalysis && typeof window.MechnarPerformanceAnalysis.render === "function") {
+        await window.MechnarPerformanceAnalysis.render(pageContent);
+      } else {
+        pageContent.textContent = "Performance Analysis could not load. Refresh the application and try again.";
+      }
+      return;
+    }
+
     if (pageId === "meetings" && ["admin","supervisor","staff","employee"].includes(String(user?.role || "").toLowerCase())) {
       if (window.MechnarMeetings && typeof window.MechnarMeetings.render === "function") {
         await window.MechnarMeetings.render(pageContent);
