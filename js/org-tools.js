@@ -22,6 +22,7 @@ function table(headers,rows){const wrap=$("div","mt-table-wrap"),t=$("table","mt
 function stats(items){const n=$("div","mt-stats");items.forEach(([k,v])=>{const x=$("div","mt-stat");x.append($("span","mt-muted",k),$("strong","",v));n.append(x)});return n}
 async function renderInventory(container){
  const root=shell(container,"OPERATIONS RESOURCES","Inventory","A unified inventory control centre for assets, procurement, stock, locations and demand.");
+  root.classList.add("mt-inventory-page");
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
  const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
