@@ -282,3 +282,106 @@
 .mt-inventory-page>.mt-toolbar{order:1}
 .mt-inventory-page>.mt-content{order:2}
 .mt-inventory-page>.mt-inventory-tabs{order:3;margin:24px 0 0;padding:14px 0 0;border-top:1px solid var(--border,#39313f);border-bottom:0}
+
+
+/* Inventory: compact, deliberate module navigation and cleaner page rhythm. */
+.mt-inventory-page{
+  gap:0;
+  min-width:0;
+}
+.mt-inventory-page>.mt-toolbar{
+  align-items:center;
+  gap:14px;
+  padding:0 0 16px;
+  margin:0 0 18px;
+  border-bottom:1px solid rgba(160,140,190,.16);
+}
+.mt-inventory-page>.mt-toolbar>.mt-input{
+  min-width:180px;
+  max-width:420px;
+  min-height:38px;
+  border-radius:7px;
+}
+.mt-inventory-page>.mt-toolbar .mt-toolbar-actions{
+  gap:7px;
+}
+.mt-inventory-page>.mt-toolbar .mt-toolbar-actions>.mt-btn{
+  min-height:36px;
+  padding:7px 12px;
+  border-radius:7px;
+  font-size:12px;
+}
+.mt-inventory-page>.mt-content{
+  order:2;
+  min-width:0;
+  padding-bottom:22px;
+}
+.mt-inventory-page>.mt-inventory-tabs{
+  order:3;
+  display:flex;
+  align-items:center;
+  flex-wrap:nowrap;
+  gap:3px;
+  width:100%;
+  min-width:0;
+  margin:8px 0 0;
+  padding:8px 4px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  border:1px solid rgba(160,140,190,.17);
+  border-radius:9px;
+  background:rgba(20,17,25,.72);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(151,119,180,.48) transparent;
+  -webkit-overflow-scrolling:touch;
+}
+.mt-inventory-page>.mt-inventory-tabs>.mt-btn{
+  position:relative;
+  flex:0 0 auto;
+  min-height:32px;
+  padding:7px 10px;
+  border:1px solid transparent;
+  border-radius:6px;
+  background:transparent;
+  color:var(--muted,#aaa2b7);
+  font-size:11px;
+  font-weight:550;
+  letter-spacing:.01em;
+  line-height:1.2;
+  white-space:nowrap;
+  box-shadow:none;
+  transition:background .16s ease,color .16s ease,border-color .16s ease;
+}
+.mt-inventory-page>.mt-inventory-tabs>.mt-btn:hover{
+  color:var(--text,#eee8f5);
+  background:rgba(112,86,139,.16);
+  border-color:rgba(174,147,202,.16);
+}
+.mt-inventory-page>.mt-inventory-tabs>.mt-btn.is-active{
+  color:#f2eafa;
+  background:rgba(105,78,132,.3);
+  border-color:rgba(174,147,202,.32);
+  box-shadow:inset 0 -2px 0 rgba(190,164,215,.78);
+}
+.mt-inventory-page>.mt-inventory-tabs::-webkit-scrollbar{height:5px}
+.mt-inventory-page>.mt-inventory-tabs::-webkit-scrollbar-thumb{
+  border-radius:8px;
+  background:rgba(151,119,180,.42);
+}
+.mt-inventory-page>.mt-content>.mt-stats{
+  margin-top:0;
+}
+.mt-inventory-page>.mt-content>.mt-section{
+  border-radius:8px;
+}
+@media(max-width:900px){
+  .mt-inventory-page>.mt-toolbar{align-items:stretch;flex-direction:column}
+  .mt-inventory-page>.mt-toolbar>.mt-input{max-width:none;width:100%}
+  .mt-inventory-page>.mt-toolbar .mt-toolbar-actions{justify-content:flex-start}
+}
+@media(max-width:600px){
+  .mt-inventory-page>.mt-toolbar .mt-toolbar-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mt-inventory-page>.mt-toolbar .mt-toolbar-actions>.mt-btn{width:100%;min-width:0}
+  .mt-inventory-page>.mt-inventory-tabs{margin-top:4px}
+  .mt-inventory-page>.mt-inventory-tabs>.mt-btn{padding:7px 9px;font-size:10.5px}
+}
