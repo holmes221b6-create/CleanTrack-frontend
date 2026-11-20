@@ -135,7 +135,7 @@
       '<div class="mw-shell">'+
         '<header class="mw-welcome"><div class="mw-welcome-copy"><div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>'+
           (showWorkspaceGreeting?'<h1>'+esc(greeting)+', '+esc(name)+'.</h1>':'')+'<p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team operations overview</p></div>'+
-          '<div class="mw-header-actions"><button type="button" class="mw-calendar-trigger" data-mw-calendar-trigger aria-expanded="false">▦ Operations calendar</button><div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
+          '<div class="mw-header-actions"><button type="button" class="mw-calendar-trigger" data-mw-calendar-trigger aria-expanded="false">▦ Scheduled Operations</button><div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
         '<section class="mw-stat-grid" aria-label="Team operations summary">'+
           '<article class="mw-stat"><span>Total operations</span><strong>'+metrics.total_operations+'</strong></article>'+
           '<article class="mw-stat"><span>In progress</span><strong>'+metrics.in_progress+'</strong></article>'+
@@ -173,7 +173,7 @@
           '<button class="button button-secondary" data-mw-page="reviews">Review Queue</button><button class="button button-secondary" data-mw-page="personnel">Personnel</button>'+
           '<button class="button button-secondary" data-mw-page="team-channel">Team Channel</button></nav></div>';
     root.querySelectorAll("[data-mw-page]").forEach(btn=>btn.addEventListener("click",()=>nav?.setActivePage(btn.dataset.mwPage)));
-    setupCalendar(root, operations);
+    setupScheduledOperations(root, operations);
     setupActivityHistory(root, activity);
 
   }
@@ -208,168 +208,36 @@
     return String(action || "updated").replace(/[._]/g, " ").replace(/\b\w/g, x => x.toUpperCase());
   }
 
-  function setupCalendar(root, operations) {
-    const trigger=root.querySelector("[data-mw-calendar-trigger]");
-    if(!trigger)return;
-    const today=startOfDay(new Date());
-    let cursor=new Date(today.getFullYear(),today.getMonth(),1);
-    let selected=new Date(today);
-    let view="month";
-    const filters={status:"",priority:"",location:"",zone:""};
-    const panel=document.createElement("section");
-    panel.className="mw-calendar-popover";
-    panel.hidden=true;
-    panel.setAttribute("role","dialog");
-    panel.setAttribute("aria-label","Operations calendar");
-    panel.innerHTML='<header class="mw-calendar-popover-head"><div><strong data-mw-heading></strong><small data-mw-subheading></small></div>'+
-      '<div class="mw-calendar-popover-actions"><button type="button" data-mw-today>Today</button><button type="button" data-mw-prev aria-label="Previous period">‹</button>'+
-      '<button type="button" data-mw-next aria-label="Next period">›</button><button type="button" data-mw-close aria-label="Close calendar">×</button></div></header>'+
-      '<nav class="mw-calendar-views" aria-label="Calendar view"><button data-view="day">Day</button><button data-view="week">Week</button>'+
-      '<button data-view="month" class="active">Month</button><button data-view="agenda">Agenda</button></nav>'+
-      '<div class="mw-calendar-filters"><label>Status<select data-filter="status"><option value="">All statuses</option></select></label>'+
-      '<label>Priority<select data-filter="priority"><option value="">All priorities</option></select></label>'+
-      '<label>Location<select data-filter="location"><option value="">All locations</option></select></label>'+
-      '<label>Zone<select data-filter="zone"><option value="">All zones</option></select></label></div>'+
-      '<div class="mw-calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>'+
-      '<div class="mw-calendar-dates" data-mw-dates></div><section class="mw-calendar-selected" data-mw-selected><h3 data-mw-selected-title></h3><div data-mw-selected-events></div></section>';
-    root.appendChild(panel);
-    const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-    const dayEvents=d=>filtered().filter(o=>{const dt=dateValue(o.due_at);return dt&&key(dt)===key(d);}).sort((a,b)=>dateValue(a.due_at)-dateValue(b.due_at));
-    const filtered=()=>operations.filter(o=>{
-      const status=String(o.status||"").trim().toLowerCase().replace(/[\s-]+/g,"_");
-      if(filters.status&&status!==filters.status)return false;
-      if(filters.priority&&String(o.priority||"Normal").toLowerCase()!==filters.priority)return false;
-      if(filters.location&&String(o.location_id||"")!==filters.location)return false;
-      if(filters.zone&&String(o.zone_id||"")!==filters.zone)return false;
-      return Boolean(dateValue(o.due_at));
-    });
-    const addOption=(select,value,label)=>{const option=document.createElement("option");option.value=value;option.textContent=label;select.appendChild(option);};
-    const populate=(field,values)=>{const select=panel.querySelector('[data-filter="'+field+'"]');values.forEach(v=>addOption(select,v.value,v.label));};
-    const unique=(field,labelField)=>{const map=new Map();operations.forEach(o=>{const id=o[field];if(id!=null&&id!==""&&!map.has(String(id)))map.set(String(id),o[labelField]||("ID "+id));});return Array.from(map,([value,label])=>({value,label})).sort((a,b)=>a.label.localeCompare(b.label));};
-    populate("status",Array.from(new Set(operations.map(o=>String(o.status||"Pending").trim().toLowerCase().replace(/[\s-]+/g,"_")))).sort().map(v=>({value:v,label:v.replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())})));
-    populate("priority",Array.from(new Set(operations.map(o=>String(o.priority||"Normal").toLowerCase()))).sort().map(v=>({value:v,label:v.charAt(0).toUpperCase()+v.slice(1)})));
-    populate("location",unique("location_id","location_name"));
-    populate("zone",unique("zone_id","zone_name"));
-    panel.querySelectorAll("[data-filter]").forEach(select=>select.addEventListener("change",()=>{filters[select.dataset.filter]=select.value;render();}));
-    function periodLabel(){
-      if(view==="day")return new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(selected);
-      if(view==="week"){const start=weekStart(cursor),end=addDays(start,6);return dateLabel(start,{month:"short",day:"numeric"})+" – "+dateLabel(end,{month:"short",day:"numeric",year:"numeric"});}
-      return new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(cursor);
-    }
-    function weekStart(d){const x=startOfDay(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
-    function addEvent(parent,o){
-      const item=document.createElement("article");item.className="mw-calendar-event";
-      const title=document.createElement("strong");title.textContent=o.title||"Untitled operation";
-      const meta=document.createElement("small");
-      const dt=dateValue(o.due_at);
-      const assignment=o.original_assigned_to_name&&o.assigned_to_name&&o.original_assigned_to_name!==o.assigned_to_name
-        ?"Admin origin: "+o.original_assigned_to_name+" → Current: "+o.assigned_to_name
-        :o.assigned_to_name?"Assigned to "+o.assigned_to_name:o.assigned_supervisor_name?"Supervisor: "+o.assigned_supervisor_name:"Unassigned";
-      meta.textContent=[dt?dateLabel(dt,{hour:"2-digit",minute:"2-digit"}):"No deadline",o.overdue?"Overdue":String(o.status||"").replace(/_/g," "),o.priority||"Normal",assignment,o.location_name||"Location not assigned",o.zone_name||"Zone not assigned"].join(" · ");
-      item.append(title,meta);parent.appendChild(item);
-    }
-    function renderEventsForDate(d){
-      const list=panel.querySelector("[data-mw-selected-events]");list.replaceChildren();
-      const events=dayEvents(d);
-      if(!events.length){const p=document.createElement("p");p.className="mw-calendar-empty";p.textContent="No operations due on this date.";list.appendChild(p);return;}
-      events.forEach(o=>addEvent(list,o));
-    }
+  function setupScheduledOperations(root, operations) {
+    const trigger = root.querySelector("[data-mw-calendar-trigger]");
+    if (!trigger) return;
+    const scheduled = operations.filter(function(o){ return dateValue(o.due_at); }).sort(function(a,b){ return dateValue(a.due_at)-dateValue(b.due_at); });
+    const overlay = document.createElement("div"); overlay.className = "mw-scheduled-overlay"; overlay.hidden = true;
+    overlay.innerHTML = '<section class="mw-scheduled-dialog" role="dialog" aria-modal="true"><header class="mw-scheduled-head"><div><span class="mw-eyebrow">TEAM SCHEDULE</span><h2>Scheduled Operations</h2><p data-summary></p></div><button type="button" data-close aria-label="Close">×</button></header><label class="mw-scheduled-search">Search operations<input type="search" data-search placeholder="Search title, location, staff…"></label><div class="mw-scheduled-list" data-list></div></section>';
+    root.appendChild(overlay);
+    const list=overlay.querySelector("[data-list]"), search=overlay.querySelector("[data-search]");
     function render(){
-      panel.querySelector("[data-mw-heading]").textContent=view==="agenda"?"Operations agenda":periodLabel();
-      panel.querySelector("[data-mw-subheading]").textContent=filtered().length+" scheduled operation"+(filtered().length===1?"":"s")+" · team scope";
-      panel.querySelectorAll("[data-view]").forEach(b=>{b.classList.toggle("active",b.dataset.view===view);b.setAttribute("aria-pressed",String(b.dataset.view===view));});
-      const weekdays=panel.querySelector(".mw-calendar-weekdays"),dates=panel.querySelector("[data-mw-dates]");
-      weekdays.hidden=view!=="month";
-      dates.className="mw-calendar-dates "+(view==="week"?"is-week":view==="day"?"is-day":view==="agenda"?"is-agenda":"");
-      dates.replaceChildren();
-      if(view==="month"){
-        const first=new Date(cursor.getFullYear(),cursor.getMonth(),1),offset=(first.getDay()+6)%7,start=addDays(first,-offset);
-        for(let i=0;i<42;i++){const d=addDays(start,i),count=dayEvents(d).length,b=document.createElement("button");b.type="button";
-          b.className="mw-calendar-date"+(d.getMonth()!==cursor.getMonth()?" outside":"")+(key(d)===key(today)?" today":"")+(key(d)===key(selected)?" selected":"");
-          b.textContent=String(d.getDate());b.setAttribute("aria-label",new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(d)+(count?", "+count+" scheduled operations":""));
-          if(count){const dot=document.createElement("i");dot.className="mw-calendar-count";dot.setAttribute("aria-hidden","true");b.appendChild(dot);}
-          b.addEventListener("click",()=>{selected=startOfDay(d);if(d.getMonth()!==cursor.getMonth())cursor=new Date(d.getFullYear(),d.getMonth(),1);render();});dates.appendChild(b);}
-        panel.querySelector("[data-mw-selected-title]").textContent="Operations · "+dateLabel(selected,{month:"short",day:"numeric",year:"numeric"});
-        renderEventsForDate(selected);
-      } else if(view==="day"){
-        panel.querySelector("[data-mw-selected-title]").textContent="Operations · "+dateLabel(selected,{month:"short",day:"numeric",year:"numeric"});
-        renderEventsForDate(selected);
-      } else if(view==="week"){
-        const start=weekStart(cursor);
-        for(let i=0;i<7;i++){const d=addDays(start,i),column=document.createElement("section");column.className="mw-calendar-week-column";
-          const head=document.createElement("button");head.type="button";head.className="mw-calendar-week-day";head.textContent=new Intl.DateTimeFormat(undefined,{weekday:"short",day:"numeric"}).format(d);
-          head.addEventListener("click",()=>{selected=startOfDay(d);view="day";render();});column.appendChild(head);
-          const events=dayEvents(d);if(!events.length)column.appendChild(document.createTextNode("—"));
-          events.forEach(o=>{const chip=document.createElement("button");chip.type="button";chip.className="mw-calendar-week-event";chip.textContent=o.title||"Operation";chip.title=(o.status||"")+" · "+(o.priority||"Normal");chip.addEventListener("click",()=>{selected=startOfDay(d);view="day";render();});column.appendChild(chip);});
-          dates.appendChild(column);}
-        panel.querySelector("[data-mw-selected-title]").textContent="Selected day · "+dateLabel(selected,{month:"short",day:"numeric",year:"numeric"});
-        renderEventsForDate(selected);
-      } else {
-        panel.querySelector("[data-mw-selected-title]").textContent="Scheduled work by deadline";
-        const events=filtered().sort((a,b)=>dateValue(a.due_at)-dateValue(b.due_at));
-        if(!events.length){dates.appendChild(document.createTextNode("No scheduled operations match these filters."));}
-        events.forEach(o=>addEvent(dates,o));
-        panel.querySelector("[data-mw-selected-events]").replaceChildren();
-      }
-      if(view==="agenda")panel.querySelector("[data-mw-selected]").hidden=true;
-      else panel.querySelector("[data-mw-selected]").hidden=false;
+      const q=search.value.toLowerCase().trim();
+      const rows=scheduled.filter(function(o){return !q||[o.title,o.location_name,o.zone_name,o.assigned_to_name,o.status,o.priority].join(" ").toLowerCase().includes(q);});
+      overlay.querySelector("[data-summary]").textContent=rows.length+" scheduled operation"+(rows.length===1?"":"s")+" · Team scope";
+      list.replaceChildren();
+      if(!rows.length){const empty=document.createElement("p");empty.className="mw-calendar-empty";empty.textContent=scheduled.length?"No matching scheduled operations.":"No operations have a scheduled date yet.";list.appendChild(empty);return;}
+      rows.forEach(function(o){
+        const item=document.createElement("article");item.className="mw-calendar-event";
+        const title=document.createElement("strong");title.textContent=o.title||"Untitled operation";
+        const meta=document.createElement("small"),dt=dateValue(o.due_at);
+        const assigned=o.assigned_to_name?"Assigned to "+o.assigned_to_name:o.assigned_supervisor_name?"Supervisor: "+o.assigned_supervisor_name:"Unassigned";
+        meta.textContent=[dt?dateLabel(dt,{dateStyle:"medium",timeStyle:"short"}):"Schedule not recorded",String(o.status||"Pending").replace(/_/g," "),o.priority||"Normal",assigned,o.location_name||"Location not assigned",o.zone_name||"Zone not assigned"].join(" · ");
+        item.append(title,meta);list.appendChild(item);
+      });
     }
-    let userPositioned=false;
-    function clampPanelPosition(){
-      const rect=panel.getBoundingClientRect();
-      const left=Math.max(8,Math.min(window.innerWidth-rect.width-8,rect.left));
-      const top=Math.max(8,Math.min(window.innerHeight-rect.height-8,rect.top));
-      panel.style.left=left+"px";panel.style.top=top+"px";
-    }
-    function position(){
-      panel.hidden=false;panel.style.visibility="hidden";
-      if(userPositioned){clampPanelPosition();panel.style.visibility="visible";return;}
-      const r=trigger.getBoundingClientRect();
-      const w=Math.min(440,window.innerWidth-20);panel.style.width=w+"px";
-      panel.style.maxHeight=Math.max(300,window.innerHeight-20)+"px";
-      const h=Math.min(panel.scrollHeight,window.innerHeight-20);
-      let left=Math.min(window.innerWidth-w-10,Math.max(10,r.right-w)),top=r.bottom+9;
-      if(top+h>window.innerHeight-10)top=Math.max(10,r.top-h-9);
-      panel.style.left=left+"px";panel.style.top=top+"px";panel.style.visibility="visible";
-    }
-    trigger.addEventListener("click",()=>{if(panel.hidden){render();position();trigger.setAttribute("aria-expanded","true");panel.querySelector("[data-mw-close]").focus();}
-      else{panel.hidden=true;trigger.setAttribute("aria-expanded","false");}});
-    panel.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;if(view==="week")cursor=new Date(selected);if(view==="day")cursor=new Date(selected);render();}));
-    panel.querySelector("[data-mw-prev]").addEventListener("click",()=>{if(view==="day")selected=addDays(selected,-1);else if(view==="week")cursor=addDays(cursor,-7);else cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);render();});
-    panel.querySelector("[data-mw-next]").addEventListener("click",()=>{if(view==="day")selected=addDays(selected,1);else if(view==="week")cursor=addDays(cursor,7);else cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render();});
-    panel.querySelector("[data-mw-today]").addEventListener("click",()=>{selected=new Date(today);cursor=new Date(today.getFullYear(),today.getMonth(),1);render();});
-    panel.querySelector("[data-mw-close]").addEventListener("click",()=>{panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();});
-    const dragHandle=panel.querySelector(".mw-calendar-popover-head");
-    let dragState=null;
-    dragHandle.addEventListener("pointerdown",event=>{
-      if(event.button!==0||event.target.closest("button"))return;
-      const rect=panel.getBoundingClientRect();
-      dragState={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top};
-      dragHandle.setPointerCapture(event.pointerId);
-      dragHandle.classList.add("is-dragging");
-      event.preventDefault();
-    });
-    dragHandle.addEventListener("pointermove",event=>{
-      if(!dragState||event.pointerId!==dragState.pointerId)return;
-      const left=dragState.left+(event.clientX-dragState.startX);
-      const top=dragState.top+(event.clientY-dragState.startY);
-      const maxLeft=Math.max(8,window.innerWidth-panel.offsetWidth-8);
-      const maxTop=Math.max(8,window.innerHeight-panel.offsetHeight-8);
-      panel.style.left=Math.max(8,Math.min(maxLeft,left))+"px";
-      panel.style.top=Math.max(8,Math.min(maxTop,top))+"px";
-      userPositioned=true;
-    });
-    const endDrag=event=>{
-      if(!dragState||event.pointerId!==dragState.pointerId)return;
-      dragState=null;dragHandle.classList.remove("is-dragging");
-      if(dragHandle.hasPointerCapture(event.pointerId))dragHandle.releasePointerCapture(event.pointerId);
-    };
-    dragHandle.addEventListener("pointerup",endDrag);
-    dragHandle.addEventListener("pointercancel",endDrag);
-    root.addEventListener("pointerdown",event=>{if(!panel.hidden&&!panel.contains(event.target)&&!trigger.contains(event.target)){panel.hidden=true;trigger.setAttribute("aria-expanded","false");}});
-    panel.addEventListener("keydown",event=>{if(event.key==="Escape"){panel.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();}});
-    window.addEventListener("resize",()=>{if(!panel.hidden){if(userPositioned)clampPanelPosition();else position();}});
-    window.addEventListener("scroll",()=>{if(!panel.hidden&&!userPositioned)position();},true);
+    const close=function(){overlay.hidden=true;trigger.setAttribute("aria-expanded","false");trigger.focus();};
+    trigger.addEventListener("click",function(){overlay.hidden=false;trigger.setAttribute("aria-expanded","true");render();overlay.querySelector("[data-close]").focus();});
+    search.addEventListener("input",render);
+    overlay.querySelector("[data-close]").addEventListener("click",close);
+    overlay.addEventListener("click",function(e){if(e.target===overlay)close();});
+    overlay.querySelector(".mw-scheduled-dialog").addEventListener("keydown",function(e){if(e.key==="Escape"){e.stopPropagation();close();}});
+    render();
   }
   window.MechnarSupervisorWorkspace = Object.freeze({ render });
 })();
