@@ -2045,8 +2045,9 @@ function bindNavigation() {
 
         state.started = true;
         try {
-          const greetingKey = "mechnar.workspace-greeting-shown." + String(user?.id ?? user?.email ?? "current").toLowerCase();
-          sessionStorage.removeItem(greetingKey);
+          const greetingIdentity = String(user?.id ?? user?.email ?? "current").toLowerCase();
+          sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+          sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
         } catch (_) {}
         showAuthenticatedLayout(user);
         showMessage("You are now signed in.", "success");
