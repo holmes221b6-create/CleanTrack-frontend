@@ -28,7 +28,7 @@ jobs:
               before=subprocess.check_output(["git","rev-parse",f"{after}^"],text=True).strip()
 
           # Explicitly suppress presentation-only and maintenance commits.
-          if re.search(r"\\b(css|style|visual|colour|color|theme|animation|layout|spacing|responsive|format|lint|refactor|chore|docs|test|bug|bugfix|hotfix)\\b",subject,re.I):
+          if re.search(r"\b(css|style|visual|colour|color|theme|animation|layout|spacing|responsive|format|lint|refactor|chore|docs|test|bug|bugfix|hotfix)\b",subject,re.I):
               print("Presentation/maintenance/bug-fix commit: no What's New entry.")
               raise SystemExit(0)
 
@@ -69,13 +69,13 @@ jobs:
           # considered. Require substantive added executable source plus a
           # signal of actual behaviour (actions, API/data flow, state or logic).
           signals=re.compile(
-            r"addEventListener|\\bon(click|change|submit)\\b|"
-            r"fetch\\s*\\(|\\b(API|CleanTrackApi)\\.(get|post|patch|request|download)\\b|"
-            r"@\\w+\\.(route|get|post|put|patch|delete)\\b|"
-            r"\\b(router|dispatch|submit|handle[A-Z]\\w*|save[A-Z]\\w*|"
-            r"create[A-Z]\\w*|delete[A-Z]\\w*|update[A-Z]\\w*|"
-            r"localStorage|sessionStorage|transaction|commit)\\b|"
-            r"\\b(if|else|for|while|try|await|return)\\b"
+            r"addEventListener|\bon(click|change|submit)\b|"
+            r"fetch\s*\(|\b(API|CleanTrackApi)\.(get|post|patch|request|download)\b|"
+            r"@\w+\.(route|get|post|put|patch|delete)\b|"
+            r"\b(router|dispatch|submit|handle[A-Z]\w*|save[A-Z]\w*|"
+            r"create[A-Z]\w*|delete[A-Z]\w*|update[A-Z]\w*|"
+            r"localStorage|sessionStorage|transaction|commit)\b|"
+            r"\b(if|else|for|while|try|await|return)\b"
           )
           functional={}
           for route, files in candidates.items():
@@ -109,7 +109,7 @@ jobs:
           for route, files in functional.items():
               uid=f"{after[:12]}-{route}"
               if any(x.get("id")==uid for x in updates): continue
-              clean=re.sub(r"^(feat|feature|enhance|improve|update)(\\([^)]+\\))?:\\s*","",subject,flags=re.I).strip()
+              clean=re.sub(r"^(feat|feature|enhance|improve|update)(\([^)]+\))?:\s*","",subject,flags=re.I).strip()
               title=clean[:90] or f"{route.replace('-',' ').title()} feature update"
               updates.insert(0,{
                 "id":uid,"page":route,"feature":title,
