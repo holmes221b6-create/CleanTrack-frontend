@@ -107,8 +107,12 @@
   window.CleanTrackOrganizationContext = Object.freeze({ apply: applyOrganizationIdentity, refresh: loadOrganizationIdentity });
 
   function showAuthenticatedLayout(user) {
+    const workspaceElement = getElement("workspace-view");
     setVisible(getElement("auth-view"), false);
-    setVisible(getElement("workspace-view"), true);
+    if (workspaceElement) {
+      workspaceElement.classList.remove("mn-workspace-entering");
+      workspaceElement.setAttribute("aria-busy", "true");
+    }
     updateFooterGuide(user);
 
     const nameElement = getElement("header-user-name");
@@ -159,10 +163,22 @@
     const defaultPage = navigation.getDefaultPage(user.role);
 
     if (defaultPage) {
+      // setActivePage dispatches synchronously. renderPage installs its loading
+      // frame before the workspace becomes visible, avoiding a blank first frame.
       navigation.setActivePage(defaultPage);
     }
+    if (workspaceElement) {
+      setVisible(workspaceElement, true);
+      workspaceElement.classList.add("mn-workspace-entering");
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          workspaceElement.classList.remove("mn-workspace-entering");
+          workspaceElement.removeAttribute("aria-busy");
+        });
+      });
+    }
     showWelcomeBackIfNeeded(user);
-    window.setTimeout(function(){ showShadowFeatureAnnouncement(user); }, 160);
+    window.setTimeout(function(){ showShadowFeatureAnnouncement(user); }, 520);
   }
   
   
