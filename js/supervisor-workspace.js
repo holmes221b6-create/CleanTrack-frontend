@@ -134,7 +134,7 @@
     root.innerHTML =
       '<div class="mw-shell">'+
         '<header class="mw-welcome"><div class="mw-welcome-copy"><div class="mw-eyebrow">MECHNAR · SUPERVISOR WORKSPACE</div>'+
-          (showWorkspaceGreeting?'<h1>'+esc(greeting)+', '+esc(name)+'.</h1>':'')+'<p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team operations overview</p></div>'+
+          (showWorkspaceGreeting?'<h1>'+esc(greeting)+', '+esc(name)+'.</h1>':'')+'<p>'+esc(data.team.name)+' <span class="mw-header-separator">/</span> Team overview</p></div>'+
           '<div class="mw-header-actions"><button type="button" class="mw-calendar-trigger" data-mw-calendar-trigger aria-expanded="false">▦ Scheduled Operations</button><div class="mw-updated">Live records <span>Updated '+esc(dateLabel(metrics.data_as_of,{hour:"2-digit",minute:"2-digit"}))+'</span></div></div></header>'+
         '<section class="mw-stat-grid" aria-label="Team operations summary">'+
           '<article class="mw-stat"><span>Total operations</span><strong>'+metrics.total_operations+'</strong></article>'+
