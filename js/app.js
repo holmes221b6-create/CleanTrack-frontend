@@ -1483,14 +1483,19 @@
     if (!badge || !window.CleanTrackApi || !auth.isAuthenticated()) return;
     try {
       const data = await window.CleanTrackApi.get("notifications");
-      const count = Number(data.unread_count || 0);
+      const rows = Array.isArray(data.notifications) ? data.notifications : [];
+      const unreadRows = rows.filter(item => !item.is_read && item.id != null);
+      const count = Number(data.unread_count ?? unreadRows.length);
       badge.textContent = count > 99 ? "99+" : String(count);
       badge.hidden = count <= 0;
       const notificationButton = getElement("notifications-button");
       if (notificationButton) {
         notificationButton.dataset.notificationUnreadCount = String(count);
-        const acknowledgedCount = Number(notificationButton.dataset.notificationPanelCount || 0);
-        notificationButton.classList.toggle("has-unopened-notifications", count > acknowledgedCount);
+        let acknowledged = [];
+        try { acknowledged = JSON.parse(notificationButton.dataset.notificationAcknowledgedIds || "[]"); } catch (_) {}
+        const acknowledgedIds = new Set(acknowledged.map(String));
+        const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id)));
+        notificationButton.classList.toggle("has-unopened-notifications", hasNewUnread);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
         notificationButton.title = count ? count + " unread notification" + (count === 1 ? "" : "s") : "Notifications";
       }
@@ -1520,9 +1525,14 @@
     if (!button || button.dataset.notificationsReady === "true") return;
     button.dataset.notificationsReady = "true";
     button.addEventListener("click", async function () {
-      // Acknowledge the current unread count for animation purposes only.
-      // Notifications remain unread until the user explicitly marks them read.
-      button.dataset.notificationPanelCount = button.dataset.notificationUnreadCount || "0";
+      // Acknowledge exact unread notification IDs, not the count. A new
+      // notification must animate even when another unread item was just read.
+      try {
+        const current = await window.CleanTrackApi.get("notifications");
+        const currentRows = Array.isArray(current.notifications) ? current.notifications : [];
+        const ids = currentRows.filter(item => !item.is_read && item.id != null).map(item => String(item.id)).slice(0, 300);
+        button.dataset.notificationAcknowledgedIds = JSON.stringify(ids);
+      } catch (_) {}
       button.classList.remove("has-unopened-notifications");
       const dialog = getElement("app-modal");
       const title = getElement("modal-title");
@@ -2083,7 +2093,7 @@ function bindNavigation() {
       window.setInterval(function () {
         refreshNotificationBadge();
         refreshAnnouncementBadge();
-      }, 60000);
+      }, 12000);
     }
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
