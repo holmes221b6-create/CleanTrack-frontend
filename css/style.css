@@ -1780,3 +1780,16 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
 #workspace-view #notifications-button.has-unopened-notifications .notification-count {
   animation: mechnar-notification-glow 1.1s ease-in-out infinite !important;
 }
+
+/* Smooth, non-flashing transition into the authenticated workspace. */
+#workspace-view.mn-workspace-entering{
+  animation:mechnar-workspace-enter .24s cubic-bezier(.2,.75,.25,1) both;
+  will-change:opacity,transform;
+}
+@keyframes mechnar-workspace-enter{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(prefers-reduced-motion:reduce){
+  #workspace-view.mn-workspace-entering{animation:none!important;will-change:auto}
+}
