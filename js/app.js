@@ -1480,51 +1480,61 @@
   
   function setNotificationBellMotion(button, active) {
     if (!button) return;
-    const bell = button.querySelector(".notification-bell-icon");
-    const badge = getElement("notification-count");
-    button.classList.toggle("has-unopened-notifications", !!active);
+    const shouldAnimate = !!active;
+    const alreadyAnimating = button.dataset.mechnarBellMotionActive === "true";
+    if (shouldAnimate === alreadyAnimating) return;
+    button.dataset.mechnarBellMotionActive = shouldAnimate ? "true" : "false";
 
-    // Use the Web Animations API so global reduced-motion CSS or another
-    // stylesheet cannot silently cancel the notification's required motion.
-    if (typeof button._mechnarBellAnimations === "undefined") button._mechnarBellAnimations = [];
-    button._mechnarBellAnimations.forEach(function (animation) {
+    const icon = button.querySelector(".notification-bell-icon");
+    const svg = icon && icon.querySelector("svg");
+    const badge = getElement("notification-count");
+
+    // Cancel any earlier Web Animations API effects before applying the
+    // inline important animation. This is deliberately independent of the
+    // page's stylesheet order and reduced-motion rules.
+    (button._mechnarBellAnimations || []).forEach(function (animation) {
       try { animation.cancel(); } catch (_) {}
     });
     button._mechnarBellAnimations = [];
-    if (!active) return;
 
-    if (typeof Element !== "undefined" && Element.prototype && Element.prototype.animate) {
-      const swingFrames = [
-        { transform: "rotate(0deg) scale(1)" },
-        { transform: "rotate(-18deg) scale(1.12)", offset: 0.12 },
-        { transform: "rotate(18deg) scale(1.12)", offset: 0.24 },
-        { transform: "rotate(-15deg) scale(1.1)", offset: 0.36 },
-        { transform: "rotate(15deg) scale(1.1)", offset: 0.48 },
-        { transform: "rotate(0deg) scale(1)" }
-      ];
-      if (bell) button._mechnarBellAnimations.push(
-        bell.animate(swingFrames, { duration: 1100, iterations: Infinity, easing: "ease-in-out" })
-      );
-      button._mechnarBellAnimations.push(
-        button.animate(
-          [{ filter: "drop-shadow(0 0 0 rgba(174,139,220,0))" }, { filter: "drop-shadow(0 0 10px rgba(174,139,220,.98))" }, { filter: "drop-shadow(0 0 0 rgba(174,139,220,0))" }],
-          { duration: 1100, iterations: Infinity, easing: "ease-in-out" }
-        )
-      );
-      if (badge && !badge.hidden) button._mechnarBellAnimations.push(
-        badge.animate([{ transform: "scale(1)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }],
-          { duration: 850, iterations: Infinity, easing: "ease-in-out" })
-      );
+    if (shouldAnimate) {
+      button.classList.add("has-unopened-notifications");
+      button.style.setProperty("animation", "mechnarBellGlow 1.1s ease-in-out infinite", "important");
+      button.style.setProperty("filter", "drop-shadow(0 0 7px rgba(174,139,220,.9))", "important");
+      if (svg) {
+        svg.style.setProperty("animation", "mechnarBellSwing 1.1s ease-in-out infinite", "important");
+        svg.style.setProperty("transform-origin", "50% 12%", "important");
+        svg.style.setProperty("transform-box", "fill-box", "important");
+      } else if (icon) {
+        icon.style.setProperty("animation", "mechnarBellSwing 1.1s ease-in-out infinite", "important");
+        icon.style.setProperty("transform-origin", "50% 12%", "important");
+      }
+      if (badge && !badge.hidden) badge.style.setProperty("animation", "mechnarBellBadge .85s ease-in-out infinite", "important");
+    } else {
+      button.classList.remove("has-unopened-notifications");
+      ["animation", "filter"].forEach(function (name) { button.style.removeProperty(name); });
+      if (svg) ["animation", "transform-origin", "transform-box"].forEach(function (name) { svg.style.removeProperty(name); });
+      if (icon) ["animation", "transform-origin"].forEach(function (name) { icon.style.removeProperty(name); });
+      if (badge) badge.style.removeProperty("animation");
     }
   }
 
+  function ensureNotificationBellKeyframes() {
+    if (document.getElementById("mechnar-notification-bell-keyframes")) return;
+    const style = document.createElement("style");
+    style.id = "mechnar-notification-bell-keyframes";
+    style.textContent = "@keyframes mechnarBellSwing{0%,100%{transform:rotate(0) scale(1)}10%,30%{transform:rotate(-19deg) scale(1.12)}20%,40%{transform:rotate(19deg) scale(1.12)}55%,75%{transform:rotate(0) scale(1)}}@keyframes mechnarBellGlow{0%,100%{filter:drop-shadow(0 0 1px rgba(174,139,220,.2))}50%{filter:drop-shadow(0 0 12px rgba(174,139,220,1))}}@keyframes mechnarBellBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}";
+    document.head.appendChild(style);
+  }
+
   async function refreshNotificationBadge() {
+    ensureNotificationBellKeyframes();
     const badge = getElement("notification-count");
     if (!badge || !window.CleanTrackApi || !auth.isAuthenticated()) return;
     try {
       const data = await window.CleanTrackApi.get("notifications");
       const rows = Array.isArray(data.notifications) ? data.notifications : [];
-      const unreadRows = rows.filter(item => !item.is_read && item.id != null);
+      const unreadRows = rows.filter(item => item.is_read === false && item.id != null);
       const count = Number(data.unread_count ?? unreadRows.length);
       badge.textContent = count > 99 ? "99+" : String(count);
       badge.hidden = count <= 0;
@@ -1534,7 +1544,7 @@
         let acknowledged = [];
         try { acknowledged = JSON.parse(notificationButton.dataset.notificationAcknowledgedIds || "[]"); } catch (_) {}
         const acknowledgedIds = new Set(acknowledged.map(String));
-        const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id)));
+        const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id))) || (count > 0 && unreadRows.length === 0 && !notificationButton.dataset.notificationPanelOpen === "true");
         const panelIsOpen = notificationButton.dataset.notificationPanelOpen === "true";
         setNotificationBellMotion(notificationButton, hasNewUnread && !panelIsOpen);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
