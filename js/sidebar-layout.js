@@ -424,8 +424,8 @@ if (identity) {
           status.textContent = "The activity service is unavailable. No sample notifications are shown.";
           return;
         }
-        api.get("organizations/audit-log?limit=100").then(result => {
-          const entries = Array.isArray(result && result.events) ? result.events : [];
+        api.get("audit-trail?" + params.toString()).then(result => {
+          const entries = Array.isArray(result && result.entries) ? result.entries : [];
           const recent = entries.filter(entry => {
             const raw = entry.created_at || entry.timestamp || entry.occurred_at;
             const date = raw ? new Date(raw) : null;
@@ -453,7 +453,7 @@ if (identity) {
             const detail = document.createElement("p");
             const actor = entry.actor_name || entry.user_name || entry.actor || "An organization member";
             const details = entry.details && typeof entry.details === "object" ? entry.details : {};
-            const record = entry.record_name || entry.target_name || entry.resource_name || entry.entity_name || details.title || details.name || details.label || "";
+            const record = entry.affected_record || entry.record_name || entry.target_name || entry.resource_name || entry.entity_name || details.title || details.name || details.label || "";
             const action = String(entry.action_label || entry.action || entry.event_type || entry.event || "performed an activity").replace(/[._-]+/g," ");
             detail.textContent = actor + " — " + action + (record ? ": " + record : "");
             item.appendChild(detail);
