@@ -1,0 +1,49 @@
+/* Header is outside #workspace-view, so target the real global header button. */
+body #notifications-button.has-unopened-notifications {
+  animation: mechnar-bell-button-pulse 1.15s ease-in-out infinite !important;
+  transform-origin: 50% 50% !important;
+  will-change: transform, filter !important;
+}
+body #notifications-button.has-unopened-notifications .notification-bell-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  animation: mechnar-bell-swing 1.15s ease-in-out infinite !important;
+  transform-origin: 50% 12% !important;
+}
+body #notifications-button .notification-bell-icon svg {
+  display: block !important;
+  width: 21px !important;
+  height: 21px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.8 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+body #notifications-button.has-unopened-notifications .notification-count {
+  animation: mechnar-bell-badge-pulse .8s ease-in-out infinite !important;
+}
+@keyframes mechnar-bell-swing {
+  0%, 100% { transform: rotate(0) scale(1); }
+  8%, 24%, 40% { transform: rotate(-18deg) scale(1.12); }
+  16%, 32%, 48% { transform: rotate(18deg) scale(1.12); }
+  56%, 70% { transform: rotate(0) scale(1); }
+}
+@keyframes mechnar-bell-button-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(174,139,220,0)); }
+  50% { filter: drop-shadow(0 0 8px rgba(174,139,220,.95)); }
+}
+@keyframes mechnar-bell-badge-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(239,68,68,.35); }
+  50% { transform: scale(1.18); box-shadow: 0 0 11px rgba(239,68,68,.95); }
+}
+/* Explicitly requested notification motion takes precedence over OS motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  body #notifications-button.has-unopened-notifications,
+  body #notifications-button.has-unopened-notifications .notification-bell-icon,
+  body #notifications-button.has-unopened-notifications .notification-count {
+    animation-duration: 1.15s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
