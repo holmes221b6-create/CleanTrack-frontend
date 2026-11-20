@@ -1544,7 +1544,7 @@
         let acknowledged = [];
         try { acknowledged = JSON.parse(notificationButton.dataset.notificationAcknowledgedIds || "[]"); } catch (_) {}
         const acknowledgedIds = new Set(acknowledged.map(String));
-        const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id))) || (count > 0 && unreadRows.length === 0 && !notificationButton.dataset.notificationPanelOpen === "true");
+        const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id))) || (count > 0 && unreadRows.length === 0 && notificationButton.dataset.notificationPanelOpen !== "true");
         const panelIsOpen = notificationButton.dataset.notificationPanelOpen === "true";
         setNotificationBellMotion(notificationButton, hasNewUnread && !panelIsOpen);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
