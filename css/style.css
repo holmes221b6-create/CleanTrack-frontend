@@ -1604,12 +1604,7 @@ display: none !important;
   0%, 100% { box-shadow: 0 1px 4px rgb(0 0 0 / 24%); }
   50% { box-shadow: 0 0 10px rgb(168 115 235 / 75%); }
 }
-@media (prefers-reduced-motion: reduce) {
-  #notifications-button.has-unopened-notifications > span:first-child,
-  #notifications-button.has-unopened-notifications .notification-count {
-    animation: none !important;
-  }
-}
+/* Notification bell motion is controlled directly by app.js. */
 #notifications-button .notification-count {
   position: absolute; top: -5px; right: -5px; z-index: 2;
   min-width: 19px; height: 19px; padding: 0 5px;
