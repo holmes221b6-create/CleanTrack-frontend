@@ -1495,7 +1495,8 @@
         try { acknowledged = JSON.parse(notificationButton.dataset.notificationAcknowledgedIds || "[]"); } catch (_) {}
         const acknowledgedIds = new Set(acknowledged.map(String));
         const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id)));
-        notificationButton.classList.toggle("has-unopened-notifications", hasNewUnread);
+        const panelIsOpen = notificationButton.dataset.notificationPanelOpen === "true";
+        notificationButton.classList.toggle("has-unopened-notifications", hasNewUnread && !panelIsOpen);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
         notificationButton.title = count ? count + " unread notification" + (count === 1 ? "" : "s") : "Notifications";
       }
@@ -1525,15 +1526,17 @@
     if (!button || button.dataset.notificationsReady === "true") return;
     button.dataset.notificationsReady = "true";
     button.addEventListener("click", async function () {
-      // Acknowledge exact unread notification IDs, not the count. A new
-      // notification must animate even when another unread item was just read.
+      // Stop the bell immediately when the user opens the notification panel.
+      // The unread state itself is not changed by opening the panel.
+      button.dataset.notificationPanelOpen = "true";
+      button.classList.remove("has-unopened-notifications");
+      // Acknowledge exact unread notification IDs, not the count.
       try {
         const current = await window.CleanTrackApi.get("notifications");
         const currentRows = Array.isArray(current.notifications) ? current.notifications : [];
         const ids = currentRows.filter(item => !item.is_read && item.id != null).map(item => String(item.id)).slice(0, 300);
         button.dataset.notificationAcknowledgedIds = JSON.stringify(ids);
       } catch (_) {}
-      button.classList.remove("has-unopened-notifications");
       const dialog = getElement("app-modal");
       const title = getElement("modal-title");
       const content = getElement("modal-content");
@@ -1546,6 +1549,13 @@
       if (typeof dialog.showModal === "function") {
         if (!dialog.open) dialog.showModal();
       } else dialog.setAttribute("open", "");
+      if (dialog.dataset.notificationCloseBound !== "true") {
+        dialog.dataset.notificationCloseBound = "true";
+        dialog.addEventListener("close", function () {
+          button.dataset.notificationPanelOpen = "false";
+          refreshNotificationBadge();
+        });
+      }
       try {
         const data = await window.CleanTrackApi.get("notifications");
         const rows = Array.isArray(data.notifications) ? data.notifications : [];
@@ -2093,7 +2103,7 @@ function bindNavigation() {
       window.setInterval(function () {
         refreshNotificationBadge();
         refreshAnnouncementBadge();
-      }, 12000);
+      }, 3000);
     }
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
