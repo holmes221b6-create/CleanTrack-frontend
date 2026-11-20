@@ -1,0 +1,84 @@
+name: Publish feature updates
+on:
+  push:
+    branches: [main, master]
+permissions:
+  contents: write
+jobs:
+  publish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build What's New manifest from changed feature modules
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          COMMIT_SUBJECT: ${{ github.event.head_commit.message }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, re
+          before=os.environ.get("BEFORE_SHA","")
+          after=os.environ["AFTER_SHA"]
+          subject=os.environ.get("COMMIT_SUBJECT","").splitlines()[0].strip() or "Feature update"
+          if not before or set(before)=={"0"}:
+              before=subprocess.check_output(["git","rev-parse",f"{after}^"],text=True).strip()
+          paths=subprocess.check_output(["git","diff","--name-only",before,after],text=True).splitlines()
+          routes={
+            "teams.js":"teams","teams.css":"teams",
+            "org-tools.js":"inventory","org-tools.css":"inventory",
+            "supervisor-personnel.js":"personnel","supervisor-personnel.css":"personnel",
+            "performance-analysis.js":"performance-analysis","performance-analysis.css":"performance-analysis",
+            "operations.js":"operations","operations.css":"operations",
+            "supervisor-workspace.js":"workspace","supervisor-workspace.css":"workspace",
+            "quality-inspections.js":"inspections","quality-inspections.css":"inspections",
+            "announcements.js":"announcements","announcements.css":"announcements",
+            "meetings.js":"meetings","meetings.css":"meetings",
+            "reports.js":"reports","reports.css":"reports",
+            "performance-arena.js":"performance-arena","performance-arena.css":"performance-arena",
+            "staff.js":"staff","staff.css":"staff",
+            "locations.js":"locations","locations.css":"locations",
+            "zones.js":"zones","zones.css":"zones",
+            "supervisor-review-queue.js":"review-queue","supervisor-review-queue.css":"review-queue"
+          }
+          changed={}
+          for path in paths:
+              name=path.rsplit("/",1)[-1]
+              route=routes.get(name)
+              if route and path.startswith(("js/","css/")):
+                  changed.setdefault(route,[]).append(path)
+          if not changed:
+              print("No mapped feature modules changed; no What's New entry.")
+              raise SystemExit(0)
+          file="whats-new.json"
+          try:
+              with open(file,encoding="utf-8") as f: manifest=json.load(f)
+          except (FileNotFoundError,json.JSONDecodeError):
+              manifest={"updates":[]}
+          updates=manifest.setdefault("updates",[])
+          for route, files in changed.items():
+              uid=f"{after[:12]}-{route}"
+              if any(x.get("id")==uid for x in updates): continue
+              clean=re.sub(r"^(feat|feature|fix|update|refactor)(\\([^)]+\\))?:\\s*","",subject,flags=re.I).strip()
+              title=clean[:90] or f"{route.replace('-',' ').title()} update"
+              updates.insert(0,{
+                "id":uid,"page":route,"feature":title,
+                "description":f"{subject}. Updated area: {', '.join(files[:4])}"+(f" and {len(files)-4} more files." if len(files)>4 else "."),
+                "commit":after,"published_at":os.environ.get("GITHUB_EVENT_NAME","push")
+              })
+          manifest["updates"]=updates[:100]
+          with open(file,"w",encoding="utf-8") as f: json.dump(manifest,f,ensure_ascii=False,indent=2)
+          PY
+      - name: Commit release manifest
+        run: |
+          if git diff --quiet -- whats-new.json; then
+            echo "No manifest changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add whats-new.json
+          git commit -m "chore: publish automatic What's New updates [skip ci]"
+          git push
