@@ -4,10 +4,36 @@
 (function(){
   "use strict";
   const RELEASE_UPDATES = [
-    // Example:
-    // {id:"settings-notification-preferences-2026-11",page:"settings",
-    //  feature:"Notification preferences",description:"New notification controls are available.",
-    //  target:"[data-feature='notification-preferences']"}
+    {
+      id:"teams-native-team-performance-2026-11-v1",
+      page:"teams",
+      feature:"Team Performance Overview",
+      description:"The Teams workspace now has a native performance overview with operational totals, completion and punctuality rates, workload-aware team scoring, weekly trends and individual team rankings."
+    },
+    {
+      id:"inventory-separated-workspace-panels-2026-11-v1",
+      page:"inventory",
+      feature:"Dedicated Inventory panels",
+      description:"Inventory sections now open in their own focused panels, including Items & Assets, Procurement, Stock Control, Locations, Transfers, Requests, Maintenance, Analytics, Forecast and Movement History."
+    },
+    {
+      id:"supervisor-personnel-fullscreen-2026-11-v1",
+      page:"personnel",
+      feature:"Full-screen Personnel workspace",
+      description:"Personnel now opens in a dedicated full-screen workspace with independently scrollable contacts, conversations and profile details."
+    },
+    {
+      id:"supervisor-performance-analysis-2026-11-v1",
+      page:"performance-analysis",
+      feature:"Performance Analysis",
+      description:"A dedicated analysis page brings together team comparisons, performance rankings, improvement guidance, history and measurable next steps."
+    },
+    {
+      id:"operations-nested-detail-panels-2026-11-v1",
+      page:"operations",
+      feature:"Operation details in nested panels",
+      description:"Opening an operation from an operations queue now displays its details inside that queue panel, so you can return to the same list without losing your place."
+    }
   ];
   const auth=window.CleanTrackAuth;
   const user=()=>auth&&auth.getCurrentUser?auth.getCurrentUser():null;
@@ -61,6 +87,9 @@
       const page=button.dataset.page;setTimeout(()=>showUpdates(page),250);
     });
     window.addEventListener("storage",decorate);
+    window.addEventListener("cleantrack:login",decorate);
+    window.addEventListener("cleantrack:session-restored",decorate);
+    window.addEventListener("cleantrack:logout",decorate);
     window.MechnarWhatsNew={refresh:decorate,pendingFor:page=>unseen(page).length};
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
