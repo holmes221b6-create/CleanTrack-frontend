@@ -48,17 +48,19 @@
   function paint(root, data) {
     const user = window.CleanTrackAuth?.getCurrentUser?.() || {};
     const name = user.name || data.supervisor?.name || "there";
-    const firstKey = "mechnar.first-login." + String(user.id || "").toLowerCase();
-    const greetingKey = "mechnar.workspace-greeting-shown." + String(user.id || user.email || "current").toLowerCase();
-    let firstLogin = false;
+    const greetingIdentity = String(user?.id || user?.email || "current").toLowerCase();
+    const pendingGreetingKey = "mechnar.workspace-greeting-pending." + greetingIdentity;
+    const greetingKey = "mechnar.workspace-greeting-shown." + greetingIdentity;
     let showWorkspaceGreeting = false;
     try {
-      firstLogin = sessionStorage.getItem(firstKey) === "1";
-      if (firstLogin) sessionStorage.removeItem(firstKey);
-      showWorkspaceGreeting = sessionStorage.getItem(greetingKey) !== "1";
-      if (showWorkspaceGreeting) sessionStorage.setItem(greetingKey, "1");
-    } catch (_) { showWorkspaceGreeting = true; }
-    const greeting = firstLogin ? "Welcome" : "Welcome back";
+      showWorkspaceGreeting = sessionStorage.getItem(pendingGreetingKey) === "1" &&
+        sessionStorage.getItem(greetingKey) !== "1";
+      if (showWorkspaceGreeting) {
+        sessionStorage.setItem(greetingKey, "1");
+        sessionStorage.removeItem(pendingGreetingKey);
+      }
+    } catch (_) { showWorkspaceGreeting = false; }
+    const greeting = "Welcome back";
     const metrics = data.metrics;
     const operations = Array.isArray(data.operations) ? data.operations : [];
     const members = Array.isArray(data.members) ? data.members : [];
