@@ -12,69 +12,119 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Build What's New manifest from changed feature modules
+      - name: Detect user-facing functional changes
+        id: detect
         env:
           BEFORE_SHA: ${{ github.event.before }}
           AFTER_SHA: ${{ github.sha }}
           COMMIT_SUBJECT: ${{ github.event.head_commit.message }}
         run: |
           python - <<'PY'
-          import json, os, subprocess, re
+          import json, os, re, subprocess
           before=os.environ.get("BEFORE_SHA","")
           after=os.environ["AFTER_SHA"]
           subject=os.environ.get("COMMIT_SUBJECT","").splitlines()[0].strip() or "Feature update"
           if not before or set(before)=={"0"}:
               before=subprocess.check_output(["git","rev-parse",f"{after}^"],text=True).strip()
-          paths=subprocess.check_output(["git","diff","--name-only",before,after],text=True).splitlines()
-          routes={
-            "teams.js":"teams","teams.css":"teams",
-            "org-tools.js":"inventory","org-tools.css":"inventory",
-            "supervisor-personnel.js":"personnel","supervisor-personnel.css":"personnel",
-            "performance-analysis.js":"performance-analysis","performance-analysis.css":"performance-analysis",
-            "operations.js":"operations","operations.css":"operations",
-            "supervisor-workspace.js":"workspace","supervisor-workspace.css":"workspace",
-            "quality-inspections.js":"inspections","quality-inspections.css":"inspections",
-            "announcements.js":"announcements","announcements.css":"announcements",
-            "meetings.js":"meetings","meetings.css":"meetings",
-            "reports.js":"reports","reports.css":"reports",
-            "performance-arena.js":"performance-arena","performance-arena.css":"performance-arena",
-            "staff.js":"staff","staff.css":"staff",
-            "locations.js":"locations","locations.css":"locations",
-            "zones.js":"zones","zones.css":"zones",
-            "supervisor-review-queue.js":"review-queue","supervisor-review-queue.css":"review-queue"
-          }
-          changed={}
-          for path in paths:
-              name=path.rsplit("/",1)[-1]
-              route=routes.get(name)
-              if route and path.startswith(("js/","css/")):
-                  changed.setdefault(route,[]).append(path)
-          if not changed:
-              print("No mapped feature modules changed; no What's New entry.")
+
+          # Explicitly suppress presentation-only and maintenance commits.
+          if re.search(r"\\b(css|style|visual|colour|color|theme|animation|layout|spacing|responsive|format|lint|refactor|chore|docs|test|bug|bugfix|hotfix)\\b",subject,re.I):
+              print("Presentation/maintenance/bug-fix commit: no What's New entry.")
               raise SystemExit(0)
+
+          routes={
+            "teams.js":"teams", "org-tools.js":"inventory",
+            "supervisor-personnel.js":"personnel",
+            "performance-analysis.js":"performance-analysis",
+            "operations.js":"operations", "supervisor-workspace.js":"workspace",
+            "quality-inspections.js":"inspections", "announcements.js":"announcements",
+            "meetings.js":"meetings", "reports.js":"reports",
+            "performance-arena.js":"performance-arena", "staff.js":"staff",
+            "locations.js":"locations", "zones.js":"zones",
+            "supervisor-review-queue.js":"review-queue"
+          }
+          backend_routes={
+            "teams.py":"teams", "operations.py":"operations",
+            "personnel.py":"personnel", "performance.py":"performance-analysis",
+            "analytics.py":"performance-analysis", "inventory.py":"inventory",
+            "inspections.py":"inspections", "announcements.py":"announcements",
+            "meetings.py":"meetings", "reports.py":"reports",
+            "notifications.py":"notifications"
+          }
+          changed=subprocess.check_output(
+            ["git","diff","--name-only",before,after],text=True
+          ).splitlines()
+          candidates={}
+          for path in changed:
+              name=path.rsplit("/",1)[-1]
+              route=None
+              if path.startswith("js/") and name.endswith(".js"):
+                  route=routes.get(name)
+              elif path.startswith("app/routes/") and name.endswith(".py"):
+                  route=backend_routes.get(name)
+              if route:
+                  candidates.setdefault(route,[]).append(path)
+
+          # CSS, HTML, images, fonts and other presentation assets are never
+          # considered. Require substantive added executable source plus a
+          # signal of actual behaviour (actions, API/data flow, state or logic).
+          signals=re.compile(
+            r"addEventListener|\\bon(click|change|submit)\\b|"
+            r"fetch\\s*\\(|\\b(API|CleanTrackApi)\\.(get|post|patch|request|download)\\b|"
+            r"@\\w+\\.(route|get|post|put|patch|delete)\\b|"
+            r"\\b(router|dispatch|submit|handle[A-Z]\\w*|save[A-Z]\\w*|"
+            r"create[A-Z]\\w*|delete[A-Z]\\w*|update[A-Z]\\w*|"
+            r"localStorage|sessionStorage|transaction|commit)\\b|"
+            r"\\b(if|else|for|while|try|await|return)\\b"
+          )
+          functional={}
+          for route, files in candidates.items():
+              added=[]
+              for path in files:
+                  diff=subprocess.check_output(
+                    ["git","diff","--unified=0",before,after,"--",path],
+                    text=True,errors="replace"
+                  )
+                  for line in diff.splitlines():
+                      if not line.startswith("+") or line.startswith("+++"):
+                          continue
+                      code=line[1:].strip()
+                      if not code or code.startswith(("//","#","*","/*","<!--")):
+                          continue
+                      added.append(code)
+              executable=[line for line in added if not re.fullmatch(r"[{};,)]*",line)]
+              if len(executable)>=4 and any(signals.search(line) for line in executable):
+                  functional[route]=files
+
+          if not functional:
+              print("No substantive user-facing functional change detected; no dot.")
+              raise SystemExit(0)
+
           file="whats-new.json"
           try:
               with open(file,encoding="utf-8") as f: manifest=json.load(f)
           except (FileNotFoundError,json.JSONDecodeError):
               manifest={"updates":[]}
           updates=manifest.setdefault("updates",[])
-          for route, files in changed.items():
+          for route, files in functional.items():
               uid=f"{after[:12]}-{route}"
               if any(x.get("id")==uid for x in updates): continue
-              clean=re.sub(r"^(feat|feature|fix|update|refactor)(\([^)]+\))?:\s*","",subject,flags=re.I).strip()
-              title=clean[:90] or f"{route.replace('-',' ').title()} update"
+              clean=re.sub(r"^(feat|feature|enhance|improve|update)(\\([^)]+\\))?:\\s*","",subject,flags=re.I).strip()
+              title=clean[:90] or f"{route.replace('-',' ').title()} feature update"
               updates.insert(0,{
                 "id":uid,"page":route,"feature":title,
-                "description":f"{subject}. Updated area: {', '.join(files[:4])}"+(f" and {len(files)-4} more files." if len(files)>4 else "."),
+                "description":f"{subject}. Functional changes were detected in: {', '.join(files[:4])}"+(f" and {len(files)-4} more source files." if len(files)>4 else "."),
                 "commit":after,"published_at":os.environ.get("GITHUB_EVENT_NAME","push")
               })
           manifest["updates"]=updates[:100]
-          with open(file,"w",encoding="utf-8") as f: json.dump(manifest,f,ensure_ascii=False,indent=2)
+          with open(file,"w",encoding="utf-8") as f:
+              json.dump(manifest,f,ensure_ascii=False,indent=2)
+          print("Published functional updates for:",", ".join(functional))
           PY
       - name: Commit release manifest
         run: |
           if git diff --quiet -- whats-new.json; then
-            echo "No manifest changes."
+            echo "No functional update to publish."
             exit 0
           fi
           git config user.name "github-actions[bot]"
