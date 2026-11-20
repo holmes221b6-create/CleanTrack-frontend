@@ -35,8 +35,8 @@ body #notifications-button.has-unopened-notifications .notification-count {
   50% { filter: drop-shadow(0 0 8px rgba(174,139,220,.95)); }
 }
 @keyframes mechnar-bell-badge-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 2px rgba(239,68,68,.35); }
-  50% { transform: scale(1.18); box-shadow: 0 0 11px rgba(239,68,68,.95); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 3px rgba(124,58,237,.55), 0 0 0 1px rgba(196,181,253,.35); }
+  50% { transform: scale(1.18); box-shadow: 0 0 12px rgba(139,92,246,.95), 0 0 0 2px rgba(221,214,254,.55); }
 }
 /* Explicitly requested notification motion takes precedence over OS motion preference. */
 @media (prefers-reduced-motion: reduce) {
@@ -56,9 +56,10 @@ body #notifications-button.has-unopened-notifications { animation: mechnar-bell-
 #notification-count,
 #notifications-button #notification-count,
 #notifications-button .notification-count {
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
-  background-color: #7c3aed !important;
+  background: linear-gradient(145deg, #581c87 0%, #3b0764 58%, #2e1065 100%) !important;
+  background-color: #3b0764 !important;
   color: #ffffff !important;
-  border: 1px solid rgba(216, 180, 254, .75) !important;
-  box-shadow: 0 0 8px rgba(139, 92, 246, .38) !important;
+  border: 1px solid #c4b5fd !important;
+  box-shadow: 0 0 0 1px rgba(76, 29, 149, .55), 0 0 10px rgba(124, 58, 237, .72) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .65) !important;
 }
