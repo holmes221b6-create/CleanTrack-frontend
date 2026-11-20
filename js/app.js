@@ -1488,6 +1488,9 @@
       badge.hidden = count <= 0;
       const notificationButton = getElement("notifications-button");
       if (notificationButton) {
+        notificationButton.dataset.notificationUnreadCount = String(count);
+        const acknowledgedCount = Number(notificationButton.dataset.notificationPanelCount || 0);
+        notificationButton.classList.toggle("has-unopened-notifications", count > acknowledgedCount);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
         notificationButton.title = count ? count + " unread notification" + (count === 1 ? "" : "s") : "Notifications";
       }
@@ -1517,6 +1520,10 @@
     if (!button || button.dataset.notificationsReady === "true") return;
     button.dataset.notificationsReady = "true";
     button.addEventListener("click", async function () {
+      // Acknowledge the current unread count for animation purposes only.
+      // Notifications remain unread until the user explicitly marks them read.
+      button.dataset.notificationPanelCount = button.dataset.notificationUnreadCount || "0";
+      button.classList.remove("has-unopened-notifications");
       const dialog = getElement("app-modal");
       const title = getElement("modal-title");
       const content = getElement("modal-content");
