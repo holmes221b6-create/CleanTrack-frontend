@@ -47,3 +47,7 @@ body #notifications-button.has-unopened-notifications .notification-count {
     animation-iteration-count: infinite !important;
   }
 }
+
+/* Fallback for browsers without the Web Animations API. */
+body #notifications-button.has-unopened-notifications .notification-bell-icon { animation: mechnar-bell-swing 1.1s ease-in-out infinite !important; }
+body #notifications-button.has-unopened-notifications { animation: mechnar-bell-button-pulse 1.1s ease-in-out infinite !important; }
