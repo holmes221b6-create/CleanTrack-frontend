@@ -1746,3 +1746,19 @@ html[data-theme="light"] .ct-op-maintenance-head{background:#fff!important}
 .ct-op-form-modal-dialog .ct-op-form-actions .ct-op-button{min-height:40px!important}
 .ct-op-form-modal-dialog .ct-op-form-actions~.ct-op-notice{margin-bottom:0!important}
 @media(max-width:640px){.ct-op-form-modal-dialog .ct-op-form-actions{margin:10px -12px -12px!important;padding:10px 12px 12px!important}}
+
+/* Operation details opened from a work-queue stay nested inside that queue panel. */
+.ct-op-queue-modal-panel{position:relative!important}
+.ct-op-queue-modal-panel>.ct-op-detail-backdrop[data-nested-queue="true"]{
+ position:absolute!important;inset:0!important;z-index:5!important;width:100%!important;height:100%!important;
+ background:rgba(5,8,16,.52)!important;backdrop-filter:blur(2px)!important;
+}
+.ct-op-queue-modal-panel>.ct-op-detail-panel[data-nested-queue="true"]{
+ position:absolute!important;inset:0!important;z-index:6!important;width:100%!important;height:100%!important;
+ max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:var(--ct-op-panel,#171b26)!important;padding:22px!important;box-sizing:border-box!important;
+}
+@media(max-width:640px){
+ .ct-op-queue-modal-panel>.ct-op-detail-panel[data-nested-queue="true"]{padding:14px!important}
+}
