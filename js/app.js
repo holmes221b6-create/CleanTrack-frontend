@@ -1478,6 +1478,46 @@
   }
 
   
+  function setNotificationBellMotion(button, active) {
+    if (!button) return;
+    const bell = button.querySelector(".notification-bell-icon");
+    const badge = getElement("notification-count");
+    button.classList.toggle("has-unopened-notifications", !!active);
+
+    // Use the Web Animations API so global reduced-motion CSS or another
+    // stylesheet cannot silently cancel the notification's required motion.
+    if (typeof button._mechnarBellAnimations === "undefined") button._mechnarBellAnimations = [];
+    button._mechnarBellAnimations.forEach(function (animation) {
+      try { animation.cancel(); } catch (_) {}
+    });
+    button._mechnarBellAnimations = [];
+    if (!active) return;
+
+    if (typeof Element !== "undefined" && Element.prototype && Element.prototype.animate) {
+      const swingFrames = [
+        { transform: "rotate(0deg) scale(1)" },
+        { transform: "rotate(-18deg) scale(1.12)", offset: 0.12 },
+        { transform: "rotate(18deg) scale(1.12)", offset: 0.24 },
+        { transform: "rotate(-15deg) scale(1.1)", offset: 0.36 },
+        { transform: "rotate(15deg) scale(1.1)", offset: 0.48 },
+        { transform: "rotate(0deg) scale(1)" }
+      ];
+      if (bell) button._mechnarBellAnimations.push(
+        bell.animate(swingFrames, { duration: 1100, iterations: Infinity, easing: "ease-in-out" })
+      );
+      button._mechnarBellAnimations.push(
+        button.animate(
+          [{ filter: "drop-shadow(0 0 0 rgba(174,139,220,0))" }, { filter: "drop-shadow(0 0 10px rgba(174,139,220,.98))" }, { filter: "drop-shadow(0 0 0 rgba(174,139,220,0))" }],
+          { duration: 1100, iterations: Infinity, easing: "ease-in-out" }
+        )
+      );
+      if (badge && !badge.hidden) button._mechnarBellAnimations.push(
+        badge.animate([{ transform: "scale(1)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }],
+          { duration: 850, iterations: Infinity, easing: "ease-in-out" })
+      );
+    }
+  }
+
   async function refreshNotificationBadge() {
     const badge = getElement("notification-count");
     if (!badge || !window.CleanTrackApi || !auth.isAuthenticated()) return;
@@ -1496,7 +1536,7 @@
         const acknowledgedIds = new Set(acknowledged.map(String));
         const hasNewUnread = unreadRows.some(item => !acknowledgedIds.has(String(item.id)));
         const panelIsOpen = notificationButton.dataset.notificationPanelOpen === "true";
-        notificationButton.classList.toggle("has-unopened-notifications", hasNewUnread && !panelIsOpen);
+        setNotificationBellMotion(notificationButton, hasNewUnread && !panelIsOpen);
         notificationButton.setAttribute("aria-label", count ? "Open notifications, " + count + " unread" : "Open notifications");
         notificationButton.title = count ? count + " unread notification" + (count === 1 ? "" : "s") : "Notifications";
       }
@@ -1529,7 +1569,7 @@
       // Stop the bell immediately when the user opens the notification panel.
       // The unread state itself is not changed by opening the panel.
       button.dataset.notificationPanelOpen = "true";
-      button.classList.remove("has-unopened-notifications");
+      setNotificationBellMotion(button, false);
       // Acknowledge exact unread notification IDs, not the count.
       try {
         const current = await window.CleanTrackApi.get("notifications");
