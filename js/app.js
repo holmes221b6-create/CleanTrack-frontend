@@ -2106,8 +2106,17 @@ function bindNavigation() {
       const restoredUser = await auth.restoreSession();
       // Prefer current auth state if sign-in completed during startup restore.
       const user = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser;
-      if (user) showAuthenticatedLayout(user);
-      else showUnauthenticatedLayout();
+      if (user) {
+        // A restored authenticated session is a fresh app-open visit too.
+        // Reset the Workspace greeting so it appears on the first Workspace
+        // visit after the app starts, then remains hidden after page navigation.
+        try {
+          const greetingIdentity = String(user?.id ?? user?.email ?? "current").toLowerCase();
+          sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+          sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+        } catch (_) {}
+        showAuthenticatedLayout(user);
+      } else showUnauthenticatedLayout();
     } catch (error) {
       state.error = error.message;
       showUnauthenticatedLayout();
