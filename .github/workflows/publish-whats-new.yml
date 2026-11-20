@@ -61,7 +61,7 @@ jobs:
           for route, files in changed.items():
               uid=f"{after[:12]}-{route}"
               if any(x.get("id")==uid for x in updates): continue
-              clean=re.sub(r"^(feat|feature|fix|update|refactor)(\\([^)]+\\))?:\\s*","",subject,flags=re.I).strip()
+              clean=re.sub(r"^(feat|feature|fix|update|refactor)(\([^)]+\))?:\s*","",subject,flags=re.I).strip()
               title=clean[:90] or f"{route.replace('-',' ').title()} update"
               updates.insert(0,{
                 "id":uid,"page":route,"feature":title,
