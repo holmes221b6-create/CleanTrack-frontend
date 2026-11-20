@@ -1584,8 +1584,32 @@ display: none !important;
 }
 
 
-/* Messaging-app style unread counter attached to the notification bell. */
+/* Persistent notification activity motion until the user opens the panel. */
 #notifications-button { position: relative; }
+#notifications-button.has-unopened-notifications > span:first-child {
+  display: inline-block;
+  transform-origin: 50% 12%;
+  animation: mechnar-notification-ring 1.35s ease-in-out infinite;
+}
+#notifications-button.has-unopened-notifications .notification-count {
+  animation: mechnar-notification-glow 1.8s ease-in-out infinite;
+}
+@keyframes mechnar-notification-ring {
+  0%, 100% { transform: rotate(0) scale(1); }
+  8%, 22%, 36% { transform: rotate(-11deg) scale(1.04); }
+  15%, 29%, 43% { transform: rotate(11deg) scale(1.04); }
+  52% { transform: rotate(0) scale(1); }
+}
+@keyframes mechnar-notification-glow {
+  0%, 100% { box-shadow: 0 1px 4px rgb(0 0 0 / 24%); }
+  50% { box-shadow: 0 0 10px rgb(168 115 235 / 75%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #notifications-button.has-unopened-notifications > span:first-child,
+  #notifications-button.has-unopened-notifications .notification-count {
+    animation: none !important;
+  }
+}
 #notifications-button .notification-count {
   position: absolute; top: -5px; right: -5px; z-index: 2;
   min-width: 19px; height: 19px; padding: 0 5px;
