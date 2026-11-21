@@ -100,6 +100,7 @@ if (identity) {
     const feedbackButton = document.createElement("button");
     feedbackButton.type = "button";
     feedbackButton.className = "ct-toolbar-icon-button";
+    feedbackButton.classList.add("ct-feedback-trigger");
     feedbackButton.setAttribute("aria-label", "Report a bug or suggest an improvement");
     feedbackButton.title = "Feedback";
     feedbackButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-4.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h8M8 15h5"/></svg>';
