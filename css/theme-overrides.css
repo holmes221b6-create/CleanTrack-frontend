@@ -2286,3 +2286,25 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
     animation: none !important;
   }
 }
+
+
+/* MECHNAR top-bar feedback control: use the app's purple accent, not the legacy green. */
+#workspace-view .ct-toolbar-actions > .ct-feedback-trigger,
+html[data-theme="light"] #workspace-view .ct-toolbar-actions > .ct-feedback-trigger {
+  color: #c4a5ff !important;
+  background: rgba(126, 78, 255, 0.16) !important;
+  border: 1px solid rgba(157, 117, 255, 0.38) !important;
+  box-shadow: 0 0 0 1px rgba(126, 78, 255, 0.08), 0 3px 12px rgba(92, 48, 190, 0.12) !important;
+}
+#workspace-view .ct-toolbar-actions > .ct-feedback-trigger:hover,
+#workspace-view .ct-toolbar-actions > .ct-feedback-trigger:focus-visible,
+html[data-theme="light"] #workspace-view .ct-toolbar-actions > .ct-feedback-trigger:hover,
+html[data-theme="light"] #workspace-view .ct-toolbar-actions > .ct-feedback-trigger:focus-visible {
+  color: #ffffff !important;
+  background: #7545d6 !important;
+  border-color: #9b75f5 !important;
+  box-shadow: 0 0 0 3px rgba(126, 78, 255, 0.2), 0 5px 16px rgba(92, 48, 190, 0.22) !important;
+}
+#workspace-view .ct-toolbar-actions > .ct-feedback-trigger svg {
+  stroke: currentColor !important;
+}
