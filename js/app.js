@@ -1152,8 +1152,17 @@
       return;
     }
 
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "sites") {
+      if (window.MechnarSupervisorSitesZones && typeof window.MechnarSupervisorSitesZones.render === "function") {
+        await window.MechnarSupervisorSitesZones.render(pageContent);
+      } else {
+        pageContent.textContent = "Sites & Zones could not load. Refresh the page and try again.";
+      }
+      return;
+    }
+
     if (String(user?.role || "").toLowerCase() === "supervisor" &&
-        ["reviews", "sites", "performance"].includes(pageId)) {
+        ["reviews", "performance"].includes(pageId)) {
       const descriptions = {
         personnel: ["Personnel", "Manage staff belonging to your assigned team, including profiles and work assignments."],
         teams: ["Teams", "Manage your own team and view other organization teams in read-only mode. Other teams' employee records and private operations remain inaccessible."],
