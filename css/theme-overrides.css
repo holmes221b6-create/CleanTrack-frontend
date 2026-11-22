@@ -2308,3 +2308,33 @@ html[data-theme="light"] #workspace-view .ct-toolbar-actions > .ct-feedback-trig
 #workspace-view .ct-toolbar-actions > .ct-feedback-trigger svg {
   stroke: currentColor !important;
 }
+
+
+/* MECHNAR feedback panel: use the product's purple primary-action treatment. */
+.ct-feedback-panel .ct-feedback-submit,
+.ct-feedback-panel .ct-feedback-submit:hover,
+.ct-feedback-panel .ct-feedback-submit:focus,
+.ct-feedback-panel .ct-feedback-submit:active {
+  background: linear-gradient(135deg, #7138c8 0%, #54239f 100%) !important;
+  background-color: #642caf !important;
+  border: 1px solid #9666df !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgb(100 44 175 / 28%), inset 0 1px 0 rgb(255 255 255 / 12%) !important;
+  transition: background .18s ease, box-shadow .18s ease, transform .18s ease !important;
+}
+.ct-feedback-panel .ct-feedback-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8048d8 0%, #6230b2 100%) !important;
+  box-shadow: 0 10px 26px rgb(100 44 175 / 36%), inset 0 1px 0 rgb(255 255 255 / 15%) !important;
+  transform: translateY(-1px);
+}
+.ct-feedback-panel .ct-feedback-submit:focus-visible {
+  outline: 2px solid #c4a4ff !important;
+  outline-offset: 3px !important;
+}
+.ct-feedback-panel .ct-feedback-submit:disabled {
+  background: #563783 !important;
+  border-color: #7655a3 !important;
+  color: #eee6ff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
