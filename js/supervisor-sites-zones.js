@@ -20,7 +20,7 @@ const css=`
 .msz-notice{min-height:20px;font-size:12px;color:var(--muted,#999);margin:8px 0}.msz-notice.error{color:#e58b8b}.msz-notice.success{color:#6ac6a0}
 .msz-metrics{display:flex;gap:30px;flex-wrap:wrap;border-top:1px solid var(--border,#383840);border-bottom:1px solid var(--border,#383840);padding:13px 4px;margin:14px 0 22px}
 .msz-metric{min-width:120px}.msz-metric strong{display:block;font-size:23px;font-weight:650}.msz-metric span{font-size:11px;color:var(--muted,#999)}
-.msz-map-panel{border:1px solid var(--border,#383840);border-radius:10px;margin:14px 0 22px;overflow:hidden;background:var(--surface,#17171d)}.msz-map-head{padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center}.msz-map-head strong{font-size:15px}.msz-map-head p{margin:5px 0 0;font-size:12px;color:var(--muted,#999);line-height:1.5}.msz-map-chip{font-size:10px;color:var(--muted,#999);border:1px solid var(--border,#41414a);border-radius:20px;padding:5px 9px;white-space:nowrap}.msz-map-search{display:flex;gap:8px;padding:0 14px 10px}.msz-map-search input{flex:1}.msz-map{height:430px;background:var(--surface,#17171d)}.msz-map-notice{font-size:11px;color:var(--muted,#999);padding:0 14px 9px}.msz-map-notice.is-error{color:#e58b8b}.msz-map-results{display:grid;gap:7px;padding:0 14px 10px}.msz-map-result{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px;border:1px solid var(--border,#383840);border-radius:8px}.msz-map-result-copy{display:grid;gap:3px;min-width:0}.msz-map-result-copy strong{font-size:12px}.msz-map-result-copy span,.msz-map-result-copy small{font-size:10px;color:var(--muted,#999);overflow-wrap:anywhere}.msz-map-picked{font-size:11px;color:#6ac6a0;padding:0 14px 10px}.msz-map-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--border,#383840)}.msz-map-footer p{margin:0;font-size:10px;color:var(--muted,#999)}
+.msz-map-panel{border:1px solid var(--border,#383840);border-radius:10px;margin:14px 0 22px;overflow:hidden;background:var(--surface,#17171d)}.msz-map-head{padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center}.msz-map-head strong{font-size:15px}.msz-map-head p{margin:5px 0 0;font-size:12px;color:var(--muted,#999);line-height:1.5}.msz-map-chip{font-size:10px;color:var(--muted,#999);border:1px solid var(--border,#41414a);border-radius:20px;padding:5px 9px;white-space:nowrap}.msz-map-search{display:flex;gap:8px;padding:0 14px 10px}.msz-map-search input{flex:1}.msz-map{display:block;width:100%;height:560px;border:0;background:var(--surface,#17171d)}.msz-map-notice{font-size:11px;color:var(--muted,#999);padding:0 14px 9px}.msz-map-notice.is-error{color:#e58b8b}.msz-map-results{display:grid;gap:7px;padding:0 14px 10px}.msz-map-result{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px;border:1px solid var(--border,#383840);border-radius:8px}.msz-map-result-copy{display:grid;gap:3px;min-width:0}.msz-map-result-copy strong{font-size:12px}.msz-map-result-copy span,.msz-map-result-copy small{font-size:10px;color:var(--muted,#999);overflow-wrap:anywhere}.msz-map-picked{font-size:11px;color:#6ac6a0;padding:0 14px 10px}.msz-map-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--border,#383840)}.msz-map-footer p{margin:0;font-size:10px;color:var(--muted,#999)}
 .msz-columns{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-items:start}
 .msz-section{border-top:1px solid var(--border,#383840);padding-top:13px;min-width:0;width:100%}.msz-section h2{font-size:16px;margin:0 0 11px}
 .msz-directory{display:grid}.msz-site{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 8px;border-bottom:1px solid var(--border,#303039);cursor:pointer}
@@ -34,8 +34,8 @@ const css=`
 .msz-qr{width:220px;height:220px;background:#fff;margin:12px auto;padding:10px;display:grid;place-items:center}.msz-qr canvas,.msz-qr img{max-width:100%;max-height:100%}
 .msz-event{padding:10px 0;border-bottom:1px solid var(--border,#333)}.msz-event strong{font-size:12px}.msz-event small,.msz-event p{display:block;color:var(--muted,#999);font-size:11px;margin:5px 0;overflow-wrap:anywhere}
 .msz-map-link{font-size:12px;color:inherit;display:inline-block;margin-top:9px}
-@media(max-width:850px){.msz-columns{grid-template-columns:1fr}.msz-map{height:340px}}
-@media(max-width:560px){.msz-form{grid-template-columns:1fr}.msz-field.full,.msz-form-actions{grid-column:auto}.msz-map-search{flex-wrap:wrap}.msz-map-search input{min-width:100%}.msz-map{height:290px}.msz-map-head{align-items:flex-start;flex-direction:column}.msz-map-footer{align-items:flex-start;flex-direction:column}.msz-site{align-items:flex-start}.msz-site-meta{white-space:normal}}
+@media(max-width:850px){.msz-columns{grid-template-columns:1fr}.msz-map{height:420px}}
+@media(max-width:560px){.msz-form{grid-template-columns:1fr}.msz-field.full,.msz-form-actions{grid-column:auto}.msz-map-search{flex-wrap:wrap}.msz-map-search input{min-width:100%}.msz-map{height:340px}.msz-map-head{align-items:flex-start;flex-direction:column}.msz-map-footer{align-items:flex-start;flex-direction:column}.msz-site{align-items:flex-start}.msz-site-meta{white-space:normal}}
 `;
 function notify(message,type=""){const n=host?.querySelector("[data-notice]");if(n){n.textContent=message||"";n.className="msz-notice "+type;}}
 function siteZones(site){return zones.filter(z=>String(z.location_id)===String(site.id));}
@@ -64,257 +64,18 @@ function qrModal(title,textValue,filename){modal(title,body=>{body.append($("p",
 function siteQr(site){if(!site.qr_token||site.qr_enabled===false){notify("This site QR is unavailable or has been disabled by Admin.","error");return;}if(site.qr_expires_at&&Date.parse(site.qr_expires_at)<=Date.now()){notify("This site QR has expired. Ask Admin to issue a new code.","error");return;}const base=String(window.CleanTrackConfig?.apiBaseUrl||"").replace(/\/$/,"");qrModal("Site identity QR · "+site.name,base+"/locations/resolve/"+encodeURIComponent(site.qr_token),"mechnar-site-"+site.id+".png");}
 function zoneQr(zone){if(!zone.qr_token||zone.qr_enabled===false){notify("This zone QR is unavailable or has been disabled by Admin.","error");return;}if(zone.qr_expires_at&&Date.parse(zone.qr_expires_at)<=Date.now()){notify("This zone QR has expired. Ask Admin to issue a new code.","error");return;}const base=String(window.CleanTrackConfig?.apiBaseUrl||"").replace(/\/$/,"");qrModal("Zone identity QR · "+zone.name,base+"/zones/resolve/"+encodeURIComponent(zone.qr_token),"mechnar-zone-"+zone.id+".png");}
 
-let buildingLayer=null,landmarkLayer=null,buildingRefreshTimer=null,landmarkRefreshTimer=null,lastBuildingFetchAt=0,lastBuildingBounds="",lastLandmarkFetchAt=0,lastLandmarkBounds="",lastPlaceSearchAt=0,mapNoticeNode=null,searchResultsNode=null;
+let mapFrame=null,mapNoticeNode=null,searchResultsNode=null,lastPlaceSearchAt=0;
 function mapMsg(message,error){if(!mapNoticeNode)return;mapNoticeNode.hidden=!message;mapNoticeNode.textContent=message||"";mapNoticeNode.classList.toggle("is-error",!!error);}
-function drawMapPins(){
- if(!map||!mapLayer||!window.L)return;mapLayer.clearLayers();
- sites.filter(s=>s.latitude!==null&&s.latitude!==undefined&&s.longitude!==null&&s.longitude!==undefined&&Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude))).forEach(site=>{
-  const state=String(site.status||"active").toLowerCase();
-  const pin=L.circleMarker([Number(site.latitude),Number(site.longitude)],{radius:String(selectedSite)===String(site.id)?10:7,color:state==="archived"?"#93939d":state==="inactive"?"#dfa64f":"#42cfa4",fillColor:state==="archived"?"#73737d":state==="inactive"?"#dfa64f":"#42cfa4",fillOpacity:.9,weight:2}).addTo(mapLayer);
-  pin.bindTooltip(String(site.name||"Site "+site.id),{permanent:true,direction:"top",offset:[0,-9],opacity:.98});
-  pin.bindPopup("<strong>"+String(site.name||"Site").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+"</strong><br>"+String(site.address||"Address not recorded").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])));
-  pin.on("click",()=>selectSite(site.id));
- });
-}
-  async function loadLandmarks(force){
-    if(!map||!landmarkLayer||!map.hasLayer(landmarkLayer))return;
-    const bounds=map.getBounds(),zoom=map.getZoom();
-    if(zoom<11){
-      mapMsg("Zoom in to level 11 or closer to load named villages, neighbourhoods and landmarks. This works outside city boundaries too.",false);
-      landmarkLayer.clearLayers();lastLandmarkBounds="";
-      return;
-    }
-    const south=bounds.getSouth(),west=bounds.getWest(),north=bounds.getNorth(),east=bounds.getEast();
-    const spanLat=north-south,spanLon=east-west;
-    if(spanLat>0.55||spanLon>0.65||spanLat*spanLon>0.22){
-      mapMsg("Zoom in one level to search named places in this area. Smaller map queries include more useful local details and keep the map responsive.",false);
-      return;
-    }
-    const boundsKey=[south,west,north,east].map(v=>v.toFixed(5)).join(",");
-    if(!force&&boundsKey===lastLandmarkBounds)return;
-    const elapsed=Date.now()-lastLandmarkFetchAt;
-    if(!force&&elapsed<1400){
-      if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
-      landmarkRefreshTimer=window.setTimeout(()=>loadLandmarks(false),1400-elapsed);
-      return;
-    }
-    lastLandmarkFetchAt=Date.now();lastLandmarkBounds=boundsKey;
-    mapMsg("Loading named places, villages and landmarks for the visible area…",false);
-    const box="("+south+","+west+","+north+","+east+")";
-    const query='[out:json][timeout:22];('+
-      'nwr["name"]["place"~"^(city|town|village|hamlet|suburb|neighbourhood|quarter|locality|isolated_dwelling)$"]'+box+';'+
-      'nwr["name"]["tourism"~"^(attraction|museum|viewpoint|artwork|zoo|theme_park|picnic_site|information)$"]'+box+';'+
-      'nwr["name"]["historic"]'+box+';'+
-      'nwr["name"]["landmark"]'+box+';'+
-      'nwr["name"]["natural"~"^(peak|waterfall|spring|cave_entrance|beach|lake|hot_spring|wood|wetland)$"]'+box+';'+
-      'nwr["name"]["amenity"~"^(place_of_worship|hospital|school|college|university|community_centre|bus_station|library|marketplace|monastery)$"]'+box+';'+
-      'nwr["name"]["leisure"~"^(park|garden|nature_reserve|sports_centre|playground)$"]'+box+';'+
-      ');out center tags;';
-    const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
-    let data=null,lastError=null;
-    for(const endpoint of endpoints){
-      const controller=new AbortController(),timeout=window.setTimeout(()=>controller.abort(),26000);
-      try{
-        const response=await fetch(endpoint,{
-          method:"POST",
-          headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},
-          body:new URLSearchParams({data:query}),
-          signal:controller.signal
-        });
-        if(!response.ok)throw new Error("Landmark data service returned HTTP "+response.status+".");
-        data=await response.json();break;
-      }catch(error){lastError=error;}
-      finally{window.clearTimeout(timeout);}
-    }
-    if(!data){
-      lastLandmarkBounds="";
-      mapMsg((lastError&&lastError.name==="AbortError"?"The landmark search timed out. Zoom closer or try again.":lastError&&lastError.message)||"Named place data is temporarily unavailable. The street map and saved locations are still available.",true);
-      return;
-    }
-    if(!map||!landmarkLayer||!map.hasLayer(landmarkLayer))return;
-    const now=map.getBounds();
-    if(map.getZoom()!==zoom||now.getSouthWest().distanceTo(bounds.getSouthWest())>350){
-      lastLandmarkBounds="";
-      if(landmarkRefreshTimer)window.clearTimeout(landmarkRefreshTimer);
-      landmarkRefreshTimer=window.setTimeout(()=>loadLandmarks(false),500);
-      return;
-    }
-    landmarkLayer.clearLayers();
-    const elements=Array.isArray(data.elements)?data.elements:[];
-    const seen=new Set();let count=0;
-    elements.slice(0,400).forEach(item=>{
-      const tags=item.tags||{},name=String(tags.name||"").trim();
-      if(!name)return;
-      const lat=Number(item.lat??item.center?.lat),lon=Number(item.lon??item.center?.lon);
-      if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat>90||lon < -180||lon>180)return;
-      const key=name.toLocaleLowerCase()+"|"+lat.toFixed(4)+"|"+lon.toFixed(4);
-      if(seen.has(key))return;seen.add(key);
-      const category=tags.place?"Locality · "+String(tags.place).replaceAll("_"," "):
-        tags.tourism?"Tourism · "+String(tags.tourism).replaceAll("_"," "):
-        tags.historic?"Historic place · "+String(tags.historic).replaceAll("_"," "):
-        tags.landmark?"Landmark":
-        tags.natural?"Natural feature · "+String(tags.natural).replaceAll("_"," "):
-        tags.amenity?"Place · "+String(tags.amenity).replaceAll("_"," "):
-        tags.leisure?"Leisure · "+String(tags.leisure).replaceAll("_"," "):"Named place";
-      const isLocality=Boolean(tags.place);
-      const marker=L.circleMarker([lat,lon],{
-        radius:isLocality?6:5,
-        color:isLocality?"#265bd7":"#9a4bc8",
-        weight:2,
-        fillColor:isLocality?"#8bb5ff":"#e0a4ff",
-        fillOpacity:.95
-      }).addTo(landmarkLayer);
-      marker.bindTooltip(name,{permanent:true,direction:"top",offset:[0,-6],opacity:.98,className:"ct-loc-landmark-label"});
-      const popup=$("div","ct-loc-building-popup");
-      popup.append($("strong","",name),$("span","",category));
-      const locality=[tags["addr:suburb"],tags["addr:neighbourhood"],tags["addr:town"],tags["addr:village"],tags["addr:city"],tags["addr:county"],tags["addr:state"],tags["addr:country"]].filter(Boolean);
-      if(locality.length)popup.append($("span","",locality.filter((v,i,a)=>a.indexOf(v)===i).join(", ")));
-      popup.append($("small","","OpenStreetMap named feature · map coverage varies by area."));
-      marker.bindPopup(popup);count++;
-    });
-    mapMsg(count
-      ?count+" named localities and landmarks loaded for the visible area, including mapped places outside cities. Select a label for details."
-      :"No named localities or landmarks are mapped in this view. Move slightly or zoom out/in and retry; OpenStreetMap coverage varies by area.",false);
-  }
-  function enableLandmarksForCurrentView(){
-    if(!map||!landmarkLayer)return;
-    if(!map.hasLayer(landmarkLayer))landmarkLayer.addTo(map);
-    else loadLandmarks(true);
-  }
-  async function loadBuildingFootprints(force){
-    if(!map||!buildingLayer||!map.hasLayer(buildingLayer))return;
-    const bounds=map.getBounds(),zoom=map.getZoom();
-    if(zoom<17){
-      mapMsg("Building footprints are detailed data. Zoom in to level 17 or closer, then enable the building layer again.",false);
-      buildingLayer.clearLayers();lastBuildingBounds="";
-      return;
-    }
-    const south=bounds.getSouth(),west=bounds.getWest(),north=bounds.getNorth(),east=bounds.getEast();
-    const spanLat=north-south,spanLon=east-west;
-    if(spanLat>0.025||spanLon>0.035||spanLat*spanLon>0.00045){
-      mapMsg("Zoom in one more level for building footprints. This keeps the map query small and responsive.",false);
-      return;
-    }
-    const boundsKey=[south,west,north,east].map(v=>v.toFixed(5)).join(",");
-    if(!force&&boundsKey===lastBuildingBounds)return;
-    const elapsed=Date.now()-lastBuildingFetchAt;
-    if(!force&&elapsed<1400){
-      if(buildingRefreshTimer)window.clearTimeout(buildingRefreshTimer);
-      buildingRefreshTimer=window.setTimeout(()=>loadBuildingFootprints(false),1400-elapsed);
-      return;
-    }
-    lastBuildingFetchAt=Date.now();lastBuildingBounds=boundsKey;
-    mapMsg("Loading real building footprints from OpenStreetMap…",false);
-    const query='[out:json][timeout:18];way["building"]('+south+','+west+','+north+','+east+');out geom;';
-    try{
-      const response=await fetch("https://overpass-api.de/api/interpreter",{
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},
-        body:new URLSearchParams({data:query})
-      });
-      if(!response.ok)throw new Error("Building map data is temporarily unavailable (HTTP "+response.status+").");
-      const data=await response.json();
-      if(!map||!buildingLayer||!map.hasLayer(buildingLayer)||map.getBounds().getSouthWest().distanceTo(bounds.getSouthWest())>350)return;
-      buildingLayer.clearLayers();
-      const elements=Array.isArray(data.elements)?data.elements:[];
-      let count=0;
-      elements.forEach(item=>{
-        const tags=item.tags||{},geometry=Array.isArray(item.geometry)?item.geometry.map(p=>[Number(p.lat),Number(p.lon)]):[];
-        if(geometry.length<4||geometry.some(p=>!Number.isFinite(p[0])||!Number.isFinite(p[1])))return;
-        const polygon=L.polygon(geometry,{color:"#e2a33b",weight:1.5,opacity:.95,fillColor:"#f6bf51",fillOpacity:.18});
-        const popup=$("div","ct-loc-building-popup");
-        popup.append($("strong","",tags.name||tags["addr:housenumber"]||("Mapped building #"+item.id)));
-        const metadata=[tags.building&&("Type: "+tags.building),tags["building:levels"]&&("Floors: "+tags["building:levels"]),tags["addr:street"],tags["addr:city"]].filter(Boolean);
-        if(metadata.length)popup.append($("div","",metadata.join(" · ")));
-        popup.append($("small","", "Building footprint from OpenStreetMap · map data may be incomplete."));
-        polygon.bindPopup(popup);
-        if(tags.name)polygon.bindTooltip(tags.name,{sticky:true});
-        polygon.addTo(buildingLayer);count++;
-      });
-      if(count)mapMsg(count+" real building footprint"+(count===1?"":"s")+" loaded. Select an outline to view available map details.",false);
-      else mapMsg("No building footprints are mapped in this small area. Try moving the map or check a place with more OpenStreetMap building data.",false);
-    }catch(error){
-      lastBuildingBounds="";
-      mapMsg((error.message||"Building footprints could not be loaded.")+" The street map and saved locations are still available.",true);
-    }
-  }
-function fitAllSitePins(){
- if(!map||!window.L)return;
- const points=sites.filter(s=>s.latitude!==null&&s.latitude!==undefined&&s.longitude!==null&&s.longitude!==undefined&&Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude))).map(s=>[Number(s.latitude),Number(s.longitude)]);
- if(points.length===1)map.setView(points[0],16);else if(points.length>1)map.fitBounds(L.latLngBounds(points),{padding:[30,30],maxZoom:16});else map.setView([20,0],3);
-}
-function focusSiteOnMap(site){
- if(!map){notify("The interactive map is not ready yet.","error");return;}
- if(site.latitude===null||site.latitude===undefined||site.longitude===null||site.longitude===undefined){notify("This site has no saved map coordinates. Admin must pin its real location on the Locations map.","error");return;}
- const lat=Number(site.latitude),lon=Number(site.longitude);
- if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat>90||lon < -180||lon>180){notify("This site's saved map coordinates are invalid. Admin must correct them.","error");return;}
- map.invalidateSize();map.flyTo([lat,lon],17,{animate:true,duration:1.05});host.querySelector(".msz-map-panel")?.scrollIntoView({behavior:"smooth",block:"nearest"});
- let marker=null;mapLayer?.eachLayer(layer=>{const ll=layer.getLatLng?.();if(ll&&Math.abs(ll.lat-lat)<1e-6&&Math.abs(ll.lng-lon)<1e-6)marker=layer;});
- marker?.openPopup();
- if(landmarkLayer&&!map.hasLayer(landmarkLayer))landmarkLayer.addTo(map);else loadLandmarks(true);
-}
-function selectSite(id){selectedSite=id;selectedZone=null;drawDirectory();drawZones();const site=sites.find(s=>String(s.id)===String(id));if(site)focusSiteOnMap(site);}
-function initMap(){
- const node=host.querySelector("[data-map]");
- if(!node)return;
- if(!window.L){node.textContent="The map library did not load. Refresh the page to retry.";return;}
- if(map){try{map.off();map.remove();}catch(_){}map=null;}
- map=L.map(node,{scrollWheelZoom:false,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20,dragging:true,touchZoom:true,doubleClickZoom:true,boxZoom:true,keyboard:true}).setView([20,0],3);
- node.addEventListener("wheel",e=>{
-  if(!e.ctrlKey||!map)return;e.preventDefault();if(!e.deltaY)return;
-  const current=map.getZoom(),next=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),current+(e.deltaY<0?1:-1)));
-  if(next!==current)map.setZoomAround(map.mouseEventToLatLng(e),next,{animate:false});
- },{passive:false});
- const osmTiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,maxNativeZoom:19,noWrap:true,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'});
- const cartoTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:20,noWrap:true,attribution:'&copy; OpenStreetMap contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
- let osmLoaded=0,osmErrors=0,fallbackActivated=false;
- osmTiles.on("tileload",()=>{osmLoaded++;});
- osmTiles.on("tileerror",()=>{osmErrors++;if(!fallbackActivated&&osmErrors>=3&&osmLoaded===0){fallbackActivated=true;if(map.hasLayer(osmTiles))map.removeLayer(osmTiles);cartoTiles.addTo(map);mapMsg("Using alternate street-map tiles because the primary OpenStreetMap tile server did not respond.",false);}});
- osmTiles.addTo(map);
- mapLayer=L.layerGroup().addTo(map);buildingLayer=L.layerGroup();landmarkLayer=L.layerGroup();
- L.control.layers({"OpenStreetMap":osmTiles,"Alternate street map":cartoTiles},{"Landmarks & localities (OpenStreetMap)":landmarkLayer,"Building footprints (OpenStreetMap)":buildingLayer},{collapsed:true,position:"topright"}).addTo(map);
- map.on("overlayadd",e=>{if(e.layer===buildingLayer)loadBuildingFootprints(true);if(e.layer===landmarkLayer)loadLandmarks(true);});
- map.on("moveend",()=>{
-  if(buildingLayer&&map.hasLayer(buildingLayer)){if(buildingRefreshTimer)clearTimeout(buildingRefreshTimer);buildingRefreshTimer=setTimeout(()=>loadBuildingFootprints(false),900);}
-  if(landmarkLayer&&map.hasLayer(landmarkLayer)){if(landmarkRefreshTimer)clearTimeout(landmarkRefreshTimer);landmarkRefreshTimer=setTimeout(()=>loadLandmarks(false),1000);}
- });
- drawMapPins();
- if(sites.some(s=>s.latitude!==null&&s.latitude!==undefined&&s.longitude!==null&&s.longitude!==undefined))fitAllSitePins();
- else mapMsg("No saved site coordinates are available yet. Admin can pin the real locations from the Locations page. No sample pins are shown.",false);
- setTimeout(()=>{if(map){map.invalidateSize();if(selectedSite!==null){const site=sites.find(x=>String(x.id)===String(selectedSite));if(site)focusSiteOnMap(site);}}},100);
-}
-async function searchPlaces(value){
- if(!value)return;
- const buttonNode=host.querySelector("[data-map-find]");if(buttonNode){buttonNode.disabled=true;buttonNode.textContent="Searching…";}
- searchResultsNode?.replaceChildren($("p","msz-muted","Searching OpenStreetMap place names…"));
- try{
-  const wait=Math.max(0,1100-(Date.now()-lastPlaceSearchAt));if(wait)await new Promise(resolve=>setTimeout(resolve,wait));lastPlaceSearchAt=Date.now();
-  const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&limit=10&q="+encodeURIComponent(value);
-  const response=await fetch(url,{headers:{"Accept":"application/json","Accept-Language":document.documentElement.lang||"en"}});
-  if(!response.ok)throw new Error("Place search is unavailable right now (HTTP "+response.status+").");
-  const results=await response.json();searchResultsNode?.replaceChildren();
-  if(!Array.isArray(results)||!results.length){searchResultsNode?.append($("p","msz-muted","No results found. Try a more specific address or place."));return;}
-  results.forEach(place=>{
-   const title=place.name||String(place.display_name||"").split(",")[0]||"Map result",country=place.address?.country||"Country not identified";
-   const region=[place.address?.state,place.address?.region,place.address?.county].filter((v,i,a)=>v&&a.indexOf(v)===i&&v!==country).slice(0,2).join(", ");
-   const row=$("div","msz-map-result"),copy=$("div","msz-map-result-copy");
-   copy.append($("strong","",title),$("span","",country),$("small","",([region,place.display_name||""].filter(Boolean).join(" · "))),$("small","",String(place.type||place.class||"place").replaceAll("_"," ")));
-   row.append(copy,button("View here","msz-btn",()=>{
-    const lat=Number(place.lat),lon=Number(place.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon)){notify("The map provider returned invalid coordinates.","error");return;}
-    const bounds=Array.isArray(place.boundingbox)?place.boundingbox.map(Number):[];
-    if(bounds.length===4&&bounds.every(Number.isFinite)){const south=bounds[0],north=bounds[1],west=bounds[2],east=bounds[3];map.fitBounds([[south,west],[north,east]],{padding:[28,28],maxZoom:(Math.abs(north-south)>.02||Math.abs(east-west)>.02)?14:19});}
-    else{const type=String(place.type||"").toLowerCase(),zoom=["country","state","region"].includes(type)?6:["city","administrative","municipality"].includes(type)?12:["suburb","neighbourhood","quarter","village"].includes(type)?14:["house","building","residential","address","road"].includes(type)?19:17;map.setView([lat,lon],zoom);}
-    if(mapSearchLayer)map.removeLayer(mapSearchLayer);
-    mapSearchLayer=L.marker([lat,lon]).addTo(map).bindPopup(String(place.display_name||title)).openPopup();
-    if(landmarkLayer&&!map.hasLayer(landmarkLayer))landmarkLayer.addTo(map);else loadLandmarks(true);
-    searchResultsNode.replaceChildren($("p","msz-map-picked","Map centred on "+title+" · "+country+". This is a map preview; it does not change the saved site record."));
-   }));searchResultsNode?.append(row);
-  });
- }catch(error){searchResultsNode?.replaceChildren($("p","msz-notice error",error.message||"Place search failed."));}
- finally{if(buttonNode){buttonNode.disabled=false;buttonNode.textContent="Search places";}}
-}
+function mapUrl(query,zoom){return "https://maps.google.com/maps?q="+encodeURIComponent(query)+"&z="+String(zoom||15)+"&output=embed";}
+function showMapLocation(query,zoom,message){if(!mapFrame||!query)return;mapFrame.src=mapUrl(query,zoom||15);mapMsg(message||"Interactive Google Maps view · drag to move, use zoom controls or mouse wheel, and explore surrounding streets and places.",false);}
+function drawMapPins(){}
+function fitAllSitePins(){const valid=sites.filter(x=>x.latitude!=null&&x.longitude!=null&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)));if(!valid.length){showMapLocation("India",5,"No organisation sites have saved coordinates yet. Showing the wider map.");return;}if(valid.length===1){const x=valid[0];showMapLocation(Number(x.latitude)+","+Number(x.longitude),15,"Showing the saved organisation site. Pan and zoom around it.");return;}const lats=valid.map(x=>Number(x.latitude)),lons=valid.map(x=>Number(x.longitude)),center=((Math.min(...lats)+Math.max(...lats))/2)+","+((Math.min(...lons)+Math.max(...lons))/2),spread=Math.max(Math.max(...lats)-Math.min(...lats),Math.max(...lons)-Math.min(...lons)),zoom=spread>20?4:spread>5?6:spread>1?9:spread>.15?12:15;showMapLocation(center,zoom,"Map centred to include the organisation's saved sites. Pan and zoom to browse.");}
+function focusSiteOnMap(site){if(!mapFrame){notify("The interactive map is still loading.","error");return;}if(site.latitude==null||site.longitude==null){const query=[site.name,site.address].filter(Boolean).join(", ");if(query)showMapLocation(query+", India",14,"No GPS pin is saved for this site. Showing its saved name and address; Admin must save exact coordinates for precise positioning.");else notify("This site has no saved address or coordinates.","error");return;}const lat=Number(site.latitude),lon=Number(site.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat>90||lon < -180||lon>180){notify("This site's saved map coordinates are invalid. Correct them in Admin.","error");return;}showMapLocation(lat+","+lon,18,"Showing "+(site.name||"the selected site")+" at its saved GPS coordinates. Drag and zoom to explore surrounding places.");}
+function selectSite(id){selectedSite=id;selectedZone=null;drawDirectory();drawZones();const site=sites.find(x=>String(x.id)===String(id));if(site)focusSiteOnMap(site);}
+function initMap(){mapFrame=host.querySelector("[data-map-frame]");map=null;mapLayer=null;if(!mapFrame){mapMsg("Map frame could not be initialized.",true);return;}fitAllSitePins();}
+async function searchPlaces(value){if(!value||!mapFrame)return;const buttonNode=host.querySelector("[data-map-find]");if(buttonNode){buttonNode.disabled=true;buttonNode.textContent="Searching…";}searchResultsNode?.replaceChildren($("p","msz-muted","Searching real-world place names…"));try{const wait=Math.max(0,1100-(Date.now()-lastPlaceSearchAt));if(wait)await new Promise(resolve=>setTimeout(resolve,wait));lastPlaceSearchAt=Date.now();const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&q="+encodeURIComponent(value),response=await fetch(url,{headers:{"Accept":"application/json","Accept-Language":document.documentElement.lang||"en"}});if(!response.ok)throw new Error("Place search is temporarily unavailable (HTTP "+response.status+").");const results=await response.json();searchResultsNode?.replaceChildren();if(!Array.isArray(results)||!results.length){searchResultsNode?.append($("p","msz-muted","No matching places found. Try adding the city, state and country."));return;}results.forEach(place=>{const title=String(place.name||String(place.display_name||"").split(",")[0]||"Map result"),lat=Number(place.lat),lon=Number(place.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return;const row=$("div","msz-map-result"),copy=$("div","msz-map-result-copy");copy.append($("strong","",title),$("span","",place.address?.country||"Country not identified"),$("small","",String(place.display_name||"")));row.append(copy,button("Open here","msz-btn",()=>{const box=Array.isArray(place.boundingbox)?place.boundingbox.map(Number):[];let zoom=17;if(box.length===4&&box.every(Number.isFinite)){const span=Math.max(Math.abs(box[1]-box[0]),Math.abs(box[3]-box[2]));zoom=span>5?7:span>1?10:span>.15?13:17;}showMapLocation(lat+","+lon,zoom,"Showing "+title+" in interactive Google Maps. Drag and zoom to explore.");searchResultsNode.replaceChildren($("p","msz-map-picked","Map moved to "+title+". Browse the surrounding streets, neighbourhoods and places."));}));searchResultsNode?.append(row);});}catch(error){searchResultsNode?.replaceChildren($("p","msz-notice error",error.message||"Place search failed."));}finally{if(buttonNode){buttonNode.disabled=false;buttonNode.textContent="Search places";}}}
 function exportCsv(){const header=["Record","Site ID","Site","Address","Site status","Team","Zone ID","Zone","Floor / area","Zone status","Assigned members","Operations"];const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const data=[header];sites.forEach(s=>{const allowed=authorized(s),zs=allowed?siteZones(s):[];if(!zs.length)data.push(["Site",s.id,s.name,s.address,s.status,allowed?(s.team_name||s.team_id):"Restricted","","","","","",""]);zs.forEach(z=>data.push(["Zone",s.id,s.name,s.address,s.status,z.effective_team_name||z.team_name,z.id,z.name,z.floor_label,z.status,z.member_count,z.operation_count]));});const blob=new Blob(["\ufeff"+data.map(r=>r.map(quote).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=$("a");a.href=url;a.download="mechnar-supervisor-sites-zones.csv";a.click();URL.revokeObjectURL(url);notify("Exported organisation directory and authorised zone information.","success");}
 function exportPdf(){const w=window.open("","_blank");if(!w){notify("Allow pop-ups to create the PDF report.","error");return;}const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));const content=sites.map(s=>{const zs=authorized(s)?siteZones(s):[];return "<section><h2>"+esc(s.name)+"</h2><p>"+esc(s.address)+" · "+esc(s.status)+"</p>"+(authorized(s)?"<p>Team: "+esc(s.team_name||s.team_id)+" · Operations: "+siteOps(s).length+"</p>":"<p>Operational details restricted to authorised team scope.</p>")+"<ul>"+zs.map(z=>"<li>"+esc(z.name)+" — "+esc(z.floor_label)+" — "+esc(z.status)+"</li>").join("")+"</ul></section>";}).join("");w.document.write("<!doctype html><html><head><title>MECHNAR Sites & Zones</title><style>body{font:13px Arial;margin:30px;color:#222}h1{font-size:23px}section{break-inside:avoid;margin:22px 0}li{margin:5px 0}</style></head><body><h1>MECHNAR · Supervisor Sites & Zones</h1><p>Generated "+esc(new Date().toLocaleString())+"</p>"+content+"<script>window.onload=()=>window.print()<\/script></body></html>");w.document.close();}
-function render(container){host=container;host.replaceChildren();const page=$("main","msz"),style=$("style");style.textContent=css;page.append(style);const header=$("header","msz-head"),intro=$("div");intro.append($("p","msz-kicker","TEAM OPERATIONS  /  PLACE DIRECTORY"),$("h1","","Sites & Zones"),$("p","msz-intro","Browse organisation sites and manage the operational zones within your authorised team scope. Admin retains ownership of organisation-wide locations and team assignments."));const tools=$("div","msz-tools");tools.append(button("Export CSV","msz-btn",exportCsv),button("PDF report","msz-btn",exportPdf));header.append(intro,tools);page.append(header);const toolbar=$("div","msz-toolbar"),q=$("input","msz-input");q.placeholder="Search site name, address or team";q.addEventListener("input",()=>{search=q.value.trim().toLowerCase();drawDirectory();});const filter=$("select","msz-select");[["all","All statuses"],["active","Active"],["inactive","Inactive"],["archived","Archived"]].forEach(([v,l])=>filter.append(new Option(l,v)));filter.addEventListener("change",()=>{status=filter.value;drawDirectory();});toolbar.append(q,filter);page.append(toolbar);const noticeNode=$("p","msz-notice");noticeNode.dataset.notice="1";page.append(noticeNode);const metrics=$("div","msz-metrics");metrics.dataset.metrics="1";page.append(metrics);const mapPanel=$("section","msz-map-panel"),mapHead=$("div","msz-map-head"),mapTitle=$("div");mapTitle.append($("strong","","Browse map"),$("p","","Explore the real-world location, search countries, cities, roads, landmarks and addresses, and inspect nearby mapped places."));mapHead.append(mapTitle,$("span","msz-map-chip","OpenStreetMap · no API key"));const mapSearch=$("form","msz-map-search"),mapInput=$("input","msz-input");mapInput.placeholder="Search a real place, city, landmark or address";mapInput.autocomplete="off";mapInput.dataset.mapSearch="1";const find=button("Search places","msz-btn msz-primary",null);find.type="submit";find.dataset.mapFind="1";mapSearch.append(mapInput,find);mapSearch.addEventListener("submit",e=>{e.preventDefault();searchPlaces(mapInput.value.trim());});searchResultsNode=$("div","msz-map-results");mapNoticeNode=$("div","msz-map-notice");mapNoticeNode.hidden=true;const mapNode=$("div","msz-map");mapNode.dataset.map="1";const mapFooter=$("div","msz-map-footer");mapFooter.append($("p","","Geographic reference only · map coverage depends on OpenStreetMap data."),button("Show all organisation sites","msz-btn",fitAllSitePins));mapPanel.append(mapHead,mapSearch,searchResultsNode,mapNoticeNode,mapNode,mapFooter);page.append(mapPanel);const workspace=$("section","msz-section");workspace.append($("h2","","Organisation sites"));const directory=$("div","msz-directory");directory.dataset.sites="1";workspace.append(directory);const zonePanel=$("section","msz-section");zonePanel.dataset.zones="1";zonePanel.append($("h2","","Authorised zones"));workspace.append(zonePanel);page.append(workspace);host.append(page);(async()=>{try{await load();draw();initMap();}catch(e){notify(e.message||"Sites & Zones could not load. Check your connection and refresh.","error");}})();}
+function render(container){host=container;host.replaceChildren();const page=$("main","msz"),style=$("style");style.textContent=css;page.append(style);const header=$("header","msz-head"),intro=$("div");intro.append($("p","msz-kicker","TEAM OPERATIONS  /  PLACE DIRECTORY"),$("h1","","Sites & Zones"),$("p","msz-intro","Browse organisation sites and manage the operational zones within your authorised team scope. Admin retains ownership of organisation-wide locations and team assignments."));const tools=$("div","msz-tools");tools.append(button("Export CSV","msz-btn",exportCsv),button("PDF report","msz-btn",exportPdf));header.append(intro,tools);page.append(header);const toolbar=$("div","msz-toolbar"),q=$("input","msz-input");q.placeholder="Search site name, address or team";q.addEventListener("input",()=>{search=q.value.trim().toLowerCase();drawDirectory();});const filter=$("select","msz-select");[["all","All statuses"],["active","Active"],["inactive","Inactive"],["archived","Archived"]].forEach(([v,l])=>filter.append(new Option(l,v)));filter.addEventListener("change",()=>{status=filter.value;drawDirectory();});toolbar.append(q,filter);page.append(toolbar);const noticeNode=$("p","msz-notice");noticeNode.dataset.notice="1";page.append(noticeNode);const metrics=$("div","msz-metrics");metrics.dataset.metrics="1";page.append(metrics);const mapPanel=$("section","msz-map-panel"),mapHead=$("div","msz-map-head"),mapTitle=$("div");mapTitle.append($("strong","","Interactive map"),$("p","","Browse the real world inside MECHNAR. Drag the map to move, zoom in and out, and explore surrounding roads, neighbourhoods and places."));mapHead.append(mapTitle,$("span","msz-map-chip","Google Maps · interactive"));const mapSearch=$("form","msz-map-search"),mapInput=$("input","msz-input");mapInput.placeholder="Search a city, neighbourhood, landmark or address";mapInput.autocomplete="off";mapInput.dataset.mapSearch="1";const find=button("Search places","msz-btn msz-primary",null);find.type="submit";find.dataset.mapFind="1";mapSearch.append(mapInput,find);mapSearch.addEventListener("submit",e=>{e.preventDefault();searchPlaces(mapInput.value.trim());});searchResultsNode=$("div","msz-map-results");mapNoticeNode=$("div","msz-map-notice");mapNoticeNode.hidden=true;const mapNode=$("iframe","msz-map");mapNode.dataset.mapFrame="1";mapNode.title="Interactive Google Map of organisation sites";mapNode.loading="lazy";mapNode.allowFullscreen=true;mapNode.referrerPolicy="no-referrer-when-downgrade";mapNode.src=mapUrl("India",5);const mapFooter=$("div","msz-map-footer");mapFooter.append($("p","","Select an organisation site to centre the map on its saved coordinates."),button("Show organisation sites","msz-btn",fitAllSitePins));mapPanel.append(mapHead,mapSearch,searchResultsNode,mapNoticeNode,mapNode,mapFooter);page.append(mapPanel);const workspace=$("section","msz-section");workspace.append($("h2","","Organisation sites"));const directory=$("div","msz-directory");directory.dataset.sites="1";workspace.append(directory);const zonePanel=$("section","msz-section");zonePanel.dataset.zones="1";zonePanel.append($("h2","","Authorised zones"));workspace.append(zonePanel);page.append(workspace);host.append(page);(async()=>{try{await load();draw();initMap();}catch(e){notify(e.message||"Sites & Zones could not load. Check your connection and refresh.","error");}})();}
 window.MechnarSupervisorSitesZones=Object.freeze({render});
 })();
