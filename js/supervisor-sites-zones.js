@@ -165,11 +165,11 @@ function drawMapPins(){
         fillOpacity:.95
       }).addTo(landmarkLayer);
       marker.bindTooltip(name,{permanent:true,direction:"top",offset:[0,-6],opacity:.98,className:"ct-loc-landmark-label"});
-      const popup=el("div","ct-loc-building-popup");
-      popup.append(el("strong","",name),el("span","",category));
+      const popup=$("div","ct-loc-building-popup");
+      popup.append($("strong","",name),$("span","",category));
       const locality=[tags["addr:suburb"],tags["addr:neighbourhood"],tags["addr:town"],tags["addr:village"],tags["addr:city"],tags["addr:county"],tags["addr:state"],tags["addr:country"]].filter(Boolean);
-      if(locality.length)popup.append(el("span","",locality.filter((v,i,a)=>a.indexOf(v)===i).join(", ")));
-      popup.append(el("small","","OpenStreetMap named feature · map coverage varies by area."));
+      if(locality.length)popup.append($("span","",locality.filter((v,i,a)=>a.indexOf(v)===i).join(", ")));
+      popup.append($("small","","OpenStreetMap named feature · map coverage varies by area."));
       marker.bindPopup(popup);count++;
     });
     mapMsg(count
@@ -222,11 +222,11 @@ function drawMapPins(){
         const tags=item.tags||{},geometry=Array.isArray(item.geometry)?item.geometry.map(p=>[Number(p.lat),Number(p.lon)]):[];
         if(geometry.length<4||geometry.some(p=>!Number.isFinite(p[0])||!Number.isFinite(p[1])))return;
         const polygon=L.polygon(geometry,{color:"#e2a33b",weight:1.5,opacity:.95,fillColor:"#f6bf51",fillOpacity:.18});
-        const popup=el("div","ct-loc-building-popup");
-        popup.append(el("strong","",tags.name||tags["addr:housenumber"]||("Mapped building #"+item.id)));
+        const popup=$("div","ct-loc-building-popup");
+        popup.append($("strong","",tags.name||tags["addr:housenumber"]||("Mapped building #"+item.id)));
         const metadata=[tags.building&&("Type: "+tags.building),tags["building:levels"]&&("Floors: "+tags["building:levels"]),tags["addr:street"],tags["addr:city"]].filter(Boolean);
-        if(metadata.length)popup.append(el("div","",metadata.join(" · ")));
-        popup.append(el("small","", "Building footprint from OpenStreetMap · map data may be incomplete."));
+        if(metadata.length)popup.append($("div","",metadata.join(" · ")));
+        popup.append($("small","", "Building footprint from OpenStreetMap · map data may be incomplete."));
         polygon.bindPopup(popup);
         if(tags.name)polygon.bindTooltip(tags.name,{sticky:true});
         polygon.addTo(buildingLayer);count++;
@@ -259,7 +259,7 @@ function initMap(){
  if(!node)return;
  if(!window.L){node.textContent="The map library did not load. Refresh the page to retry.";return;}
  if(map){try{map.off();map.remove();}catch(_){}map=null;}
- map=L.map(node,{scrollWheelZoom:false,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20}).setView([20,0],3);
+ map=L.map(node,{scrollWheelZoom:false,zoomControl:true,preferCanvas:true,worldCopyJump:false,maxZoom:20,dragging:true,touchZoom:true,doubleClickZoom:true,boxZoom:true,keyboard:true}).setView([20,0],3);
  node.addEventListener("wheel",e=>{
   if(!e.ctrlKey||!map)return;e.preventDefault();if(!e.deltaY)return;
   const current=map.getZoom(),next=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),current+(e.deltaY<0?1:-1)));
