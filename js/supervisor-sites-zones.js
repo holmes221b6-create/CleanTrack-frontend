@@ -265,10 +265,14 @@ function initMap(){
   const current=map.getZoom(),next=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),current+(e.deltaY<0?1:-1)));
   if(next!==current)map.setZoomAround(map.mouseEventToLatLng(e),next,{animate:false});
  },{passive:false});
- const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,maxNativeZoom:19,noWrap:true,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'});
- tiles.on("tileerror",()=>mapMsg("Map tiles could not load. Check your connection. The site directory remains available.",true));tiles.addTo(map);
+ const osmTiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,maxNativeZoom:19,noWrap:true,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'});
+ const cartoTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:20,noWrap:true,attribution:'&copy; OpenStreetMap contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+ let osmLoaded=0,osmErrors=0,fallbackActivated=false;
+ osmTiles.on("tileload",()=>{osmLoaded++;});
+ osmTiles.on("tileerror",()=>{osmErrors++;if(!fallbackActivated&&osmErrors>=3&&osmLoaded===0){fallbackActivated=true;if(map.hasLayer(osmTiles))map.removeLayer(osmTiles);cartoTiles.addTo(map);mapMsg("Using alternate street-map tiles because the primary OpenStreetMap tile server did not respond.",false);}});
+ osmTiles.addTo(map);
  mapLayer=L.layerGroup().addTo(map);buildingLayer=L.layerGroup();landmarkLayer=L.layerGroup();
- L.control.layers({"Street map":tiles},{"Landmarks & localities (OpenStreetMap)":landmarkLayer,"Building footprints (OpenStreetMap)":buildingLayer},{collapsed:true,position:"topright"}).addTo(map);
+ L.control.layers({"OpenStreetMap":osmTiles,"Alternate street map":cartoTiles},{"Landmarks & localities (OpenStreetMap)":landmarkLayer,"Building footprints (OpenStreetMap)":buildingLayer},{collapsed:true,position:"topright"}).addTo(map);
  map.on("overlayadd",e=>{if(e.layer===buildingLayer)loadBuildingFootprints(true);if(e.layer===landmarkLayer)loadLandmarks(true);});
  map.on("moveend",()=>{
   if(buildingLayer&&map.hasLayer(buildingLayer)){if(buildingRefreshTimer)clearTimeout(buildingRefreshTimer);buildingRefreshTimer=setTimeout(()=>loadBuildingFootprints(false),900);}
