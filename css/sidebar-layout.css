@@ -966,8 +966,8 @@ html body #app-modal #modal-title .ct-shadow-panel-tap-target .ct-shadow-panel-m
 }
 html body #app-modal #modal-title .ct-shadow-panel-tongue {
   position: absolute !important; z-index: 5 !important;
-  left: 50% !important; top: 60% !important;
-  display: block !important; width: 9px !important; height: 0 !important;
+  left: 50% !important; top: 52% !important;
+  display: block !important; width: 11px !important; height: 0 !important;
   border: 1.5px solid #ffb0cf !important;
   border-radius: 2px 2px 7px 7px !important;
   background: linear-gradient(90deg,#b91550 0%,#f04483 48%,#c51e5b 100%) !important;
@@ -991,8 +991,8 @@ html body #app-modal #modal-title .ct-shadow-panel-tap-target.is-tongue-out .ct-
 }
 @keyframes ctShadowTongueReveal {
   0%,24%,100% { height: 0; opacity: 0; transform: translateX(-50%) scaleY(0); }
-  38% { height: 16px; opacity: 1; transform: translateX(-50%) scaleY(1); }
-  65% { height: 16px; opacity: 1; transform: translateX(-50%) scaleY(1); }
+  34% { height: 15px; opacity: 1; transform: translateX(-50%) scaleY(1); }
+  68% { height: 15px; opacity: 1; transform: translateX(-50%) scaleY(1); }
   84% { height: 9px; opacity: .9; transform: translateX(-50%) scaleY(.65); }
 }
 @media (max-width: 600px) {
