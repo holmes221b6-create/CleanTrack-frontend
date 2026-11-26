@@ -2313,7 +2313,15 @@ function bindNavigation() {
       }, 2600);
     };
     if (splash) {
-      splash.addEventListener("click", enterApplication);
+      // Pointer-down fires at the instant the finger/mouse touches the title screen,
+      // rather than waiting for the later click event after release.
+      splash.addEventListener("pointerdown", function (event) {
+        if (event.isPrimary !== false && event.button !== 2) enterApplication();
+      }, { passive: true });
+      // Keep a click fallback for assistive technology that synthesizes clicks.
+      splash.addEventListener("click", function (event) {
+        if (event.detail === 0) enterApplication();
+      });
       splash.addEventListener("keydown", function (event) {
         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); enterApplication(); }
       });
