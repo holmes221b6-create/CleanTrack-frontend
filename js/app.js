@@ -2240,21 +2240,36 @@ function bindNavigation() {
     // user-controlled: tap/click anywhere or press Enter.
     const splash = document.getElementById("cleantrack-launch-splash");
     let launchUser = null, launchReady = false, launchRequested = false;
+    let launchEntryPending = false;
     const enterApplication = function () {
-      if (!launchReady) { launchRequested = true; return; }
-      if (!splash || !splash.isConnected) return;
-      splash.classList.add("ct-launch-exiting");
+      if (launchEntryPending || !splash || !splash.isConnected) return;
+      launchEntryPending = true;
+      splash.classList.add("ct-launch-preparing");
+      const beginButton = splash.querySelector(".ct-launch-begin");
+      if (beginButton) {
+        beginButton.textContent = "PREPARING MECHNAR";
+        beginButton.setAttribute("aria-label", "Preparing MECHNAR");
+      }
+      // Keep the title screen visible briefly after user input, then transition.
       window.setTimeout(function () {
-        if (launchUser) {
-          try {
-            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
-            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-          } catch (_) {}
-          showAuthenticatedLayout(launchUser);
-        } else showUnauthenticatedLayout();
-        splash.remove();
-      }, 520);
+        if (!splash.isConnected) return;
+        if (!launchReady) {
+          launchRequested = true;
+          return;
+        }
+        splash.classList.add("ct-launch-exiting");
+        window.setTimeout(function () {
+          if (launchUser) {
+            try {
+              const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
+              sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+              sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+            } catch (_) {}
+            showAuthenticatedLayout(launchUser);
+          } else showUnauthenticatedLayout();
+          splash.remove();
+        }, 520);
+      }, 2600);
     };
     if (splash) {
       splash.addEventListener("click", enterApplication);
