@@ -2273,7 +2273,7 @@ function bindNavigation() {
           const master = context.createGain();
           const compressor = context.createDynamicsCompressor();
           master.gain.setValueAtTime(0.0001, now);
-          master.gain.exponentialRampToValueAtTime(0.26, now + 0.08);
+          master.gain.exponentialRampToValueAtTime(0.30, now + 0.08);
           master.gain.setTargetAtTime(0.0001, now + 1.05, 0.24);
           compressor.threshold.setValueAtTime(-20, now);
           compressor.knee.setValueAtTime(18, now);
@@ -2357,7 +2357,7 @@ function bindNavigation() {
       // The icon-only brand intro lasts 2.75s. Only then reveal the prompt and enable entry.
       window.setTimeout(function () {
         if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 2550);
+      }, 1950);
     }
     setLoading(false);
     try {
