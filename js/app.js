@@ -2243,16 +2243,23 @@ function bindNavigation() {
     let launchEntryPending = false;
     const finishLaunch = function () {
       if (!splash || !splash.isConnected || !launchReady) return;
+
+      // Prepare the correct destination UNDER the splash before fading it.
+      // Otherwise the default auth markup is exposed during the 520ms exit
+      // transition, causing a login-page flash before the authenticated app.
+      if (launchUser) {
+        try {
+          const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
+          sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+          sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+        } catch (_) {}
+        showAuthenticatedLayout(launchUser);
+      } else {
+        showUnauthenticatedLayout();
+      }
+
       splash.classList.add("ct-launch-exiting");
       window.setTimeout(function () {
-        if (launchUser) {
-          try {
-            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
-            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-          } catch (_) {}
-          showAuthenticatedLayout(launchUser);
-        } else showUnauthenticatedLayout();
         splash.remove();
       }, 520);
     };
