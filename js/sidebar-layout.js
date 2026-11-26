@@ -584,10 +584,9 @@ if (identity) {
         const modalTitle = document.getElementById("modal-title");
         if (modalTitle) {
           modalTitle.replaceChildren();
-          const shadowTapTarget = document.createElement("span");
+          const shadowTapTarget = document.createElement("button");
+          shadowTapTarget.type = "button";
           shadowTapTarget.className = "ct-shadow-panel-tap-target";
-          shadowTapTarget.setAttribute("role", "button");
-          shadowTapTarget.setAttribute("tabindex", "0");
           shadowTapTarget.setAttribute("aria-label", "Make Shadow stick out its tongue");
           const shadowMark = document.createElement("img");
           shadowMark.className = "ct-shadow-panel-mark";
@@ -609,12 +608,9 @@ if (identity) {
               shadowTapTarget.classList.remove("is-tongue-out");
             }, 480);
           };
-          shadowTapTarget.addEventListener("click", playTongue);
-          shadowTapTarget.addEventListener("keydown", event => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              playTongue();
-            }
+          shadowTapTarget.addEventListener("click", event => {
+            event.stopPropagation();
+            playTongue();
           });
           const titleText = document.createElement("span");
           titleText.textContent = "Shadow Assistance";
