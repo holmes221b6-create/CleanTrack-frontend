@@ -608,9 +608,13 @@ if (identity) {
               shadowTapTarget.classList.remove("is-tongue-out");
             }, 480);
           };
-          shadowTapTarget.addEventListener("click", event => {
+          shadowTapTarget.addEventListener("pointerdown", event => {
             event.stopPropagation();
             playTongue();
+          });
+          shadowTapTarget.addEventListener("click", event => {
+            event.stopPropagation();
+            if (event.detail === 0) playTongue();
           });
           const titleText = document.createElement("span");
           titleText.textContent = "Shadow Assistance";
