@@ -1,6 +1,14 @@
 {
   "updates": [
     {
+      "id": "profile-visibility-guided-switch-2026-11-v1",
+      "page": "settings",
+      "section": "privacy",
+      "feature": "Profile Visibility Preference",
+      "target": "[data-whats-new-anchor=\"profile-visibility\"]",
+      "description": "The Profile Visibility Preference is now a themed ON/OFF switch. Turn it on to prefer visibility limited to authorized members of your organization, or turn it off to disable that preference. This is an account preference only; server-enforced role and organization permissions always take priority."
+    },
+    {
       "id": "teams-native-team-performance-2026-11-v1",
       "page": "teams",
       "feature": "Team Performance Overview",
