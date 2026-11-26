@@ -3,6 +3,7 @@
   "use strict";
   let RELEASE_UPDATES=[];
   let manifestRequest=null;
+  let manifestLoaded=false;
   let activeGuide=null;
   const auth=window.CleanTrackAuth;
   const user=()=>auth&&auth.getCurrentUser?auth.getCurrentUser():null;
@@ -16,11 +17,12 @@
   const unseen=page=>RELEASE_UPDATES.filter(x=>x.page===page&&!read().includes(x.id));
 
   async function loadManifest(){
+    if(manifestLoaded)return Promise.resolve(RELEASE_UPDATES);
     if(manifestRequest)return manifestRequest;
     manifestRequest=fetch("whats-new.json?v="+encodeURIComponent(Date.now()),{cache:"no-store",credentials:"same-origin"})
       .then(r=>{if(!r.ok)throw new Error("Release manifest unavailable");return r.json()})
-      .then(data=>{RELEASE_UPDATES=Array.isArray(data.updates)?data.updates.filter(x=>x&&x.id&&x.page&&x.feature):[];decorate();return RELEASE_UPDATES})
-      .catch(()=>{RELEASE_UPDATES=[];decorate();return RELEASE_UPDATES})
+      .then(data=>{RELEASE_UPDATES=Array.isArray(data.updates)?data.updates.filter(x=>x&&x.id&&x.page&&x.feature):[];manifestLoaded=true;decorate();return RELEASE_UPDATES})
+      .catch(()=>{RELEASE_UPDATES=[];manifestLoaded=false;decorate();return RELEASE_UPDATES})
       .finally(()=>{manifestRequest=null});
     return manifestRequest;
   }
@@ -35,8 +37,9 @@
     });
   }
   function showUpdates(page){
-    const shown=presented(),list=unseen(page).filter(x=>!shown.includes(x.id));if(!list.length)return;
-    savePresented([...shown,...list.map(x=>x.id)]);
+    // Keep pending announcements available until the user explicitly explores
+    // the walkthrough or skips it. Closing the dialog is not an acknowledgement.
+    const list=unseen(page);if(!list.length)return;
     document.getElementById("mn-whats-new-overlay")?.remove();
     const overlay=document.createElement("div");overlay.id="mn-whats-new-overlay";overlay.className="mn-whats-new-overlay";
     const panel=document.createElement("section");panel.className="mn-whats-new-panel";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","What's New");
@@ -92,9 +95,13 @@
     closeGuide(false);
     const nav=window.CleanTrackNavigation;
     if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
+    if(update.section){
+      const sectionButton=document.querySelector(`[data-settings-nav="${CSS.escape(update.section)}"]`);
+      if(sectionButton)sectionButton.click();
+    }
     const findTarget=()=>{
       try{
-        if(update.target){const exact=document.querySelector(update.target);if(exact)return exact;}
+        if(update.target){const exact=document.querySelector(update.target);if(exact&&exact.getClientRects().length)return exact;}
         const wanted=String(update.feature||"").trim().toLowerCase();
         const candidates=Array.from(document.querySelectorAll("h1,h2,h3,h4,[role='tab'],button,.sr-panel-heading,.sr-directory-card,.sr-metric"));
         const exact=candidates.find(node=>node.getClientRects().length&&node.textContent.trim().toLowerCase()===wanted);
