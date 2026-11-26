@@ -1,65 +1,40 @@
-/* Header is outside #workspace-view, so target the real global header button. */
-body #notifications-button.has-unopened-notifications {
-  animation: mechnar-bell-button-pulse 1.15s ease-in-out infinite !important;
-  transform-origin: 50% 50% !important;
-  will-change: transform, filter !important;
-}
+/* MECHNAR notification indicator: keep the bell still and sweep a soft highlight down it. */
+body #notifications-button.has-unopened-notifications { animation:none!important; filter:none!important; transform:none!important; }
 body #notifications-button.has-unopened-notifications .notification-bell-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  animation: mechnar-bell-swing 1.15s ease-in-out infinite !important;
-  transform-origin: 50% 12% !important;
+  position:relative!important; overflow:hidden!important; isolation:isolate;
+  animation:none!important; transform:none!important;
+}
+body #notifications-button.has-unopened-notifications .notification-bell-icon::after {
+  content:""; position:absolute; z-index:2; top:-115%; left:0; width:100%; height:100%;
+  border-radius:50%; pointer-events:none;
+  background:linear-gradient(to bottom,transparent 0%,rgba(222,198,255,.04) 28%,rgba(238,224,255,.88) 49%,rgba(183,135,245,.22) 57%,transparent 78%);
+  mix-blend-mode:screen;
+  animation:mechnar-bell-vertical-shine 2.4s cubic-bezier(.35,0,.55,1) infinite;
 }
 body #notifications-button .notification-bell-icon svg {
-  display: block !important;
-  width: 21px !important;
-  height: 21px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 1.8 !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
+  display:block!important; width:21px!important; height:21px!important; fill:none!important;
+  stroke:currentColor!important; stroke-width:1.8!important; stroke-linecap:round!important; stroke-linejoin:round!important;
 }
 body #notifications-button.has-unopened-notifications .notification-count {
-  animation: mechnar-bell-badge-pulse .8s ease-in-out infinite !important;
+  animation:mechnar-bell-badge-pulse 1.8s ease-in-out infinite!important;
 }
-@keyframes mechnar-bell-swing {
-  0%, 100% { transform: rotate(0) scale(1); }
-  8%, 24%, 40% { transform: rotate(-18deg) scale(1.12); }
-  16%, 32%, 48% { transform: rotate(18deg) scale(1.12); }
-  56%, 70% { transform: rotate(0) scale(1); }
-}
-@keyframes mechnar-bell-button-pulse {
-  0%, 100% { filter: drop-shadow(0 0 0 rgba(174,139,220,0)); }
-  50% { filter: drop-shadow(0 0 8px rgba(174,139,220,.95)); }
+@keyframes mechnar-bell-vertical-shine {
+  0%,12% { transform:translateY(0); opacity:0; }
+  22% { opacity:.95; }
+  72% { opacity:.85; }
+  88%,100% { transform:translateY(230%); opacity:0; }
 }
 @keyframes mechnar-bell-badge-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 3px rgba(124,58,237,.55), 0 0 0 1px rgba(196,181,253,.35); }
-  50% { transform: scale(1.18); box-shadow: 0 0 12px rgba(139,92,246,.95), 0 0 0 2px rgba(221,214,254,.55); }
+  0%,100% { transform:scale(1); box-shadow:0 0 3px rgba(124,58,237,.55),0 0 0 1px rgba(196,181,253,.35); }
+  50% { transform:scale(1.12); box-shadow:0 0 10px rgba(139,92,246,.85),0 0 0 2px rgba(221,214,254,.48); }
 }
-/* Explicitly requested notification motion takes precedence over OS motion preference. */
-@media (prefers-reduced-motion: reduce) {
-  body #notifications-button.has-unopened-notifications,
-  body #notifications-button.has-unopened-notifications .notification-bell-icon,
-  body #notifications-button.has-unopened-notifications .notification-count {
-    animation-duration: 1.15s !important;
-    animation-iteration-count: infinite !important;
-  }
+@media(prefers-reduced-motion:reduce) {
+  body #notifications-button.has-unopened-notifications .notification-bell-icon::after,
+  body #notifications-button.has-unopened-notifications .notification-count { animation:none!important; }
 }
-
-/* Fallback for browsers without the Web Animations API. */
-body #notifications-button.has-unopened-notifications .notification-bell-icon { animation: mechnar-bell-swing 1.1s ease-in-out infinite !important; }
-body #notifications-button.has-unopened-notifications { animation: mechnar-bell-button-pulse 1.1s ease-in-out infinite !important; }
-
-/* MECHNAR theme: unread notification counter uses the app's purple palette. */
-#notification-count,
-#notifications-button #notification-count,
-#notifications-button .notification-count {
-  background: linear-gradient(145deg, #581c87 0%, #3b0764 58%, #2e1065 100%) !important;
-  background-color: #3b0764 !important;
-  color: #ffffff !important;
-  border: 1px solid #c4b5fd !important;
-  box-shadow: 0 0 0 1px rgba(76, 29, 149, .55), 0 0 10px rgba(124, 58, 237, .72) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .65) !important;
+#notification-count,#notifications-button #notification-count,#notifications-button .notification-count {
+  background:linear-gradient(145deg,#581c87 0%,#3b0764 58%,#2e1065 100%)!important;
+  background-color:#3b0764!important; color:#fff!important; border:1px solid #c4b5fd!important;
+  box-shadow:0 0 0 1px rgba(76,29,149,.55),0 0 10px rgba(124,58,237,.72)!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.65)!important;
 }
