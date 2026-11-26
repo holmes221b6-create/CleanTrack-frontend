@@ -971,6 +971,30 @@
     }, 1800);
   }
 
+  // Keep recently visited workspaces mounted off-screen. Returning to a page
+  // restores its live DOM, form state, scroll position and event handlers
+  // instead of rebuilding the workspace and repeating its API requests.
+  const pageViewCache = new Map();
+  const pageScrollCache = new Map();
+  const PAGE_VIEW_CACHE_LIMIT = 12;
+
+  function cacheCurrentPage(pageId, pageContent) {
+    if (!pageId || !pageContent || !pageContent.childNodes.length) return;
+    const fragment = document.createDocumentFragment();
+    while (pageContent.firstChild) fragment.appendChild(pageContent.firstChild);
+    pageViewCache.delete(pageId);
+    pageViewCache.set(pageId, fragment);
+    pageScrollCache.set(pageId, {
+      windowY: window.scrollY || 0,
+      contentTop: pageContent.scrollTop || 0
+    });
+    while (pageViewCache.size > PAGE_VIEW_CACHE_LIMIT) {
+      const oldest = pageViewCache.keys().next().value;
+      pageViewCache.delete(oldest);
+      pageScrollCache.delete(oldest);
+    }
+  }
+
   async function renderPage(pageId) {
     const previousPage = state.currentPage;
     if (pageId === "personnel" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
@@ -1027,6 +1051,28 @@
     }
 
     if (!pageContent) return;
+
+    // Save the workspace being left before changing the visible page.
+    if (previousPage && previousPage !== pageId) {
+      cacheCurrentPage(previousPage, pageContent);
+    }
+
+    // Restore previously opened workspaces instantly without re-running
+    // their render functions or their initial API requests.
+    const cachedView = pageViewCache.get(pageId);
+    if (cachedView) {
+      pageViewCache.delete(pageId);
+      pageContent.replaceChildren(cachedView);
+      const savedScroll = pageScrollCache.get(pageId);
+      requestAnimationFrame(() => {
+        if (savedScroll) {
+          window.scrollTo(0, savedScroll.windowY);
+          pageContent.scrollTop = savedScroll.contentTop;
+        }
+      });
+      if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
+      return;
+    }
 
     pageContent.replaceChildren();
     beginInstantPageFrame(pageContent, pageId);
