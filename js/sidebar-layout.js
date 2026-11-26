@@ -592,7 +592,7 @@ if (identity) {
           shadowMark.draggable = false;
           const titleText = document.createElement("span");
           titleText.textContent = "Shadow Assistance";
-          modalTitle.append(shadowMark, titleText);
+          modalTitle.append(titleText, shadowMark);
           modalTitle.classList.add("ct-shadow-panel-title");
         }
         const wrap = appendText(content, "div", "", "ct-help-dialog ct-assistant-chat");
