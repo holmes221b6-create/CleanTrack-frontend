@@ -26,3 +26,8 @@
 @keyframes mnGuidePop{from{opacity:0;transform:translateY(9px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:600px){.mn-whats-new-overlay{padding:12px}.mn-whats-new-panel{padding:17px}.mn-whats-new-actions{gap:8px}.mn-whats-new-action,.mn-whats-new-skip{flex:1;padding:9px 10px}.mn-whats-new-guide{padding:16px}}
 @media(prefers-reduced-motion:reduce){.mn-whats-new-dot,.mn-whats-new-guide{animation:none}.mn-whats-new-action,.mn-whats-new-skip{transition:none}}
+
+/* Guided walkthrough is a blocking modal layer, anchored to the actual feature. */
+.mn-whats-new-guide-blocker{position:fixed;inset:0;z-index:100509;background:transparent;touch-action:none;overscroll-behavior:contain;cursor:wait}
+.mn-whats-new-guide{z-index:100510;pointer-events:auto}
+.mn-whats-new-highlight{position:relative;z-index:100508!important;}
