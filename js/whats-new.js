@@ -37,9 +37,13 @@
     });
   }
   function showUpdates(page){
-    // Keep pending announcements available until the user explicitly explores
-    // the walkthrough or skips it. Closing the dialog is not an acknowledgement.
-    const list=unseen(page);if(!list.length)return;
+    // The release announcement is shown once per update and per user/org.
+    // The guided walkthrough itself is launched only by the explicit Explore
+    // Features action. Closing the announcement does not acknowledge the update.
+    const shown=presented();
+    const list=unseen(page).filter(update=>!shown.includes(update.id));
+    if(!list.length)return;
+    savePresented([...shown,...list.map(update=>update.id)]);
     document.getElementById("mn-whats-new-overlay")?.remove();
     const overlay=document.createElement("div");overlay.id="mn-whats-new-overlay";overlay.className="mn-whats-new-overlay";
     const panel=document.createElement("section");panel.className="mn-whats-new-panel";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","What's New");
@@ -50,7 +54,7 @@
     list.forEach(update=>{
       const item=document.createElement("article");item.className="mn-whats-new-item";
       const h=document.createElement("h3");h.textContent=update.feature;
-      const action=document.createElement("button");action.type="button";action.className="mn-whats-new-action";action.textContent="Explore feature";
+      const action=document.createElement("button");action.type="button";action.className="mn-whats-new-action";action.textContent="Explore Features";
       action.addEventListener("click",async()=>{overlay.remove();await navigateToFeature(update)});
       const skip=document.createElement("button");skip.type="button";skip.className="mn-whats-new-skip";skip.textContent="Skip";
       skip.addEventListener("click",()=>{acknowledge(update);item.remove();if(!panel.querySelector(".mn-whats-new-item"))overlay.remove();});
