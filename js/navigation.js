@@ -376,7 +376,7 @@
         overlay.remove();
         window.__MECHNAR_TEAMS_LOADING__ = false;
       }
-    }, 3000);
+    }, 0);
   }, true);
 
   document.addEventListener("DOMContentLoaded", ensureBackButton);
