@@ -606,7 +606,7 @@ if (identity) {
             shadowTapTarget.classList.add("is-tongue-out");
             tongueTimer = window.setTimeout(() => {
               shadowTapTarget.classList.remove("is-tongue-out");
-            }, 480);
+            }, 900);
           };
           shadowTapTarget.addEventListener("pointerdown", event => {
             event.stopPropagation();
