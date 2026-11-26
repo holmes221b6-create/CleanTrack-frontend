@@ -138,6 +138,7 @@ function normalizeUser(user) {
     );
 
     if (currentUser) {
+      try { window.localStorage.setItem("mechnar.cached-user.v1", JSON.stringify(currentUser)); } catch (_) {}
       currentUser.first_login = Boolean(response.first_login ?? response.data?.first_login);
       try {
         const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
@@ -261,7 +262,7 @@ function normalizeUser(user) {
       currentUser = null;
       persistToken("");
       persistRefreshToken("");
-      try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); window.localStorage.removeItem(SESSION_AUTH_DAY_KEY); } catch (_) {}
+      try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); window.localStorage.removeItem(SESSION_AUTH_DAY_KEY); window.localStorage.removeItem("mechnar.cached-user.v1"); } catch (_) {}
       emitAuthEvent("cleantrack:logout", null);
     }
   }
@@ -314,6 +315,9 @@ function normalizeUser(user) {
       const user = response.user || response.data?.user || null;
 
       currentUser = normalizeUser(user);
+      if (currentUser) {
+        try { window.localStorage.setItem("mechnar.cached-user.v1", JSON.stringify(currentUser)); } catch (_) {}
+      }
 
       // Apply the signed-in user's saved preferences on every restored session.
       if (currentUser) {
@@ -325,8 +329,18 @@ function normalizeUser(user) {
     } catch (error) {
       // Never let a stale restore failure clear a successful newer login.
       if (restoreVersion !== authStateVersion) return currentUser;
-      currentUser = null;
-      if (error.status === 401 || error.status === 403) persistToken("");
+      if (error.status === 401 || error.status === 403) {
+        currentUser = null;
+        persistToken("");
+        persistRefreshToken("");
+      } else {
+        // A temporary network/API outage must not turn a valid same-day
+        // authenticated session into a login screen.
+        try {
+          const cached = JSON.parse(window.localStorage.getItem("mechnar.cached-user.v1") || "null");
+          currentUser = normalizeUser(cached);
+        } catch (_) { currentUser = null; }
+      }
 
       if (error.status !== 401 && error.status !== 403) {
         console.warn(
