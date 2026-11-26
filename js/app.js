@@ -2303,13 +2303,18 @@ function bindNavigation() {
             try { master.disconnect(); compressor.disconnect(); } catch (_) {}
           }, 1900);
         };
-        if (context.state === "running") {
-          play();
-        } else {
-          context.resume().then(play).catch(function (error) {
-            console.warn("MECHNAR launch audio could not resume:", error);
-          });
+        // Schedule the sound synchronously inside pointerdown/keydown.
+        // If the context is suspended, the nodes wait on its audio clock and
+        // begin as soon as resume() is accepted; we do not wait for its promise.
+        if (context.state !== "running") {
+          const resumeResult = context.resume();
+          if (resumeResult && typeof resumeResult.catch === "function") {
+            resumeResult.catch(function (error) {
+              console.warn("MECHNAR launch audio could not resume:", error);
+            });
+          }
         }
+        play();
       } catch (error) {
         console.warn("MECHNAR launch audio is unavailable:", error);
       }
@@ -2357,7 +2362,7 @@ function bindNavigation() {
       // Reveal the title immediately after the shortened icon intro completes.
       window.setTimeout(function () {
         if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 1820);
+      }, 1320);
     }
     setLoading(false);
     try {
