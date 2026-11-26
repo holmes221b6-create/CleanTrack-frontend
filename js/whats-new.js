@@ -65,6 +65,10 @@
     if(!activeGuide)return;
     const guide=activeGuide;activeGuide=null;
     guide.timer&&clearInterval(guide.timer);
+    guide.keydown&&document.removeEventListener("keydown",guide.keydown);
+    guide.blocker.remove();
+    document.body.style.overflow=guide.previousBodyOverflow;
+    if(guide.workspace){guide.workspace.inert=guide.previousInert;}
     guide.resize&&window.removeEventListener("resize",guide.resize);
     guide.scroll&&window.removeEventListener("scroll",guide.scroll,true);
     guide.bubble.remove();
@@ -112,9 +116,9 @@
         const words=wanted.split(/\\s+/).filter(word=>word.length>3);
         const partial=candidates.find(node=>node.getClientRects().length&&words.length&&words.every(word=>node.textContent.toLowerCase().includes(word)));
         if(partial)return partial.closest(".sr-panel,.sr-directory-card,.sr-metric,.sr-workspace,.sr-page")||partial;
-        // Automatic releases may not have a hand-authored selector. Anchor
-        // those guides to the visible workspace rather than silently failing.
-        return document.querySelector("#workspace-view main, #workspace-view .workspace-content, #workspace-view");
+        // Never place a walkthrough at a generic page/footer location. If its
+        // actual feature cannot be identified, do not show a misleading guide.
+        return null;
       }catch(_){return null}
     };
     let target=findTarget();
@@ -122,7 +126,16 @@
     if(!target)return false;
     target.scrollIntoView({behavior:"smooth",block:"center"});
     target.classList.add("mn-whats-new-highlight","mn-whats-new-pending-target");
-    const bubble=document.createElement("aside");bubble.className="mn-whats-new-guide";bubble.setAttribute("role","status");
+    const blocker=document.createElement("div");blocker.className="mn-whats-new-guide-blocker";blocker.setAttribute("aria-hidden","true");
+    const workspace=document.getElementById("workspace-view");
+    const previousInert=workspace?workspace.inert:false;
+    const previousBodyOverflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    if(workspace)workspace.inert=true;
+    const stop=(event)=>{event.preventDefault();event.stopPropagation();};
+    ["wheel","touchmove","pointerdown","click","keydown"].forEach(type=>blocker.addEventListener(type,stop,{passive:false}));
+    document.body.append(blocker);
+    const bubble=document.createElement("aside");bubble.className="mn-whats-new-guide";bubble.setAttribute("role","dialog");bubble.setAttribute("aria-modal","true");bubble.setAttribute("aria-label","Feature walkthrough");
     const pointer=document.createElement("span");pointer.className="mn-whats-new-guide-pointer";
     const kicker=document.createElement("div");kicker.className="mn-whats-new-guide-kicker";kicker.textContent="FEATURE WALKTHROUGH";
     const heading=document.createElement("h3");heading.textContent="Here's what's new";
@@ -132,9 +145,11 @@
     const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-whats-new-guide-dismiss";dismiss.textContent="×";dismiss.setAttribute("aria-label","Close walkthrough");
     dismiss.addEventListener("click",()=>closeGuide(false));
     bubble.append(pointer,dismiss,kicker,heading,text,done);document.body.append(bubble);
-    const guide={update,target,bubble,text,doneButton:done,timer:null,done:false};
+    const guide={update,target,bubble,blocker,workspace,previousInert,previousBodyOverflow,text,doneButton:done,timer:null,done:false};
     activeGuide=guide;
     guide.resize=()=>positionGuide(guide);guide.scroll=()=>positionGuide(guide);
+    guide.keydown=e=>{if(e.key==="Escape"){e.preventDefault();closeGuide(false);}else if(e.key==="Tab"){e.preventDefault();(document.activeElement===done?dismiss:done).focus();}};
+    document.addEventListener("keydown",guide.keydown);
     window.addEventListener("resize",guide.resize);window.addEventListener("scroll",guide.scroll,true);
     positionGuide(guide);setTimeout(()=>{if(activeGuide===guide){positionGuide(guide);typeDescription(guide)}},450);
     return true;
