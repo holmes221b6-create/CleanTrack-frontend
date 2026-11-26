@@ -584,15 +584,36 @@ if (identity) {
         const modalTitle = document.getElementById("modal-title");
         if (modalTitle) {
           modalTitle.replaceChildren();
+          const shadowTapTarget = document.createElement("span");
+          shadowTapTarget.className = "ct-shadow-panel-tap-target";
+          shadowTapTarget.setAttribute("role", "button");
+          shadowTapTarget.setAttribute("tabindex", "0");
+          shadowTapTarget.setAttribute("aria-label", "Make Shadow stick out its tongue");
           const shadowMark = document.createElement("img");
           shadowMark.className = "ct-shadow-panel-mark";
           shadowMark.src = "assets/shadow-character-imu.svg?v=3";
           shadowMark.alt = "";
           shadowMark.setAttribute("aria-hidden", "true");
           shadowMark.draggable = false;
+          const shadowTongue = document.createElement("span");
+          shadowTongue.className = "ct-shadow-panel-tongue";
+          shadowTongue.setAttribute("aria-hidden", "true");
+          shadowTapTarget.append(shadowMark, shadowTongue);
+          const playTongue = () => {
+            shadowTapTarget.classList.remove("is-tongue-out");
+            void shadowTapTarget.offsetWidth;
+            shadowTapTarget.classList.add("is-tongue-out");
+          };
+          shadowTapTarget.addEventListener("click", playTongue);
+          shadowTapTarget.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              playTongue();
+            }
+          });
           const titleText = document.createElement("span");
           titleText.textContent = "Shadow Assistance";
-          modalTitle.append(titleText, shadowMark);
+          modalTitle.append(titleText, shadowTapTarget);
           modalTitle.classList.add("ct-shadow-panel-title");
         }
         const wrap = appendText(content, "div", "", "ct-help-dialog ct-assistant-chat");
