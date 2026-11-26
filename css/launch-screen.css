@@ -2,7 +2,7 @@
 #cleantrack-launch-splash.ct-launch-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 45%,#241b31 0%,#111016 48%,#09090d 100%);color:#f4efff;opacity:1;transition:opacity .5s ease,transform .5s ease;cursor:pointer;touch-action:manipulation;user-select:none}
 #cleantrack-launch-splash.ct-launch-screen::before{content:"";position:absolute;inset:-30%;z-index:-2;background:conic-gradient(from 0deg at 50% 50%,transparent 0 20%,rgba(133,78,190,.09) 28%,transparent 38% 65%,rgba(94,62,148,.08) 75%,transparent 86%);opacity:0;animation:ctLaunchAura 34s linear infinite;animation-play-state:paused;transition:opacity 1s ease}
 #cleantrack-launch-splash.ct-launch-screen::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.48) 100%);pointer-events:none}
-.ct-launch-atmosphere{display:none;position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;transform:scale(1.025);filter:blur(8px);transition:opacity 1s ease,transform 1.25s cubic-bezier(.2,.75,.2,1),filter 1s ease}
+.ct-launch-atmosphere{display:none;position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;transform:scale(1.025);filter:blur(8px);transition:opacity .22s ease,transform .3s cubic-bezier(.2,.75,.2,1),filter .22s ease}
 .ct-launch-orbit{position:absolute;left:50%;top:46%;width:min(76vw,680px);aspect-ratio:1;border:1px solid rgba(174,130,225,.09);border-radius:50%;transform:translate(-50%,-50%);animation:ctLaunchOrbit 30s linear infinite}
 .ct-launch-orbit.orbit-two{width:min(54vw,470px);border-style:dashed;animation-duration:44s;animation-direction:reverse}
 .ct-launch-figure{position:absolute;display:grid;place-items:center;width:clamp(30px,5vw,58px);height:clamp(30px,5vw,58px);color:rgba(174,151,205,.25);filter:drop-shadow(0 0 12px rgba(151,101,207,.12));animation:ctLaunchFloat 8s ease-in-out infinite}
@@ -11,7 +11,7 @@
 .figure-shield{left:12%;bottom:25%;animation-delay:-5s}.figure-orb{right:13%;bottom:24%;animation-delay:-1s;color:rgba(175,143,221,.32)}
 .ct-launch-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#c9a7ff;box-shadow:0 0 12px 3px rgba(162,105,225,.55);animation:ctLaunchDrift 9s ease-in-out infinite}
 .p1{left:28%;top:17%}.p2{left:76%;top:20%;animation-delay:-3s}.p3{left:8%;top:55%;animation-delay:-5s}.p4{right:9%;top:63%;animation-delay:-2s}.p5{left:37%;bottom:17%;animation-delay:-4s}.p6{right:36%;bottom:12%;animation-delay:-6s}
-.ct-launch-icon-stage{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;align-items:center;gap:13px;transform:translate(-50%,-50%);animation:ctLaunchIconOut 1.9s ease forwards}
+.ct-launch-icon-stage{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;align-items:center;gap:13px;transform:translate(-50%,-50%);animation:ctLaunchIconOut 1.8s ease forwards}
 .ct-launch-icon-stage img{width:clamp(66px,12vw,112px);height:auto;filter:drop-shadow(0 0 24px rgba(151,95,215,.34))}
 .ct-launch-icon-stage span{font-size:clamp(13px,2vw,18px);font-weight:700;letter-spacing:.32em;color:#eee6f8}
 .ct-launch-title-stage{position:absolute;left:50%;top:46%;width:min(90%,560px);display:flex;flex-direction:column;align-items:center;text-align:center;opacity:0;transform:translate(-50%,-43%) scale(.94);animation:none}
@@ -44,7 +44,7 @@
 
 /* Cinematic hand-off: the animated world blooms in behind the fading brand mark. */
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere{display:block;opacity:1;transform:scale(1);filter:blur(0)}
-#cleantrack-launch-splash.ct-launch-title-active .ct-launch-title-stage{animation:ctLaunchTitleIn 1.25s cubic-bezier(.2,.75,.2,1) both}
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-title-stage{animation:ctLaunchTitleIn .65s cubic-bezier(.2,.75,.2,1) both}
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere .ct-launch-figure,
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere .ct-launch-particle{animation-play-state:running}
 
