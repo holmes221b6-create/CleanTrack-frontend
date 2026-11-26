@@ -63,5 +63,24 @@
 /* Profile privacy preference: native checkbox styled as the app's purple on/off switch. */
 .ct-settings-privacy-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0}
 .ct-settings-privacy-toggle-row .ct-settings-check{align-items:center;gap:14px;cursor:pointer;line-height:1.45}
-.ct-settings-privacy-toggle-row .ct-settings-check input{flex:0 0 46px;margin:0}
+.ct-settings-privacy-toggle-row .ct-settings-check{display:flex;align-items:center;justify-content:space-between;width:100%;gap:18px}
+.ct-settings-privacy-toggle-row .ct-settings-check input.ct-settings-toggle{
+ appearance:none!important;-webkit-appearance:none!important;
+ display:inline-block!important;position:relative;flex:0 0 48px!important;
+ width:48px!important;min-width:48px!important;height:27px!important;min-height:27px!important;
+ margin:0!important;padding:0!important;border:1px solid var(--border-strong)!important;
+ border-radius:999px!important;background:#555!important;box-shadow:inset 0 1px 3px rgb(0 0 0 / 25%)!important;
+ cursor:pointer;transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.ct-settings-privacy-toggle-row .ct-settings-check input.ct-settings-toggle::before{
+ content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;
+ border-radius:50%;background:#fff;box-shadow:0 1px 3px rgb(0 0 0 / 35%);
+ transition:transform .2s ease;
+}
+.ct-settings-privacy-toggle-row .ct-settings-check input.ct-settings-toggle:checked{
+ background:var(--primary)!important;border-color:var(--primary)!important;
+ box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 18%,transparent)!important;
+}
+.ct-settings-privacy-toggle-row .ct-settings-check input.ct-settings-toggle:checked::before{transform:translateX(21px)}
+.ct-settings-privacy-toggle-row .ct-settings-check input.ct-settings-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
 .ct-settings-privacy-toggle-row .ct-settings-muted{margin:8px 0 0}
