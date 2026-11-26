@@ -96,6 +96,9 @@
     const nav=window.CleanTrackNavigation;
     if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
     if(update.section){
+      // Route rendering is event-driven; wait for Settings to mount before
+      // selecting its nested section.
+      await new Promise(resolve=>setTimeout(resolve,350));
       const sectionButton=document.querySelector(`[data-settings-nav="${CSS.escape(update.section)}"]`);
       if(sectionButton)sectionButton.click();
     }
@@ -109,7 +112,9 @@
         const words=wanted.split(/\\s+/).filter(word=>word.length>3);
         const partial=candidates.find(node=>node.getClientRects().length&&words.length&&words.every(word=>node.textContent.toLowerCase().includes(word)));
         if(partial)return partial.closest(".sr-panel,.sr-directory-card,.sr-metric,.sr-workspace,.sr-page")||partial;
-        return null;
+        // Automatic releases may not have a hand-authored selector. Anchor
+        // those guides to the visible workspace rather than silently failing.
+        return document.querySelector("#workspace-view main, #workspace-view .workspace-content, #workspace-view");
       }catch(_){return null}
     };
     let target=findTarget();
