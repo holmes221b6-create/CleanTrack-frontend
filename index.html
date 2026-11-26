@@ -360,7 +360,7 @@ html[data-theme="black"] #cleantrack-launch-splash{
 }
 </style>
 
-    <link rel="stylesheet" href="css/launch-screen.css?v=20261126-crossfade-tap-audio-v14">
+    <link rel="stylesheet" href="css/launch-screen.css?v=20261126-splash-inline-audio-onset-v15">
     <link rel="stylesheet" href="css/notification-bell.css?v=20261120-v3">
     <link rel="stylesheet" href="css/whats-new.css?v=20261126-anchored-blocking-tour-v3">
 </head>
@@ -382,6 +382,7 @@ html[data-theme="black"] #cleantrack-launch-splash{
 <button class="ct-launch-begin" type="button" aria-label="Tap to begin">TAP TO BEGIN <span aria-hidden="true">↗</span></button>
 <div class="ct-launch-keyhint">PRESS ENTER TO BEGIN</div>
 </div>
+<script>(function(){var splash=document.getElementById("cleantrack-launch-splash");if(splash)window.setTimeout(function(){if(splash.isConnected)splash.classList.add("ct-launch-title-active");},950);})();</script>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div id="app" class="app-shell">
