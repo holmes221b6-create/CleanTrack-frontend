@@ -2244,6 +2244,33 @@ function bindNavigation() {
     const enterApplication = function () {
       if (launchEntryPending || !splash || !splash.isConnected) return;
       launchEntryPending = true;
+      // A short, original UI confirmation tone; Web Audio is started only after the user's gesture.
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          const audio = new AudioContextClass();
+          const now = audio.currentTime;
+          const master = audio.createGain();
+          master.gain.setValueAtTime(0.0001, now);
+          master.gain.exponentialRampToValueAtTime(0.075, now + 0.035);
+          master.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+          master.connect(audio.destination);
+          [[523.25,0,0.18],[659.25,0.11,0.2],[783.99,0.25,0.34]].forEach(function (tone) {
+            const oscillator = audio.createOscillator();
+            const gain = audio.createGain();
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(tone[0], now + tone[1]);
+            gain.gain.setValueAtTime(0.0001, now + tone[1]);
+            gain.gain.exponentialRampToValueAtTime(0.48, now + tone[1] + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + tone[1] + tone[2]);
+            oscillator.connect(gain);
+            gain.connect(master);
+            oscillator.start(now + tone[1]);
+            oscillator.stop(now + tone[1] + tone[2] + 0.03);
+          });
+          window.setTimeout(function () { audio.close().catch(function () {}); }, 1000);
+        }
+      } catch (_) {}
       splash.classList.add("ct-launch-preparing");
       const beginButton = splash.querySelector(".ct-launch-begin");
       if (beginButton) {
