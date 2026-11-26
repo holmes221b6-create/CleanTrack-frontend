@@ -2268,7 +2268,9 @@ function bindNavigation() {
         }
         const context = launchAudioContext;
         const play = function () {
-          if (context.state !== "running") return;
+          // Do not wait for state === running: that check was dropping the
+          // first tap's sound while resume() was still resolving. Nodes can be
+          // scheduled on the suspended audio clock and play as it resumes.
           const now = context.currentTime;
           const master = context.createGain();
           const compressor = context.createDynamicsCompressor();
@@ -2362,7 +2364,7 @@ function bindNavigation() {
       // Reveal the title immediately after the shortened icon intro completes.
       window.setTimeout(function () {
         if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 1320);
+      }, 950);
     }
     setLoading(false);
     try {
