@@ -74,9 +74,8 @@
     const acknowledge=()=>{
       const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);
       badge.remove();target.classList.remove("mn-whats-new-pending-target","mn-whats-new-highlight");
-      target.removeEventListener("click",acknowledge,true);decorate();
+      decorate();
     };
-    target.addEventListener("click",acknowledge,true);
     badge.addEventListener("click",e=>{e.stopPropagation();acknowledge();});
   }
   function init(){
