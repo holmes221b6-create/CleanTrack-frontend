@@ -92,10 +92,21 @@
     closeGuide(false);
     const nav=window.CleanTrackNavigation;
     if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
-    const findTarget=()=>{try{return update.target?document.querySelector(update.target):null}catch(_){return null}};
+    const findTarget=()=>{
+      try{
+        if(update.target){const exact=document.querySelector(update.target);if(exact)return exact;}
+        const wanted=String(update.feature||"").trim().toLowerCase();
+        const candidates=Array.from(document.querySelectorAll("h1,h2,h3,h4,[role='tab'],button,.sr-panel-heading,.sr-directory-card,.sr-metric"));
+        const exact=candidates.find(node=>node.getClientRects().length&&node.textContent.trim().toLowerCase()===wanted);
+        if(exact)return exact.closest(".sr-panel,.sr-directory-card,.sr-metric,.sr-workspace,.sr-page")||exact;
+        const words=wanted.split(/\\s+/).filter(word=>word.length>3);
+        const partial=candidates.find(node=>node.getClientRects().length&&words.length&&words.every(word=>node.textContent.toLowerCase().includes(word)));
+        if(partial)return partial.closest(".sr-panel,.sr-directory-card,.sr-metric,.sr-workspace,.sr-page")||partial;
+        return null;
+      }catch(_){return null}
+    };
     let target=findTarget();
     for(let i=0;!target&&i<30;i++){await new Promise(resolve=>setTimeout(resolve,150));target=findTarget();}
-    if(!target)target=document.querySelector("#workspace-content, #main-content, [data-workspace-content], main");
     if(!target)return false;
     target.scrollIntoView({behavior:"smooth",block:"center"});
     target.classList.add("mn-whats-new-highlight","mn-whats-new-pending-target");
