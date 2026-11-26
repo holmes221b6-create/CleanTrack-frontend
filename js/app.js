@@ -2236,32 +2236,43 @@ function bindNavigation() {
     bindNavigation();
     bindAvatarEditProfile();
 
-    // Keep the native app-mark splash visible while checking today's session.
-    // Returning users go straight to their workspace; the login screen is only
-    // revealed when signed out or when the local calendar day has changed.
+    // Resolve authentication behind the interactive title screen. Entry is
+    // user-controlled: tap/click anywhere or press Enter.
     const splash = document.getElementById("cleantrack-launch-splash");
+    let launchUser = null, launchReady = false, launchRequested = false;
+    const enterApplication = function () {
+      if (!launchReady) { launchRequested = true; return; }
+      if (!splash || !splash.isConnected) return;
+      splash.classList.add("ct-launch-exiting");
+      window.setTimeout(function () {
+        if (launchUser) {
+          try {
+            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
+            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+          } catch (_) {}
+          showAuthenticatedLayout(launchUser);
+        } else showUnauthenticatedLayout();
+        splash.remove();
+      }, 520);
+    };
+    if (splash) {
+      splash.addEventListener("click", enterApplication);
+      splash.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); enterApplication(); }
+      });
+      window.setTimeout(function () { if (splash.isConnected) splash.classList.add("ct-launch-title-active"); }, 1050);
+    }
     setLoading(false);
     try {
       const restoredUser = await auth.restoreSession();
-      // Prefer current auth state if sign-in completed during startup restore.
-      const user = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser;
-      if (user) {
-        // Reset the Workspace greeting for the first visit after each app launch.
-        try {
-          const greetingIdentity = String(user?.id ?? user?.email ?? "current").toLowerCase();
-          sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-          sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-        } catch (_) {}
-        showAuthenticatedLayout(user);
-      } else showUnauthenticatedLayout();
+      launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser || null;
     } catch (error) {
       state.error = error.message;
-      showUnauthenticatedLayout();
+      launchUser = null;
     } finally {
-      if (splash) {
-        splash.classList.add("is-hidden");
-        window.setTimeout(function(){ if(splash.isConnected)splash.remove(); },420);
-      }
+      launchReady = true;
+      if (launchRequested) enterApplication();
     }
   }
 
