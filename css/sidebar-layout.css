@@ -899,15 +899,15 @@ html body #app-modal #modal-title.ct-shadow-panel-title {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  gap: 7px !important;
+  gap: 9px !important;
   vertical-align: middle !important;
 }
 html body #app-modal #modal-title .ct-shadow-panel-mark {
   display: block !important;
-  width: 21px !important;
-  height: 27px !important;
-  min-width: 21px !important;
-  flex: 0 0 21px !important;
+  width: 29px !important;
+  height: 36px !important;
+  min-width: 29px !important;
+  flex: 0 0 29px !important;
   margin: 0 !important;
   object-fit: contain !important;
   filter: drop-shadow(0 0 5px rgba(173,111,231,.38)) !important;
