@@ -2236,30 +2236,17 @@ function bindNavigation() {
     bindNavigation();
     bindAvatarEditProfile();
 
-    // Render the sign-in interface immediately. Session restoration can take
-    // longer when the hosted API is waking up; it must never hold the launch
-    // splash over the entire application or prevent a fresh login.
-    showUnauthenticatedLayout();
+    // Keep the native app-mark splash visible while checking today's session.
+    // Returning users go straight to their workspace; the login screen is only
+    // revealed when signed out or when the local calendar day has changed.
     const splash = document.getElementById("cleantrack-launch-splash");
-    if (splash) {
-      const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
-      const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : 350;
-      const waitFor = Math.max(0, minimumVisible - elapsed);
-      window.setTimeout(function () {
-        splash.classList.add("is-hidden");
-        window.setTimeout(function () { splash.remove(); }, 420);
-      }, waitFor);
-    }
-
     setLoading(false);
     try {
       const restoredUser = await auth.restoreSession();
       // Prefer current auth state if sign-in completed during startup restore.
       const user = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser;
       if (user) {
-        // A restored authenticated session is a fresh app-open visit too.
-        // Reset the Workspace greeting so it appears on the first Workspace
-        // visit after the app starts, then remains hidden after page navigation.
+        // Reset the Workspace greeting for the first visit after each app launch.
         try {
           const greetingIdentity = String(user?.id ?? user?.email ?? "current").toLowerCase();
           sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
@@ -2270,6 +2257,11 @@ function bindNavigation() {
     } catch (error) {
       state.error = error.message;
       showUnauthenticatedLayout();
+    } finally {
+      if (splash) {
+        splash.classList.add("is-hidden");
+        window.setTimeout(function(){ if(splash.isConnected)splash.remove(); },420);
+      }
     }
   }
 
