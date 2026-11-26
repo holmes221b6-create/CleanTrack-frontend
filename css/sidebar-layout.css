@@ -892,3 +892,35 @@ html body #workspace-view .ct-shadow-assistant-label {
 @media (prefers-reduced-motion: reduce) {
   html body #workspace-view .ct-shadow-assistant-mark { animation: none !important; }
 }
+
+
+/* Shadow branding belongs inside the assistant panel, not on the toolbar control. */
+html body #workspace-view #modal-title.ct-shadow-panel-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+}
+html body #workspace-view #modal-title .ct-shadow-panel-mark {
+  display: block !important;
+  width: 34px !important;
+  height: 42px !important;
+  flex: 0 0 34px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 0 9px rgba(173,111,231,.4)) !important;
+  animation: ctShadowPanelFloat 5.8s ease-in-out infinite, ctShadowPanelFade 7s ease-in-out infinite alternate !important;
+}
+html body #workspace-view #modal-title.ct-shadow-panel-title span {
+  display: inline-block !important;
+  line-height: 1.2 !important;
+}
+@keyframes ctShadowPanelFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
+}
+@keyframes ctShadowPanelFade {
+  0%,100% { opacity: .62; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #workspace-view #modal-title .ct-shadow-panel-mark { animation: none !important; }
+}
