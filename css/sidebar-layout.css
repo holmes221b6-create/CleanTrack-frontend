@@ -904,10 +904,10 @@ html body #app-modal #modal-title.ct-shadow-panel-title {
 }
 html body #app-modal #modal-title .ct-shadow-panel-mark {
   display: block !important;
-  width: 29px !important;
-  height: 36px !important;
-  min-width: 29px !important;
-  flex: 0 0 29px !important;
+  width: 32px !important;
+  height: 40px !important;
+  min-width: 32px !important;
+  flex: 0 0 32px !important;
   margin: 0 !important;
   object-fit: contain !important;
   filter: drop-shadow(0 0 5px rgba(173,111,231,.38)) !important;
