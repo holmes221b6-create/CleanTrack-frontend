@@ -24,6 +24,11 @@ jobs:
           before=os.environ.get("BEFORE_SHA","")
           after=os.environ["AFTER_SHA"]
           subject=os.environ.get("COMMIT_SUBJECT","").splitlines()[0].strip() or "Feature update"
+          # Publish only when a developer explicitly labels the commit as a user-facing feature.
+          # This prevents ordinary fixes, refactors, and incidental source edits from creating dots.
+          if not re.match(r"^(feat|feature|enhance)(\([^)]+\))?:\s*\S", subject, re.I):
+              print("Commit is not explicitly marked as a feature; no What's New entry.")
+              raise SystemExit(0)
           if not before or set(before)=={"0"}:
               before=subprocess.check_output(["git","rev-parse",f"{after}^"],text=True).strip()
 
