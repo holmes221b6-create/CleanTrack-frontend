@@ -2264,7 +2264,7 @@ function bindNavigation() {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) return;
         if (!launchAudioContext || launchAudioContext.state === "closed") {
-          launchAudioContext = new AudioContextClass();
+          launchAudioContext = new AudioContextClass({ latencyHint: "interactive" });
         }
         const context = launchAudioContext;
         const play = function () {
@@ -2274,8 +2274,7 @@ function bindNavigation() {
           const now = context.currentTime;
           const master = context.createGain();
           const compressor = context.createDynamicsCompressor();
-          master.gain.setValueAtTime(0.0001, now);
-          master.gain.exponentialRampToValueAtTime(0.30, now + 0.08);
+          master.gain.setValueAtTime(0.24, now);
           master.gain.setTargetAtTime(0.0001, now + 1.05, 0.24);
           compressor.threshold.setValueAtTime(-20, now);
           compressor.knee.setValueAtTime(18, now);
@@ -2283,10 +2282,10 @@ function bindNavigation() {
           master.connect(compressor);
           compressor.connect(context.destination);
           [
-            { hz: 174.61, delay: 0, duration: 1.45, level: 0.22, type: "sine" },
-            { hz: 261.63, delay: 0.04, duration: 1.25, level: 0.13, type: "sine" },
-            { hz: 349.23, delay: 0.16, duration: 1.05, level: 0.075, type: "triangle" },
-            { hz: 233.08, delay: 0.30, duration: 0.95, level: 0.045, type: "sine" }
+            { hz: 174.61, delay: 0, duration: 1.20, level: 0.22, type: "sine" },
+            { hz: 261.63, delay: 0, duration: 1.05, level: 0.13, type: "sine" },
+            { hz: 349.23, delay: 0, duration: 0.90, level: 0.075, type: "triangle" },
+            { hz: 233.08, delay: 0, duration: 0.85, level: 0.045, type: "sine" }
           ].forEach(function (tone) {
             const oscillator = context.createOscillator();
             const envelope = context.createGain();
@@ -2294,7 +2293,7 @@ function bindNavigation() {
             oscillator.type = tone.type;
             oscillator.frequency.setValueAtTime(tone.hz, startAt);
             envelope.gain.setValueAtTime(0.0001, startAt);
-            envelope.gain.exponentialRampToValueAtTime(tone.level, startAt + 0.10);
+            envelope.gain.exponentialRampToValueAtTime(tone.level, startAt + 0.006);
             envelope.gain.setTargetAtTime(0.0001, startAt + tone.duration * 0.55, 0.22);
             oscillator.connect(envelope);
             envelope.connect(master);
@@ -2326,7 +2325,6 @@ function bindNavigation() {
       // Do not allow the icon-only intro to be skipped; entry begins on the animated title screen.
       if (!splash.classList.contains("ct-launch-title-active")) return;
       launchEntryPending = true;
-      playLaunchChime();
       splash.classList.add("ct-launch-preparing");
       const beginButton = splash.querySelector(".ct-launch-begin");
       if (beginButton) {
@@ -2346,25 +2344,22 @@ function bindNavigation() {
       // Pointer-down fires at the instant the finger/mouse touches the title screen,
       // rather than waiting for the later click event after release.
       splash.addEventListener("pointerdown", function (event) {
-        if (event.isPrimary !== false && event.button !== 2) enterApplication();
+        if (event.isPrimary !== false && event.button !== 2) { playLaunchChime(); enterApplication(); }
       }, { passive: true });
       // Keep a click fallback for assistive technology that synthesizes clicks.
       splash.addEventListener("click", function (event) {
-        if (event.detail === 0) enterApplication();
+        if (event.detail === 0) { playLaunchChime(); enterApplication(); }
       });
       splash.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); enterApplication(); }
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playLaunchChime(); enterApplication(); }
       });
       document.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && !event.altKey && !event.ctrlKey && !event.metaKey && splash.isConnected) {
           event.preventDefault();
+          playLaunchChime();
           enterApplication();
         }
       });
-      // Reveal the title immediately after the shortened icon intro completes.
-      window.setTimeout(function () {
-        if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 950);
     }
     setLoading(false);
     try {
