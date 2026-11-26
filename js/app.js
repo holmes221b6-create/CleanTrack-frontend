@@ -2241,61 +2241,71 @@ function bindNavigation() {
     const splash = document.getElementById("cleantrack-launch-splash");
     let launchUser = null, launchReady = false, launchRequested = false;
     let launchEntryPending = false;
-    const enterApplication = function () {
-      if (launchEntryPending || !splash || !splash.isConnected) return;
-      launchEntryPending = true;
-      // A short, original UI confirmation tone; Web Audio is started only after the user's gesture.
+    const finishLaunch = function () {
+      if (!splash || !splash.isConnected || !launchReady) return;
+      splash.classList.add("ct-launch-exiting");
+      window.setTimeout(function () {
+        if (launchUser) {
+          try {
+            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
+            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+          } catch (_) {}
+          showAuthenticatedLayout(launchUser);
+        } else showUnauthenticatedLayout();
+        splash.remove();
+      }, 520);
+    };
+    const playLaunchChime = function () {
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) {
-          const audio = new AudioContextClass();
+        if (!AudioContextClass) return;
+        const audio = new AudioContextClass();
+        const play = function () {
           const now = audio.currentTime;
           const master = audio.createGain();
           master.gain.setValueAtTime(0.0001, now);
-          master.gain.exponentialRampToValueAtTime(0.075, now + 0.035);
-          master.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+          master.gain.exponentialRampToValueAtTime(0.22, now + 0.035);
+          master.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
           master.connect(audio.destination);
-          [[523.25,0,0.18],[659.25,0.11,0.2],[783.99,0.25,0.34]].forEach(function (tone) {
+          [[587.33,0,0.28],[739.99,0.13,0.34],[880,0.29,0.52]].forEach(function (tone) {
             const oscillator = audio.createOscillator();
-            const gain = audio.createGain();
-            oscillator.type = "sine";
+            const voice = audio.createGain();
+            oscillator.type = "triangle";
             oscillator.frequency.setValueAtTime(tone[0], now + tone[1]);
-            gain.gain.setValueAtTime(0.0001, now + tone[1]);
-            gain.gain.exponentialRampToValueAtTime(0.48, now + tone[1] + 0.025);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + tone[1] + tone[2]);
-            oscillator.connect(gain);
-            gain.connect(master);
+            voice.gain.setValueAtTime(0.0001, now + tone[1]);
+            voice.gain.exponentialRampToValueAtTime(0.72, now + tone[1] + 0.025);
+            voice.gain.exponentialRampToValueAtTime(0.0001, now + tone[1] + tone[2]);
+            oscillator.connect(voice);
+            voice.connect(master);
             oscillator.start(now + tone[1]);
-            oscillator.stop(now + tone[1] + tone[2] + 0.03);
+            oscillator.stop(now + tone[1] + tone[2] + 0.04);
           });
-          window.setTimeout(function () { audio.close().catch(function () {}); }, 1000);
-        }
+          window.setTimeout(function () { audio.close().catch(function () {}); }, 1400);
+        };
+        if (audio.state === "suspended") audio.resume().then(play).catch(function () {});
+        else play();
       } catch (_) {}
+    };
+    const enterApplication = function () {
+      if (launchEntryPending || !splash || !splash.isConnected) return;
+      // Do not allow the icon-only intro to be skipped; entry begins on the animated title screen.
+      if (!splash.classList.contains("ct-launch-title-active")) return;
+      launchEntryPending = true;
+      playLaunchChime();
       splash.classList.add("ct-launch-preparing");
       const beginButton = splash.querySelector(".ct-launch-begin");
       if (beginButton) {
         beginButton.textContent = "PREPARING MECHNAR";
         beginButton.setAttribute("aria-label", "Preparing MECHNAR");
       }
-      // Keep the title screen visible briefly after user input, then transition.
       window.setTimeout(function () {
         if (!splash.isConnected) return;
         if (!launchReady) {
           launchRequested = true;
           return;
         }
-        splash.classList.add("ct-launch-exiting");
-        window.setTimeout(function () {
-          if (launchUser) {
-            try {
-              const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
-              sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-              sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-            } catch (_) {}
-            showAuthenticatedLayout(launchUser);
-          } else showUnauthenticatedLayout();
-          splash.remove();
-        }, 520);
+        finishLaunch();
       }, 2600);
     };
     if (splash) {
@@ -2309,7 +2319,10 @@ function bindNavigation() {
           enterApplication();
         }
       });
-      window.setTimeout(function () { if (splash.isConnected) splash.classList.add("ct-launch-title-active"); }, 1050);
+      // The icon-only brand intro lasts 2.75s. Only then reveal the prompt and enable entry.
+      window.setTimeout(function () {
+        if (splash.isConnected) splash.classList.add("ct-launch-title-active");
+      }, 2750);
     }
     setLoading(false);
     try {
@@ -2320,7 +2333,7 @@ function bindNavigation() {
       launchUser = null;
     } finally {
       launchReady = true;
-      if (launchRequested) enterApplication();
+      if (launchRequested) finishLaunch();
     }
   }
 
