@@ -59,3 +59,9 @@
 /* Keep Location & Places out of the personal Settings interface. */
 .ct-settings-nav-item[data-settings-nav="places"],
 .ct-settings-panel[data-settings-panel="places"] { display: none !important; }
+
+/* Profile privacy preference: native checkbox styled as the app's purple on/off switch. */
+.ct-settings-privacy-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0}
+.ct-settings-privacy-toggle-row .ct-settings-check{align-items:center;gap:14px;cursor:pointer;line-height:1.45}
+.ct-settings-privacy-toggle-row .ct-settings-check input{flex:0 0 46px;margin:0}
+.ct-settings-privacy-toggle-row .ct-settings-muted{margin:8px 0 0}
