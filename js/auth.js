@@ -154,6 +154,7 @@ function normalizeUser(user) {
 
     // Load this user's saved theme and locale as soon as authentication succeeds.
     if (typeof window.CleanTrackPreferences?.setUser === "function") { window.CleanTrackPreferences.setUser(currentUser.id); }
+    markLoginDay();
     markActive();
     emitAuthEvent("cleantrack:login", currentUser);
     return currentUser;
@@ -231,6 +232,7 @@ function normalizeUser(user) {
     if (token) {
       persistToken(token);
       currentUser = normalizeUser(user);
+      markLoginDay();
       if (currentUser) {
         const firstKey = "mechnar.first-login." + String(currentUser.id || "").toLowerCase();
         try { currentUser.first_login = window.sessionStorage.getItem(firstKey) === "1"; } catch (_) { currentUser.first_login = false; }
@@ -259,13 +261,16 @@ function normalizeUser(user) {
       currentUser = null;
       persistToken("");
       persistRefreshToken("");
-      try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); } catch (_) {}
+      try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); window.localStorage.removeItem(SESSION_AUTH_DAY_KEY); } catch (_) {}
       emitAuthEvent("cleantrack:logout", null);
     }
   }
 
   const SESSION_LAST_ACTIVE_KEY = "cleantrack_last_active_at";
-  const SESSION_MAX_IDLE_MS = 7 * 24 * 60 * 60 * 1000;
+  const SESSION_AUTH_DAY_KEY = "mechnar.authenticated-day.v1";
+  function localCalendarDay(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  function markLoginDay(){try{window.localStorage.setItem(SESSION_AUTH_DAY_KEY,localCalendarDay());}catch(_){}}
+
 
   function markActive() {
     if (!getAuthToken()) return;
@@ -288,15 +293,19 @@ function normalizeUser(user) {
     const restoreVersion = authStateVersion;
     try {
       const token = getAuthToken();
-      let lastActive = 0;
-      try { lastActive = Number(window.localStorage.getItem(SESSION_LAST_ACTIVE_KEY) || 0); } catch (_) {}
-      if (token && lastActive && Date.now() - lastActive > SESSION_MAX_IDLE_MS) {
-        currentUser = null;
-        persistToken("");
-        persistRefreshToken("");
-        try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); } catch (_) {}
-        emitAuthEvent("cleantrack:session-expired", null);
-        return null;
+      if (token) {
+        let authenticatedDay = "";
+        try { authenticatedDay = window.localStorage.getItem(SESSION_AUTH_DAY_KEY) || ""; } catch (_) {}
+        // Existing sessions without a day marker are grandfathered for today.
+        if (!authenticatedDay) markLoginDay();
+        else if (authenticatedDay !== localCalendarDay()) {
+          currentUser = null;
+          persistToken("");
+          persistRefreshToken("");
+          try { window.localStorage.removeItem(SESSION_LAST_ACTIVE_KEY); window.localStorage.removeItem(SESSION_AUTH_DAY_KEY); } catch (_) {}
+          emitAuthEvent("cleantrack:session-expired", null);
+          return null;
+        }
       }
       const response = await api.get("auth/me");
       // A login/register/logout started while this request was in flight.
