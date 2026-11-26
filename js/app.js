@@ -1054,7 +1054,9 @@
 
     // Save the workspace being left before changing the visible page.
     if (previousPage && previousPage !== pageId) {
-      cacheCurrentPage(previousPage, pageContent);
+      const supervisorRole = String(user?.role || "").toLowerCase() === "supervisor";
+      const isOverlayRoute = supervisorRole && ["personnel", "performance"].includes(previousPage);
+      if (!isOverlayRoute) cacheCurrentPage(previousPage, pageContent);
     }
 
     // Restore previously opened workspaces instantly without re-running
