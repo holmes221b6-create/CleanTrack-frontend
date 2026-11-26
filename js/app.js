@@ -2265,17 +2265,26 @@ function bindNavigation() {
       if (AudioContextClass) {
         launchAudioContext = new AudioContextClass();
         const sampleRate = launchAudioContext.sampleRate;
-        const duration = 0.92;
+        // Quiet cinematic chime: warm and calming, with a restrained minor-key tension.
+        const duration = 1.55;
         launchChimeBuffer = launchAudioContext.createBuffer(1, Math.ceil(sampleRate * duration), sampleRate);
         const samples = launchChimeBuffer.getChannelData(0);
-        [[659.25,0,0.25],[783.99,0.12,0.30],[987.77,0.27,0.58]].forEach(function (tone) {
-          const start = Math.floor(tone[1] * sampleRate);
-          const length = Math.floor(tone[2] * sampleRate);
+        const layers = [
+          { frequency: 174.61, amplitude: 0.075, start: 0, length: 1.42 },
+          { frequency: 261.63, amplitude: 0.048, start: 0, length: 1.28 },
+          { frequency: 349.23, amplitude: 0.027, start: 0.08, length: 1.16 },
+          { frequency: 523.25, amplitude: 0.018, start: 0.24, length: 0.94 },
+          { frequency: 659.25, amplitude: 0.012, start: 0.43, length: 0.78 }
+        ];
+        layers.forEach(function (tone) {
+          const start = Math.floor(tone.start * sampleRate);
+          const length = Math.floor(tone.length * sampleRate);
           for (let i = 0; i < length && start + i < samples.length; i++) {
             const t = i / sampleRate;
-            const attack = Math.min(1, t / 0.012);
-            const decay = Math.exp(-4.8 * t / tone[2]);
-            samples[start + i] += Math.sin(2 * Math.PI * tone[0] * t) * attack * decay * 0.24;
+            const attack = Math.min(1, t / 0.16);
+            const release = Math.pow(Math.max(0, 1 - t / tone.length), 1.7);
+            const shimmer = 1 + 0.012 * Math.sin(2 * Math.PI * 4.2 * t);
+            samples[start + i] += Math.sin(2 * Math.PI * tone.frequency * t) * attack * release * tone.amplitude * shimmer;
           }
         });
       }
@@ -2286,7 +2295,7 @@ function bindNavigation() {
         const source = launchAudioContext.createBufferSource();
         const volume = launchAudioContext.createGain();
         source.buffer = launchChimeBuffer;
-        volume.gain.value = 1.15;
+        volume.gain.value = 0.32;
         source.connect(volume);
         volume.connect(launchAudioContext.destination);
         // Queue playback immediately in the same pointerdown/Enter event. If the
