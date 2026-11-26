@@ -599,10 +599,15 @@ if (identity) {
           shadowTongue.className = "ct-shadow-panel-tongue";
           shadowTongue.setAttribute("aria-hidden", "true");
           shadowTapTarget.append(shadowMark, shadowTongue);
+          let tongueTimer;
           const playTongue = () => {
+            window.clearTimeout(tongueTimer);
             shadowTapTarget.classList.remove("is-tongue-out");
             void shadowTapTarget.offsetWidth;
             shadowTapTarget.classList.add("is-tongue-out");
+            tongueTimer = window.setTimeout(() => {
+              shadowTapTarget.classList.remove("is-tongue-out");
+            }, 480);
           };
           shadowTapTarget.addEventListener("click", playTongue);
           shadowTapTarget.addEventListener("keydown", event => {
