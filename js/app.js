@@ -2239,10 +2239,10 @@ function bindNavigation() {
     // Resolve authentication behind the interactive title screen. Entry is
     // user-controlled: tap/click anywhere or press Enter.
     const splash = document.getElementById("cleantrack-launch-splash");
-    let launchUser = null, launchReady = false, launchRequested = false;
+    let launchUser = null, launchReady = false, launchRequested = false, launchDelayElapsed = false;
     let launchEntryPending = false;
     const finishLaunch = function () {
-      if (!splash || !splash.isConnected || !launchReady) return;
+      if (!splash || !splash.isConnected || !launchReady || !launchDelayElapsed) return;
 
       // Prepare the correct destination UNDER the splash before fading it.
       // Otherwise the default auth markup is exposed during the 520ms exit
@@ -2340,12 +2340,10 @@ function bindNavigation() {
       }
       window.setTimeout(function () {
         if (!splash.isConnected) return;
-        if (!launchReady) {
-          launchRequested = true;
-          return;
-        }
+        launchDelayElapsed = true;
+        launchRequested = true;
         finishLaunch();
-      }, 2600);
+      }, 3200);
     };
     if (splash) {
       // Pointer-down fires at the instant the finger/mouse touches the title screen,
@@ -2377,7 +2375,7 @@ function bindNavigation() {
       launchUser = null;
     } finally {
       launchReady = true;
-      if (launchRequested) finishLaunch();
+      if (launchRequested && launchDelayElapsed) finishLaunch();
     }
   }
 
