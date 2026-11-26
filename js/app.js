@@ -2290,19 +2290,35 @@ function bindNavigation() {
       }
     } catch (_) { launchAudioContext = null; launchChimeBuffer = null; }
     const playLaunchChime = function () {
+      if (!launchAudioContext || !launchChimeBuffer) return;
+      const startPlayback = function () {
+        try {
+          if (!launchAudioContext || !launchChimeBuffer) return;
+          const source = launchAudioContext.createBufferSource();
+          const volume = launchAudioContext.createGain();
+          source.buffer = launchChimeBuffer;
+          // Audible on laptop speakers without returning to the previous loud level.
+          volume.gain.setValueAtTime(0.62, launchAudioContext.currentTime);
+          source.connect(volume);
+          volume.connect(launchAudioContext.destination);
+          source.start(0);
+        } catch (error) {
+          console.warn("MECHNAR launch sound could not be played:", error);
+        }
+      };
       try {
-        if (!launchAudioContext || !launchChimeBuffer) return;
-        const source = launchAudioContext.createBufferSource();
-        const volume = launchAudioContext.createGain();
-        source.buffer = launchChimeBuffer;
-        volume.gain.value = 0.32;
-        source.connect(volume);
-        volume.connect(launchAudioContext.destination);
-        // Queue playback immediately in the same pointerdown/Enter event. If the
-        // context is suspended by autoplay policy, it begins as soon as resume completes.
-        source.start(0);
-        if (launchAudioContext.state === "suspended") launchAudioContext.resume().catch(function () {});
-      } catch (_) {}
+        // Resume first. Starting a source while the context is suspended can
+        // leave it queued or inaudible in some browsers.
+        if (launchAudioContext.state === "running") {
+          startPlayback();
+        } else {
+          launchAudioContext.resume().then(startPlayback).catch(function (error) {
+            console.warn("MECHNAR launch audio could not resume:", error);
+          });
+        }
+      } catch (error) {
+        console.warn("MECHNAR launch audio is unavailable:", error);
+      }
     };
     const enterApplication = function () {
       if (launchEntryPending || !splash || !splash.isConnected) return;
