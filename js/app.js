@@ -2261,6 +2261,12 @@ function bindNavigation() {
       splash.addEventListener("keydown", function (event) {
         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); enterApplication(); }
       });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.altKey && !event.ctrlKey && !event.metaKey && splash.isConnected) {
+          event.preventDefault();
+          enterApplication();
+        }
+      });
       window.setTimeout(function () { if (splash.isConnected) splash.classList.add("ct-launch-title-active"); }, 1050);
     }
     setLoading(false);
