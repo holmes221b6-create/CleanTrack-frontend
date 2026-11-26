@@ -831,3 +831,64 @@ html body #workspace-view #workspace-navigation .ct-nav-active {
     padding: 20px 14px 18px !important;
   }
 }
+
+
+/* Shadow Assistance — the same Shadow artwork used on the pre-login title screen. */
+html body #workspace-view .ct-toolbar-actions .ct-shadow-assistant-trigger {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgba(158, 128, 205, .24) !important;
+  border-radius: 10px !important;
+  background: rgba(139, 112, 188, .09) !important;
+  color: #d9c9f4 !important;
+  white-space: nowrap !important;
+}
+html body #workspace-view .ct-toolbar-actions .ct-shadow-assistant-trigger:hover {
+  background: rgba(139, 112, 188, .17) !important;
+  border-color: rgba(177, 146, 226, .42) !important;
+  color: #f1eaff !important;
+}
+html body #workspace-view .ct-shadow-assistant-mark {
+  display: block !important;
+  width: 25px !important;
+  height: 29px !important;
+  flex: 0 0 25px !important;
+  object-fit: contain !important;
+  opacity: .94 !important;
+  filter: drop-shadow(0 0 7px rgba(173,111,231,.35)) !important;
+  animation: ctShadowToolbarFloat 5.8s ease-in-out infinite, ctShadowToolbarFade 7s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+}
+html body #workspace-view .ct-shadow-assistant-label {
+  display: inline-block !important;
+  color: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .025em !important;
+  line-height: 1 !important;
+}
+@keyframes ctShadowToolbarFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-3px) rotate(3deg); }
+}
+@keyframes ctShadowToolbarFade {
+  0%,100% { opacity: .62; }
+  50% { opacity: 1; }
+}
+@media (max-width: 760px) {
+  html body #workspace-view .ct-toolbar-actions .ct-shadow-assistant-trigger {
+    width: 40px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+  html body #workspace-view .ct-shadow-assistant-label { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #workspace-view .ct-shadow-assistant-mark { animation: none !important; }
+}
