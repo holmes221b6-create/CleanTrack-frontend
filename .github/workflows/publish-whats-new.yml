@@ -38,15 +38,25 @@ jobs:
               raise SystemExit(0)
 
           routes={
-            "teams.js":"teams", "org-tools.js":"inventory",
-            "supervisor-personnel.js":"personnel",
-            "performance-analysis.js":"performance-analysis",
-            "operations.js":"operations", "supervisor-workspace.js":"workspace",
-            "quality-inspections.js":"inspections", "announcements.js":"announcements",
-            "meetings.js":"meetings", "reports.js":"reports",
-            "performance-arena.js":"performance-arena", "staff.js":"staff",
-            "locations.js":"locations", "zones.js":"zones",
-            "supervisor-review-queue.js":"review-queue"
+            "teams.js":["teams"], "org-tools.js":["inventory"],
+            "supervisor-personnel.js":["personnel"],
+            "performance-analysis.js":["performance-analysis"],
+            "operations.js":["operations"], "supervisor-workspace.js":["workspace"],
+            "quality-inspections.js":["inspections"], "announcements.js":["announcements"],
+            "meetings.js":["meetings"], "reports.js":["reports"],
+            "performance-arena.js":["performance"], "staff.js":["staff"],
+            "locations.js":["locations"], "zones.js":["zones"],
+            "supervisor-review-queue.js":["reviews"],
+            "settings.js":["settings"], "preferences.js":["settings"],
+            "staff-incidents.js":["incident-reports","incidents"],
+            "supervisor-records.js":["incidents","inspections","handovers"],
+            "supervisor-sites-zones.js":["sites"], "invitations.js":["invitations"],
+            "audit-trail.js":["audit"], "organization-settings.js":["org-settings"],
+            "admin-dashboard.js":["dashboard"], "admin-home.js":["home"],
+            "supervisor-team-channel.js":["team-channel"], "teams-home.js":["teams"],
+            "billing.js":["billing"], "analytics.js":["analytics"],
+            "logs.js":["reviews"], "my-desk.js":["my-desk"],
+            "inventory.js":["inventory"], "staff-workspace.js":["workspace"]
           }
           backend_routes={
             "teams.py":"teams", "operations.py":"operations",
@@ -63,11 +73,13 @@ jobs:
           for path in changed:
               name=path.rsplit("/",1)[-1]
               route=None
+              route_list=[]
               if path.startswith("js/") and name.endswith(".js"):
-                  route=routes.get(name)
+                  route_list=routes.get(name,[])
               elif path.startswith("app/routes/") and name.endswith(".py"):
-                  route=backend_routes.get(name)
-              if route:
+                  backend_route=backend_routes.get(name)
+                  route_list=[backend_route] if backend_route else []
+              for route in route_list:
                   candidates.setdefault(route,[]).append(path)
 
           # CSS, HTML, images, fonts and other presentation assets are never
@@ -118,6 +130,7 @@ jobs:
               title=clean[:90] or f"{route.replace('-',' ').title()} feature update"
               updates.insert(0,{
                 "id":uid,"page":route,"feature":title,
+                "target":"#workspace-content",
                 "description":f"{subject}. Functional changes were detected in: {', '.join(files[:4])}"+(f" and {len(files)-4} more source files." if len(files)>4 else "."),
                 "commit":after,"published_at":os.environ.get("GITHUB_EVENT_NAME","push")
               })
