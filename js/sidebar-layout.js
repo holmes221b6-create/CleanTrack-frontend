@@ -108,9 +108,10 @@ if (identity) {
     const assistantButton = document.createElement("button");
     assistantButton.type = "button";
     assistantButton.className = "ct-toolbar-icon-button";
-    assistantButton.setAttribute("aria-label", "Open AI assistant");
-    assistantButton.title = "CleanTrack AI assistant";
-    assistantButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 14.2 9.8 21.2 12l-7 2.2-2.2 7-2.2-7L2.8 12l7-2.2z"/><path d="m19 2 .8 2.2L22 5l-2.2.8L19 8l-.8-2.2L16 5l2.2-.8z"/></svg>';
+    assistantButton.classList.add("ct-shadow-assistant-trigger");
+    assistantButton.setAttribute("aria-label", "Open Shadow Assistance");
+    assistantButton.title = "Shadow Assistance";
+    assistantButton.innerHTML = '<img class="ct-shadow-assistant-mark" src="assets/shadow-character-imu.svg?v=3" alt="" aria-hidden="true" draggable="false"><span class="ct-shadow-assistant-label">Shadow Assistance</span>';
 
     const profileButton = document.createElement("button");
     profileButton.type = "button";
@@ -580,9 +581,9 @@ if (identity) {
         return { text: "I can explain CleanTrack's workflows and check live records exposed to your signed-in role. I couldn't confidently match that wording to a specific feature, so I won't invent an answer. Try asking in terms of the outcome you want—for example, 'show my current tasks', 'check why Logs is empty', 'how do I submit work for review?', or 'how do I import a location and create zones?'.", pages: matchPages(question) };
       }
 
-      openWorkspaceDialog("CleanTrack Assistant", content => {
+      openWorkspaceDialog("Shadow Assistance", content => {
         const wrap = appendText(content, "div", "", "ct-help-dialog ct-assistant-chat");
-        appendText(wrap, "p", "Your CleanTrack workspace helper", "ct-help-lead");
+        appendText(wrap, "p", "Your MECHNAR workspace companion", "ct-help-lead");
         appendText(wrap, "p", "Free built-in guidance. No paid AI API and no external web search.", "ct-help-note");
 
         const transcript = document.createElement("div");
@@ -635,7 +636,7 @@ if (identity) {
         if (history.length) {
           history.forEach(item => addMessage(item.role, item.text, false));
         } else {
-          addMessage("assistant", "Hello! I'm CleanTrack Assistant. I can guide you through your workspace and explain how CleanTrack features fit together. Ask me about operations, locations and zones, reviews, logs, reports, staff, or settings.");
+          addMessage("assistant", "Hello. I'm Shadow, your MECHNAR workspace companion. I can guide you through operations, locations and zones, reviews, logs, reports, staff, and settings.");
         }
         const starterRow = document.createElement("div");
         starterRow.style.cssText = "display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;";
