@@ -2256,63 +2256,57 @@ function bindNavigation() {
         splash.remove();
       }, 520);
     };
-    // Prepare one reusable audio context and chime buffer while the title screen loads.
-    // This avoids constructing/decoding audio at the exact moment of the user's tap.
+    // Create audio only after a real user gesture. Some browsers keep an
+    // AudioContext created during page load permanently suspended on first play.
     let launchAudioContext = null;
-    let launchChimeBuffer = null;
-    try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        launchAudioContext = new AudioContextClass();
-        const sampleRate = launchAudioContext.sampleRate;
-        // Quiet cinematic chime: warm and calming, with a restrained minor-key tension.
-        const duration = 1.55;
-        launchChimeBuffer = launchAudioContext.createBuffer(1, Math.ceil(sampleRate * duration), sampleRate);
-        const samples = launchChimeBuffer.getChannelData(0);
-        const layers = [
-          { frequency: 174.61, amplitude: 0.075, start: 0, length: 1.42 },
-          { frequency: 261.63, amplitude: 0.048, start: 0, length: 1.28 },
-          { frequency: 349.23, amplitude: 0.027, start: 0.08, length: 1.16 },
-          { frequency: 523.25, amplitude: 0.018, start: 0.24, length: 0.94 },
-          { frequency: 659.25, amplitude: 0.012, start: 0.43, length: 0.78 }
-        ];
-        layers.forEach(function (tone) {
-          const start = Math.floor(tone.start * sampleRate);
-          const length = Math.floor(tone.length * sampleRate);
-          for (let i = 0; i < length && start + i < samples.length; i++) {
-            const t = i / sampleRate;
-            const attack = Math.min(1, t / 0.16);
-            const release = Math.pow(Math.max(0, 1 - t / tone.length), 1.7);
-            const shimmer = 1 + 0.012 * Math.sin(2 * Math.PI * 4.2 * t);
-            samples[start + i] += Math.sin(2 * Math.PI * tone.frequency * t) * attack * release * tone.amplitude * shimmer;
-          }
-        });
-      }
-    } catch (_) { launchAudioContext = null; launchChimeBuffer = null; }
     const playLaunchChime = function () {
-      if (!launchAudioContext || !launchChimeBuffer) return;
-      const startPlayback = function () {
-        try {
-          if (!launchAudioContext || !launchChimeBuffer) return;
-          const source = launchAudioContext.createBufferSource();
-          const volume = launchAudioContext.createGain();
-          source.buffer = launchChimeBuffer;
-          // Audible on laptop speakers without returning to the previous loud level.
-          volume.gain.setValueAtTime(0.62, launchAudioContext.currentTime);
-          source.connect(volume);
-          volume.connect(launchAudioContext.destination);
-          source.start(0);
-        } catch (error) {
-          console.warn("MECHNAR launch sound could not be played:", error);
-        }
-      };
       try {
-        // Resume first. Starting a source while the context is suspended can
-        // leave it queued or inaudible in some browsers.
-        if (launchAudioContext.state === "running") {
-          startPlayback();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!launchAudioContext || launchAudioContext.state === "closed") {
+          launchAudioContext = new AudioContextClass();
+        }
+        const context = launchAudioContext;
+        const play = function () {
+          if (context.state !== "running") return;
+          const now = context.currentTime;
+          const master = context.createGain();
+          const compressor = context.createDynamicsCompressor();
+          master.gain.setValueAtTime(0.0001, now);
+          master.gain.exponentialRampToValueAtTime(0.20, now + 0.08);
+          master.gain.setTargetAtTime(0.0001, now + 1.05, 0.24);
+          compressor.threshold.setValueAtTime(-20, now);
+          compressor.knee.setValueAtTime(18, now);
+          compressor.ratio.setValueAtTime(4, now);
+          master.connect(compressor);
+          compressor.connect(context.destination);
+          [
+            { hz: 174.61, delay: 0, duration: 1.45, level: 0.22, type: "sine" },
+            { hz: 261.63, delay: 0.04, duration: 1.25, level: 0.13, type: "sine" },
+            { hz: 349.23, delay: 0.16, duration: 1.05, level: 0.075, type: "triangle" },
+            { hz: 233.08, delay: 0.30, duration: 0.95, level: 0.045, type: "sine" }
+          ].forEach(function (tone) {
+            const oscillator = context.createOscillator();
+            const envelope = context.createGain();
+            const startAt = now + tone.delay;
+            oscillator.type = tone.type;
+            oscillator.frequency.setValueAtTime(tone.hz, startAt);
+            envelope.gain.setValueAtTime(0.0001, startAt);
+            envelope.gain.exponentialRampToValueAtTime(tone.level, startAt + 0.10);
+            envelope.gain.setTargetAtTime(0.0001, startAt + tone.duration * 0.55, 0.22);
+            oscillator.connect(envelope);
+            envelope.connect(master);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + tone.duration);
+          });
+          window.setTimeout(function () {
+            try { master.disconnect(); compressor.disconnect(); } catch (_) {}
+          }, 1900);
+        };
+        if (context.state === "running") {
+          play();
         } else {
-          launchAudioContext.resume().then(startPlayback).catch(function (error) {
+          context.resume().then(play).catch(function (error) {
             console.warn("MECHNAR launch audio could not resume:", error);
           });
         }
