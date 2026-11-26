@@ -11,7 +11,7 @@
 .figure-shield{left:12%;bottom:25%;animation-delay:-5s}.figure-orb{right:13%;bottom:24%;animation-delay:-1s;color:rgba(175,143,221,.32)}
 .ct-launch-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#c9a7ff;box-shadow:0 0 12px 3px rgba(162,105,225,.55);animation:ctLaunchDrift 9s ease-in-out infinite}
 .p1{left:28%;top:17%}.p2{left:76%;top:20%;animation-delay:-3s}.p3{left:8%;top:55%;animation-delay:-5s}.p4{right:9%;top:63%;animation-delay:-2s}.p5{left:37%;bottom:17%;animation-delay:-4s}.p6{right:36%;bottom:12%;animation-delay:-6s}
-.ct-launch-icon-stage{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;align-items:center;gap:13px;transform:translate(-50%,-50%);animation:ctLaunchIconOut 2.75s ease forwards}
+.ct-launch-icon-stage{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;align-items:center;gap:13px;transform:translate(-50%,-50%);animation:ctLaunchIconOut 1.9s ease forwards}
 .ct-launch-icon-stage img{width:clamp(66px,12vw,112px);height:auto;filter:drop-shadow(0 0 24px rgba(151,95,215,.34))}
 .ct-launch-icon-stage span{font-size:clamp(13px,2vw,18px);font-weight:700;letter-spacing:.32em;color:#eee6f8}
 .ct-launch-title-stage{position:absolute;left:50%;top:46%;width:min(90%,560px);display:flex;flex-direction:column;align-items:center;text-align:center;opacity:0;transform:translate(-50%,-43%) scale(.94);animation:none}
