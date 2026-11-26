@@ -2,6 +2,10 @@
 (function(){
   "use strict";
   let RELEASE_UPDATES=[];
+  const style=document.createElement("style");
+  style.textContent=".mn-whats-new-pending-target{position:relative;outline:1px solid rgba(210,55,75,.7)!important;outline-offset:5px;border-radius:6px}.mn-whats-new-feature-dot{display:inline-flex;align-items:center;justify-content:center;margin:0 0 8px 8px;padding:3px 7px;border:0;border-radius:10px;background:#d73550;color:#fff;font:700 9px/1.2 inherit;letter-spacing:.06em;cursor:pointer;box-shadow:0 0 0 3px rgba(215,53,80,.16)}.mn-whats-new-highlight{animation:mnWhatsNewPulse 1.1s ease 2}@keyframes mnWhatsNewPulse{50%{box-shadow:0 0 0 5px rgba(215,53,80,.2)}}";
+  document.head.appendChild(style);
+
   let manifestRequest=null;
   const auth=window.CleanTrackAuth;
   const user=()=>auth&&auth.getCurrentUser?auth.getCurrentUser():null;
@@ -44,10 +48,9 @@
       const h=document.createElement("h3");h.textContent=update.feature;
       const p=document.createElement("p");p.textContent=update.description||"A feature on this page has been updated.";
       const action=document.createElement("button");action.type="button";action.className="mn-whats-new-action";action.textContent="Explore feature";
-      action.addEventListener("click",()=>{
-        const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);
-        overlay.remove();decorate();
-        if(update.target){const target=document.querySelector(update.target);if(target){target.scrollIntoView({behavior:"smooth",block:"center"});target.classList.add("mn-whats-new-highlight");setTimeout(()=>target.classList.remove("mn-whats-new-highlight"),2200)}}
+      action.addEventListener("click",async()=>{
+        overlay.remove();
+        await navigateToFeature(update);
       });
       item.append(h,p,action);panel.append(item);
     });
@@ -55,6 +58,26 @@
     const esc=e=>{if(e.key==="Escape"){overlay.remove();document.removeEventListener("keydown",esc)}};
     document.addEventListener("keydown",esc);
     document.body.append(overlay);close.focus();
+  }
+  async function navigateToFeature(update){
+    const nav=window.CleanTrackNavigation;
+    if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
+    const findTarget=()=>{try{return update.target?document.querySelector(update.target):null}catch(_){return null}};
+    let target=findTarget();
+    for(let i=0;!target&&i<30;i++){await new Promise(resolve=>setTimeout(resolve,150));target=findTarget();}
+    if(!target)target=document.querySelector("#workspace-content, #main-content, [data-workspace-content], main");
+    if(!target)return;
+    target.scrollIntoView({behavior:"smooth",block:"center"});
+    target.classList.add("mn-whats-new-highlight","mn-whats-new-pending-target");
+    let badge=target.querySelector(":scope > .mn-whats-new-feature-dot");
+    if(!badge){badge=document.createElement("button");badge.type="button";badge.className="mn-whats-new-feature-dot";badge.textContent="NEW";badge.title="Click to acknowledge this feature";badge.setAttribute("aria-label","Acknowledge new feature");target.appendChild(badge);}
+    const acknowledge=()=>{
+      const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);
+      badge.remove();target.classList.remove("mn-whats-new-pending-target","mn-whats-new-highlight");
+      target.removeEventListener("click",acknowledge,true);decorate();
+    };
+    target.addEventListener("click",acknowledge,true);
+    badge.addEventListener("click",e=>{e.stopPropagation();acknowledge();});
   }
   function init(){
     const root=document.getElementById("workspace-navigation");if(!root)return;
@@ -68,7 +91,7 @@
     window.addEventListener("storage",decorate);
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
-    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length};
+    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false);}};
     loadManifest();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
