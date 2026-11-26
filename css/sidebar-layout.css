@@ -904,10 +904,10 @@ html body #app-modal #modal-title.ct-shadow-panel-title {
 }
 html body #app-modal #modal-title .ct-shadow-panel-mark {
   display: block !important;
-  width: 32px !important;
-  height: 40px !important;
-  min-width: 32px !important;
-  flex: 0 0 32px !important;
+  width: clamp(42px, 4.6vw, 56px) !important;
+  height: clamp(58px, 6.8vw, 78px) !important;
+  min-width: clamp(42px, 4.6vw, 56px) !important;
+  flex: 0 0 clamp(42px, 4.6vw, 56px) !important;
   margin: 0 !important;
   object-fit: contain !important;
   filter: drop-shadow(0 0 5px rgba(173,111,231,.38)) !important;
@@ -925,6 +925,14 @@ html body #app-modal #modal-title.ct-shadow-panel-title span {
   25% { transform: translate3d(0, -3px, 0) rotate(0deg) scale(1.04); opacity: 1; }
   50% { transform: translate3d(1px, -1px, 0) rotate(5deg) scale(1); opacity: .9; }
   75% { transform: translate3d(0, -4px, 0) rotate(0deg) scale(1.03); opacity: 1; }
+}
+@media (max-width: 600px) {
+  html body #app-modal #modal-title .ct-shadow-panel-mark {
+    width: 38px !important;
+    height: 54px !important;
+    min-width: 38px !important;
+    flex: 0 0 38px !important;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   html body #app-modal #modal-title .ct-shadow-panel-mark { animation: none !important; }
