@@ -894,33 +894,38 @@ html body #workspace-view .ct-shadow-assistant-label {
 }
 
 
-/* Shadow branding belongs inside the assistant panel, not on the toolbar control. */
-html body #workspace-view #modal-title.ct-shadow-panel-title {
-  display: flex !important;
+/* Compact animated Shadow mark, aligned directly beside the assistant panel title. */
+html body #app-modal #modal-title.ct-shadow-panel-title {
+  display: inline-flex !important;
   align-items: center !important;
-  gap: 11px !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  vertical-align: middle !important;
 }
-html body #workspace-view #modal-title .ct-shadow-panel-mark {
+html body #app-modal #modal-title .ct-shadow-panel-mark {
   display: block !important;
-  width: 34px !important;
-  height: 42px !important;
-  flex: 0 0 34px !important;
+  width: 21px !important;
+  height: 27px !important;
+  min-width: 21px !important;
+  flex: 0 0 21px !important;
+  margin: 0 !important;
   object-fit: contain !important;
-  filter: drop-shadow(0 0 9px rgba(173,111,231,.4)) !important;
-  animation: ctShadowPanelFloat 5.8s ease-in-out infinite, ctShadowPanelFade 7s ease-in-out infinite alternate !important;
+  filter: drop-shadow(0 0 5px rgba(173,111,231,.38)) !important;
+  transform-origin: 50% 75% !important;
+  animation: ctShadowPanelMotion 2.8s ease-in-out infinite !important;
+  will-change: transform, opacity !important;
 }
-html body #workspace-view #modal-title.ct-shadow-panel-title span {
+html body #app-modal #modal-title.ct-shadow-panel-title span {
   display: inline-block !important;
+  margin: 0 !important;
   line-height: 1.2 !important;
 }
-@keyframes ctShadowPanelFloat {
-  0%,100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-4px) rotate(3deg); }
-}
-@keyframes ctShadowPanelFade {
-  0%,100% { opacity: .62; }
-  50% { opacity: 1; }
+@keyframes ctShadowPanelMotion {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-5deg) scale(1); opacity: .78; }
+  25% { transform: translate3d(0, -3px, 0) rotate(0deg) scale(1.04); opacity: 1; }
+  50% { transform: translate3d(1px, -1px, 0) rotate(5deg) scale(1); opacity: .9; }
+  75% { transform: translate3d(0, -4px, 0) rotate(0deg) scale(1.03); opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html body #workspace-view #modal-title .ct-shadow-panel-mark { animation: none !important; }
+  html body #app-modal #modal-title .ct-shadow-panel-mark { animation: none !important; }
 }
