@@ -27,9 +27,13 @@ async function render(root,mode){
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
  let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},toolErrors={},view="home";
  const get=async()=>{
-  const d=await API.get("quality/inspections");items=Array.isArray(d.items)?d.items:[];
+  const requests=[API.get("quality/inspections")];
+  if(!isStaff&&!isAdmin)requests.push(API.get("quality/templates"),API.get("quality/schedules"),API.get("quality/team-leader"),API.get("supervisor/records/options"));
+  const loaded=await Promise.allSettled(requests);
+  if(loaded[0].status==="rejected")throw loaded[0].reason;
+  const d=loaded[0].value;items=Array.isArray(d.items)?d.items:[];
   if(!isStaff&&!isAdmin){
-   const results=await Promise.allSettled([API.get("quality/templates"),API.get("quality/schedules"),API.get("quality/team-leader"),API.get("supervisor/records/options")]);
+   const results=loaded.slice(1);
    toolErrors={
     templates:results[0].status==="rejected"?results[0].reason:null,
     schedules:results[1].status==="rejected"?results[1].reason:null,
