@@ -951,9 +951,14 @@ html body #app-modal #modal-title .ct-shadow-panel-tap-target {
   flex: 0 0 clamp(42px, 4.6vw, 56px) !important;
   margin: 0 !important;
   padding: 0 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
   border: 0 !important;
   outline-offset: 3px !important;
   background: transparent !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 0 !important;
   cursor: pointer !important;
   vertical-align: middle !important;
   -webkit-tap-highlight-color: transparent;
