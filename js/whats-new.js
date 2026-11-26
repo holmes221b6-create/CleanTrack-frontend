@@ -12,6 +12,10 @@
   const storageKey=()=>{const u=user()||{};return "mechnar.whats-new.v1:"+String(u.organization_id||"org")+":"+String(u.id||u.email||"user");};
   const read=()=>{try{return JSON.parse(localStorage.getItem(storageKey())||"[]")}catch(_){return []}};
   const save=a=>{try{localStorage.setItem(storageKey(),JSON.stringify(a))}catch(_){}};
+  const presentedKey=()=>storageKey()+":presented";
+  const presented=()=>{try{return JSON.parse(localStorage.getItem(presentedKey())||"[]")}catch(_){return []}};
+  const savePresented=a=>{try{localStorage.setItem(presentedKey(),JSON.stringify(a))}catch(_){}};
+  const acknowledge=update=>{const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);decorate();};
   const unseen=page=>RELEASE_UPDATES.filter(x=>x.page===page&&!read().includes(x.id));
   async function loadManifest(){
     if(manifestRequest)return manifestRequest;
@@ -35,7 +39,9 @@
     });
   }
   function showUpdates(page){
-    const list=unseen(page);if(!list.length)return;
+    const shown=presented();
+    const list=unseen(page).filter(x=>!shown.includes(x.id));if(!list.length)return;
+    savePresented([...shown,...list.map(x=>x.id)]);
     document.getElementById("mn-whats-new-overlay")?.remove();
     const overlay=document.createElement("div");overlay.id="mn-whats-new-overlay";overlay.className="mn-whats-new-overlay";
     const panel=document.createElement("section");panel.className="mn-whats-new-panel";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","What's New");
@@ -52,7 +58,10 @@
         overlay.remove();
         await navigateToFeature(update);
       });
-      item.append(h,p,action);panel.append(item);
+      const skip=document.createElement("button");skip.type="button";skip.className="mn-whats-new-skip";skip.textContent="Skip";
+      skip.addEventListener("click",()=>{acknowledge(update);item.remove();if(!panel.querySelector(".mn-whats-new-item"))overlay.remove();});
+      const actions=document.createElement("div");actions.className="mn-whats-new-actions";actions.append(action,skip);
+      item.append(h,p,actions);panel.append(item);
     });
     overlay.append(panel);overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove()});
     const esc=e=>{if(e.key==="Escape"){overlay.remove();document.removeEventListener("keydown",esc)}};
@@ -71,12 +80,11 @@
     target.classList.add("mn-whats-new-highlight","mn-whats-new-pending-target");
     let badge=target.querySelector(":scope > .mn-whats-new-feature-dot");
     if(!badge){badge=document.createElement("button");badge.type="button";badge.className="mn-whats-new-feature-dot";badge.textContent="NEW";badge.title="Click to acknowledge this feature";badge.setAttribute("aria-label","Acknowledge new feature");target.appendChild(badge);}
-    const acknowledge=()=>{
-      const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);
+    const acknowledgeFeature=()=>{
+      acknowledge(update);
       badge.remove();target.classList.remove("mn-whats-new-pending-target","mn-whats-new-highlight");
-      decorate();
     };
-    badge.addEventListener("click",e=>{e.stopPropagation();acknowledge();});
+    badge.addEventListener("click",e=>{e.stopPropagation();acknowledgeFeature();});
   }
   function init(){
     const root=document.getElementById("workspace-navigation");if(!root)return;
