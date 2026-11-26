@@ -717,3 +717,117 @@ html body #workspace-view .ct-workspace-shell.ct-sidebar-collapsed .ct-sidebar .
 .ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative;z-index:9;align-items:center;justify-content:center;min-width:64px;padding:9px 16px;border:1px solid rgba(170,145,255,.75)!important;border-radius:10px;background:rgba(128,96,220,.3)!important;color:var(--text-color,#f5f3fb)!important;font:inherit;font-weight:750;cursor:pointer!important;transition:background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
 .ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button:hover{background:rgba(128,96,220,.5)!important;border-color:rgba(190,170,255,1)!important;transform:translateY(-1px);box-shadow:0 5px 16px rgba(80,55,150,.25)}
 .ct-profile-edit-overlay .ct-profile-skill-entry .ct-profile-add-button:active{transform:translateY(0) scale(.97)}
+
+
+/* MECHNAR sidebar identity and navigation hierarchy — structured enterprise treatment. */
+html body #workspace-view .ct-sidebar {
+  padding: 22px 14px 18px !important;
+  background: #0d1423 !important;
+  border-right: 1px solid rgba(157, 139, 198, .16) !important;
+}
+html body #workspace-view .ct-sidebar .ct-sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 42px !important;
+  margin: 0 0 18px !important;
+  padding: 0 9px 15px !important;
+  border-bottom: 1px solid rgba(170, 155, 207, .2) !important;
+  color: #f3efff !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  letter-spacing: .17em !important;
+  line-height: 1.2 !important;
+}
+html body #workspace-view .ct-sidebar .workspace-identity {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 9px !important;
+  min-width: 0 !important;
+  margin: 0 0 22px !important;
+  padding: 2px 9px 18px !important;
+  border-bottom: 1px solid rgba(170, 155, 207, .14) !important;
+}
+html body #workspace-view .ct-sidebar #workspace-organization {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  overflow-wrap: anywhere !important;
+  color: #f0edf8 !important;
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  letter-spacing: .005em !important;
+  line-height: 1.45 !important;
+}
+html body #workspace-view .ct-sidebar #workspace-role {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  min-height: 23px !important;
+  margin: 0 !important;
+  padding: 3px 9px !important;
+  border: 1px solid rgba(160, 130, 220, .28) !important;
+  border-radius: 6px !important;
+  background: rgba(139, 112, 188, .13) !important;
+  color: #c9b9ed !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  letter-spacing: .075em !important;
+  line-height: 1.25 !important;
+  text-transform: uppercase !important;
+}
+html body #workspace-view .ct-sidebar .ct-sidebar-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  margin: 0 0 9px !important;
+  padding: 0 9px !important;
+  color: #9184ad !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .19em !important;
+  line-height: 1.4 !important;
+}
+html body #workspace-view .ct-sidebar .ct-sidebar-label::after {
+  content: "" !important;
+  display: block !important;
+  height: 1px !important;
+  flex: 1 1 auto !important;
+  background: linear-gradient(90deg, rgba(145,132,173,.3), transparent) !important;
+}
+html body #workspace-view #workspace-navigation {
+  gap: 5px !important;
+}
+html body #workspace-view #workspace-navigation button,
+html body #workspace-view #workspace-navigation a {
+  min-height: 41px !important;
+  gap: 11px !important;
+  padding: 9px 11px !important;
+  border-radius: 7px !important;
+  color: #c5c0d1 !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  letter-spacing: .005em !important;
+  line-height: 1.35 !important;
+  transition: background .16s ease, color .16s ease, border-color .16s ease !important;
+}
+html body #workspace-view #workspace-navigation button:hover,
+html body #workspace-view #workspace-navigation a:hover {
+  background: rgba(255,255,255,.055) !important;
+  color: #f5f1ff !important;
+}
+html body #workspace-view #workspace-navigation .active,
+html body #workspace-view #workspace-navigation [aria-current="page"],
+html body #workspace-view #workspace-navigation .ct-nav-active {
+  border-color: rgba(157, 128, 211, .24) !important;
+  background: linear-gradient(90deg, rgba(139,112,188,.2), rgba(139,112,188,.07)) !important;
+  box-shadow: inset 2px 0 #a88bd8 !important;
+  color: #f5f0ff !important;
+}
+@media (max-width: 760px) {
+  html body #workspace-view .ct-sidebar {
+    padding: 20px 14px 18px !important;
+  }
+}
