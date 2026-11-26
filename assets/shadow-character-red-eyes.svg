@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 250" role="img" aria-labelledby="title desc">
+<title id="title">Shadow, MECHNAR AI companion</title>
+<desc id="desc">A small floating shadow companion with a soft hood, swept side fins, intense crimson-red eyes, tiny hovering hands and a glowing chest core.</desc>
+<defs>
+ <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30243e"/><stop offset=".52" stop-color="#100d18"/><stop offset="1" stop-color="#050509"/></linearGradient>
+ <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#65458a"/><stop offset=".5" stop-color="#21172f"/><stop offset="1" stop-color="#7650a1"/></linearGradient>
+ <radialGradient id="crimson"><stop stop-color="#fff1f3"/><stop offset=".18" stop-color="#ffb0b8"/><stop offset=".48" stop-color="#ff263f"/><stop offset=".78" stop-color="#d00022"/><stop offset="1" stop-color="#650012"/></radialGradient>
+ <filter id="redEyeGlow" x="-180%" y="-180%" width="460%" height="460%"><feGaussianBlur stdDeviation="7" result="blur"/><feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.8  0 0.05 0 0 0  0 0 0.08 0 0  0 0 0 1 0" result="redBlur"/><feMerge><feMergeNode in="redBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="softGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<!-- swept side fins give Shadow a distinct silhouette without crown-like spikes -->
+<path d="M69 75Q34 46 19 59Q31 87 60 101M151 75Q186 46 201 59Q189 87 160 101" fill="#100c17" stroke="#59406f" stroke-width="4" stroke-linejoin="round"/>
+<!-- floating cloak body -->
+<path d="M110 28C70 28 48 57 50 98Q51 131 32 178Q26 196 43 196H177Q194 196 188 178Q169 131 170 98C172 57 150 28 110 28Z" fill="url(#body)" stroke="url(#rim)" stroke-width="4"/>
+<path d="M62 119Q110 143 158 119M47 183Q110 207 173 183" fill="none" stroke="#6d4a8e" stroke-width="3" opacity=".42"/>
+<!-- hood brow -->
+<path d="M65 91Q110 53 155 91Q139 78 110 82Q81 78 65 91Z" fill="#08070d" stroke="#49355e" stroke-width="2"/>
+<g filter="url(#redEyeGlow)">
+ <path d="M76 105Q91 91 103 105Q91 117 76 105Z" fill="url(#crimson)" stroke="#ff5365" stroke-width="1.4"/>
+ <path d="M117 105Q129 91 144 105Q129 117 117 105Z" fill="url(#crimson)" stroke="#ff5365" stroke-width="1.4"/>
+</g>
+<path d="M103 130Q110 134 117 130" fill="none" stroke="#a77bd1" stroke-width="2.5" stroke-linecap="round" opacity=".65"/>
+<!-- little hovering hands -->
+<path d="M39 146Q22 143 19 157Q23 170 42 165M181 146Q198 143 201 157Q197 170 178 165" fill="#171020" stroke="#60447b" stroke-width="3"/>
+<!-- chest core -->
+<path d="M110 153 120 164 110 177 100 164Z" fill="#251735" stroke="#9464bf" stroke-width="2"/>
+<circle cx="110" cy="164" r="4" fill="#d7a9ff" filter="url(#softGlow)"/>
+<!-- tapered lower wisp -->
+<path d="M68 190Q78 216 94 226L110 237 126 226Q142 216 152 190Q110 204 68 190Z" fill="#08070d" stroke="#49345e" stroke-width="3"/>
+</svg>
