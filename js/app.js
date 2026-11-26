@@ -2257,35 +2257,39 @@ function bindNavigation() {
       }, 520);
     };
     const playLaunchChime = function () {
+      // Start the audio graph synchronously inside the click/Enter gesture.
+      // Do not wait for resume() before scheduling the sound.
+      let audio;
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) return;
-        const audio = new AudioContextClass();
-        const play = function () {
-          const now = audio.currentTime;
-          const master = audio.createGain();
-          master.gain.setValueAtTime(0.0001, now);
-          master.gain.exponentialRampToValueAtTime(0.22, now + 0.035);
-          master.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
-          master.connect(audio.destination);
-          [[587.33,0,0.28],[739.99,0.13,0.34],[880,0.29,0.52]].forEach(function (tone) {
-            const oscillator = audio.createOscillator();
-            const voice = audio.createGain();
-            oscillator.type = "triangle";
-            oscillator.frequency.setValueAtTime(tone[0], now + tone[1]);
-            voice.gain.setValueAtTime(0.0001, now + tone[1]);
-            voice.gain.exponentialRampToValueAtTime(0.72, now + tone[1] + 0.025);
-            voice.gain.exponentialRampToValueAtTime(0.0001, now + tone[1] + tone[2]);
-            oscillator.connect(voice);
-            voice.connect(master);
-            oscillator.start(now + tone[1]);
-            oscillator.stop(now + tone[1] + tone[2] + 0.04);
-          });
-          window.setTimeout(function () { audio.close().catch(function () {}); }, 1400);
-        };
-        if (audio.state === "suspended") audio.resume().then(play).catch(function () {});
-        else play();
-      } catch (_) {}
+        audio = new AudioContextClass();
+        if (audio.state === "suspended") audio.resume().catch(function () {});
+        const now = audio.currentTime;
+        const master = audio.createGain();
+        master.gain.setValueAtTime(0.0001, now);
+        master.gain.linearRampToValueAtTime(0.2, now + 0.018);
+        master.gain.setValueAtTime(0.2, now + 0.16);
+        master.gain.exponentialRampToValueAtTime(0.0001, now + 0.82);
+        master.connect(audio.destination);
+        // Immediate, bright three-note confirmation chime.
+        [[659.25,0,0.2],[783.99,0.09,0.25],[987.77,0.2,0.48]].forEach(function (tone) {
+          const oscillator = audio.createOscillator();
+          const voice = audio.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(tone[0], now);
+          voice.gain.setValueAtTime(0.0001, now);
+          voice.gain.linearRampToValueAtTime(0.72, now + 0.012);
+          voice.gain.exponentialRampToValueAtTime(0.0001, now + tone[2]);
+          oscillator.connect(voice);
+          voice.connect(master);
+          oscillator.start(now);
+          oscillator.stop(now + tone[2] + 0.025);
+        });
+        window.setTimeout(function () { if (audio && audio.state !== "closed") audio.close().catch(function () {}); }, 1200);
+      } catch (_) {
+        if (audio && audio.state !== "closed") audio.close().catch(function () {});
+      }
     };
     const enterApplication = function () {
       if (launchEntryPending || !splash || !splash.isConnected) return;
