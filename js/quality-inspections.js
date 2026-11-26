@@ -27,7 +27,7 @@ async function render(root,mode){
  const say=(s,bad=false)=>{notice.hidden=!s;notice.textContent=s||"";notice.classList.toggle("is-error",bad);};
  let items=[],templates=[],schedules=[],leader=null,options={operations:[],locations:[],zones:[]},toolErrors={},view="home";
  const get=async()=>{
-  const d=await API.get("quality/inspections");items=d.items||[];
+  const d=await API.get("quality/inspections");items=Array.isArray(d.items)?d.items:[];
   if(!isStaff&&!isAdmin){
    const results=await Promise.allSettled([API.get("quality/templates"),API.get("quality/schedules"),API.get("quality/team-leader"),API.get("supervisor/records/options")]);
    toolErrors={
