@@ -32,3 +32,12 @@
 #cleantrack-launch-splash.ct-launch-preparing .ct-launch-orbit{animation-duration:3s}
 #cleantrack-launch-splash.ct-launch-preparing .ct-launch-figure{filter:drop-shadow(0 0 18px rgba(151,101,207,.32))}
 @keyframes ctLaunchPreparing{0%,100%{opacity:.58;letter-spacing:.22em}50%{opacity:1;letter-spacing:.28em}}
+
+/* Keep entry controls hidden during the app-icon-only opening beat. */
+#cleantrack-launch-splash .ct-launch-begin,
+#cleantrack-launch-splash .ct-launch-keyhint{opacity:0;visibility:hidden;pointer-events:none}
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-begin,
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-keyhint{visibility:visible;animation:ctLaunchPromptIn .65s ease 0s forwards}
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-begin{pointer-events:auto}
+@keyframes ctLaunchPromptIn{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+#cleantrack-launch-splash.ct-launch-preparing .ct-launch-begin{visibility:visible;opacity:1}
