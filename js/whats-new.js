@@ -1,12 +1,9 @@
-/* MECHNAR What's New — automatically loaded release manifest with per-user acknowledgements. */
+/* MECHNAR What's New — release announcements and guided feature walkthroughs. */
 (function(){
   "use strict";
   let RELEASE_UPDATES=[];
-  const style=document.createElement("style");
-  style.textContent=".mn-whats-new-pending-target{position:relative;outline:1px solid rgba(210,55,75,.7)!important;outline-offset:5px;border-radius:6px}.mn-whats-new-feature-dot{display:inline-flex;align-items:center;justify-content:center;margin:0 0 8px 8px;padding:3px 7px;border:0;border-radius:10px;background:#d73550;color:#fff;font:700 9px/1.2 inherit;letter-spacing:.06em;cursor:pointer;box-shadow:0 0 0 3px rgba(215,53,80,.16)}.mn-whats-new-highlight{animation:mnWhatsNewPulse 1.1s ease 2}@keyframes mnWhatsNewPulse{50%{box-shadow:0 0 0 5px rgba(215,53,80,.2)}}";
-  document.head.appendChild(style);
-
   let manifestRequest=null;
+  let activeGuide=null;
   const auth=window.CleanTrackAuth;
   const user=()=>auth&&auth.getCurrentUser?auth.getCurrentUser():null;
   const storageKey=()=>{const u=user()||{};return "mechnar.whats-new.v1:"+String(u.organization_id||"org")+":"+String(u.id||u.email||"user");};
@@ -17,88 +14,116 @@
   const savePresented=a=>{try{localStorage.setItem(presentedKey(),JSON.stringify(a))}catch(_){}};
   const acknowledge=update=>{const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);decorate();};
   const unseen=page=>RELEASE_UPDATES.filter(x=>x.page===page&&!read().includes(x.id));
+
   async function loadManifest(){
     if(manifestRequest)return manifestRequest;
     manifestRequest=fetch("whats-new.json?v="+encodeURIComponent(Date.now()),{cache:"no-store",credentials:"same-origin"})
-      .then(response=>{if(!response.ok)throw new Error("Release manifest unavailable");return response.json()})
+      .then(r=>{if(!r.ok)throw new Error("Release manifest unavailable");return r.json()})
       .then(data=>{RELEASE_UPDATES=Array.isArray(data.updates)?data.updates.filter(x=>x&&x.id&&x.page&&x.feature):[];decorate();return RELEASE_UPDATES})
       .catch(()=>{RELEASE_UPDATES=[];decorate();return RELEASE_UPDATES})
       .finally(()=>{manifestRequest=null});
     return manifestRequest;
   }
   function decorate(){
-    const root=document.getElementById("workspace-navigation"); if(!root)return;
+    const root=document.getElementById("workspace-navigation");if(!root)return;
     root.querySelectorAll(".nav-item[data-page]").forEach(button=>{
-      const page=button.dataset.page,label=button.querySelector(".nav-item-label");
-      if(!label)return;
-      let dot=button.querySelector(".mn-whats-new-dot");
-      const pending=unseen(page).length>0;
+      const page=button.dataset.page,label=button.querySelector(".nav-item-label");if(!label)return;
+      let dot=button.querySelector(".mn-whats-new-dot");const pending=unseen(page).length>0;
       if(pending&&!dot){dot=document.createElement("span");dot.className="mn-whats-new-dot";dot.setAttribute("aria-label","New feature update");dot.title="New feature update — open to explore";label.appendChild(dot)}
       if(!pending&&dot)dot.remove();
       button.classList.toggle("has-whats-new",pending);
     });
   }
   function showUpdates(page){
-    const shown=presented();
-    const list=unseen(page).filter(x=>!shown.includes(x.id));if(!list.length)return;
+    const shown=presented(),list=unseen(page).filter(x=>!shown.includes(x.id));if(!list.length)return;
     savePresented([...shown,...list.map(x=>x.id)]);
     document.getElementById("mn-whats-new-overlay")?.remove();
     const overlay=document.createElement("div");overlay.id="mn-whats-new-overlay";overlay.className="mn-whats-new-overlay";
     const panel=document.createElement("section");panel.className="mn-whats-new-panel";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","What's New");
     const head=document.createElement("header");head.className="mn-whats-new-head";
-    const title=document.createElement("div");title.innerHTML="<span class='mn-whats-new-kicker'>MECHNAR RELEASE NOTES</span><h2>What's New</h2><p>Explore the latest changes on this page.</p>";
+    const title=document.createElement("div");title.innerHTML="<span class='mn-whats-new-kicker'>MECHNAR RELEASE NOTES</span><h2>What's New</h2><p>Choose a feature to see its guided walkthrough.</p>";
     const close=document.createElement("button");close.type="button";close.className="mn-whats-new-close";close.textContent="×";close.setAttribute("aria-label","Close");
     close.addEventListener("click",()=>overlay.remove());head.append(title,close);panel.append(head);
     list.forEach(update=>{
       const item=document.createElement("article");item.className="mn-whats-new-item";
       const h=document.createElement("h3");h.textContent=update.feature;
-      const p=document.createElement("p");p.textContent=update.description||"A feature on this page has been updated.";
       const action=document.createElement("button");action.type="button";action.className="mn-whats-new-action";action.textContent="Explore feature";
-      action.addEventListener("click",async()=>{
-        overlay.remove();
-        await navigateToFeature(update);
-      });
+      action.addEventListener("click",async()=>{overlay.remove();await navigateToFeature(update)});
       const skip=document.createElement("button");skip.type="button";skip.className="mn-whats-new-skip";skip.textContent="Skip";
       skip.addEventListener("click",()=>{acknowledge(update);item.remove();if(!panel.querySelector(".mn-whats-new-item"))overlay.remove();});
       const actions=document.createElement("div");actions.className="mn-whats-new-actions";actions.append(action,skip);
-      item.append(h,p,actions);panel.append(item);
+      item.append(h,actions);panel.append(item);
     });
     overlay.append(panel);overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove()});
     const esc=e=>{if(e.key==="Escape"){overlay.remove();document.removeEventListener("keydown",esc)}};
-    document.addEventListener("keydown",esc);
-    document.body.append(overlay);close.focus();
+    document.addEventListener("keydown",esc);document.body.append(overlay);close.focus();
+  }
+  function closeGuide(shouldAcknowledge){
+    if(!activeGuide)return;
+    const guide=activeGuide;activeGuide=null;
+    guide.timer&&clearInterval(guide.timer);
+    guide.resize&&window.removeEventListener("resize",guide.resize);
+    guide.scroll&&window.removeEventListener("scroll",guide.scroll,true);
+    guide.bubble.remove();
+    guide.target.classList.remove("mn-whats-new-highlight","mn-whats-new-pending-target");
+    if(shouldAcknowledge)acknowledge(guide.update);
+  }
+  function positionGuide(guide){
+    const r=guide.target.getBoundingClientRect(),bubble=guide.bubble;
+    const width=Math.min(390,window.innerWidth-32);
+    bubble.style.width=width+"px";
+    const left=Math.max(16,Math.min(window.innerWidth-width-16,r.left+r.width/2-width/2));
+    const below=r.bottom+18,above=r.top-bubble.offsetHeight-18;
+    const placeAbove=below+bubble.offsetHeight>window.innerHeight-12&&above>12;
+    bubble.classList.toggle("mn-whats-new-guide-above",placeAbove);
+    bubble.style.left=left+"px";
+    bubble.style.top=Math.max(12,placeAbove?above:Math.min(below,window.innerHeight-bubble.offsetHeight-12))+"px";
+    bubble.style.setProperty("--mn-guide-arrow-left",Math.max(22,Math.min(width-34,r.left+r.width/2-left))+"px");
+  }
+  function typeDescription(guide){
+    const words=(guide.update.description||"This feature has been updated.").split(/\s+/);
+    let index=0;guide.text.textContent="";guide.timer=setInterval(()=>{
+      if(!activeGuide||activeGuide!==guide){clearInterval(guide.timer);return}
+      guide.text.textContent+=(index?" ":"")+words[index++];
+      if(index>=words.length){clearInterval(guide.timer);guide.timer=null;guide.done=true;guide.doneButton.disabled=false;guide.doneButton.textContent="Got it";}
+    },65);
   }
   async function navigateToFeature(update){
+    closeGuide(false);
     const nav=window.CleanTrackNavigation;
     if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
     const findTarget=()=>{try{return update.target?document.querySelector(update.target):null}catch(_){return null}};
     let target=findTarget();
     for(let i=0;!target&&i<30;i++){await new Promise(resolve=>setTimeout(resolve,150));target=findTarget();}
     if(!target)target=document.querySelector("#workspace-content, #main-content, [data-workspace-content], main");
-    if(!target)return;
+    if(!target)return false;
     target.scrollIntoView({behavior:"smooth",block:"center"});
     target.classList.add("mn-whats-new-highlight","mn-whats-new-pending-target");
-    let badge=target.querySelector(":scope > .mn-whats-new-feature-dot");
-    if(!badge){badge=document.createElement("button");badge.type="button";badge.className="mn-whats-new-feature-dot";badge.textContent="NEW";badge.title="Click to acknowledge this feature";badge.setAttribute("aria-label","Acknowledge new feature");target.appendChild(badge);}
-    const acknowledgeFeature=()=>{
-      acknowledge(update);
-      badge.remove();target.classList.remove("mn-whats-new-pending-target","mn-whats-new-highlight");
-    };
-    badge.addEventListener("click",e=>{e.stopPropagation();acknowledgeFeature();});
+    const bubble=document.createElement("aside");bubble.className="mn-whats-new-guide";bubble.setAttribute("role","status");
+    const pointer=document.createElement("span");pointer.className="mn-whats-new-guide-pointer";
+    const kicker=document.createElement("div");kicker.className="mn-whats-new-guide-kicker";kicker.textContent="FEATURE WALKTHROUGH";
+    const heading=document.createElement("h3");heading.textContent="Here's what's new";
+    const text=document.createElement("p");text.className="mn-whats-new-guide-text";
+    const done=document.createElement("button");done.type="button";done.className="mn-whats-new-guide-done";done.disabled=true;done.textContent="Showing you…";
+    done.addEventListener("click",()=>closeGuide(true));
+    const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-whats-new-guide-dismiss";dismiss.textContent="×";dismiss.setAttribute("aria-label","Close walkthrough");
+    dismiss.addEventListener("click",()=>closeGuide(false));
+    bubble.append(pointer,dismiss,kicker,heading,text,done);document.body.append(bubble);
+    const guide={update,target,bubble,text,doneButton:done,timer:null,done:false};
+    activeGuide=guide;
+    guide.resize=()=>positionGuide(guide);guide.scroll=()=>positionGuide(guide);
+    window.addEventListener("resize",guide.resize);window.addEventListener("scroll",guide.scroll,true);
+    positionGuide(guide);setTimeout(()=>{if(activeGuide===guide){positionGuide(guide);typeDescription(guide)}},450);
+    return true;
   }
   function init(){
     const root=document.getElementById("workspace-navigation");if(!root)return;
-    decorate();
-    new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
-    root.addEventListener("click",e=>{
-      const button=e.target.closest(".nav-item[data-page]");if(!button)return;
-      const page=button.dataset.page;
-      loadManifest().then(()=>setTimeout(()=>showUpdates(page),250));
-    });
+    decorate();new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
+    root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>showUpdates(page),250));});
     window.addEventListener("storage",decorate);
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
-    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false);}};
+    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false)}};
     loadManifest();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
