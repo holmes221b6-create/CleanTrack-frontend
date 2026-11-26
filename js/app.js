@@ -2354,10 +2354,10 @@ function bindNavigation() {
           enterApplication();
         }
       });
-      // The icon-only brand intro lasts 2.75s. Only then reveal the prompt and enable entry.
+      // Reveal the title immediately after the shortened icon intro completes.
       window.setTimeout(function () {
         if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 1950);
+      }, 1820);
     }
     setLoading(false);
     try {
