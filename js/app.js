@@ -1553,55 +1553,24 @@
   
   function setNotificationBellMotion(button, active) {
     if (!button) return;
-    const shouldAnimate = !!active;
-    const alreadyAnimating = button.dataset.mechnarBellMotionActive === "true";
-    if (shouldAnimate === alreadyAnimating) return;
-    button.dataset.mechnarBellMotionActive = shouldAnimate ? "true" : "false";
-
+    // CSS owns the visual treatment: a stationary bell with a vertical shimmer.
+    // Never apply Web Animations or inline transforms here; those caused ringing.
+    if (active) button.classList.add("has-unopened-notifications");
+    else button.classList.remove("has-unopened-notifications");
+    button.style.removeProperty("animation");
+    button.style.removeProperty("filter");
     const icon = button.querySelector(".notification-bell-icon");
     const svg = icon && icon.querySelector("svg");
-    const badge = getElement("notification-count");
-
-    // Cancel any earlier Web Animations API effects before applying the
-    // inline important animation. This is deliberately independent of the
-    // page's stylesheet order and reduced-motion rules.
-    (button._mechnarBellAnimations || []).forEach(function (animation) {
-      try { animation.cancel(); } catch (_) {}
+    [icon, svg].filter(Boolean).forEach(function (node) {
+      ["animation", "transform", "transform-origin", "transform-box"].forEach(function (name) {
+        node.style.removeProperty(name);
+      });
     });
-    button._mechnarBellAnimations = [];
-
-    if (shouldAnimate) {
-      button.classList.add("has-unopened-notifications");
-      button.style.setProperty("animation", "mechnarBellGlow 1.1s ease-in-out infinite", "important");
-      button.style.setProperty("filter", "drop-shadow(0 0 7px rgba(174,139,220,.9))", "important");
-      if (svg) {
-        svg.style.setProperty("animation", "mechnarBellSwing 1.1s ease-in-out infinite", "important");
-        svg.style.setProperty("transform-origin", "50% 12%", "important");
-        svg.style.setProperty("transform-box", "fill-box", "important");
-      } else if (icon) {
-        icon.style.setProperty("animation", "mechnarBellSwing 1.1s ease-in-out infinite", "important");
-        icon.style.setProperty("transform-origin", "50% 12%", "important");
-      }
-      if (badge && !badge.hidden) badge.style.setProperty("animation", "mechnarBellBadge .85s ease-in-out infinite", "important");
-    } else {
-      button.classList.remove("has-unopened-notifications");
-      ["animation", "filter"].forEach(function (name) { button.style.removeProperty(name); });
-      if (svg) ["animation", "transform-origin", "transform-box"].forEach(function (name) { svg.style.removeProperty(name); });
-      if (icon) ["animation", "transform-origin"].forEach(function (name) { icon.style.removeProperty(name); });
-      if (badge) badge.style.removeProperty("animation");
-    }
-  }
-
-  function ensureNotificationBellKeyframes() {
-    if (document.getElementById("mechnar-notification-bell-keyframes")) return;
-    const style = document.createElement("style");
-    style.id = "mechnar-notification-bell-keyframes";
-    style.textContent = "@keyframes mechnarBellSwing{0%,100%{transform:rotate(0) scale(1)}10%,30%{transform:rotate(-19deg) scale(1.12)}20%,40%{transform:rotate(19deg) scale(1.12)}55%,75%{transform:rotate(0) scale(1)}}@keyframes mechnarBellGlow{0%,100%{filter:drop-shadow(0 0 1px rgba(174,139,220,.2))}50%{filter:drop-shadow(0 0 12px rgba(174,139,220,1))}}@keyframes mechnarBellBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}";
-    document.head.appendChild(style);
+    const badge = getElement("notification-count");
+    if (badge) badge.style.removeProperty("animation");
   }
 
   async function refreshNotificationBadge() {
-    ensureNotificationBellKeyframes();
     const badge = getElement("notification-count");
     if (!badge || !window.CleanTrackApi || !auth.isAuthenticated()) return;
     try {
