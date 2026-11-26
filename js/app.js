@@ -926,7 +926,7 @@
         console.error("Personnel panel failed to load:", error);
       }
       if (token === personnelOpenToken && personnelOverlay === overlay) overlay.querySelector(".mn-personnel-close").focus();
-    }, 1800);
+    }, 0);
   }
 
   let performanceArenaOverlay = null;
@@ -2178,7 +2178,7 @@ function bindNavigation() {
       window.setInterval(function () {
         refreshNotificationBadge();
         refreshAnnouncementBadge();
-      }, 3000);
+      }, 30000);
     }
     bindLoginForm();
     if (typeof bindRegistrationForm === "function") {
@@ -2195,7 +2195,7 @@ function bindNavigation() {
     const splash = document.getElementById("cleantrack-launch-splash");
     if (splash) {
       const elapsed = Date.now() - (window.__MECHNAR_SPLASH_STARTED_AT__ || Date.now());
-      const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1180 : 1720;
+      const minimumVisible = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : 350;
       const waitFor = Math.max(0, minimumVisible - elapsed);
       window.setTimeout(function () {
         splash.classList.add("is-hidden");
