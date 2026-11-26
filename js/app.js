@@ -2256,40 +2256,44 @@ function bindNavigation() {
         splash.remove();
       }, 520);
     };
-    const playLaunchChime = function () {
-      // Start the audio graph synchronously inside the click/Enter gesture.
-      // Do not wait for resume() before scheduling the sound.
-      let audio;
-      try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
-        audio = new AudioContextClass();
-        if (audio.state === "suspended") audio.resume().catch(function () {});
-        const now = audio.currentTime;
-        const master = audio.createGain();
-        master.gain.setValueAtTime(0.0001, now);
-        master.gain.linearRampToValueAtTime(0.2, now + 0.018);
-        master.gain.setValueAtTime(0.2, now + 0.16);
-        master.gain.exponentialRampToValueAtTime(0.0001, now + 0.82);
-        master.connect(audio.destination);
-        // Immediate, bright three-note confirmation chime.
-        [[659.25,0,0.2],[783.99,0.09,0.25],[987.77,0.2,0.48]].forEach(function (tone) {
-          const oscillator = audio.createOscillator();
-          const voice = audio.createGain();
-          oscillator.type = "sine";
-          oscillator.frequency.setValueAtTime(tone[0], now);
-          voice.gain.setValueAtTime(0.0001, now);
-          voice.gain.linearRampToValueAtTime(0.72, now + 0.012);
-          voice.gain.exponentialRampToValueAtTime(0.0001, now + tone[2]);
-          oscillator.connect(voice);
-          voice.connect(master);
-          oscillator.start(now);
-          oscillator.stop(now + tone[2] + 0.025);
+    // Prepare one reusable audio context and chime buffer while the title screen loads.
+    // This avoids constructing/decoding audio at the exact moment of the user's tap.
+    let launchAudioContext = null;
+    let launchChimeBuffer = null;
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        launchAudioContext = new AudioContextClass();
+        const sampleRate = launchAudioContext.sampleRate;
+        const duration = 0.92;
+        launchChimeBuffer = launchAudioContext.createBuffer(1, Math.ceil(sampleRate * duration), sampleRate);
+        const samples = launchChimeBuffer.getChannelData(0);
+        [[659.25,0,0.25],[783.99,0.12,0.30],[987.77,0.27,0.58]].forEach(function (tone) {
+          const start = Math.floor(tone[1] * sampleRate);
+          const length = Math.floor(tone[2] * sampleRate);
+          for (let i = 0; i < length && start + i < samples.length; i++) {
+            const t = i / sampleRate;
+            const attack = Math.min(1, t / 0.012);
+            const decay = Math.exp(-4.8 * t / tone[2]);
+            samples[start + i] += Math.sin(2 * Math.PI * tone[0] * t) * attack * decay * 0.24;
+          }
         });
-        window.setTimeout(function () { if (audio && audio.state !== "closed") audio.close().catch(function () {}); }, 1200);
-      } catch (_) {
-        if (audio && audio.state !== "closed") audio.close().catch(function () {});
       }
+    } catch (_) { launchAudioContext = null; launchChimeBuffer = null; }
+    const playLaunchChime = function () {
+      try {
+        if (!launchAudioContext || !launchChimeBuffer) return;
+        const source = launchAudioContext.createBufferSource();
+        const volume = launchAudioContext.createGain();
+        source.buffer = launchChimeBuffer;
+        volume.gain.value = 1.15;
+        source.connect(volume);
+        volume.connect(launchAudioContext.destination);
+        // Queue playback immediately in the same pointerdown/Enter event. If the
+        // context is suspended by autoplay policy, it begins as soon as resume completes.
+        source.start(0);
+        if (launchAudioContext.state === "suspended") launchAudioContext.resume().catch(function () {});
+      } catch (_) {}
     };
     const enterApplication = function () {
       if (launchEntryPending || !splash || !splash.isConnected) return;
