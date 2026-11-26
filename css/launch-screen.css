@@ -1,8 +1,8 @@
 /* MECHNAR interactive living title screen — shared by Admin, Supervisor and Staff. */
 #cleantrack-launch-splash.ct-launch-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 45%,#241b31 0%,#111016 48%,#09090d 100%);color:#f4efff;opacity:1;transition:opacity .5s ease,transform .5s ease;cursor:pointer;touch-action:manipulation;user-select:none}
-#cleantrack-launch-splash.ct-launch-screen::before{content:"";position:absolute;inset:-30%;z-index:-2;background:conic-gradient(from 0deg at 50% 50%,transparent 0 20%,rgba(133,78,190,.09) 28%,transparent 38% 65%,rgba(94,62,148,.08) 75%,transparent 86%);animation:ctLaunchAura 34s linear infinite;animation-play-state:paused}
+#cleantrack-launch-splash.ct-launch-screen::before{content:"";position:absolute;inset:-30%;z-index:-2;background:conic-gradient(from 0deg at 50% 50%,transparent 0 20%,rgba(133,78,190,.09) 28%,transparent 38% 65%,rgba(94,62,148,.08) 75%,transparent 86%);opacity:0;animation:ctLaunchAura 34s linear infinite;animation-play-state:paused;transition:opacity 1s ease}
 #cleantrack-launch-splash.ct-launch-screen::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.48) 100%);pointer-events:none}
-.ct-launch-atmosphere{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;transform:scale(1.025);filter:blur(8px);transition:opacity 1s ease,transform 1.25s cubic-bezier(.2,.75,.2,1),filter 1s ease}
+.ct-launch-atmosphere{display:none;position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;transform:scale(1.025);filter:blur(8px);transition:opacity 1s ease,transform 1.25s cubic-bezier(.2,.75,.2,1),filter 1s ease}
 .ct-launch-orbit{position:absolute;left:50%;top:46%;width:min(76vw,680px);aspect-ratio:1;border:1px solid rgba(174,130,225,.09);border-radius:50%;transform:translate(-50%,-50%);animation:ctLaunchOrbit 30s linear infinite}
 .ct-launch-orbit.orbit-two{width:min(54vw,470px);border-style:dashed;animation-duration:44s;animation-direction:reverse}
 .ct-launch-figure{position:absolute;display:grid;place-items:center;width:clamp(30px,5vw,58px);height:clamp(30px,5vw,58px);color:rgba(174,151,205,.25);filter:drop-shadow(0 0 12px rgba(151,101,207,.12));animation:ctLaunchFloat 8s ease-in-out infinite}
@@ -43,10 +43,10 @@
 #cleantrack-launch-splash.ct-launch-preparing .ct-launch-begin{visibility:visible;opacity:1}
 
 /* Cinematic hand-off: the animated world blooms in behind the fading brand mark. */
-#cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere{opacity:1;transform:scale(1);filter:blur(0)}
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere{display:block;opacity:1;transform:scale(1);filter:blur(0)}
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-title-stage{animation:ctLaunchTitleIn 1.25s cubic-bezier(.2,.75,.2,1) both}
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere .ct-launch-figure,
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-atmosphere .ct-launch-particle{animation-play-state:running}
 
 /* Keep the rotating light completely still during the app-icon-only intro. */
-#cleantrack-launch-splash.ct-launch-title-active::before{animation-play-state:running}
+#cleantrack-launch-splash.ct-launch-title-active::before{opacity:1;animation-play-state:running}
