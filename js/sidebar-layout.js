@@ -587,34 +587,35 @@ if (identity) {
           const shadowTapTarget = document.createElement("button");
           shadowTapTarget.type = "button";
           shadowTapTarget.className = "ct-shadow-panel-tap-target";
-          shadowTapTarget.setAttribute("aria-label", "Make Shadow stick out its tongue");
+          shadowTapTarget.setAttribute("aria-label", "Awaken Shadow's crimson eyes");
           const shadowMark = document.createElement("img");
           shadowMark.className = "ct-shadow-panel-mark";
-          shadowMark.src = "assets/shadow-character-imu.svg?v=3";
+          const normalShadowSrc = "assets/shadow-character-imu.svg?v=3";
+          const awakenedShadowSrc = "assets/shadow-character-red-eyes.svg?v=1";
+          shadowMark.src = normalShadowSrc;
           shadowMark.alt = "";
           shadowMark.setAttribute("aria-hidden", "true");
           shadowMark.draggable = false;
-          const shadowTongue = document.createElement("span");
-          shadowTongue.className = "ct-shadow-panel-tongue";
-          shadowTongue.setAttribute("aria-hidden", "true");
-          shadowTapTarget.append(shadowMark, shadowTongue);
-          let tongueTimer;
-          const playTongue = () => {
-            window.clearTimeout(tongueTimer);
+          shadowTapTarget.append(shadowMark);
+          let redEyesTimer;
+          const awakenShadow = () => {
+            window.clearTimeout(redEyesTimer);
+            shadowMark.src = awakenedShadowSrc;
             shadowTapTarget.classList.remove("is-tongue-out");
             void shadowTapTarget.offsetWidth;
             shadowTapTarget.classList.add("is-tongue-out");
-            tongueTimer = window.setTimeout(() => {
+            redEyesTimer = window.setTimeout(() => {
               shadowTapTarget.classList.remove("is-tongue-out");
+              shadowMark.src = normalShadowSrc;
             }, 900);
           };
           shadowTapTarget.addEventListener("pointerdown", event => {
             event.stopPropagation();
-            playTongue();
+            awakenShadow();
           });
           shadowTapTarget.addEventListener("click", event => {
             event.stopPropagation();
-            if (event.detail === 0) playTongue();
+            if (event.detail === 0) awakenShadow();
           });
           const titleText = document.createElement("span");
           titleText.textContent = "Shadow Assistance";
