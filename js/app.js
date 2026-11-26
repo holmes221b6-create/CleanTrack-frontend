@@ -2338,7 +2338,7 @@ function bindNavigation() {
       // The icon-only brand intro lasts 2.75s. Only then reveal the prompt and enable entry.
       window.setTimeout(function () {
         if (splash.isConnected) splash.classList.add("ct-launch-title-active");
-      }, 2750);
+      }, 2850);
     }
     setLoading(false);
     try {
