@@ -642,7 +642,23 @@
     dialog.append(header,details,footer);overlay.append(dialog);
     overlay.addEventListener("click",event=>{if(event.target===overlay)overlay.remove();});
     close.addEventListener("click",()=>overlay.remove());
-    contextRoot.append(overlay);
+    // The guide is a separate, centered modal panel above the current page.
+    // Keep contextRoot only as the source of page-specific information; never
+    // mount the modal inside a page/panel where local layout can constrain it.
+    document.body.append(overlay);
+    const previousOverflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    const restoreGuide=()=>{
+      overlay.remove();
+      document.body.style.overflow=previousOverflow;
+      document.removeEventListener("keydown",onGuideKeydown,true);
+    };
+    const onGuideKeydown=(event)=>{
+      if(event.key==="Escape"){event.preventDefault();restoreGuide();}
+    };
+    document.addEventListener("keydown",onGuideKeydown,true);
+    overlay.addEventListener("click",event=>{if(event.target===overlay)restoreGuide();},{once:true});
+    close.addEventListener("click",restoreGuide,{once:true});
     close.focus();
   }
   // Setup guidance is opt-in and contextual. Never force the tour into the
