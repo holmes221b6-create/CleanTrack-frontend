@@ -931,7 +931,6 @@ async function renderSupervisorTeams(container){
   try{
    const data=await API.get("teams/supervisor/mine");
    await renderOwn(data);
-   if(window.MechnarWhatsNew?.refresh){await window.MechnarWhatsNew.refresh();window.MechnarWhatsNew.showForPage?.("teams");}
   }catch(e){
    own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));
    pageError("overview",e,loadOwn);
@@ -946,18 +945,7 @@ async function renderSupervisorTeams(container){
 async function render(container){
  const user=AUTH?.getCurrentUser?.();container.replaceChildren();
  if(String(user?.role||"").toLowerCase()==="supervisor"){
-  try{await renderSupervisorTeams(container);}
-  catch(error){
-   console.error("[Teams] Workspace initialization failed:",error);
-   document.querySelectorAll(".ct-team-fullscreen-shell").forEach(node=>node.remove());
-   document.documentElement.classList.remove("ct-team-workspace-open");
-   document.body.classList.remove("ct-team-workspace-open");
-   const panel=el("section","ct-team-fullscreen-placeholder");
-   panel.append(el("h2","","Teams workspace couldn't load"),el("p","ct-team-muted",error?.message||"An unexpected error interrupted the Teams workspace."));
-   panel.append(button("Retry Teams","ct-team-btn ct-team-btn--primary",()=>render(container)));
-   container.replaceChildren(panel);
-  }
-  return;
+  await renderSupervisorTeams(container);return;
  }
  if(String(user?.role||"").toLowerCase()!=="admin"){container.append(el("p","ct-team-error","Team management is available to Admin users only."));return}
  root=el("section","ct-team-manager");const header=el("header","ct-team-manager-header"),copy=el("div");copy.append(el("p","ct-team-eyebrow","ORGANIZATION MANAGEMENT"),el("h1","","Teams"),el("p","ct-team-muted","Create and manage teams, assignments, workload, reports, and historical records."));header.append(copy,button("+ Create Team","ct-team-btn ct-team-btn--primary",()=>{createOpen(true);root.querySelector("[data-team-create]")?.scrollIntoView({behavior:"smooth",block:"center"})}));root.append(header);
