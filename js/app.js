@@ -2207,6 +2207,25 @@ function bindNavigation() {
       return;
     }
 
+    // Bind the splash CTA before any other startup work. A failure in an
+    // unrelated page initializer must not leave the launch button inert.
+    const earlySplash = document.getElementById("cleantrack-launch-splash");
+    let earlyLaunchRequested = false;
+    const requestEarlyLaunch = function(event) {
+      const target = event.target && event.target.closest ? event.target.closest(".ct-launch-begin") : null;
+      if (!target || !earlySplash || !earlySplash.isConnected || earlyLaunchRequested) return;
+      if (event.type === "pointerup" && event.button === 2) return;
+      event.preventDefault();
+      event.stopPropagation();
+      earlyLaunchRequested = true;
+      if (typeof window.__MECHNAR_BEGIN_HANDLER__ === "function") window.__MECHNAR_BEGIN_HANDLER__();
+      else window.__MECHNAR_BEGIN_PENDING__ = true;
+    };
+    if (earlySplash) {
+      earlySplash.addEventListener("pointerup", requestEarlyLaunch, true);
+      earlySplash.addEventListener("click", requestEarlyLaunch, true);
+    }
+
     state.started = true;
     bindFooterHelp();
     bindNotificationsButton();
@@ -2335,8 +2354,13 @@ function bindNavigation() {
         launchDelayElapsed = true;
         launchRequested = true;
         finishLaunch();
-      }, 3200);
+      }, 1800);
     };
+    window.__MECHNAR_BEGIN_HANDLER__ = enterApplication;
+    if (window.__MECHNAR_BEGIN_PENDING__) {
+      window.__MECHNAR_BEGIN_PENDING__ = false;
+      enterApplication();
+    }
     if (splash) {
       const beginButton = splash.querySelector(".ct-launch-begin");
       if (beginButton) {
