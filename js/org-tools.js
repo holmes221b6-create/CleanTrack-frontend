@@ -26,28 +26,32 @@ async function renderInventory(container){
  if(role()==="supervisor")root.classList.add("mt-inventory-page--supervisor");
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
- const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
+ const toolbar=$("div","mt-toolbar mt-inventory-toolbar"),search=input("search","","search"),searchWrap=$("form","mt-inventory-search");
+ search.placeholder="Search item, SKU, supplier, location or request";search.setAttribute("aria-label","Search inventory");
+ const searchButton=btn("Search",null,true);searchButton.type="submit";searchWrap.append(search,searchButton);toolbar.append(searchWrap);
+ const toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");
  const isSupervisor=role()==="supervisor";
  if(isSupervisor){
-  // Keep every Supervisor overview action in one shared toolbar group.
   toolbarActions.append(
    btn("+ Register item",()=>itemPanel(null),true),
-   btn("Record purchase",()=>purchasePanel()),
-   btn("Upload invoice",()=>invoicePanel()),
    btn("Record stock movement",()=>movementPicker()),
-   btn("Receive stock",()=>movementPicker("receipt")),
-   btn("Record consumption",()=>movementPicker("consumption")),
-   btn("Create transfer",()=>transferPanel()),
    btn("New request",()=>requestPanel()),
-   btn("Export items CSV",exportItemsCsv),
+   btn("Export CSV",exportItemsCsv),
    btn("Refresh",load)
   );
+  const more=$("details","mt-inventory-more");
+  const summary=$("summary","mt-inventory-more-toggle","More actions");
+  const menu=$("div","mt-inventory-more-menu");
+  [["Record purchase",()=>purchasePanel()],["Upload invoice",()=>invoicePanel()],["Receive stock",()=>movementPicker("receipt")],["Record consumption",()=>movementPicker("consumption")],["Create transfer",()=>transferPanel()]].forEach(([label,action])=>menu.append(btn(label,()=>{more.open=false;action()})));
+  more.append(summary,menu);toolbarActions.append(more);
   toolbar.classList.add("mt-inventory-toolbar--consolidated");
  }else{
   if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
   toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
  }
  toolbar.append(toolbarActions);root.append(toolbar);
+ searchWrap.addEventListener("submit",e=>{e.preventDefault();draw()});
+ search.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();draw()}});
  const tabs=$("nav","mt-inventory-tabs"),content=$("div","mt-content");let activeContent=content;root.append(tabs,content);
  const views=[["overview","Overview"],["items","Items & assets"],["procurement","Procurement"],["stock","Stock control"],["locations","Locations"],["transfers","Transfers"],["requests","Requests"],["maintenance","Maintenance"],["analytics","Analytics"],["forecast","Forecast"],["history","Movement history"]];
  views.forEach(([id,label])=>{const b=btn(label,()=>openViewPanel(id,label));b.dataset.view=id;tabs.append(b)});
