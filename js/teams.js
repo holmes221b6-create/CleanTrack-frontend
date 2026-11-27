@@ -586,15 +586,42 @@ async function renderSupervisorTeams(container){
   areaHeader.append(areaIntro,areaCounts);areas.append(areaHeader);
   const areaNotice=el("p","ct-team-sites-notice");areaNotice.hidden=true;areas.append(areaNotice);
   const siteLayout=el("div","ct-team-sites-layout");
+  const createPanel=el("section","ct-team-sites-create-panel");
+  const createHead=el("div","ct-team-sites-create-head");createHead.append(el("p","ct-team-eyebrow","ZONE CONFIGURATION"),el("h3","","Create an operational zone"),el("p","ct-team-muted","Define a floor, block, department or controlled area inside one of your team's assigned locations."));
+  const createForm=el("form","ct-team-sites-create-form");
+  const locationField=el("label","ct-team-sites-create-field");locationField.append(el("span","","Parent location"));
+  const createLocation=el("select","ct-team-sites-create-input");createLocation.required=true;createLocation.setAttribute("aria-label","Choose parent location");locationField.append(createLocation);
+  const nameField=el("label","ct-team-sites-create-field");nameField.append(el("span","","Zone name"));const createName=el("input","ct-team-sites-create-input");createName.type="text";createName.required=true;createName.maxLength=150;createName.placeholder="e.g. Ground Floor Reception";nameField.append(createName);
+  const floorField=el("label","ct-team-sites-create-field");floorField.append(el("span","","Floor / block / area"));const createFloor=el("input","ct-team-sites-create-input");createFloor.type="text";createFloor.maxLength=120;createFloor.placeholder="e.g. Ground Floor";floorField.append(createFloor);
+  const descriptionField=el("label","ct-team-sites-create-field ct-team-sites-create-wide");descriptionField.append(el("span","","Purpose and notes"));const createDescription=el("textarea","ct-team-sites-create-input");createDescription.rows=2;createDescription.maxLength=4000;createDescription.placeholder="Describe the area or any operational notes…";descriptionField.append(createDescription);
+  const createFooter=el("div","ct-team-sites-create-footer");const createHint=el("span","ct-team-muted","Only locations assigned to your team are available.");const createSubmit=button("Create zone","ct-team-btn ct-team-btn--primary",null,"submit");createFooter.append(createHint,createSubmit);
+  createForm.append(locationField,nameField,floorField,descriptionField,createFooter);createPanel.append(createHead,createForm);
   const siteDirectory=el("section","ct-team-sites-directory");
   const directoryHead=el("div","ct-team-sites-panel-head");directoryHead.append(el("h3","","Assigned locations"),el("span","ct-team-muted",(data.locations||[]).length+" sites"));siteDirectory.append(directoryHead);
   const siteSearch=el("input","ct-team-sites-search");siteSearch.type="search";siteSearch.placeholder="Search your locations…";siteSearch.setAttribute("aria-label","Search assigned locations");siteDirectory.append(siteSearch);
   const siteList=el("div","ct-team-sites-list");siteDirectory.append(siteList);
   const siteDetail=el("section","ct-team-sites-detail");
-  siteLayout.append(siteDirectory,siteDetail);areas.append(siteLayout);locationsPage.append(areas);
+  siteLayout.append(createPanel,siteDirectory,siteDetail);areas.append(siteLayout);locationsPage.append(areas);
   const assignedLocations=(data.locations||[]).slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
   const assignedZones=(data.zones||[]).slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
   let activeLocationId=assignedLocations[0]?.id??null;
+  assignedLocations.forEach(site=>{const option=el("option","",site.name||"Location");option.value=String(site.id);createLocation.append(option)});
+  if(!assignedLocations.length){createLocation.disabled=true;createSubmit.disabled=true;createHint.textContent="An Admin must assign a location to your team before you can create zones."}
+  createForm.addEventListener("submit",async event=>{
+    event.preventDefault();
+    if(!createLocation.value||!createName.value.trim())return;
+    createSubmit.disabled=true;createSubmit.textContent="Creating…";
+    try{
+      const result=await API.post("zones",{name:createName.value.trim(),floor_label:createFloor.value.trim(),description:createDescription.value.trim(),location_id:Number(createLocation.value)});
+      const fresh=await API.get("zones");const rows=Array.isArray(fresh.zones)?fresh.zones:[];
+      const ownIds=new Set(assignedLocations.map(x=>String(x.id)));
+      assignedZones.splice(0,assignedZones.length,...rows.filter(z=>ownIds.has(String(z.location_id))));
+      createName.value="";createFloor.value="";createDescription.value="";
+      activeLocationId=Number(createLocation.value);renderSiteDirectory();renderLocationDetail();
+      showAreaNotice(result.message||"Zone created successfully.");
+    }catch(error){showAreaNotice(error.message||"Zone could not be created.",true)}
+    finally{createSubmit.disabled=false;createSubmit.textContent="Create zone"}
+  });
   const teamOps=data.operations||[];
   const locationZones=id=>assignedZones.filter(z=>String(z.location_id)===String(id));
   const locationOperations=id=>{const ids=new Set(locationZones(id).map(z=>String(z.id)));return teamOps.filter(op=>String(op.location_id)===String(id)||ids.has(String(op.zone_id)))};
@@ -638,7 +665,7 @@ async function renderSupervisorTeams(container){
     [["Zones",zonesHere.length],["Operations",opsHere.length],["Open",opsHere.filter(x=>!["completed","complete","approved","done","closed","cancelled","canceled"].includes(String(x.status||"").toLowerCase())).length]].forEach(([label,value])=>{const item=el("div","ct-team-sites-detail-stat");item.append(el("strong","",String(value)),el("span","",label));stats.append(item)});
     siteDetail.append(stats);
     const actions=el("div","ct-team-sites-actions");
-    actions.append(button("+ Create zone","ct-team-btn ct-team-btn--primary",()=>createTeamZone(site)));
+    const useThisSite=button("Use this location for zone creation","ct-team-btn ct-team-btn--quiet",()=>{createLocation.value=String(site.id);createName.focus();createPanel.scrollIntoView({behavior:"smooth",block:"center"});});actions.append(useThisSite);
     if(site.latitude!=null&&site.longitude!=null){const mapLink=el("a","ct-team-btn","Open map ↗");mapLink.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(site.latitude+","+site.longitude);mapLink.target="_blank";mapLink.rel="noopener noreferrer";actions.append(mapLink)}
     siteDetail.append(actions);
     const zoneHead=el("div","ct-team-sites-section-head");zoneHead.append(el("h4","","Zones at this location"),el("span","ct-team-muted",zonesHere.length+" areas"));siteDetail.append(zoneHead);
