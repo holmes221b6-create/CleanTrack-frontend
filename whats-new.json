@@ -39,13 +39,6 @@
       "description": "Opening an operation from an operations queue now displays its details inside that queue panel, so you can return to the same list without losing your place."
     },
     {
-      "id": "mechnar-global-feature-discovery-2026-11-v1",
-      "page": "all",
-      "feature": "Explore Features across MECHNAR",
-      "target": "#workspace-navigation",
-      "description": "MECHNAR now supports release announcements and guided feature discovery across the entire workspace. Updates can be announced globally or targeted to the roles and pages that can actually use them, so new capabilities are not hidden in one role or section."
-    },
-    {
       "id": "supervisor-interactive-sites-zones-2026-11-v1",
       "page": "teams",
       "roles": [
@@ -54,6 +47,26 @@
       "feature": "Interactive Locations & Zones",
       "target": ".ct-team-sites-create-panel",
       "description": "The Supervisor Teams workspace now provides a full-width zone creation area above a full-width assigned-location directory. Select an assigned location, create operational zones, inspect zone details, personnel, linked operations and activity history."
+    },
+    {
+      "id": "teams-locations-zones-page-discovery-v2-20261127",
+      "page": "teams",
+      "roles": [
+        "Supervisor"
+      ],
+      "feature": "Locations & Zones workspace",
+      "target": ".ct-team-sites-create-panel",
+      "description": "The Supervisor Teams page now places the zone creation workspace across the full width, followed by a full-width assigned-location directory. Create zones, inspect details, review assigned personnel and follow linked operations."
+    },
+    {
+      "id": "teams-performance-refresh-layout-discovery-v2-20261127",
+      "page": "teams",
+      "roles": [
+        "Supervisor"
+      ],
+      "feature": "Team Performance date controls",
+      "target": ".ct-team-performance-refresh-row",
+      "description": "The Team Performance refresh action now sits beneath the From and To date controls, keeping the reporting period together and giving the refresh action its own aligned row."
     }
   ]
 }
