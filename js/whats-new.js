@@ -102,7 +102,7 @@
   async function navigateToFeature(update){
     closeGuide(false);
     const nav=window.CleanTrackNavigation;
-    if(nav&&typeof nav.setActivePage==="function"&&update.page)nav.setActivePage(update.page);
+    if(nav&&typeof nav.setActivePage==="function"&&update.page&&update.page!=="all")nav.setActivePage(update.page);
     if(update.section){
       // Route rendering is event-driven; wait for Settings to mount before
       // selecting its nested section.
