@@ -104,3 +104,219 @@
 .ct-settings-notification-toggle-row input.ct-settings-toggle:checked{background:var(--primary)!important;border-color:var(--primary)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 18%,transparent)!important}
 .ct-settings-notification-toggle-row input.ct-settings-toggle:checked::before{transform:translateX(21px)}
 .ct-settings-notification-toggle-row input.ct-settings-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+
+
+/* Professional Settings workspace — aligned with MECHNAR's deep-navy default. */
+#page-content .ct-settings-page{
+  width:min(100%,1440px);
+  padding:4px 0 42px;
+  color:var(--text);
+}
+#page-content .ct-settings-header{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:54px;
+  margin:0 0 20px;
+  padding:0 0 15px;
+  border-bottom:1px solid var(--border);
+  background:transparent;
+}
+#page-content .ct-settings-title-group h1{
+  margin:0;
+  color:var(--text)!important;
+  font-size:clamp(25px,2.4vw,31px);
+  line-height:1.15;
+  font-weight:740;
+  letter-spacing:-.035em;
+}
+#page-content .ct-settings-layout{
+  grid-template-columns:224px minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+#page-content .ct-settings-nav{
+  position:sticky;
+  top:86px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:9px;
+  border:1px solid #203d5e;
+  border-radius:12px;
+  background:#0d1c32!important;
+  box-shadow:none;
+}
+#page-content .ct-settings-nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:42px;
+  padding:7px 10px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent!important;
+  color:#aebed2!important;
+  font-size:12px;
+  font-weight:560;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+#page-content .ct-settings-nav-item:hover{
+  background:#142640!important;
+  border-color:#203d5e!important;
+  color:#edf3fc!important;
+}
+#page-content .ct-settings-nav-item.is-active{
+  background:#172d49!important;
+  border-color:#31577e!important;
+  color:#f2f6fc!important;
+  box-shadow:inset 3px 0 #8e69d4;
+}
+#page-content .ct-settings-nav-item .ct-settings-icon{
+  flex:0 0 27px;
+  width:27px;
+  height:27px;
+  border-radius:7px;
+  background:#142640!important;
+  color:#a9c1dc!important;
+  font-size:13px;
+}
+#page-content .ct-settings-nav-item.is-active .ct-settings-icon{
+  background:#203b5b!important;
+  color:#d8c6fa!important;
+}
+#page-content .ct-settings-panels{min-width:0}
+#page-content .ct-settings-panel{display:grid;gap:13px}
+#page-content .ct-settings-card{
+  padding:20px 21px;
+  border:1px solid #203d5e!important;
+  border-radius:11px;
+  background:#0d1c32!important;
+  box-shadow:none!important;
+}
+#page-content .ct-settings-card-header{
+  align-items:center;
+  gap:11px;
+  margin-bottom:17px;
+  padding-bottom:13px;
+  border-bottom:1px solid rgb(43 77 112 / 55%);
+}
+#page-content .ct-settings-card-header h2{
+  margin:0 0 4px;
+  color:#e8eef8!important;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+#page-content .ct-settings-card-header p{
+  max-width:760px;
+  color:#9aadc6!important;
+  font-size:11.5px;
+  line-height:1.55;
+}
+#page-content .ct-settings-card-header .ct-settings-icon{
+  width:34px;height:34px;flex-basis:34px;
+  border:1px solid #294768;
+  border-radius:9px;
+  background:#142640!important;
+  color:#b9a2e9!important;
+}
+#page-content .ct-settings-grid{gap:15px 17px}
+#page-content .ct-settings-field{
+  gap:6px;
+  color:#dce7f5!important;
+  font-size:12px;
+  font-weight:650;
+}
+#page-content .ct-settings-field small{
+  color:#879bb5!important;
+  font-size:10.5px;
+  line-height:1.45;
+}
+#page-content .ct-settings-input{
+  min-height:41px;
+  border:1px solid #294768!important;
+  border-radius:8px;
+  background:#09172a!important;
+  color:#edf3fc!important;
+  font-size:12px;
+}
+#page-content .ct-settings-input:focus{
+  outline:2px solid #4779aa;
+  outline-offset:1px;
+}
+#page-content .ct-settings-button{
+  min-height:36px;
+  padding:8px 13px;
+  border:1px solid #31577e!important;
+  border-radius:8px;
+  background:#142b46!important;
+  color:#e8eef8!important;
+  font-size:11.5px;
+  font-weight:680;
+  box-shadow:none!important;
+}
+#page-content .ct-settings-button:hover{
+  background:#1a3859!important;
+  border-color:#4776a3!important;
+}
+#page-content .ct-settings-button-primary{
+  background:#244f7b!important;
+  border-color:#35658f!important;
+  color:#fff!important;
+}
+#page-content .ct-settings-button-primary:hover{
+  background:#2d6192!important;
+}
+#page-content .ct-settings-muted,
+#page-content .ct-settings-card .ct-settings-muted{
+  color:#9aadc6!important;
+  font-size:11.5px;
+  line-height:1.55;
+}
+#page-content .ct-settings-info-row,
+#page-content .ct-settings-integration-row{
+  border-color:#203d5e!important;
+}
+#page-content .ct-settings-theme-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+#page-content .ct-settings-theme-option{
+  min-height:112px;
+  padding:14px;
+  border:1px solid #294768!important;
+  border-radius:9px;
+  background:#09172a!important;
+  color:#e8eef8!important;
+}
+#page-content .ct-settings-theme-option.is-selected{
+  border-color:#8e69d4!important;
+  box-shadow:inset 0 0 0 1px #8e69d4!important;
+  background:#142640!important;
+}
+#page-content .ct-settings-theme-option strong{font-size:12px}
+#page-content .ct-settings-theme-option small{font-size:10px;line-height:1.45;color:#9aadc6!important}
+#page-content .ct-settings-account-data{font-size:12px;gap:10px 18px}
+#page-content .ct-settings-account-data dt{color:#91a5bf!important}
+#page-content .ct-settings-account-data dd{color:#e1eaf6!important}
+#page-content .ct-settings-status{
+  border:1px solid #294768;
+  border-radius:8px;
+  background:#09172a!important;
+  color:#b9c9dc!important;
+  font-size:11.5px;
+}
+@media(max-width:900px){
+  #page-content .ct-settings-layout{grid-template-columns:1fr;gap:13px}
+  #page-content .ct-settings-nav{
+    position:static;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:5px;
+  }
+}
+@media(max-width:620px){
+  #page-content .ct-settings-header{margin-bottom:13px;padding-bottom:12px}
+  #page-content .ct-settings-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-content .ct-settings-card{padding:15px}
+  #page-content .ct-settings-theme-options{grid-template-columns:1fr}
+  #page-content .ct-settings-grid{grid-template-columns:1fr}
+}
