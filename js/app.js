@@ -914,7 +914,7 @@
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-label", "Personnel");
-    overlay.innerHTML = '<header class="mn-personnel-top"><span>Personnel</span><button type="button" class="mn-personnel-close" aria-label="Close Personnel" title="Close">×</button></header><div class="mn-personnel-loading" role="status" aria-live="polite"><span class="mn-personnel-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Personnel</small></div><div class="mn-personnel-content" hidden></div>';
+    overlay.innerHTML = '<header class="mn-personnel-top"><span>Personnel</span><div class="mn-personnel-top-actions"><button type="button" class="mn-personnel-guide" aria-label="Personnel Guide">Guide</button><button type="button" class="mn-personnel-close" aria-label="Close Personnel" title="Close">×</button></div></header>'<div class="mn-personnel-loading" role="status" aria-live="polite"><span class="mn-personnel-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Personnel</small></div><div class="mn-personnel-content" hidden></div>';
     const style = document.createElement("style");
     style.dataset.mechnarPersonnelOverlay = "true";
     style.textContent = '#mechnar-personnel-overlay{position:fixed!important;inset:0!important;z-index:2147483001!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-personnel-overlay .mn-personnel-top{height:54px;min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015);font-size:15px;font-weight:650}#mechnar-personnel-overlay .mn-personnel-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-personnel-overlay .mn-personnel-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}#mechnar-personnel-overlay .mn-personnel-spinner{width:42px;height:42px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:mnPersonnelSpin .82s linear infinite}#mechnar-personnel-overlay .mn-personnel-loading strong{font-size:15px;font-weight:600}#mechnar-personnel-overlay .mn-personnel-loading small{font-size:12px;opacity:.65}#mechnar-personnel-overlay .mn-personnel-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;height:calc(100% - 54px);overflow:auto;padding:0}#mechnar-personnel-overlay .mn-personnel-content[hidden]{display:none!important}#mechnar-personnel-overlay .mn-personnel-content>*{max-width:none!important}@keyframes mnPersonnelSpin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){#mechnar-personnel-overlay .mn-personnel-spinner{animation-duration:2.4s}}';
@@ -922,6 +922,7 @@
     document.body.appendChild(overlay);
     personnelOverlay = overlay;
     overlay.querySelector(".mn-personnel-close").addEventListener("click", closePersonnelOverlay);
+    window.MechnarPageGuide?.attach(overlay.querySelector(".mn-personnel-guide"),"personnel");
     const onEscape = event => { if (event.key === "Escape" && personnelOverlay === overlay) closePersonnelOverlay(); };
     overlay.addEventListener("keydown", onEscape);
     window.setTimeout(async () => {
@@ -965,10 +966,11 @@
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-label", "Performance Arena");
-    overlay.innerHTML = '<header class="pa-fullscreen-top"><span class="pa-fullscreen-brand">Performance Arena</span><button type="button" class="pa-fullscreen-close" aria-label="Back to global pages" title="Back to global pages">×</button></header><div class="pa-fullscreen-loading" role="status" aria-live="polite"><span class="pa-fullscreen-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Performance Arena</small></div><div class="pa-fullscreen-content" hidden></div>';
+    overlay.innerHTML = '<header class="pa-fullscreen-top"><span class="pa-fullscreen-brand">Performance Arena</span><div class="pa-fullscreen-top-actions"><button type="button" class="pa-fullscreen-guide" aria-label="Performance Arena Guide">Guide</button><button type="button" class="pa-fullscreen-close" aria-label="Back to global pages" title="Back to global pages">×</button></div></header>'<div class="pa-fullscreen-loading" role="status" aria-live="polite"><span class="pa-fullscreen-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Performance Arena</small></div><div class="pa-fullscreen-content" hidden></div>';
     document.body.appendChild(overlay);
     performanceArenaOverlay = overlay;
     overlay.querySelector(".pa-fullscreen-close").addEventListener("click", closePerformanceArenaOverlay);
+    window.MechnarPageGuide?.attach(overlay.querySelector(".pa-fullscreen-guide"),"performance");
     const onEscape = event => { if (event.key === "Escape" && performanceArenaOverlay === overlay) closePerformanceArenaOverlay(); };
     overlay.addEventListener("keydown", onEscape);
     window.setTimeout(() => {
