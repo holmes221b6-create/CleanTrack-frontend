@@ -538,6 +538,27 @@
       ap.textContent=controls.length ? Array.from(new Set(controls)).slice(0,14).join(" · ") : "No active page actions are currently visible.";
       actions.append(ah,ap);
       details.append(sections,actions);
+      const operation=document.createElement("div");operation.className="ct-page-guide-section";
+      const oh=document.createElement("h3");oh.textContent="How to operate this page";
+      const op=document.createElement("ol");
+      const howTo = pageId === "settings" ? [
+        "Profile and account: review the information shown, edit fields that are available, then use the save or update control in that section.",
+        "Preferences and notifications: each switch controls the preference named beside it. Turn it on or off to change that preference.",
+        "Appearance: choose the theme option you want. The highlighted option is the active appearance.",
+        "Privacy and security: review each available control and its description before changing account visibility or security preferences.",
+        "Integrations and connected services: review the connection status and use the displayed connect, configure or disconnect actions where available.",
+        "Account actions: read the confirmation prompt carefully before performing sensitive account actions."
+      ] : [
+        "Begin with the page overview and read the section headings to understand the information grouped on this page.",
+        "Use the page's search and filters, when present, to narrow the list to the records you need.",
+        "Select a record or open its details to review its current information and available actions.",
+        "Use the visible create, edit, assign, review or manage controls only for the action you intend to perform.",
+        "Complete all required fields in any form, check the information, and submit to save the change.",
+        "After submitting, check the displayed status, confirmation, history or report to verify the outcome."
+      ];
+      Array.from(new Set(controls)).slice(0,8).forEach(label=>howTo.push("The “"+label+"” control: use it for the action named on the control; follow the fields or confirmation shown before completing it."));
+      howTo.slice(0,12).forEach(line=>{const li=document.createElement("li");li.textContent=line;op.append(li)});
+      operation.append(oh,op);details.append(operation);
       panel.querySelector(".ct-page-guide-count").textContent=page.label+" · "+(index+1)+" of "+pages.length;
       panel.querySelector(".ct-page-guide-prev").disabled=index===0;
       panel.querySelector(".ct-page-guide-next").textContent=index===pages.length-1?"Finish":"Next page";
