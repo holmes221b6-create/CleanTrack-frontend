@@ -187,8 +187,8 @@
   function init(){
     const root=document.getElementById("workspace-navigation");if(!root)return;
     decorate();new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
-    const content=document.getElementById("page-content")||document.getElementById("workspace-view");
-    if(content)new MutationObserver(()=>{const page=activePage();if(page)renderPageDiscovery(page)}).observe(content,{childList:true,subtree:true});
+    // Do not observe page-content mutations here: rendering the discovery banner
+    // mutates that same node and would create an endless MutationObserver loop.
     window.addEventListener("cleantrack:navigate",event=>{const page=event.detail?.page;if(page)loadManifest().then(()=>setTimeout(()=>renderPageDiscovery(page),350));});
     root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>{renderPageDiscovery(page);showUpdates(page)},350));});
     window.addEventListener("storage",decorate);
