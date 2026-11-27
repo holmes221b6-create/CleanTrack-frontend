@@ -1509,27 +1509,29 @@
     }
 
     if (pageId === "teams") {
-      const role = String(user?.role || "").toLowerCase();
-      if (role !== "admin" && role !== "supervisor") {
-        const message = document.createElement("p");
-        message.textContent = "Teams is available to Admin and Supervisor users.";
-        pageContent.appendChild(message);
-        return;
-      }
+      try {
+        const role = String(user?.role || "").toLowerCase();
+        if (role !== "admin" && role !== "supervisor") {
+          const message = document.createElement("p");
+          message.textContent = "Teams is available to Admin and Supervisor users.";
+          pageContent.appendChild(message);
+          return;
+        }
 
-      // The Teams module renders the role-specific page:
-      // Admin receives organization-wide team management; Supervisor receives
-      // the restricted own-team overview and searchable, read-only team lookup.
-      if (window.CleanTrackTeams &&
-          typeof window.CleanTrackTeams.render === "function") {
-        await window.CleanTrackTeams.render(pageContent);
-      } else {
-        const message = document.createElement("p");
-        message.textContent =
-          "The Teams module has not loaded. Check the teams.js script path.";
-        pageContent.appendChild(message);
+        // Teams renders as its own full-screen workspace. Await its complete
+        // role-specific render before dismissing the "Working on it" screen.
+        if (window.CleanTrackTeams &&
+            typeof window.CleanTrackTeams.render === "function") {
+          await window.CleanTrackTeams.render(pageContent);
+        } else {
+          const message = document.createElement("p");
+          message.textContent =
+            "The Teams module has not loaded. Check the teams.js script path.";
+          pageContent.appendChild(message);
+        }
+      } finally {
+        window.dispatchEvent(new CustomEvent("mechnar:teams-ready"));
       }
-
       return;
     }
 
