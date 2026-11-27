@@ -589,6 +589,62 @@
     if(!window.CleanTrackNavigation.setActivePage(selected.id))return;
     window.setTimeout(describeCurrentPage,420);
   }
+  // A page Guide is a local help panel, not the global multi-page tour.
+  // It is mounted inside the active page/panel so it cannot appear after that
+  // panel has been closed or route context has changed.
+  function showContextualPageGuide(user,pageId,contextRoot){
+    if(!user||!pageId||!contextRoot||!contextRoot.isConnected)return;
+    document.querySelectorAll(".ct-page-guide-overlay[data-contextual-guide='true']").forEach(node=>node.remove());
+    const menu=window.CleanTrackNavigation?.getMenu(user.role)||[];
+    const page=menu.find(item=>item.id===pageId);
+    const descriptions={
+      workspace:"Your supervisory workspace brings together the operational areas and information available to your role.",
+      personnel:"Review staff relevant to your supervisory role, open a profile, and use the available personnel actions.",
+      performance:"Build and review performance analysis using the tools, datasets and visual workspace available here.",
+      home:"Your organisation home is the starting point for the areas and information available to your role.",
+      "my-desk":"Your personal desk brings together assigned work, updates and information requiring your attention."
+    };
+    const headings=Array.from(contextRoot.querySelectorAll("h1,h2,h3,h4,[role='heading']"))
+      .filter(el=>el.offsetParent!==null).map(el=>(el.innerText||el.textContent||"").trim()).filter(Boolean);
+    const controls=Array.from(contextRoot.querySelectorAll("button,[role='button'],input[type='button'],input[type='submit']"))
+      .filter(el=>el.offsetParent!==null&&!el.disabled&&!el.closest(".ct-page-guide"))
+      .map(el=>(el.innerText||el.value||el.getAttribute("aria-label")||el.title||"").trim()).filter(Boolean);
+    const overlay=document.createElement("div");
+    overlay.className="ct-page-guide-overlay";
+    overlay.dataset.contextualGuide="true";
+    overlay.setAttribute("role","presentation");
+    const dialog=document.createElement("section");
+    dialog.className="ct-page-guide";
+    dialog.setAttribute("role","dialog");
+    dialog.setAttribute("aria-modal","true");
+    dialog.setAttribute("aria-label",(page?.label||pageId)+" guide");
+    const header=document.createElement("div");header.className="ct-page-guide-top";
+    const titleWrap=document.createElement("div");
+    const kicker=document.createElement("span");kicker.className="ct-page-guide-kicker";kicker.textContent="MECHNAR · PAGE GUIDE";
+    const title=document.createElement("h2");title.textContent=(page?.label||pageId)+" Guide";
+    const description=document.createElement("p");description.className="ct-page-guide-description";
+    description.textContent=descriptions[pageId]||"Use this guide to understand the sections and actions available on this page.";
+    titleWrap.append(kicker,title,description);
+    const close=document.createElement("button");close.type="button";close.className="ct-page-guide-close";close.textContent="×";close.setAttribute("aria-label","Close guide");
+    header.append(titleWrap,close);
+    const details=document.createElement("div");details.className="ct-page-guide-details";
+    function addSection(label,items){
+      const section=document.createElement("div");section.className="ct-page-guide-section";
+      const h=document.createElement("h3");h.textContent=label;
+      const p=document.createElement("p");p.textContent=items.length?Array.from(new Set(items)).slice(0,16).join(" · "):"This page is still loading its content, or this section has no visible items yet.";
+      section.append(h,p);details.append(section);
+    }
+    addSection("Sections on this page",headings);
+    addSection("Available controls",controls);
+    const footer=document.createElement("div");footer.className="ct-page-guide-footer";
+    const note=document.createElement("span");note.className="ct-page-guide-count";note.textContent="Help for "+(page?.label||pageId);
+    footer.append(note);
+    dialog.append(header,details,footer);overlay.append(dialog);
+    overlay.addEventListener("click",event=>{if(event.target===overlay)overlay.remove();});
+    close.addEventListener("click",()=>overlay.remove());
+    contextRoot.append(overlay);
+    close.focus();
+  }
   // Setup guidance is opt-in and contextual. Never force the tour into the
   // role's default workspace during login or first-run onboarding.
   function maybeShowFirstSetup(user){ return false; }
@@ -603,7 +659,12 @@
       button.textContent="Guide";
       button.setAttribute("aria-label",pages[index].label+" guide");
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
-      button.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();showSetupGuide(user,index);});
+      button.addEventListener("click",function(event){
+        event.preventDefault();event.stopPropagation();
+        const panelRoot=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay");
+        const contentRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content")||button.closest("#page-content")||document.getElementById("page-content");
+        showContextualPageGuide(user,pageId,contentRoot);
+      });
       return true;
     }
   });
