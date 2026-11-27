@@ -592,8 +592,16 @@
   // A page Guide is a local help panel, not the global multi-page tour.
   // It is mounted inside the active page/panel so it cannot appear after that
   // panel has been closed or route context has changed.
+  function ensureContextualGuideStyles(){
+    if(document.getElementById("ct-page-guide-style"))return;
+    const style=document.createElement("style");
+    style.id="ct-page-guide-style";
+    style.textContent=".ct-page-guide-overlay{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;background:rgba(2,7,15,.76)!important;backdrop-filter:blur(5px);box-sizing:border-box!important}.ct-page-guide{position:relative!important;width:min(760px,94vw)!important;max-height:min(82vh,900px)!important;overflow:auto!important;padding:24px 26px!important;border:1px solid #294768!important;border-top:3px solid #8e70c8!important;border-radius:14px!important;background:#0d1c32!important;color:#edf3fc!important;box-shadow:0 24px 80px rgba(0,0,0,.55)!important;box-sizing:border-box!important}.ct-page-guide-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.ct-page-guide-kicker{font-size:10px;letter-spacing:.14em;font-weight:800;color:#b49ade}.ct-page-guide h2{font-size:20px;margin:7px 0}.ct-page-guide-description{margin:0;line-height:1.55;opacity:.84}.ct-page-guide-close{flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(180,195,220,.35);border-radius:8px;background:transparent;color:inherit;font-size:23px;cursor:pointer}.ct-page-guide-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}.ct-page-guide-section{min-width:0;padding:15px;border:1px solid rgba(145,169,202,.2);border-radius:10px;background:rgba(255,255,255,.035)}.ct-page-guide-section h3{margin:0 0 8px;font-size:13px;color:#c9b5ec}.ct-page-guide-section p{margin:0;font-size:13px;line-height:1.65;overflow-wrap:anywhere;color:#e1e9f5}.ct-page-guide-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:18px;color:#aebbd0;font-size:12px}@media(max-width:620px){.ct-page-guide-overlay{padding:12px!important}.ct-page-guide{padding:19px!important;max-height:88vh!important}.ct-page-guide-details{grid-template-columns:1fr}}";
+    document.head.appendChild(style);
+  }
   function showContextualPageGuide(user,pageId,contextRoot){
     if(!user||!pageId||!contextRoot||!contextRoot.isConnected)return;
+    ensureContextualGuideStyles();
     document.querySelectorAll(".ct-page-guide-overlay[data-contextual-guide='true']").forEach(node=>node.remove());
     const menu=window.CleanTrackNavigation?.getMenu(user.role)||[];
     const page=menu.find(item=>item.id===pageId);
@@ -640,25 +648,23 @@
     const note=document.createElement("span");note.className="ct-page-guide-count";note.textContent="Help for "+(page?.label||pageId);
     footer.append(note);
     dialog.append(header,details,footer);overlay.append(dialog);
-    overlay.addEventListener("click",event=>{if(event.target===overlay)overlay.remove();});
-    close.addEventListener("click",()=>overlay.remove());
     // The guide is a separate, centered modal panel above the current page.
-    // Keep contextRoot only as the source of page-specific information; never
-    // mount the modal inside a page/panel where local layout can constrain it.
-    document.body.append(overlay);
+    // Keep contextRoot only as the source of page-specific information.
     const previousOverflow=document.body.style.overflow;
-    document.body.style.overflow="hidden";
+    const onGuideKeydown=(event)=>{
+      if(event.key==="Escape"){event.preventDefault();restoreGuide();}
+    };
     const restoreGuide=()=>{
+      if(!overlay.isConnected)return;
       overlay.remove();
       document.body.style.overflow=previousOverflow;
       document.removeEventListener("keydown",onGuideKeydown,true);
     };
-    const onGuideKeydown=(event)=>{
-      if(event.key==="Escape"){event.preventDefault();restoreGuide();}
-    };
+    document.body.append(overlay);
+    document.body.style.overflow="hidden";
     document.addEventListener("keydown",onGuideKeydown,true);
-    overlay.addEventListener("click",event=>{if(event.target===overlay)restoreGuide();},{once:true});
-    close.addEventListener("click",restoreGuide,{once:true});
+    overlay.addEventListener("click",event=>{if(event.target===overlay)restoreGuide();});
+    close.addEventListener("click",restoreGuide);
     close.focus();
   }
   // Setup guidance is opt-in and contextual. Never force the tour into the
@@ -669,16 +675,18 @@
       const user=auth.getCurrentUser();
       if(!button||!user||!pageId||!window.CleanTrackNavigation)return false;
       const pages=window.CleanTrackNavigation.getMenu(user.role);
-      const index=pages.findIndex(item=>item.id===pageId);
-      if(index<0)return false;
+      const page=pages.find(item=>item.id===pageId);
+      const contextualLabels={personnel:"Personnel",teams:"Teams",performance:"Performance",workspace:"Workspace"};
+      const pageLabel=page?.label||contextualLabels[pageId];
+      if(!pageLabel)return false;
       button.type="button";
       button.textContent="Guide";
-      button.setAttribute("aria-label",pages[index].label+" guide");
+      button.setAttribute("aria-label",pageLabel+" guide");
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
       button.addEventListener("click",function(event){
         event.preventDefault();event.stopPropagation();
-        const panelRoot=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay");
-        const contentRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content")||button.closest("#page-content")||document.getElementById("page-content");
+        const panelRoot=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
+        const contentRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||panelRoot||button.closest("#page-content")||document.getElementById("page-content");
         showContextualPageGuide(user,pageId,contentRoot);
       });
       return true;
