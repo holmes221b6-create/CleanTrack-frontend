@@ -235,7 +235,9 @@ async function renderSupervisorTeams(container){
  const who=el("span","ct-team-fullscreen-user",user?.name||user?.email||"Supervisor");
  const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{document.removeEventListener("cleantrack:personnel-profile-updated",syncPersonnelAvatar);shell.remove();document.documentElement.classList.remove("ct-team-workspace-open");document.body.classList.remove("ct-team-workspace-open");window.CleanTrackNavigation?.setActivePage("workspace")});
  closeWorkspace.type="button";closeWorkspace.setAttribute("aria-label","Close Teams workspace");closeWorkspace.title="Close Teams workspace";
- topActions.append(who,closeWorkspace);topbar.append(brand,topActions);
+ const guideButton=button("Guide","ct-team-fullscreen-guide");
+ window.MechnarPageGuide?.attach(guideButton,"teams");
+ topActions.append(who,guideButton,closeWorkspace);topbar.append(brand,topActions);
  const sidebar=el("aside","ct-team-fullscreen-sidebar");sidebar.append(el("p","ct-team-fullscreen-side-label","TEAM SPACE"));
  const pageHost=el("main","ct-team-fullscreen-main");
  const pageHeading=el("header","ct-team-fullscreen-pagehead");
