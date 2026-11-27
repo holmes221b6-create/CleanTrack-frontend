@@ -158,14 +158,43 @@
     positionGuide(guide);setTimeout(()=>{if(activeGuide===guide){positionGuide(guide);typeDescription(guide)}},450);
     return true;
   }
+  function renderPageDiscovery(page){
+    const host=document.getElementById("page-content")||document.getElementById("workspace-view");
+    if(!host)return;
+    host.querySelectorAll(".mn-page-discovery").forEach(node=>node.remove());
+    const updates=unseen(page).filter(update=>update.page!=="all");
+    if(!updates.length)return;
+    const banner=document.createElement("section");banner.className="mn-page-discovery";
+    const copy=document.createElement("div");copy.className="mn-page-discovery-copy";
+    const eyebrow=document.createElement("span");eyebrow.className="mn-page-discovery-kicker";eyebrow.textContent="NEW IN THIS WORKSPACE";
+    const heading=document.createElement("strong");heading.textContent=updates.length===1?updates[0].feature:updates.length+" new features available";
+    const description=document.createElement("p");description.textContent=updates.length===1?(updates[0].description||"Explore the latest improvement on this page."):"Explore the latest improvements introduced on this page.";
+    copy.append(eyebrow,heading,description);
+    const actions=document.createElement("div");actions.className="mn-page-discovery-actions";
+    updates.forEach(update=>{
+      const explore=document.createElement("button");explore.type="button";explore.className="mn-page-discovery-explore";explore.textContent=updates.length===1?"Explore Features":"Explore "+update.feature;
+      explore.addEventListener("click",()=>navigateToFeature(update));
+      const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-page-discovery-dismiss";dismiss.textContent="Dismiss";
+      dismiss.addEventListener("click",()=>{acknowledge(update);renderPageDiscovery(page)});
+      actions.append(explore,dismiss);
+    });
+    banner.append(copy,actions);host.prepend(banner);
+  }
+  function activePage(){
+    const nav=window.CleanTrackNavigation;
+    return nav&&typeof nav.getActivePage==="function"?nav.getActivePage():document.querySelector(".nav-item[aria-current='page']")?.dataset.page||null;
+  }
   function init(){
     const root=document.getElementById("workspace-navigation");if(!root)return;
     decorate();new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
-    root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>showUpdates(page),250));});
+    const content=document.getElementById("page-content")||document.getElementById("workspace-view");
+    if(content)new MutationObserver(()=>{const page=activePage();if(page)renderPageDiscovery(page)}).observe(content,{childList:true,subtree:true});
+    window.addEventListener("cleantrack:navigate",event=>{const page=event.detail?.page;if(page)loadManifest().then(()=>setTimeout(()=>renderPageDiscovery(page),350));});
+    root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>{renderPageDiscovery(page);showUpdates(page)},350));});
     window.addEventListener("storage",decorate);
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
-    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false)}};
+    window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,showForPage:page=>renderPageDiscovery(page),openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false)}};
     loadManifest();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
