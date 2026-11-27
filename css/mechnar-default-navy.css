@@ -1,0 +1,175 @@
+/*
+ * MECHNAR default appearance — deep navy workspace.
+ * This is the app-wide default palette; Light and Black remain selectable.
+ */
+html[data-theme="default"] {
+  color-scheme: dark !important;
+  --bg: #0b192d;
+  --bg-elevated: #101d31;
+  --surface: #0d1c32;
+  --surface-hover: #142640;
+  --surface-raised: #13243b;
+  --border: #203d5e;
+  --border-strong: #2b4d70;
+  --text: #e8eef8;
+  --text-secondary: #b4c4d9;
+  --text-muted: #8fa4bf;
+  --primary: #244f7b;
+  --primary-hover: #2d6192;
+  --primary-contrast: #f5f8ff;
+  --accent: #8e69d4;
+  --success: #3b9b83;
+  --warning: #d3a354;
+  --danger: #d66c79;
+  --info: #69a9dc;
+  --ct-bg: #0b192d;
+  --ct-page: #0b192d;
+  --ct-surface: #0e1d33;
+  --ct-panel: #0d1c32;
+  --ct-panel-raised: #142640;
+  --ct-border: #203d5e;
+  --ct-text: #e8eef8;
+  --ct-muted: #9aadc6;
+  --ct-blue: #244f7b;
+  --ct-blue-hover: #2d6192;
+  --ct-focus: #77a9d8;
+  --focus-ring: 0 0 0 3px rgb(91 147 201 / 25%);
+  --shadow-sm: 0 5px 16px rgb(0 0 0 / 18%);
+  --shadow-md: 0 16px 36px rgb(0 0 0 / 28%);
+}
+
+/* Main canvas and workspace frame */
+html[data-theme="default"] body,
+html[data-theme="default"] #app,
+html[data-theme="default"] #main-content,
+html[data-theme="default"] #workspace-view,
+html[data-theme="default"] #workspace-view .ct-workspace-shell,
+html[data-theme="default"] #workspace-view .ct-workspace-main,
+html[data-theme="default"] #page-content,
+html[data-theme="default"] .page-content {
+  background-color: #0b192d !important;
+  background-image: none !important;
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] body { color-scheme: dark !important; }
+html[data-theme="default"] .app-header,
+html[data-theme="default"] .ct-workspace-toolbar,
+html[data-theme="default"] #workspace-header,
+html[data-theme="default"] .workspace-header,
+html[data-theme="default"] .topbar {
+  background: #11131c !important;
+  border-color: #202b3d !important;
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] #workspace-navigation,
+html[data-theme="default"] .workspace-sidebar,
+html[data-theme="default"] .sidebar,
+html[data-theme="default"] .app-sidebar {
+  background: #080d16 !important;
+  border-color: #1c3049 !important;
+  color: #dbe6f5 !important;
+}
+
+/* Page sections, report surfaces, tables and contained work areas */
+html[data-theme="default"] #page-content .panel,
+html[data-theme="default"] #page-content .section,
+html[data-theme="default"] #page-content .surface,
+html[data-theme="default"] #page-content .workspace-card,
+html[data-theme="default"] #page-content .report-card,
+html[data-theme="default"] #page-content .report-history,
+html[data-theme="default"] #page-content .form-section,
+html[data-theme="default"] #page-content .settings-section,
+html[data-theme="default"] #page-content .table-wrap,
+html[data-theme="default"] #page-content .table-container,
+html[data-theme="default"] #page-content .modal-content,
+html[data-theme="default"] #page-content .mt-panel,
+html[data-theme="default"] #page-content .mt-section,
+html[data-theme="default"] #page-content .analytics-panel,
+html[data-theme="default"] #page-content .report-builder,
+html[data-theme="default"] #page-content .report-history-panel {
+  background-color: #0d1c32 !important;
+  background-image: none !important;
+  border-color: #203d5e !important;
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] #page-content h1,
+html[data-theme="default"] #page-content h2,
+html[data-theme="default"] #page-content h3,
+html[data-theme="default"] #page-content h4,
+html[data-theme="default"] #page-content label,
+html[data-theme="default"] #page-content strong,
+html[data-theme="default"] #page-content th {
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] #page-content p,
+html[data-theme="default"] #page-content small,
+html[data-theme="default"] #page-content .muted,
+html[data-theme="default"] #page-content .text-muted,
+html[data-theme="default"] #page-content td,
+html[data-theme="default"] #page-content .hint,
+html[data-theme="default"] #page-content .description {
+  color: #a9bad0 !important;
+}
+
+/* Inputs and selectors use the same navy field treatment on every page. */
+html[data-theme="default"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="default"] textarea,
+html[data-theme="default"] select,
+html[data-theme="default"] .form-control {
+  background-color: #09172a !important;
+  color: #edf3fc !important;
+  border-color: #294768 !important;
+}
+html[data-theme="default"] input::placeholder,
+html[data-theme="default"] textarea::placeholder {
+  color: #8295ae !important;
+  opacity: 1 !important;
+}
+html[data-theme="default"] select option {
+  background: #0d1c32 !important;
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] #page-content button:not(.secondary):not(.ghost):not(.icon-button):not(.close-button),
+html[data-theme="default"] #page-content .btn-primary,
+html[data-theme="default"] #page-content .primary-button {
+  border-color: #315d87 !important;
+}
+html[data-theme="default"] #page-content button.secondary,
+html[data-theme="default"] #page-content button.ghost,
+html[data-theme="default"] #page-content .btn-secondary {
+  background: #101f34 !important;
+  border-color: #294768 !important;
+  color: #dce7f5 !important;
+}
+html[data-theme="default"] #page-content button:disabled,
+html[data-theme="default"] #page-content .btn:disabled {
+  opacity: .48;
+}
+
+/* Dropdowns, dialogs and popovers */
+html[data-theme="default"] .dropdown-menu,
+html[data-theme="default"] .popover,
+html[data-theme="default"] [role="menu"],
+html[data-theme="default"] [role="listbox"],
+html[data-theme="default"] [role="dialog"],
+html[data-theme="default"] .modal-content,
+html[data-theme="default"] .modal-dialog,
+html[data-theme="default"] .mt-overlay .mt-modal,
+html[data-theme="default"] .filter-modal,
+html[data-theme="default"] .filter-panel {
+  background-color: #0d1c32 !important;
+  color: #e8eef8 !important;
+  border-color: #294768 !important;
+}
+html[data-theme="default"] #cleantrack-launch-splash {
+  background: #0b192d !important;
+  color: #e8eef8 !important;
+}
+html[data-theme="default"] #cleantrack-launch-splash .ct-splash-wordmark,
+html[data-theme="default"] #cleantrack-launch-splash .ct-splash-owner {
+  color: #e8eef8 !important;
+}
+
+/* Keep the reference image's restrained blue edge and readable contrast on small screens. */
+html[data-theme="default"] hr { border-color: #203d5e !important; }
+html[data-theme="default"] ::selection { background: #315d87 !important; color: #fff !important; }
