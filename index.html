@@ -416,14 +416,27 @@ html[data-theme="black"] #cleantrack-launch-splash{
   if(event&&event.cancelable)event.preventDefault();
   playTapSound();
   window.__MECHNAR_TAP_SOUND_PLAYED__=true;
+  splash.classList.add("ct-launch-preparing");
+  var button=splash.querySelector(".ct-launch-begin");
+  if(button)button.textContent="PREPARING MECHNAR";
   if(typeof window.__MECHNAR_BEGIN_HANDLER__==="function"){
-   window.__MECHNAR_BEGIN_HANDLER__();
+   try{window.__MECHNAR_BEGIN_HANDLER__();}
+   catch(error){console.error("MECHNAR launch handler failed:",error);window.__MECHNAR_BEGIN_PENDING__=true;}
   }else{
    window.__MECHNAR_BEGIN_PENDING__=true;
-   splash.classList.add("ct-launch-preparing");
-   var button=splash.querySelector(".ct-launch-begin");
-   if(button)button.textContent="PREPARING MECHNAR";
   }
+  // Fail-safe: a broken or late application initializer must never trap the
+  // user behind the splash. Normal launch removes this first; fallback exposes
+  // the sign-in view so the app remains reachable.
+  window.setTimeout(function(){
+   if(!splash.isConnected)return;
+   console.error("MECHNAR launch timed out; revealing sign-in recovery.");
+   splash.remove();
+   var authView=document.getElementById("auth-view");
+   var workspace=document.getElementById("workspace-view");
+   if(authView){authView.hidden=false;authView.style.display="";}
+   if(workspace&&!window.CleanTrackApp){workspace.hidden=true;workspace.style.display="none";}
+  },9000);
  }
  splash.addEventListener("pointerdown",begin,true);
  splash.addEventListener("click",begin,true);
