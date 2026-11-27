@@ -14,7 +14,7 @@
   const presented=()=>{try{return JSON.parse(localStorage.getItem(presentedKey())||"[]")}catch(_){return []}};
   const savePresented=a=>{try{localStorage.setItem(presentedKey(),JSON.stringify(a))}catch(_){}};
   const acknowledge=update=>{const seen=read();if(!seen.includes(update.id))seen.push(update.id);save(seen);decorate();};
-  const unseen=page=>RELEASE_UPDATES.filter(x=>x.page===page&&!read().includes(x.id));
+  const unseen=page=>{const role=String((user()||{}).role||"").toLowerCase();return RELEASE_UPDATES.filter(x=>(x.page==="all"||x.page===page)&&(!Array.isArray(x.roles)||!x.roles.length||x.roles.some(r=>String(r).toLowerCase()===role))&&!read().includes(x.id));};
 
   async function loadManifest(){
     if(manifestLoaded)return Promise.resolve(RELEASE_UPDATES);
