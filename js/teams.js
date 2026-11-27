@@ -266,6 +266,7 @@ async function renderSupervisorTeams(container){
    });
    pageBody.classList.toggle("is-performance-view",id==="performance");
    pageTitle.textContent=label;pageSubtitle.textContent=description;
+   setTimeout(()=>window.MechnarWhatsNew?.showForPage?.("teams"),80);
   });
   nav.dataset.page=id;nav.setAttribute("aria-current",index===0?"page":"false");sidebar.append(nav);
   const view=el("section","ct-team-fullscreen-view");view.dataset.view=id;view.hidden=index!==0;view.style.display=index===0?"block":"none";
@@ -931,6 +932,7 @@ async function renderSupervisorTeams(container){
   try{
    const data=await API.get("teams/supervisor/mine");
    await renderOwn(data);
+   setTimeout(()=>window.MechnarWhatsNew?.showForPage?.("teams"),250);
   }catch(e){
    own.replaceChildren(el("p","ct-team-error",e.message||"Could not load your team."));
    pageError("overview",e,loadOwn);
