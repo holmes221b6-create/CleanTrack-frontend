@@ -704,6 +704,35 @@
       return true;
     }
   });
+  // One document-level capture handler is the source of truth for Guide
+  // clicks. It also covers buttons replaced by page renderers, cached DOM,
+  // and controls created after the initial route mount.
+  if(!window.__MECHNAR_PAGE_GUIDE_DELEGATE__){
+    window.__MECHNAR_PAGE_GUIDE_DELEGATE__=true;
+    document.addEventListener("click",function(event){
+      const target=event.target;
+      const button=target&&typeof target.closest==="function"
+        ?target.closest("[data-mechnar-guide-page]")
+        :null;
+      if(!button)return;
+      const pageId=button.dataset.mechnarGuidePage;
+      if(!pageId)return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
+      const contextRoot=root?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||root||button.closest("#page-content")||document.getElementById("page-content")||document.body;
+      try{
+        const currentUser=auth&&typeof auth.getCurrentUser==="function"
+          ?auth.getCurrentUser()
+          :null;
+        showContextualPageGuide(currentUser||{role:"supervisor"},pageId,contextRoot);
+      }catch(error){
+        console.error("MECHNAR page guide click failed:",error);
+      }
+    },true);
+  }
+
   // Maintain exactly one in-page Guide control per rendered route.
   // Do not attach to the instant-loading skeleton: wait until real page content
   // exists, then reuse/move the existing trigger rather than creating another.
