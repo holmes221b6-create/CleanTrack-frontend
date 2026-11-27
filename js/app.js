@@ -2238,52 +2238,68 @@ function bindNavigation() {
     let launchEntryPending = false;
     let launchFinished = false;
     const finishLaunch = function () {
-      if (launchFinished || !splash || !splash.isConnected || !launchReady || !launchDelayElapsed) return;
+      if (launchFinished || !splash || !splash.isConnected || !launchDelayElapsed) return;
       launchFinished = true;
 
-      // Never leave the user trapped behind the splash if a workspace widget
-      // throws during its first render. Reveal the authenticated shell first,
-      // then let the page renderer report/recover from its own error.
+      // Do not wait for auth restoration or workspace rendering to remove the
+      // launch layer. The old sequence rendered the whole workspace first;
+      // a synchronous page-render error could therefore strand the splash.
       try {
-        if (launchUser) {
-          try {
-            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
-            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-          } catch (_) {}
-          showAuthenticatedLayout(launchUser);
-        } else {
-          showUnauthenticatedLayout();
+        if (!launchUser) launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || null;
+        if (!launchUser) {
+          const token = localStorage.getItem("cleantrack_token");
+          const cached = JSON.parse(localStorage.getItem("mechnar.cached-user.v1") || "null");
+          const authDay = localStorage.getItem("mechnar.authenticated-day.v1") || "";
+          const today = new Date().getFullYear() + "-" + String(new Date().getMonth()+1).padStart(2,"0") + "-" + String(new Date().getDate()).padStart(2,"0");
+          if (token && cached && (!authDay || authDay === today)) launchUser = cached;
         }
-      } catch (layoutError) {
-        console.error("MECHNAR launch layout initialization failed:", layoutError);
-        // A partially initialized authenticated layout must not remain hidden.
-        if (launchUser) {
-          setVisible(getElement("auth-view"), false);
+      } catch (error) {
+        console.warn("MECHNAR cached session could not be read:", error);
+      }
+
+      // Remove the splash immediately. Never make this depend on navigation,
+      // API calls, optional widgets, or the first workspace page rendering.
+      splash.classList.add("ct-launch-exiting");
+      window.setTimeout(function () { if (splash.isConnected) splash.remove(); }, 80);
+      window.setTimeout(function () { if (splash.isConnected) splash.remove(); }, 700);
+
+      window.setTimeout(function () {
+        try {
+          if (launchUser) {
+            try {
+              const greetingIdentity = String(launchUser.id ?? launchUser.email ?? "current").toLowerCase();
+              sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+              sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+            } catch (_) {}
+            // Reveal the shell before running page navigation/render code.
+            setVisible(getElement("auth-view"), false);
+            const workspace = getElement("workspace-view");
+            if (workspace) {
+              setVisible(workspace, true);
+              workspace.removeAttribute("aria-busy");
+            }
+            showAuthenticatedLayout(launchUser);
+          } else {
+            showUnauthenticatedLayout();
+          }
+        } catch (layoutError) {
+          console.error("MECHNAR workspace initialization failed after launch:", layoutError);
           const workspace = getElement("workspace-view");
-          if (workspace) {
+          const authView = getElement("auth-view");
+          if (launchUser && workspace) {
+            setVisible(authView, false);
             setVisible(workspace, true);
             workspace.removeAttribute("aria-busy");
+            const pageContent = getElement("page-content");
+            if (pageContent) {
+              pageContent.innerHTML = '<div class="ct-launch-recovery"><h2>MECHNAR is open</h2><p>Your workspace could not finish loading. Refresh to retry the workspace.</p><button type="button" onclick="location.reload()">Refresh workspace</button></div>';
+            }
+          } else {
+            setVisible(workspace, false);
+            setVisible(authView, true);
           }
-          const pageContent = getElement("page-content");
-          if (pageContent && !pageContent.childNodes.length) {
-            pageContent.textContent = "Your workspace could not finish loading. Refresh MECHNAR to try again.";
-          }
-        } else {
-          setVisible(getElement("workspace-view"), false);
-          showUnauthenticatedLayout();
         }
-      } finally {
-        // The launch layer is always dismissed after the user has activated it.
-        splash.classList.add("ct-launch-exiting");
-        window.setTimeout(function () {
-          if (splash.isConnected) splash.remove();
-        }, 520);
-        // A transition failure or reduced-motion override must not strand it.
-        window.setTimeout(function () {
-          if (splash.isConnected) splash.remove();
-        }, 1100);
-      }
+      }, 0);
     };
     // Create audio only after a real user gesture. Some browsers keep an
     // AudioContext created during page load permanently suspended on first play.
