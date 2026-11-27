@@ -577,19 +577,144 @@ async function renderSupervisorTeams(container){
   operationLayout.append(operationFilters,operationDisplay);opSection.append(operationLayout);renderOperationMeasure("active");
   operationsPage.append(opSection);
 
-  const areas=el("section","ct-team-supervisor-page-section");
-  areas.append(el("p","ct-team-eyebrow","ASSIGNED WORK AREAS"),el("h2","","Locations & zones"));
-  const areaGrid=el("div","ct-team-supervisor-areas");
-  const loc=el("div","ct-team-supervisor-area");loc.append(el("h3","","Assigned locations"));
-  const locList=el("div","ct-team-supervisor-chips");
-  (data.locations||[]).forEach(x=>locList.append(el("span","ct-team-supervisor-chip",x.name)));
-  if(!data.locations?.length)locList.append(el("span","ct-team-muted","No locations assigned."));
-  loc.append(locList);
-  const zones=el("div","ct-team-supervisor-area");zones.append(el("h3","","Assigned zones"));
-  const zoneList=el("div","ct-team-supervisor-chips");
-  (data.zones||[]).forEach(x=>zoneList.append(el("span","ct-team-supervisor-chip",x.name)));
-  if(!data.zones?.length)zoneList.append(el("span","ct-team-muted","No zones assigned."));
-  zones.append(zoneList);areaGrid.append(loc,zones);areas.append(areaGrid);locationsPage.append(areas);
+  const areas=el("section","ct-team-supervisor-page-section ct-team-sites-workspace");
+  const areaHeader=el("header","ct-team-sites-header");
+  const areaIntro=el("div","");
+  areaIntro.append(el("p","ct-team-eyebrow","OPERATIONAL FOOTPRINT"),el("h2","","Locations & zones"),el("p","ct-team-muted","Explore the sites assigned to your team, inspect their operational areas, and open live records. Your access remains limited to this team."));
+  const areaCounts=el("div","ct-team-sites-counts");
+  [[ "LOCATIONS", (data.locations||[]).length ],["ZONES",(data.zones||[]).length],["LINKED OPERATIONS",(data.operations||[]).filter(x=>x.location_id||x.zone_id).length]].forEach(([label,value])=>{const stat=el("div","ct-team-sites-count");stat.append(el("strong","",String(value)),el("span","",label));areaCounts.append(stat)});
+  areaHeader.append(areaIntro,areaCounts);areas.append(areaHeader);
+  const areaNotice=el("p","ct-team-sites-notice");areaNotice.hidden=true;areas.append(areaNotice);
+  const siteLayout=el("div","ct-team-sites-layout");
+  const siteDirectory=el("section","ct-team-sites-directory");
+  const directoryHead=el("div","ct-team-sites-panel-head");directoryHead.append(el("h3","","Assigned locations"),el("span","ct-team-muted",(data.locations||[]).length+" sites"));siteDirectory.append(directoryHead);
+  const siteSearch=el("input","ct-team-sites-search");siteSearch.type="search";siteSearch.placeholder="Search your locations…";siteSearch.setAttribute("aria-label","Search assigned locations");siteDirectory.append(siteSearch);
+  const siteList=el("div","ct-team-sites-list");siteDirectory.append(siteList);
+  const siteDetail=el("section","ct-team-sites-detail");
+  siteLayout.append(siteDirectory,siteDetail);areas.append(siteLayout);locationsPage.append(areas);
+  const assignedLocations=(data.locations||[]).slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+  const assignedZones=(data.zones||[]).slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+  let activeLocationId=assignedLocations[0]?.id??null;
+  const teamOps=data.operations||[];
+  const locationZones=id=>assignedZones.filter(z=>String(z.location_id)===String(id));
+  const locationOperations=id=>{const ids=new Set(locationZones(id).map(z=>String(z.id)));return teamOps.filter(op=>String(op.location_id)===String(id)||ids.has(String(op.zone_id)))};
+  const showAreaNotice=(message,isError=false)=>{areaNotice.textContent=message;areaNotice.hidden=!message;areaNotice.classList.toggle("is-error",Boolean(isError));};
+  function renderSiteDirectory(){
+    siteList.replaceChildren();
+    const q=siteSearch.value.trim().toLowerCase();
+    const visible=assignedLocations.filter(site=>!q||String(site.name||"").toLowerCase().includes(q)||String(site.address||"").toLowerCase().includes(q));
+    if(!visible.length){siteList.append(el("p","ct-team-sites-empty",assignedLocations.length?"No assigned locations match your search.":"No locations are currently assigned to this team."));return}
+    visible.forEach(site=>{
+      const row=button("","ct-team-site-item",()=>selectAssignedLocation(site.id));
+      row.classList.toggle("is-active",String(site.id)===String(activeLocationId));
+      const copy=el("span","ct-team-site-copy");copy.append(el("strong","",site.name||"Unnamed location"),el("small","",site.address||"Address not recorded"));
+      const meta=el("span","ct-team-site-meta");meta.append(el("b","",String(locationZones(site.id).length)),el("small","","Zones"));
+      row.append(copy,meta);row.setAttribute("aria-pressed",String(String(site.id)===String(activeLocationId)));siteList.append(row);
+    });
+  }
+  function showAreaModal(title,build){
+    const overlay=el("div","ct-team-sites-overlay"),panel=el("section","ct-team-sites-modal");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");
+    const head=el("header","ct-team-sites-modal-head");head.append(el("h2","",title));
+    const close=button("×","ct-team-sites-close",()=>dismiss());close.setAttribute("aria-label","Close panel");head.append(close);
+    const body=el("div","ct-team-sites-modal-body");panel.append(head,body);overlay.append(panel);
+    const dismiss=()=>{overlay.remove();document.removeEventListener("keydown",onKey)};
+    const onKey=e=>{if(e.key==="Escape")dismiss()};
+    overlay.addEventListener("click",e=>{if(e.target===overlay)dismiss()});document.addEventListener("keydown",onKey);document.body.append(overlay);
+    build(body,dismiss);close.focus();return {body,close,dismiss};
+  }
+  function selectAssignedLocation(id){
+    activeLocationId=id;renderSiteDirectory();renderLocationDetail();
+  }
+  function renderLocationDetail(){
+    siteDetail.replaceChildren();
+    const site=assignedLocations.find(x=>String(x.id)===String(activeLocationId));
+    if(!site){const empty=el("div","ct-team-sites-empty-state");empty.append(el("span","","⌖"),el("strong","","Select a location"),el("p","","Choose a site from the directory to inspect its zones and operational activity."));siteDetail.append(empty);return}
+    const zonesHere=locationZones(site.id),opsHere=locationOperations(site.id);
+    const head=el("header","ct-team-sites-detail-head"),identity=el("div","");
+    identity.append(el("p","ct-team-eyebrow","SELECTED LOCATION"),el("h3","",site.name||"Location"),el("p","ct-team-muted",site.address||"Address not recorded"));
+    head.append(identity,el("span","ct-team-sites-status",site.status||"Active"));siteDetail.append(head);
+    const description=site.description?el("p","ct-team-sites-description",site.description):null;if(description)siteDetail.append(description);
+    const stats=el("div","ct-team-sites-detail-stats");
+    [["Zones",zonesHere.length],["Operations",opsHere.length],["Open",opsHere.filter(x=>!["completed","complete","approved","done","closed","cancelled","canceled"].includes(String(x.status||"").toLowerCase())).length]].forEach(([label,value])=>{const item=el("div","ct-team-sites-detail-stat");item.append(el("strong","",String(value)),el("span","",label));stats.append(item)});
+    siteDetail.append(stats);
+    const actions=el("div","ct-team-sites-actions");
+    actions.append(button("+ Create zone","ct-team-btn ct-team-btn--primary",()=>createTeamZone(site)));
+    if(site.latitude!=null&&site.longitude!=null){const mapLink=el("a","ct-team-btn","Open map ↗");mapLink.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(site.latitude+","+site.longitude);mapLink.target="_blank";mapLink.rel="noopener noreferrer";actions.append(mapLink)}
+    siteDetail.append(actions);
+    const zoneHead=el("div","ct-team-sites-section-head");zoneHead.append(el("h4","","Zones at this location"),el("span","ct-team-muted",zonesHere.length+" areas"));siteDetail.append(zoneHead);
+    if(!zonesHere.length)siteDetail.append(el("p","ct-team-sites-empty","No zones have been configured at this location yet. Create the floors, blocks or operational areas your team needs."));
+    else{
+      const zoneGrid=el("div","ct-team-sites-zone-list");
+      zonesHere.forEach(zone=>{
+        const card=el("article","ct-team-sites-zone");
+        const top=el("div","ct-team-sites-zone-top");top.append(el("strong","",zone.name||"Unnamed zone"),el("span","ct-team-sites-status",zone.status||"Active"));card.append(top);
+        card.append(el("p","ct-team-muted",[zone.floor_label,zone.description].filter(Boolean).join(" · ")||"No additional area details recorded."));
+        const zoneOps=teamOps.filter(op=>String(op.zone_id)===String(zone.id));
+        const info=el("div","ct-team-sites-zone-meta");info.append(el("span","",zoneOps.length+" linked operations"));card.append(info);
+        card.append(button("Inspect zone →","ct-team-btn ct-team-btn--quiet",()=>inspectTeamZone(zone,site)));
+        zoneGrid.append(card);
+      });
+      siteDetail.append(zoneGrid);
+    }
+    const opHead=el("div","ct-team-sites-section-head");opHead.append(el("h4","","Recent operations"),el("span","ct-team-muted","Live team records"));siteDetail.append(opHead);
+    if(!opsHere.length)siteDetail.append(el("p","ct-team-sites-empty","No operations are linked to this location."));
+    else{
+      const list=el("div","ct-team-sites-operation-list");
+      opsHere.slice(0,8).forEach(op=>{const row=el("article","ct-team-sites-operation");const copy=el("div","");copy.append(el("strong","",op.title||"Untitled operation"),el("small","",op.zone_id?(assignedZones.find(z=>String(z.id)===String(op.zone_id))?.name||"Zone"):"Location-wide"));row.append(copy,el("span","ct-team-sites-status",op.status||"Unknown"));list.append(row)});
+      siteDetail.append(list);
+    }
+  }
+  async function inspectTeamZone(zone,site){
+    const dialog=showAreaModal("Zone intelligence · "+(zone.name||"Zone"),body=>{
+      body.append(el("p","ct-team-muted","Loading current zone details, assignments and linked operations…"));
+      API.get("zones/"+encodeURIComponent(zone.id)).then(result=>{
+        const z=result.zone||zone;body.replaceChildren();
+        const summary=el("div","ct-team-sites-zone-summary");
+        [["Location",site.name],["Floor / area",z.floor_label],["Status",z.status],["Assigned team",z.effective_team_name||t.name],["Team members",z.member_count],["Open operations",z.active_operation_count],["Floor plan",z.has_floor_plan?"Available":"Not uploaded"]].forEach(([label,value])=>{const item=el("div","ct-team-sites-detail-stat");item.append(el("span","",label),el("strong","",value===null||value===undefined||value===""?"—":String(value)));summary.append(item)});
+        body.append(summary);
+        if(z.description)body.append(el("p","ct-team-sites-description",z.description));
+        const people=z.assigned_people||[];body.append(el("h3","","Assigned personnel"));
+        if(!people.length)body.append(el("p","ct-team-sites-empty","No active team members are currently assigned."));
+        else{const list=el("div","ct-team-sites-people");people.forEach(person=>{const row=el("div","ct-team-sites-person");row.append(el("strong","",person.name||"Team member"),el("span","",person.role||"Member"));list.append(row)});body.append(list)}
+        const ops=z.operations||[];body.append(el("h3","","Zone operations"));
+        if(!ops.length)body.append(el("p","ct-team-sites-empty","No operations are linked to this zone."));
+        else{const list=el("div","ct-team-sites-operation-list");ops.forEach(op=>{const row=el("article","ct-team-sites-operation");row.append(el("strong","",op.title||"Untitled operation"),el("span","ct-team-sites-status",op.status||"Unknown"));list.append(row)});body.append(list)}
+        const footer=el("div","ct-team-sites-actions");
+        footer.append(button("Activity history","ct-team-btn",async()=>{try{const history=await API.get("zones/"+zone.id+"/history");const events=history.history||[];const historyPanel=showAreaModal("Zone activity · "+zone.name,b=>{if(!events.length)b.append(el("p","ct-team-sites-empty","No activity has been recorded for this zone."));events.forEach(event=>{const row=el("article","ct-team-sites-event");row.append(el("strong","",String(event.action||"Zone activity").replaceAll("."," · ")),el("small","",dateTime(event.created_at)),el("p","",typeof event.details==="string"?event.details:JSON.stringify(event.details||{})));b.append(row)})})}catch(error){showAreaNotice(error.message||"Zone history could not be loaded.",true)}}));
+        body.append(footer);
+      }).catch(error=>body.replaceChildren(el("p","ct-team-sites-error",error.message||"Zone details could not be loaded.")));
+    });
+  }
+  function createTeamZone(site){
+    showAreaModal("Create operational zone", (body,dismiss)=>{
+      const form=el("form","ct-team-sites-form");
+      const makeField=(label,type,value,wide=false)=>{const wrap=el("label","ct-team-sites-field"+(wide?" is-wide":""));wrap.append(el("span","",label));const inputNode=type==="textarea"?el("textarea","ct-team-sites-input"):el("input","ct-team-sites-input");if(type==="textarea")inputNode.rows=4;else inputNode.type=type;inputNode.value=value||"";wrap.append(inputNode);form.append(wrap);return inputNode};
+      const name=makeField("Zone name","text","");name.required=true;name.maxLength=150;
+      const floor=makeField("Floor / block / area","text","");floor.maxLength=120;
+      const description=makeField("Description","textarea","",true);description.maxLength=4000;
+      const actions=el("div","ct-team-sites-form-actions");
+      actions.append(button("Cancel","ct-team-btn",dismiss),button("Create zone","ct-team-btn ct-team-btn--primary",null,"submit"));form.append(actions);
+      form.addEventListener("submit",async event=>{
+        event.preventDefault();const submit=form.querySelector('button[type="submit"]');if(submit.disabled)return;
+        if(!name.value.trim()){name.focus();return}
+        submit.disabled=true;submit.textContent="Creating…";
+        try{
+          const result=await API.post("zones",{name:name.value.trim(),floor_label:floor.value.trim(),description:description.value.trim(),location_id:site.id});
+          const created=result.zone||{};
+          dismiss();showAreaNotice(result.message||"Zone created successfully.");
+          const fresh=await API.get("zones");
+          const rows=Array.isArray(fresh.zones)?fresh.zones:[];
+          const ownIds=new Set(assignedLocations.map(x=>String(x.id)));
+          assignedZones.splice(0,assignedZones.length,...rows.filter(z=>ownIds.has(String(z.location_id))));
+          if(created.id)activeLocationId=site.id;
+          renderSiteDirectory();renderLocationDetail();
+        }catch(error){showAreaNotice(error.message||"Zone could not be created.",true);submit.disabled=false;submit.textContent="Create zone"}
+      });
+      body.append(form);
+    });
+  }
+  siteSearch.addEventListener("input",renderSiteDirectory);
+  renderSiteDirectory();renderLocationDetail();
 
   const perf=el("section","ct-team-supervisor-page-section ct-team-performance-overview");
   const perfHeader=el("div","ct-team-performance-header");
