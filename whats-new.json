@@ -12,7 +12,8 @@
       "id": "teams-native-team-performance-2026-11-v1",
       "page": "teams",
       "feature": "Team Performance Overview",
-      "description": "The Teams workspace now has a native performance overview with operational totals, completion and punctuality rates, workload-aware team scoring, weekly trends and individual team rankings."
+      "description": "The Teams workspace now has a native performance overview with operational totals, completion and punctuality rates, workload-aware team scoring, weekly trends and individual team rankings.",
+      "target": ".ct-team-performance-content"
     },
     {
       "id": "inventory-separated-workspace-panels-2026-11-v1",
