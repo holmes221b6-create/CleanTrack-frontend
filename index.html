@@ -113,7 +113,7 @@
     <script src="js/supervisor-personnel.js?v=20261116-personnel-profile-v2" defer></script>
     <link rel="stylesheet" href="css/meetings.css?v=20261113-meetings-polish-v2">
     <script src="js/meetings.js?v=20261113-admin-supervisor-meetings-v1" defer></script>
-    <script src="js/app.js?v=20261127-whole-splash-tap-v5" defer></script>
+    <script src="js/app.js?v=20261127-launch-auth-timeout-sound-v2" defer></script>
     <script src="js/modal-scroll-lock.js?v=20261127-modal-scroll-lock-v1" defer></script>
     <script src="js/teams.js?v=20261127-await-team-data-v2" defer></script>
     <script src="js/org-tools.js?v=20261127-inventory-nav-contained-v6" defer></script>
@@ -361,7 +361,7 @@ html[data-theme="black"] #cleantrack-launch-splash{
 }
 </style>
 
-    <link rel="stylesheet" href="css/launch-screen.css?v=20261127-whole-splash-tap-v5">
+    <link rel="stylesheet" href="css/launch-screen.css?v=20261127-launch-auth-timeout-sound-v2">
     <link rel="stylesheet" href="css/notification-bell.css?v=20261126-vertical-bell-shine-v4">
     <link rel="stylesheet" href="css/whats-new.css?v=20261127-inplace-discovery-v6">
     <link rel="stylesheet" href="css/mechnar-default-navy.css?v=20261127-navy-default-v1">
@@ -390,11 +390,32 @@ html[data-theme="black"] #cleantrack-launch-splash{
  if(!splash)return;
  window.setTimeout(function(){if(splash.isConnected)splash.classList.add("ct-launch-title-active");},1720);
  var requested=false;
+ function playTapSound(){
+  try{
+   var AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)return;
+   var ctx=window.__MECHNAR_LAUNCH_AUDIO_CONTEXT__;
+   if(!ctx||ctx.state==="closed")ctx=window.__MECHNAR_LAUNCH_AUDIO_CONTEXT__=new AC({latencyHint:"interactive"});
+   if(ctx.state!=="running"){var resumed=ctx.resume();if(resumed&&resumed.catch)resumed.catch(function(){});}
+   var now=ctx.currentTime, master=ctx.createGain(), comp=ctx.createDynamicsCompressor();
+   master.gain.setValueAtTime(0.24,now);master.gain.setTargetAtTime(0.0001,now+1.05,0.24);
+   comp.threshold.setValueAtTime(-20,now);comp.knee.setValueAtTime(18,now);comp.ratio.setValueAtTime(4,now);
+   master.connect(comp);comp.connect(ctx.destination);
+   [{hz:174.61,delay:0,duration:1.20,level:0.22,type:"sine"},{hz:261.63,delay:0,duration:1.05,level:0.13,type:"sine"},{hz:349.23,delay:0,duration:0.90,level:0.075,type:"triangle"},{hz:233.08,delay:0,duration:0.85,level:0.045,type:"sine"}].forEach(function(t){
+    var osc=ctx.createOscillator(),env=ctx.createGain(),at=now+t.delay;osc.type=t.type;osc.frequency.setValueAtTime(t.hz,at);
+    env.gain.setValueAtTime(0.0001,at);env.gain.exponentialRampToValueAtTime(t.level,at+0.006);env.gain.setTargetAtTime(0.0001,at+t.duration*0.55,0.22);
+    osc.connect(env);env.connect(master);osc.start(at);osc.stop(at+t.duration);
+   });
+   window.setTimeout(function(){try{master.disconnect();comp.disconnect();}catch(_){}},1900);
+  }catch(e){console.warn("MECHNAR tap sound unavailable",e);}
+ }
  function begin(event){
   if(requested||!splash.isConnected)return;
   if(event&&event.button===2)return;
   requested=true;
   if(event&&event.cancelable)event.preventDefault();
+  playTapSound();
+  window.__MECHNAR_TAP_SOUND_PLAYED__=true;
   if(typeof window.__MECHNAR_BEGIN_HANDLER__==="function"){
    window.__MECHNAR_BEGIN_HANDLER__();
   }else{
@@ -404,14 +425,11 @@ html[data-theme="black"] #cleantrack-launch-splash{
    if(button)button.textContent="PREPARING MECHNAR";
   }
  }
- // Entire launch canvas is interactive, not only the CTA label.
  splash.addEventListener("pointerdown",begin,true);
  splash.addEventListener("click",begin,true);
  splash.addEventListener("touchstart",begin,{capture:true,passive:false});
  window.addEventListener("keydown",function(event){
-  if(splash.isConnected&&(event.key==="Enter"||event.key===" ")){
-   event.preventDefault();begin(event);
-  }
+  if(splash.isConnected&&(event.key==="Enter"||event.key===" ")&&!event.altKey&&!event.ctrlKey&&!event.metaKey){event.preventDefault();begin(event);}
  });
 })();
 </script>
