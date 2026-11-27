@@ -30,8 +30,8 @@ async function renderInventory(container){
  search.placeholder="Search item, SKU, supplier, location, request or transfer";search.setAttribute("aria-label","Search all inventory records");
  const searchButton=btn("Search",null,true);searchButton.type="submit";searchWrap.append(search,searchButton);
  const toolbarTop=$("div","mt-inventory-toolbar-top");
- const moreToggle=btn("More actions",()=>{const expanded=toolbar.classList.toggle("is-actions-expanded");moreToggle.setAttribute("aria-expanded",String(expanded))});
- moreToggle.classList.add("mt-inventory-more-toggle");moreToggle.setAttribute("aria-expanded","true");
+ const moreToggle=btn("More actions",()=>{toolbarActions.scrollIntoView({behavior:"smooth",block:"nearest"});toolbarActions.querySelector("button")?.focus()});
+ moreToggle.classList.add("mt-inventory-more-toggle");moreToggle.setAttribute("aria-label","Jump to inventory actions");
  toolbarTop.append(searchWrap,moreToggle);
  const toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");
  const isSupervisor=role()==="supervisor";
