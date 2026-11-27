@@ -607,28 +607,45 @@
       return true;
     }
   });
-  // The ordinary page guide is mounted only on the persistent Workspace route.
-  // Special full-screen workspaces own their Guide button in their own topbar.
+  // Mount one contextual Guide control inside the currently rendered page.
+  // A page-content observer handles async page modules as well as the first
+  // Workspace render; navigation back to a page is not required to reveal it.
+  let pageGuideObserver = null;
   function mountPageSetupGuide(pageId){
-    if(pageId!=="workspace")return;
     const content=getElement("page-content"),user=auth.getCurrentUser();
     if(!content||!user||!window.CleanTrackNavigation)return;
+    const role=String(user.role||"").toLowerCase();
+    // These supervisor routes render their own full-screen workspace and have
+    // a Guide control in that workspace's own header.
+    if(role==="supervisor"&&["personnel","performance"].includes(pageId))return;
     const page=content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||content.firstElementChild||content;
-    if(!page)return;
-    let trigger=page.querySelector(':scope > .ct-page-setup-trigger[data-guide-page="workspace"]');
+    if(!page||page.closest(".ct-page-guide-overlay"))return;
+    const key=String(pageId||"current");
+    let trigger=page.querySelector(':scope > .ct-page-setup-trigger[data-guide-page="'+key+'"]');
     if(trigger)return;
     trigger=document.createElement("div");
     trigger.className="ct-page-setup-trigger";
-    trigger.dataset.guidePage="workspace";
-    trigger.style.cssText="display:flex!important;justify-content:flex-end!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;margin:0 0 14px!important;";
+    trigger.dataset.guidePage=key;
+    trigger.style.cssText="display:flex!important;justify-content:flex-end!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;margin:0 0 14px!important;position:relative!important;z-index:2!important;";
     const button=document.createElement("button");
     button.type="button";
     button.textContent="Guide";
-    window.MechnarPageGuide.attach(button,"workspace");
+    window.MechnarPageGuide.attach(button,pageId);
     trigger.append(button);
     const heading=page.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
     if(heading&&heading.parentElement===page)heading.insertAdjacentElement("afterend",trigger);
     else page.insertBefore(trigger,page.firstChild);
+  }
+  function watchPageGuideMounts(pageId){
+    const content=getElement("page-content");
+    if(!content)return;
+    if(pageGuideObserver)pageGuideObserver.disconnect();
+    mountPageSetupGuide(pageId);
+    pageGuideObserver=new MutationObserver(()=>{
+      if(state.currentPage!==pageId)return;
+      mountPageSetupGuide(pageId);
+    });
+    pageGuideObserver.observe(content,{childList:true,subtree:true});
   }
   // The Workspace guide is mounted by renderPage after the real page DOM is ready.
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
@@ -1067,6 +1084,7 @@
     }
 
     if (!pageContent) return;
+    watchPageGuideMounts(pageId);
 
     // Save the workspace being left before changing the visible page.
     if (previousPage && previousPage !== pageId) {
