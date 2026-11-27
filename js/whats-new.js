@@ -41,7 +41,8 @@
     // The guided walkthrough itself is launched only by the explicit Explore
     // Features action. Closing the announcement does not acknowledge the update.
     const shown=presented();
-    const pending=unseen(page);\n    const list=selectedUpdates?selectedUpdates.filter(update=>pending.some(item=>item.id===update.id)):pending.filter(update=>!shown.includes(update.id));
+    const pending=unseen(page);
+    const list=selectedUpdates?selectedUpdates.filter(update=>pending.some(item=>item.id===update.id)):pending.filter(update=>!shown.includes(update.id));
     if(!list.length)return;
     savePresented([...shown,...list.map(update=>update.id)]);
     document.getElementById("mn-whats-new-overlay")?.remove();
