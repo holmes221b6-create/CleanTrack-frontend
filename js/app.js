@@ -592,47 +592,45 @@
   // Setup guidance is opt-in and contextual. Never force the tour into the
   // role's default workspace during login or first-run onboarding.
   function maybeShowFirstSetup(user){ return false; }
+  window.MechnarPageGuide = Object.freeze({
+    attach: function(button,pageId){
+      const user=auth.getCurrentUser();
+      if(!button||!user||!pageId||!window.CleanTrackNavigation)return false;
+      const pages=window.CleanTrackNavigation.getMenu(user.role);
+      const index=pages.findIndex(item=>item.id===pageId);
+      if(index<0)return false;
+      button.type="button";
+      button.textContent="Guide";
+      button.setAttribute("aria-label",pages[index].label+" guide");
+      button.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();showSetupGuide(user,index);});
+      return true;
+    }
+  });
+  // The ordinary page guide is mounted only on the persistent Workspace route.
+  // Special full-screen workspaces own their Guide button in their own topbar.
   function mountPageSetupGuide(pageId){
-    const content=getElement("page-content");
-    const user=auth.getCurrentUser();
-    if(!content||!user||!pageId||!window.CleanTrackNavigation)return;
-    const menu=window.CleanTrackNavigation.getMenu(user.role);
-    const pageIndex=menu.findIndex(item=>item.id===pageId);
-    if(pageIndex<0)return;
-    const page=menu[pageIndex];
-    let trigger=content.querySelector('.ct-page-setup-trigger[data-guide-page="'+pageId+'"]');
-    if(trigger&&trigger.isConnected)return;
+    if(pageId!=="workspace")return;
+    const content=getElement("page-content"),user=auth.getCurrentUser();
+    if(!content||!user||!window.CleanTrackNavigation)return;
+    const page=content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||content.firstElementChild||content;
+    if(!page)return;
+    let trigger=page.querySelector(':scope > .ct-page-setup-trigger[data-guide-page="workspace"]');
+    if(trigger)return;
     trigger=document.createElement("div");
     trigger.className="ct-page-setup-trigger";
-    trigger.dataset.guidePage=pageId;
-    const label=document.createElement("span");
-    label.textContent=page.label+" · Guide";
+    trigger.dataset.guidePage="workspace";
     const button=document.createElement("button");
     button.type="button";
     button.textContent="Guide";
-    button.addEventListener("click",()=>showSetupGuide(user,pageIndex));
-    trigger.append(label,button);
-    const pageRoot=content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||content.firstElementChild||content;
-    const heading=pageRoot.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
-    if(heading&&heading.parentElement===pageRoot)heading.insertAdjacentElement("afterend",trigger);
-    else pageRoot.insertBefore(trigger,pageRoot.firstChild);
-  }
-  let guideObserver=null;
-  function observePageForGuide(pageId){
-    const content=getElement("page-content");
-    if(!content)return;
-    if(guideObserver)guideObserver.disconnect();
-    mountPageSetupGuide(pageId);
-    guideObserver=new MutationObserver(()=>{
-      const user=auth.getCurrentUser();
-      if(!user)return;
-      if(!content.querySelector('.ct-page-setup-trigger[data-guide-page="'+pageId+'"]'))mountPageSetupGuide(pageId);
-    });
-    guideObserver.observe(content,{childList:true,subtree:true});
+    window.MechnarPageGuide.attach(button,"workspace");
+    trigger.append(button);
+    const heading=page.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
+    if(heading&&heading.parentElement===page)heading.insertAdjacentElement("afterend",trigger);
+    else page.insertBefore(trigger,page.firstChild);
   }
   window.addEventListener("cleantrack:navigate",function(event){
     const pageId=event.detail&&event.detail.page;
-    if(pageId)window.setTimeout(()=>observePageForGuide(pageId),250);
+    if(pageId==="workspace")window.setTimeout(()=>mountPageSetupGuide(pageId),350);
   });
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
   function showUnauthenticatedLayout() {
