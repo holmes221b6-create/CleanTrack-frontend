@@ -2344,7 +2344,11 @@ function bindNavigation() {
       }, 1800);
     };
     window.__MECHNAR_BEGIN_HANDLER__ = function () {
-      playLaunchChime();
+      if (window.__MECHNAR_TAP_SOUND_PLAYED__) {
+        window.__MECHNAR_TAP_SOUND_PLAYED__ = false;
+      } else {
+        playLaunchChime();
+      }
       enterApplication();
     };
     if (window.__MECHNAR_BEGIN_PENDING__) {
@@ -2360,13 +2364,32 @@ function bindNavigation() {
       });
     }
     setLoading(false);
+    // A stalled auth/me request must never hold the launch screen forever.
+    // Give normal restoration time to finish; on network timeout, use only the
+    // same-day cached identity when a saved auth token still exists.
+    let restoreTimer = null;
     try {
-      const restoredUser = await auth.restoreSession();
+      const restoredUser = await Promise.race([
+        auth.restoreSession(),
+        new Promise(function (resolve) {
+          restoreTimer = window.setTimeout(function () { resolve(null); }, 7000);
+        })
+      ]);
       launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser || null;
+      if (!launchUser) {
+        try {
+          const token = localStorage.getItem("cleantrack_token");
+          const cached = JSON.parse(localStorage.getItem("mechnar.cached-user.v1") || "null");
+          const authDay = localStorage.getItem("mechnar.authenticated-day.v1") || "";
+          const today = new Date().getFullYear() + "-" + String(new Date().getMonth()+1).padStart(2,"0") + "-" + String(new Date().getDate()).padStart(2,"0");
+          if (token && cached && (!authDay || authDay === today)) launchUser = cached;
+        } catch (_) {}
+      }
     } catch (error) {
       state.error = error.message;
       launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || null;
     } finally {
+      if (restoreTimer) window.clearTimeout(restoreTimer);
       launchReady = true;
       if (launchRequested && launchDelayElapsed) finishLaunch();
     }
