@@ -2207,42 +2207,29 @@ function bindNavigation() {
       return;
     }
 
-    // Bind the splash CTA before any other startup work. A failure in an
-    // unrelated page initializer must not leave the launch button inert.
-    const earlySplash = document.getElementById("cleantrack-launch-splash");
-    let earlyLaunchRequested = false;
-    const requestEarlyLaunch = function(event) {
-      const target = event.target && event.target.closest ? event.target.closest(".ct-launch-begin") : null;
-      if (!target || !earlySplash || !earlySplash.isConnected || earlyLaunchRequested) return;
-      if (event.type === "pointerup" && event.button === 2) return;
-      event.preventDefault();
-      event.stopPropagation();
-      earlyLaunchRequested = true;
-      if (typeof window.__MECHNAR_BEGIN_HANDLER__ === "function") window.__MECHNAR_BEGIN_HANDLER__();
-      else window.__MECHNAR_BEGIN_PENDING__ = true;
-    };
-    if (earlySplash) {
-      earlySplash.addEventListener("pointerup", requestEarlyLaunch, true);
-      earlySplash.addEventListener("click", requestEarlyLaunch, true);
-    }
-
     state.started = true;
-    bindFooterHelp();
-    bindNotificationsButton();
+    // Keep optional page/UI initializers from aborting the launch flow.
+    [
+      bindFooterHelp,
+      bindNotificationsButton,
+      bindLoginForm,
+      bindRegistrationForm,
+      bindLogoutButton,
+      bindNavigation,
+      bindAvatarEditProfile
+    ].forEach(function (initializer) {
+      if (typeof initializer !== "function") return;
+      try { initializer(); } catch (error) {
+        console.error("MECHNAR initializer failed:", error);
+      }
+    });
     if (!state.notificationPollingStarted) {
       state.notificationPollingStarted = true;
       window.setInterval(function () {
-        refreshNotificationBadge();
-        refreshAnnouncementBadge();
+        try { refreshNotificationBadge(); refreshAnnouncementBadge(); }
+        catch (error) { console.warn("MECHNAR notification refresh failed:", error); }
       }, 30000);
     }
-    bindLoginForm();
-    if (typeof bindRegistrationForm === "function") {
-  bindRegistrationForm();
-}
-    bindLogoutButton();
-    bindNavigation();
-    bindAvatarEditProfile();
 
     // Resolve authentication behind the interactive title screen. Entry is
     // user-controlled: tap/click anywhere or press Enter.
@@ -2356,58 +2343,31 @@ function bindNavigation() {
         finishLaunch();
       }, 1800);
     };
-    window.__MECHNAR_BEGIN_HANDLER__ = enterApplication;
+    window.__MECHNAR_BEGIN_HANDLER__ = function () {
+      playLaunchChime();
+      enterApplication();
+    };
     if (window.__MECHNAR_BEGIN_PENDING__) {
       window.__MECHNAR_BEGIN_PENDING__ = false;
-      enterApplication();
+      window.__MECHNAR_BEGIN_HANDLER__();
     }
     if (splash) {
-      const beginButton = splash.querySelector(".ct-launch-begin");
-      if (beginButton) {
-        // Bind entry directly to the visible CTA. Decorative splash layers must
-        // never consume the gesture or trigger entry from unrelated areas.
-        beginButton.addEventListener("pointerdown", function (event) {
-          if (event.isPrimary !== false && event.button !== 2) {
-            playLaunchChime();
-            enterApplication();
-          }
-        }, { passive: true });
-        beginButton.addEventListener("click", function (event) {
-          event.preventDefault();
-          playLaunchChime();
-          enterApplication();
-        });
-      }
-      splash.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playLaunchChime(); enterApplication(); }
-      });
       document.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" && !event.altKey && !event.ctrlKey && !event.metaKey && splash.isConnected) {
+        if ((event.key === "Enter" || event.key === " ") && !event.altKey && !event.ctrlKey && !event.metaKey && splash.isConnected) {
           event.preventDefault();
-          playLaunchChime();
-          enterApplication();
+          window.__MECHNAR_BEGIN_HANDLER__();
         }
       });
     }
     setLoading(false);
-    // A slow or stalled session-restore request must never trap the user behind
-    // the launch animation. After the grace period, continue to sign-in; a
-    // normal restore that completes sooner still opens the authenticated app.
-    const launchAuthFallback = window.setTimeout(function () {
-      if (launchReady || !splash || !splash.isConnected) return;
-      launchReady = true;
-      launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || null;
-      if (launchRequested && launchDelayElapsed) finishLaunch();
-    }, 6500);
     try {
       const restoredUser = await auth.restoreSession();
       launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser || null;
     } catch (error) {
       state.error = error.message;
-      launchUser = null;
+      launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || null;
     } finally {
-      window.clearTimeout(launchAuthFallback);
-      if (!launchReady) launchReady = true;
+      launchReady = true;
       if (launchRequested && launchDelayElapsed) finishLaunch();
     }
   }
