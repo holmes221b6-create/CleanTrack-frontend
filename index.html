@@ -113,7 +113,7 @@
     <script src="js/supervisor-personnel.js?v=20261116-personnel-profile-v2" defer></script>
     <link rel="stylesheet" href="css/meetings.css?v=20261113-meetings-polish-v2">
     <script src="js/meetings.js?v=20261113-admin-supervisor-meetings-v1" defer></script>
-    <script src="js/app.js?v=20261127-launch-hard-recovery-v3" defer></script>
+    <script src="js/app.js?v=20261127-launch-reliable-entry-v4" defer></script>
     <script src="js/modal-scroll-lock.js?v=20261127-modal-scroll-lock-v1" defer></script>
     <script src="js/teams.js?v=20261127-await-team-data-v2" defer></script>
     <script src="js/org-tools.js?v=20261127-inventory-nav-contained-v6" defer></script>
@@ -361,7 +361,7 @@ html[data-theme="black"] #cleantrack-launch-splash{
 }
 </style>
 
-    <link rel="stylesheet" href="css/launch-screen.css?v=20261127-tap-to-begin-fix-v1">
+    <link rel="stylesheet" href="css/launch-screen.css?v=20261127-launch-reliable-entry-v4">
     <link rel="stylesheet" href="css/notification-bell.css?v=20261126-vertical-bell-shine-v4">
     <link rel="stylesheet" href="css/whats-new.css?v=20261127-inplace-discovery-v6">
     <link rel="stylesheet" href="css/mechnar-default-navy.css?v=20261127-navy-default-v1">
@@ -387,29 +387,29 @@ html[data-theme="black"] #cleantrack-launch-splash{
 <script>
 (function(){
  var splash=document.getElementById("cleantrack-launch-splash");
- if(!splash)return;
+ var button=splash&&splash.querySelector(".ct-launch-begin");
+ if(!splash||!button)return;
  window.setTimeout(function(){if(splash.isConnected)splash.classList.add("ct-launch-title-active");},1720);
  var requested=false;
  function begin(event){
-  var button=event.target&&event.target.closest?event.target.closest(".ct-launch-begin"):null;
-  if(!button||requested||!splash.isConnected)return;
-  if(event.type==="pointerup"&&event.button===2)return;
+  if(requested||!splash.isConnected)return;
+  if(event&&event.button===2)return;
   requested=true;
-  if(typeof window.__MECHNAR_BEGIN_HANDLER__==="function")window.__MECHNAR_BEGIN_HANDLER__();
-  else window.__MECHNAR_BEGIN_PENDING__=true;
-  window.setTimeout(function(){
-   if(!splash.isConnected)return;
-   var app=document.getElementById("app");
-   var auth=document.getElementById("auth-view");
-   var login=document.getElementById("login-view");
-   if(app)app.hidden=false;
-   if(auth)auth.hidden=false;
-   if(login)login.hidden=false;
-   splash.remove();
-  },9000);
+  if(typeof window.__MECHNAR_BEGIN_HANDLER__==="function"){
+   window.__MECHNAR_BEGIN_HANDLER__();
+  }else{
+   window.__MECHNAR_BEGIN_PENDING__=true;
+   button.textContent="PREPARING MECHNAR";
+   splash.classList.add("ct-launch-preparing");
+  }
  }
- splash.addEventListener("pointerup",begin,true);
- splash.addEventListener("click",begin,true);
+ button.addEventListener("pointerdown",begin,{passive:true});
+ button.addEventListener("click",function(event){event.preventDefault();begin(event);});
+ window.addEventListener("keydown",function(event){
+  if(splash.isConnected&&(event.key==="Enter"||event.key===" ")){
+   event.preventDefault();begin(event);
+  }
+ });
 })();
 </script>
     <a class="skip-link" href="#main-content">Skip to main content</a>
