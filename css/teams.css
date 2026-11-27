@@ -1198,3 +1198,12 @@ html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-s
 .ct-team-sites-detail{grid-column:1/-1}
 @media(max-width:760px){.ct-team-sites-create-form{grid-template-columns:1fr 1fr}.ct-team-sites-create-wide,.ct-team-sites-create-footer{grid-column:1/-1}}
 @media(max-width:520px){.ct-team-sites-create-form{grid-template-columns:1fr}.ct-team-sites-create-wide,.ct-team-sites-create-footer{grid-column:auto}.ct-team-sites-create-footer{align-items:flex-start;flex-direction:column}.ct-team-sites-directory .ct-team-sites-list{grid-template-columns:1fr}}
+
+/* Performance date range and refresh action are intentionally stacked */
+.ct-team-performance-controls{display:flex;flex-direction:column;align-items:stretch;gap:10px;min-width:min(100%,320px)}
+.ct-team-performance-date-fields{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.ct-team-performance-date-fields .ct-team-field{min-width:145px;margin:0;flex:1}
+.ct-team-performance-date-fields .ct-team-field input{min-height:40px}
+.ct-team-performance-refresh-row{display:flex;justify-content:flex-end;width:100%}
+.ct-team-performance-refresh-row .ct-team-btn{min-width:170px;margin:0}
+@media(max-width:620px){.ct-team-performance-controls{width:100%;min-width:0}.ct-team-performance-date-fields{display:grid;grid-template-columns:1fr 1fr}.ct-team-performance-refresh-row .ct-team-btn{width:100%}}
