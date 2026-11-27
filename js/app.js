@@ -797,7 +797,18 @@
           return;
         }
         const opener = event.target.closest("[data-help-open]");
-        if (opener) openFooterHelp(opener.dataset.helpOpen);
+        if (opener) {
+          if (opener.dataset.helpOpen === "guide") {
+            dialog.close ? dialog.close() : dialog.removeAttribute("open");
+            const currentUser = auth.getCurrentUser();
+            if (currentUser) {
+              const currentPage = window.CleanTrackNavigation.getActivePage();
+              const rolePages = window.CleanTrackNavigation.getMenu(currentUser.role);
+              const currentIndex = rolePages.findIndex(item => item.id === currentPage);
+              showSetupGuide(currentUser, Math.max(0, currentIndex));
+            }
+          } else openFooterHelp(opener.dataset.helpOpen);
+        }
       });
     }
   }
