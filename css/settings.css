@@ -320,3 +320,31 @@
   #page-content .ct-settings-theme-options{grid-template-columns:1fr}
   #page-content .ct-settings-grid{grid-template-columns:1fr}
 }
+
+/* Tighten the Settings title area: remove the oversized vertical gap. */
+#page-content .ct-settings-page{padding-top:0!important}
+#page-content .ct-settings-header{
+  min-height:0!important;
+  margin:0 0 12px!important;
+  padding:0 0 9px!important;
+  align-items:center!important;
+}
+#page-content .ct-settings-title-group{margin:0!important;padding:0!important}
+#page-content .ct-settings-title-group h1{
+  margin:0!important;
+  line-height:1.08!important;
+}
+#page-content .ct-settings-header *{margin-block-start:0}
+#page-content .ct-settings-layout{margin-top:0!important}
+#page-content .ct-page-setup-trigger{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 12px;padding:8px 11px;
+  border:1px solid #203d5e;border-radius:8px;
+  background:#0d1c32;color:#aebed2;font-size:11px;
+}
+#page-content .ct-page-setup-trigger button{
+  flex:0 0 auto;min-height:30px;padding:5px 11px;
+  border:1px solid #31577e;border-radius:7px;
+  background:#142b46;color:#edf3fc;font:inherit;font-weight:700;cursor:pointer;
+}
+#page-content .ct-page-setup-trigger button:hover{background:#1a3859}
