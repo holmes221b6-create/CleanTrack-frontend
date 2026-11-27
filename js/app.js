@@ -463,169 +463,110 @@
     }
   }
   function showSetupGuide(user, startIndex) {
-    if (!user) return;
-    const steps = setupSteps(user.role);
-    let index = Math.max(0, Math.min(Number(startIndex) || 0, steps.length - 1));
-    const overlay = document.createElement("div");
-    overlay.className = "ct-setup-overlay";
-    overlay.setAttribute("role", "dialog");
-    overlay.setAttribute("aria-modal", "true");
-    overlay.setAttribute("aria-labelledby", "ct-setup-title");
-    const style = document.createElement("style");
-    style.textContent = `.ct-setup-overlay{position:fixed;inset:0;z-index:999990;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px;font-family:inherit}.ct-setup-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid var(--border,#3a3d44);border-radius:26px;padding:clamp(22px,4vw,38px);box-shadow:0 24px 90px #0005}.ct-setup-mark{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#173c2c;color:#6ee7a4;font-size:27px}.ct-setup-card h2{text-align:center;margin:0 0 8px;font-size:26px}.ct-setup-intro{text-align:center;opacity:.8;line-height:1.5;margin:0 auto 18px}.ct-setup-progress{display:flex;justify-content:center;gap:7px;margin:18px}.ct-setup-dot{width:9px;height:9px;border-radius:50%;background:#59615f}.ct-setup-dot.active{background:#25b56a}.ct-setup-step{border:1px solid var(--border,#3a3d44);border-radius:16px;padding:18px;margin:20px 0}.ct-setup-step p{opacity:.86;line-height:1.6}.ct-setup-actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:22px}.ct-setup-actions button{border-radius:12px;padding:12px 18px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;font-weight:650;cursor:pointer}.ct-setup-actions .primary{background:#16a34a;border-color:#16a34a;color:white;flex:1}.ct-setup-meta{text-align:center;opacity:.65;font-size:13px}.ct-setup-language{display:flex;justify-content:center}.ct-setup-language select{background:var(--surface,#202329);color:inherit;border:1px solid var(--border,#41454e);padding:8px 12px;border-radius:10px}.ct-tour-focus{position:relative!important;z-index:999989!important;outline:3px solid #43e58b!important;outline-offset:5px!important;box-shadow:0 0 0 8px #22c55e35,0 0 28px #22c55e50!important;scroll-margin:110px;animation:ct-tour-pulse 1.8s ease-in-out infinite}@keyframes ct-tour-pulse{0%,100%{outline-offset:4px}50%{outline-offset:8px}}.ct-tour-coach{position:fixed;z-index:999999;right:22px;bottom:22px;display:flex;align-items:flex-start;gap:12px;width:min(490px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:var(--surface,#202329);color:var(--text,#f3f4f6);border:1px solid #27c96b;border-radius:22px;padding:16px;box-shadow:0 22px 75px #000a;animation:ct-tour-arrive .28s ease-out}.ct-tour-avatar{flex:0 0 48px;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#1c9b61,#124a35);color:#fff;font-size:25px;font-weight:850;box-shadow:inset 0 0 0 2px #ffffff28}.ct-tour-speech{min-width:0;flex:1}.ct-tour-kicker{font-size:10px!important;letter-spacing:.15em;font-weight:800;opacity:.72;margin:0 0 5px!important}.ct-tour-coach h3{margin:0 0 8px;font-size:19px}.ct-tour-coach p{line-height:1.5;margin:7px 0}.ct-tour-status{font-size:12px;opacity:.68}.ct-tour-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.ct-tour-coach button{border-radius:10px;padding:10px 12px;border:1px solid var(--border,#41454e);background:transparent;color:inherit;font:inherit;cursor:pointer}.ct-tour-coach .primary{background:#16a34a;color:white;border-color:#16a34a;font-weight:750}@keyframes ct-tour-arrive{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:600px){.ct-tour-coach{right:10px;bottom:10px;width:calc(100vw - 20px);padding:13px}.ct-tour-avatar{width:40px;height:40px;flex-basis:40px;border-radius:13px}}.ct-shadow-mark{position:relative;background:radial-gradient(ellipse at 50% 70%,#0b6570 0%,#08131d 52%,#05080d 100%);border:1px solid #18d6d0;box-shadow:0 0 24px #00d9d044;overflow:hidden}.ct-shadow-glow{position:absolute;inset:7px 9px 2px;border-radius:48% 48% 18% 18%;background:linear-gradient(145deg,#182d42,#03060b 68%);clip-path:polygon(50% 0,100% 38%,84% 100%,16% 100%,0 38%)}.ct-shadow-hood{position:absolute;inset:12px 13px 10px;background:linear-gradient(135deg,#101e2d,#020407 70%);clip-path:polygon(50% 0,100% 48%,82% 100%,18% 100%,0 48%);border-bottom:1px solid #1de9e0}.ct-shadow-hood i{position:absolute;top:55%;width:6px;height:3px;background:#47fff4;box-shadow:0 0 7px #00f6ff;border-radius:50%}.ct-shadow-hood i:first-child{left:22%}.ct-shadow-hood i:nth-child(2){right:22%}.ct-tour-coach{position:fixed;inset:0;z-index:999999;width:100vw;height:100vh;max-height:none;overflow:visible;display:block;pointer-events:none;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;animation:none;color:#f3f7fa}.ct-tour-avatar{position:fixed;left:3vw;bottom:0;width:min(34vw,490px);height:min(83vh,790px);display:flex;align-items:flex-end;justify-content:center;overflow:visible;background:radial-gradient(ellipse at 50% 85%,#087b8044 0%,#06101b00 70%);border:0;box-shadow:none;pointer-events:none;transition:opacity .22s ease,transform .22s ease}.ct-shadow-character{position:relative;display:block;width:min(31vw,440px);height:min(79vh,740px);filter:drop-shadow(0 0 28px #00e5df24) drop-shadow(0 22px 32px #000);animation:ct-shadow-hover 4.2s ease-in-out infinite;transform-origin:bottom center}.ct-shadow-cloak{position:absolute;inset:108px 0 0;background:linear-gradient(100deg,#17212d 0%,#070a11 19%,#010204 48%,#080d13 76%,#16303a 100%);clip-path:polygon(50% 0,64% 5%,73% 12%,82% 10%,88% 23%,94% 38%,100% 100%,0 100%,6% 38%,12% 23%,18% 10%,27% 12%,36% 5%);border-top:2px solid #17434a;box-shadow:inset 0 22px 35px #000}.ct-shadow-cloak:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 18%,#14202c 24%,transparent 30%,transparent 68%,#182a33 76%,transparent 82%),linear-gradient(180deg,#010204 0%,#03070c 48%,#000 100%);clip-path:polygon(50% 0,58% 12%,53% 100%,47% 100%,42% 12%);opacity:.95}.ct-shadow-cloak:after{content:"";position:absolute;left:16%;right:16%;top:10%;height:32%;background:linear-gradient(180deg,#05080d,#000);clip-path:polygon(0 0,22% 18%,50% 100%,78% 18%,100% 0,83% 64%,50% 100%,17% 64%);filter:drop-shadow(0 0 8px #00b9bd22)}.ct-shadow-hood{position:absolute;top:12px;left:50%;width:clamp(100px,12vw,156px);height:142px;transform:translateX(-50%);border-radius:0;background:linear-gradient(110deg,#293441 0%,#10151e 19%,#030407 54%,#090f16 76%,#27343d 100%);clip-path:polygon(50% 0,59% 12%,72% 3%,77% 18%,94% 25%,100% 48%,86% 63%,79% 100%,21% 100%,14% 63%,0 48%,6% 25%,23% 18%,28% 3%,41% 12%);border:0;box-shadow:0 0 0 1px #18343a,0 0 24px #00e5df20;isolation:isolate}.ct-shadow-hood:before{content:"";position:absolute;inset:22% 13% 4%;background:radial-gradient(ellipse at 50% 32%,#111923 0%,#020306 57%,#000 100%);clip-path:polygon(50% 0,100% 28%,81% 100%,19% 100%,0 28%);z-index:-1}.ct-shadow-hood:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#7a899022,transparent 28%,transparent 72%,#70f7ed12);clip-path:polygon(50% 0,59% 12%,72% 3%,77% 18%,94% 25%,100% 48%,86% 63%,79% 100%,21% 100%,14% 63%,0 48%,6% 25%,23% 18%,28% 3%,41% 12%);pointer-events:none}.ct-shadow-eyes{position:absolute;top:82px;left:50%;width:76px;height:15px;transform:translateX(-50%) rotate(-5deg);background:linear-gradient(90deg,transparent 0%,#fffbf0 14%,#d9ffff 28%,#00f6ff 40%,transparent 47%,transparent 53%,#00f6ff 60%,#d9ffff 72%,#fffbf0 86%,transparent 100%);clip-path:polygon(0 20%,42% 0,50% 42%,58% 0,100% 20%,78% 100%,58% 70%,50% 100%,42% 70%,22% 100%);filter:drop-shadow(0 0 5px #8fffff) drop-shadow(0 0 15px #00f6ff);animation:ct-shadow-gaze 5s ease-in-out infinite}.ct-shadow-core{position:absolute;top:117px;left:50%;width:34px;height:42px;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 0%,#8fffff66 0%,#00dce522 30%,transparent 72%);filter:blur(5px);opacity:.65}.ct-shadow-character:before{content:"";position:absolute;z-index:2;top:0;left:50%;width:clamp(126px,15vw,190px);height:92px;transform:translateX(-50%);background:linear-gradient(110deg,#111a24,#020306 42%,#17222c 70%,#030406);clip-path:polygon(50% 0,56% 18%,65% 4%,69% 25%,82% 12%,83% 33%,100% 44%,83% 56%,73% 49%,68% 76%,59% 64%,50% 100%,41% 64%,32% 76%,27% 49%,17% 56%,0 44%,17% 33%,18% 12%,31% 25%,35% 4%,44% 18%);filter:drop-shadow(0 0 9px #00d9dc24)}.ct-shadow-character:after{content:"";position:absolute;z-index:3;top:132px;left:50%;width:clamp(100px,12vw,145px);height:24px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#020306 20%,#020306 80%,transparent);clip-path:polygon(0 0,34% 28%,50% 0,66% 28%,100% 0,80% 100%,20% 100%);opacity:.9}@keyframes ct-shadow-gaze{0%,42%,48%,100%{opacity:1;filter:drop-shadow(0 0 5px #8fffff) drop-shadow(0 0 15px #00f6ff)}45%{opacity:.42;filter:drop-shadow(0 0 2px #8fffff)}}.ct-tour-avatar:before,.ct-tour-avatar:after{content:none}.ct-tour-coach:before{content:none}.ct-tour-speech{position:fixed;left:35vw;top:25vh;width:min(40vw,650px);max-height:70vh;overflow:visible;pointer-events:auto;padding:25px 30px;background:radial-gradient(ellipse at 20% 0%,#182c3a 0%,#09131e 58%,#050a10 100%);border:2px solid #d8f7f5;border-radius:38px 38px 38px 15px;box-shadow:0 18px 58px #000c,0 0 0 5px #9cf6ed12,0 0 30px #00e5df20;clip-path:none}.ct-tour-speech:before{content:"";position:absolute;left:-21px;top:48%;width:32px;height:32px;background:#0b1722;border-left:2px solid #d8f7f5;border-bottom:2px solid #d8f7f5;transform:rotate(28deg) skew(-8deg);border-radius:0 0 0 7px;filter:drop-shadow(-4px 5px 4px #0006)}.ct-tour-speech:after{content:"";position:absolute;inset:6px;border:1px solid #b5e9e533;border-radius:31px 31px 31px 11px;pointer-events:none}.ct-tour-speech>*{position:relative;z-index:1}.ct-tour-actions button,.ct-tour-coach button{pointer-events:auto}.ct-tour-coach .ct-shadow-sound-toggle{border-color:#20dcd2;color:#8cfaf2}.ct-tour-coach .ct-shadow-sound-toggle[aria-pressed=false]{opacity:.68}.ct-tour-character-away .ct-tour-avatar{opacity:0;transform:translateX(-22px) scale(.97)}.ct-tour-character-away .ct-tour-speech{left:50%;top:20vh;transform:translateX(-50%);width:min(560px,calc(100vw - 32px))}.ct-tour-coach h3{font-size:21px}.ct-tour-coach p{font-size:14px}.ct-tour-actions button{font-size:13px}@keyframes ct-shadow-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@media(max-width:700px){.ct-tour-avatar{left:0;width:38vw;height:48vh}.ct-shadow-character{width:38vw;height:46vh;transform:scale(.8);transform-origin:bottom center}.ct-tour-speech{left:31vw;top:18vh;width:calc(69vw - 16px);max-height:65vh;padding:16px;border-width:2px;border-radius:20px}.ct-tour-speech:before{left:-13px;width:20px;height:20px;border-width:2px}.ct-tour-coach h3{font-size:17px}.ct-tour-coach p{font-size:13px}.ct-tour-actions button{padding:8px 9px;font-size:12px}.ct-tour-character-away .ct-tour-speech{left:50%;top:18vh;width:calc(100vw - 28px)}}.ct-tour-kicker:after{content:' · SHADOW’S FIELD GUIDE';color:#38e9e0}.ct-tour-coach .primary{background:#0aaea6;border-color:#20dcd2;color:#031014}@keyframes ct-shadow-breathe{0%,100%{filter:drop-shadow(0 0 3px #00d9d0)}50%{filter:drop-shadow(0 0 9px #00d9d0)}}.ct-shadow-mark,.ct-tour-avatar:after{animation:ct-shadow-breathe 2.8s ease-in-out infinite}.ct-tour-avatar{background:radial-gradient(ellipse at 52% 78%,#650b13a8 0%,#2a050b70 32%,#05030600 72%)!important}.ct-shadow-character{filter:drop-shadow(0 0 18px #e000182e) drop-shadow(0 0 48px #8d000b36) drop-shadow(0 22px 32px #000)!important}.ct-shadow-cloak{inset:122px 0 0!important;background:linear-gradient(100deg,#16090e 0%,#080609 24%,#010102 49%,#090508 76%,#21070c 100%)!important;clip-path:polygon(50% 0,63% 5%,72% 10%,82% 8%,89% 22%,94% 37%,100% 100%,0 100%,6% 37%,11% 22%,18% 8%,28% 10%,37% 5%)!important;border-top:1px solid #3d1018!important}.ct-shadow-cloak:before{background:linear-gradient(90deg,transparent 15%,#210910 25%,transparent 32%,transparent 67%,#230910 78%,transparent 86%),linear-gradient(180deg,#030204 0%,#050306 52%,#000 100%)!important}.ct-shadow-cloak:after{background:linear-gradient(180deg,#0a0508,#000)!important;filter:drop-shadow(0 0 10px #b0001522)!important}.ct-shadow-hood{top:18px!important;width:clamp(112px,13vw,166px)!important;height:178px!important;background:linear-gradient(110deg,#201218 0%,#0c080d 22%,#010102 55%,#10070c 79%,#281019 100%)!important;clip-path:polygon(50% 0,58% 12%,67% 4%,71% 18%,80% 8%,83% 25%,96% 31%,100% 48%,88% 61%,81% 100%,19% 100%,12% 61%,0 48%,4% 31%,17% 25%,20% 8%,29% 18%,33% 4%,42% 12%)!important;box-shadow:0 0 0 1px #321019,0 0 28px #a0001726!important}.ct-shadow-hood:before{inset:25% 13% 2%!important;background:radial-gradient(ellipse at 50% 36%,#020102 0%,#000 70%)!important;clip-path:polygon(50% 0,100% 25%,82% 100%,18% 100%,0 25%)!important}.ct-shadow-hood:after{background:linear-gradient(135deg,#9d24301a,transparent 28%,transparent 70%,#c21b2c12)!important}.ct-shadow-eyes{top:104px!important;width:86px!important;height:18px!important;transform:translateX(-50%) rotate(-2deg)!important;background:linear-gradient(90deg,transparent 0%,#4d0008 8%,#b20a1b 20%,#ff2437 32%,#ff9b9f 43%,transparent 48%,transparent 52%,#ff9b9f 57%,#ff2437 68%,#b20a1b 80%,#4d0008 92%,transparent 100%)!important;clip-path:polygon(0 12%,38% 20%,50% 0,62% 20%,100% 12%,80% 76%,61% 63%,50% 100%,39% 63%,20% 76%)!important;filter:drop-shadow(0 0 5px #ff1d35) drop-shadow(0 0 15px #d0001b)!important;animation:ct-shadow-gaze 6s ease-in-out infinite!important}.ct-shadow-core{top:139px!important;width:38px!important;height:54px!important;background:radial-gradient(ellipse at 50% 0%,#b5091b4a 0%,#6d061b22 32%,transparent 72%)!important;opacity:.8!important}.ct-shadow-character:before{top:0!important;width:clamp(142px,16vw,205px)!important;height:112px!important;background:linear-gradient(110deg,#21131a,#030203 42%,#1b0b11 70%,#030203)!important;clip-path:polygon(50% 0,55% 17%,63% 3%,67% 20%,78% 9%,81% 27%,100% 39%,84% 51%,76% 47%,69% 72%,59% 62%,50% 100%,41% 62%,31% 72%,24% 47%,16% 51%,0 39%,19% 27%,22% 9%,33% 20%,37% 3%,45% 17%)!important;filter:drop-shadow(0 0 12px #a0001826)!important}.ct-shadow-character:after{top:155px!important;width:clamp(108px,13vw,154px)!important;height:30px!important;background:linear-gradient(90deg,transparent,#010102 18%,#010102 82%,transparent)!important;clip-path:polygon(0 0,34% 25%,50% 0,66% 25%,100% 0,80% 100%,20% 100%)!important}@keyframes ct-shadow-gaze{0%,42%,48%,100%{opacity:1;filter:drop-shadow(0 0 5px #ff6670) drop-shadow(0 0 16px #d0001b)}45%{opacity:.58;filter:drop-shadow(0 0 2px #ff6670)}}.ct-shadow-eyes{top:111px!important;left:50%!important;width:78px!important;height:24px!important;transform:translateX(-50%)!important;background:none!important;clip-path:none!important;filter:none!important;animation:none!important;z-index:5!important}.ct-shadow-eyes:before,.ct-shadow-eyes:after{content:"";position:absolute;top:5px;width:27px;height:11px;background:linear-gradient(180deg,#ff9a9f 0%,#ff2339 36%,#a00016 100%);clip-path:polygon(0 18%,100% 0,78% 100%,20% 82%);filter:drop-shadow(0 0 4px #ff2339) drop-shadow(0 0 10px #e00020)}.ct-shadow-eyes:before{left:3px;transform:rotate(5deg)}.ct-shadow-eyes:after{right:3px;transform:scaleX(-1) rotate(5deg)}
-/* Shadow visual refresh: match the near-black hood and white eyes with crimson pupils. */ .ct-tour-avatar{background:radial-gradient(ellipse at 52% 70%,#35000bba 0%,#17000a9c 29%,#07020870 52%,transparent 76%)!important} .ct-shadow-character{filter:drop-shadow(0 0 24px #76000e55) drop-shadow(0 0 60px #2b001e55) drop-shadow(0 22px 38px #000)!important} .ct-shadow-cloak{inset:108px 0 0!important;background:linear-gradient(90deg,#09070b 0%,#020203 23%,#000 50%,#020203 76%,#0a060b 100%)!important;clip-path:polygon(50% 0,63% 4%,75% 11%,84% 17%,91% 32%,96% 53%,100% 100%,0 100%,4% 53%,9% 32%,16% 17%,25% 11%,37% 4%)!important;border-top:0!important;box-shadow:inset 0 20px 42px #000!important} .ct-shadow-cloak:before{background:linear-gradient(90deg,transparent 0%,#12070f 18%,transparent 27%,transparent 73%,#12070f 82%,transparent 100%),linear-gradient(180deg,#010102 0%,#000 100%)!important;opacity:.9!important} .ct-shadow-cloak:after{background:linear-gradient(180deg,#020103,#000)!important;filter:none!important} .ct-shadow-hood{top:0!important;width:clamp(155px,17vw,235px)!important;height:clamp(180px,24vh,250px)!important;border-radius:48% 48% 15% 15%!important;background:linear-gradient(100deg,#17101c 0%,#050408 18%,#010102 48%,#050308 78%,#211026 100%)!important;clip-path:polygon(50% 0,64% 2%,76% 10%,87% 24%,94% 43%,100% 67%,88% 100%,12% 100%,0 67%,6% 43%,13% 24%,24% 10%,36% 2%)!important;box-shadow:0 0 0 2px #42113d,0 0 25px #7b174e44!important} .ct-shadow-hood:before{inset:13% 8% 2%!important;background:radial-gradient(ellipse at 50% 35%,#010102 0%,#000 72%)!important;clip-path:polygon(50% 0,100% 25%,87% 100%,13% 100%,0 25%)!important} .ct-shadow-hood:after{background:linear-gradient(110deg,#b48bd51a,transparent 24%,transparent 76%,#a73b9c1c)!important} .ct-shadow-eyes{top:clamp(92px,14vh,126px)!important;width:clamp(120px,13vw,166px)!important;height:34px!important;z-index:6!important} .ct-shadow-eyes:before,.ct-shadow-eyes:after{top:4px!important;width:clamp(43px,4.6vw,60px)!important;height:25px!important;background:radial-gradient(ellipse at 50% 50%,#ff001e 0 10%,#9c0018 13% 21%,#15020a 24% 33%,#fff 38% 75%,#ddd7e7 100%)!important;clip-path:polygon(0 50%,17% 20%,43% 4%,62% 8%,83% 25%,100% 50%,82% 77%,58% 96%,37% 93%,15% 72%)!important;filter:drop-shadow(0 0 5px #ff002b) drop-shadow(0 0 13px #bd002c)!important} .ct-shadow-eyes:before{left:0!important;transform:none!important} .ct-shadow-eyes:after{right:0!important;transform:scaleX(-1)!important} .ct-shadow-core{top:clamp(126px,18vh,158px)!important;background:radial-gradient(ellipse at 50% 0%,#65001d22 0%,#25000d14 38%,transparent 75%)!important;opacity:.45!important} .ct-shadow-character:before{width:0!important;height:0!important;filter:none!important} .ct-shadow-character:after{top:clamp(135px,20vh,175px)!important;width:clamp(110px,13vw,155px)!important;height:28px!important;background:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)!important;opacity:1!important} @media(max-width:700px){.ct-shadow-hood{width:clamp(132px,39vw,185px)!important;height:clamp(150px,23vh,205px)!important}.ct-shadow-eyes{top:clamp(82px,13vh,105px)!important;width:clamp(110px,34vw,145px)!important;height:29px!important}.ct-shadow-eyes:before,.ct-shadow-eyes:after{width:clamp(40px,13vw,53px)!important;height:22px!important}}  /* Imu-inspired silhouette: jagged crown/headpiece, deep hood and predatory eyes. */
-.ct-shadow-hood{clip-path:polygon(50% 0,56% 7%,63% 0,68% 12%,77% 5%,80% 18%,91% 20%,94% 36%,100% 52%,91% 67%,84% 91%,70% 100%,30% 100%,16% 91%,9% 67%,0 52%,6% 36%,9% 20%,20% 18%,23% 5%,32% 12%,37% 0,44% 7%)!important;background:linear-gradient(100deg,#100912 0%,#030204 23%,#000 52%,#040105 78%,#160710 100%)!important;box-shadow:0 0 0 2px #24050d,0 0 22px #9b001b44!important}
-.ct-shadow-hood:after{content:""!important;position:absolute!important;left:12%!important;right:12%!important;top:-3%!important;height:31%!important;background:linear-gradient(180deg,#170710,#050205 65%,transparent)!important;clip-path:polygon(0 42%,13% 27%,19% 0,31% 26%,40% 8%,50% 33%,60% 8%,69% 26%,81% 0,87% 27%,100% 42%,82% 100%,18% 100%)!important;opacity:1!important}
-.ct-shadow-eyes{top:clamp(91px,13.7vh,124px)!important;filter:drop-shadow(0 0 12px #ff001f)!important}
-.ct-shadow-eyes:before,.ct-shadow-eyes:after{height:26px!important;background:radial-gradient(ellipse at 50% 50%,#ff001b 0 8%,#ff1736 10% 17%,#4b000c 20% 30%,#f8f4ff 34% 72%,#8e8795 100%)!important;clip-path:polygon(0 48%,14% 28%,34% 17%,57% 0,79% 12%,100% 44%,82% 58%,65% 84%,44% 100%,20% 74%)!important;filter:drop-shadow(0 0 5px #ff001f) drop-shadow(0 0 15px #c00026)!important}
-.ct-shadow-hood i{top:53%!important;width:9px!important;height:5px!important;background:#ff001f!important;box-shadow:0 0 8px #ff001f,0 0 18px #b80026!important}
-@media(max-width:700px){.ct-shadow-eyes{top:clamp(80px,12.8vh,104px)!important}}
-/* Fix setup-guide controls: the decorative full-screen coach must never block clicks. */
-.ct-setup-overlay{pointer-events:auto!important}
-.ct-setup-card,.ct-setup-card button,.ct-setup-card .ct-setup-actions{pointer-events:auto!important;position:relative}
-.ct-setup-actions{z-index:2!important}
-.ct-setup-actions button{position:relative!important;z-index:3!important;touch-action:manipulation!important;pointer-events:auto!important;min-height:44px}
-.ct-tour-coach{pointer-events:none!important}
-.ct-tour-coach .ct-tour-speech,.ct-tour-coach .ct-tour-speech *,.ct-tour-coach button{pointer-events:auto!important}
-.ct-tour-coach button{position:relative!important;z-index:1000001!important;cursor:pointer!important;touch-action:manipulation!important}
-
-
-/* Reference match: tall near-featureless shadow, small crimson eyes, cold violet-blue rim light. */
-.ct-tour-avatar{background:radial-gradient(ellipse at 48% 54%,#0b123b88 0%,#080a2040 36%,transparent 72%)!important}
-.ct-shadow-character{width:min(34vw,460px)!important;height:min(82vh,760px)!important;filter:drop-shadow(-7px 0 10px #4b4cba66) drop-shadow(8px 0 18px #141c6655) drop-shadow(0 28px 45px #000)!important}
-.ct-shadow-cloak{inset:104px 0 0!important;background:linear-gradient(90deg,#080910 0%,#030308 19%,#010104 52%,#020309 77%,#090b1c 100%)!important;clip-path:polygon(48% 0,55% 3%,61% 1%,66% 8%,72% 11%,79% 19%,85% 30%,90% 43%,96% 61%,100% 100%,0 100%,4% 68%,7% 47%,10% 31%,17% 20%,26% 12%,36% 7%,42% 3%)!important;border:0!important;box-shadow:inset 0 25px 40px #000!important}
-.ct-shadow-cloak:before{background:linear-gradient(90deg,#3e3c8122,transparent 18%,transparent 76%,#3b429044),linear-gradient(180deg,#000 0%,#010105 75%,#02030a 100%)!important;opacity:1!important}
-.ct-shadow-cloak:after{background:linear-gradient(90deg,transparent,#070812 50%,transparent)!important;opacity:.8!important}
-.ct-shadow-hood{top:0!important;width:clamp(155px,18vw,240px)!important;height:clamp(195px,29vh,285px)!important;border-radius:49% 49% 24% 24%!important;background:linear-gradient(100deg,#151528 0%,#05050c 22%,#010104 54%,#060611 80%,#17172d 100%)!important;clip-path:polygon(48% 0,54% 4%,58% 0,63% 7%,68% 8%,74% 17%,83% 27%,89% 43%,100% 70%,88% 100%,12% 100%,0 70%,10% 43%,17% 27%,26% 17%,32% 8%,39% 7%,43% 2%)!important;box-shadow:0 0 0 1px #37345f,0 0 22px #343b8a55!important}
-.ct-shadow-hood:before{inset:8% 8% 0!important;background:radial-gradient(ellipse at 48% 36%,#000 0%,#010105 70%,#080918 100%)!important;clip-path:polygon(48% 0,62% 7%,79% 24%,90% 55%,100% 100%,0 100%,10% 55%,21% 24%,38% 7%)!important}
-.ct-shadow-hood:after{content:""!important;position:absolute!important;left:0!important;right:0!important;top:0!important;height:23%!important;background:linear-gradient(180deg,#000 0%,#010105 75%,transparent)!important;clip-path:polygon(0 0,100% 0,100% 100%,82% 45%,69% 34%,59% 20%,51% 33%,43% 20%,31% 34%,18% 45%,0 100%)!important;opacity:1!important}
-.ct-shadow-eyes{top:clamp(108px,16vh,145px)!important;width:clamp(102px,11vw,140px)!important;height:20px!important;filter:drop-shadow(0 0 14px #e42a75aa)!important}
-.ct-shadow-eyes:before,.ct-shadow-eyes:after{top:4px!important;width:clamp(36px,3.8vw,49px)!important;height:12px!important;background:radial-gradient(ellipse at 50% 50%,#ffedf8 0 8%,#ff648f 12%,#d41450 30%,#4d082a 53%,#f3ddeb 68%,#b7a9ce 100%)!important;clip-path:polygon(0 55%,17% 26%,42% 8%,62% 12%,100% 42%,78% 65%,54% 88%,31% 100%,12% 80%)!important;filter:drop-shadow(0 0 4px #ff386e) drop-shadow(0 0 12px #d30b52)!important}
-.ct-shadow-hood i{top:53%!important;width:5px!important;height:3px!important;background:#ff7b9c!important;box-shadow:0 0 8px #ff3b78,0 0 17px #d30b52!important}
-@media(max-width:700px){.ct-shadow-character{width:min(58vw,340px)!important;height:min(76vh,620px)!important}.ct-shadow-hood{width:clamp(135px,40vw,185px)!important;height:clamp(165px,25vh,220px)!important}.ct-shadow-eyes{top:clamp(95px,14vh,120px)!important;width:clamp(92px,31vw,120px)!important}}
-.ct-setup-mark.ct-shadow-mark{width:100%!important;height:clamp(210px,38vh,330px)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
-.ct-setup-mark.ct-shadow-mark:before,.ct-setup-mark.ct-shadow-mark:after,.ct-setup-mark.ct-shadow-mark .ct-shadow-glow{display:none!important;content:none!important}
-.ct-setup-mark .ct-shadow-reference-image{display:block!important;height:100%!important;max-height:330px!important;width:auto!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;filter:none!important;animation:none!important}
-`;
-    const card = document.createElement("section");
-    card.className = "ct-setup-card";
-    const mark = document.createElement("div"); mark.className = "ct-setup-mark ct-shadow-mark"; mark.setAttribute("aria-label","Shadow, your CleanTrack guide"); const setupShadowImage = document.createElement("img"); setupShadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1"; setupShadowImage.alt = "Shadow"; setupShadowImage.draggable = false; setupShadowImage.className = "ct-shadow-reference-image"; mark.appendChild(setupShadowImage);
-    const title = document.createElement("h2"); title.id = "ct-setup-title"; title.textContent = "Learn CleanTrack by doing";
-    const intro = document.createElement("p"); intro.className = "ct-setup-intro"; intro.textContent = "I’m Shadow, your CleanTrack guide. I’ll lead you through your workspace, reveal what each important control does, and guide you as you try things yourself. You’re in control — skip or replay any lesson.";
-    const languageWrap = document.createElement("div"); languageWrap.className = "ct-setup-language";
-    const language = document.createElement("select"); language.setAttribute("aria-label","Guide language");
-    [["en","English"],["hi","Hindi"],["ur","Urdu"],["es","Español"],["pt","Português"]].forEach(function(pair){const o=document.createElement("option");o.value=pair[0];o.textContent=pair[1];language.appendChild(o)});
-    languageWrap.appendChild(language);
-    const progress = document.createElement("div"); progress.className = "ct-setup-progress";
-    const box = document.createElement("div"); box.className = "ct-setup-step";
-    const meta = document.createElement("p"); meta.className = "ct-setup-meta";
-    const actions = document.createElement("div"); actions.className = "ct-setup-actions";
-    card.append(mark,title,intro,languageWrap,progress,box,meta,actions); document.head.appendChild(style); overlay.appendChild(card); document.body.appendChild(overlay);
-    function clearFocus(){document.querySelectorAll(".ct-tour-focus").forEach(function(el){el.classList.remove("ct-tour-focus")});}
-    function finish(){try{localStorage.setItem(setupKey(user,"completed"),"1");localStorage.removeItem(setupKey(user,"pending"))}catch(_){}clearFocus();const coach=document.querySelector(".ct-tour-coach");if(coach)coach.remove();overlay.remove();if(style.isConnected)style.remove();}
-    function showCoach(step){
-      overlay.remove();
-      const page = step[2];
-      const topic = step[3] || page;
-      const menu = document.getElementById("workspace-navigation");
-      const pageItem = menu && Array.from(menu.querySelectorAll("[data-page]")).find(function(el){return el.getAttribute("data-page")===page;});
-      const heading = document.getElementById("page-title");
-      const pageTitle = (heading && heading.textContent || step[0] || "").trim();
-      const candidates = {
-        organisation: /organisation settings|organization settings|edit organisation|edit organization|organisation details|organization details/i,
-        location: /import location|add location|create location|upload floor plan|import map|add map/i,
-        zone: /create zone|add zone|import zones|new zone/i,
-        team: /invite member|invite employee|add member|add employee|team member|create team/i,
-        operation: /create operation|new operation|create task|new task|start work/i,
-        report: /generate report|create report|export report|analytics/i,
-        review: /review|approve|logs|activity history/i,
-        workspace: /workspace|today|my desk|dashboard/i,
-        person: /personnel|team member|employee/i,
-        site: /site|location|zone/i,
-        message: /send message|new message|team channel|announcement/i,
-        desk: /my desk|today|dashboard/i,
-        task: /my work|my tasks|assigned work|view task|open operation/i,
-        start: /start work|start operation|mark complete|complete work|submit/i,
-        history: /work history|history|completed work/i,
-        announcement: /announcement|notification/i,
-        settings: /profile|preferences|settings/i
-      };
-      const pattern = candidates[topic];
-      const controls = Array.from(document.querySelectorAll("button,a,[role='button'],[data-action]")).filter(function(el){
-        return !el.closest(".ct-setup-overlay,.ct-tour-coach") && el.offsetParent !== null && !el.disabled;
-      });
-      let target = pattern && controls.find(function(el){return pattern.test((el.innerText || el.textContent || el.getAttribute("aria-label") || "").trim());});
-      if (!target && pageItem && pageItem.offsetParent !== null) target = pageItem;
-      if (!target && heading) target = heading;
-      clearFocus();
-      if(target){target.classList.add("ct-tour-focus");try{target.scrollIntoView({behavior:"smooth",block:"center"});}catch(_){}}
-      const coach = document.createElement("aside");
-      coach.className = "ct-tour-coach";
-      coach.setAttribute("role","dialog");
-      coach.setAttribute("aria-live","polite");
-      const avatar = document.createElement("div"); avatar.className = "ct-tour-avatar"; avatar.setAttribute("aria-label","Shadow, the CleanTrack guide"); avatar.setAttribute("role","img"); const shadowImage = document.createElement("img"); shadowImage.className = "ct-shadow-reference-image"; shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1"; shadowImage.alt = "Shadow"; shadowImage.draggable = false; avatar.appendChild(shadowImage);
-      const speech = document.createElement("div"); speech.className = "ct-tour-speech";
-      const kicker = document.createElement("p"); kicker.className = "ct-tour-kicker"; kicker.textContent = "YOUR CLEANTRACK GUIDE · SHADOW";
-      const h = document.createElement("h3"); h.textContent = (index===0 ? "Shadow here." : index===steps.length-1 ? "Final mission: " : "Next stop: ") + step[0];
-      const p = document.createElement("p");
-      p.textContent = target && target !== pageItem && target !== heading
-        ? "Welcome to your mission! You're on " + (pageTitle || step[0]) + ". " + step[1] + " I've highlighted " + ((target.innerText || target.textContent || target.getAttribute("aria-label") || "the relevant control").trim().replace(/\\s+/g," ").slice(0,90)) + ". Click it to explore the real feature. You can back out safely; don't confirm or save anything you don't intend to change."
-        : "Mission briefing: " + step[1] + " I couldn't identify one specific action button on this screen, so explore the highlighted page area and continue when you're ready. You can skip or replay this lesson anytime.";
-      const status = document.createElement("p"); status.className = "ct-tour-status"; status.textContent = "Lesson " + (index+1) + " of " + steps.length + " · You can skip at any time";
-      const buttons = document.createElement("div"); buttons.className = "ct-tour-actions";
-      const back = document.createElement("button"); back.textContent = "Guide menu"; back.addEventListener("click",function(){coach.remove();clearFocus();showSetupGuide(user,index);});
-      const skip = document.createElement("button"); skip.textContent = "Skip"; skip.addEventListener("click",function(){coach.remove();finish();});
-      const next = document.createElement("button"); next.className = "primary"; next.textContent = index===steps.length-1 ? "Finish journey" : "Next lesson";
-      next.addEventListener("click",function(){coach.remove();clearFocus();if(index<steps.length-1){index++;showSetupGuide(user,index);}else finish();});
-      buttons.append(back,skip,next);
-      speech.append(kicker,h,p,status,buttons);
-      coach.append(avatar,speech);
-      document.body.appendChild(coach);
-      // A short, quiet arrival chime accompanies Shadow; it is generated locally.
-      playShadowArrivalSound(false);
-      // Shadow's full character is present for the lesson briefing, then steps away
-      // as soon as the user interacts with the app so the real workspace stays clear.
-      const hideCharacterOnWorkspaceAction = function(event){
-        if(!coach.isConnected || coach.contains(event.target)) return;
-        coach.classList.add("ct-tour-character-away");
-      };
-      document.addEventListener("click",hideCharacterOnWorkspaceAction,true);
-      const cleanCharacterListener = function(){
-        document.removeEventListener("click",hideCharacterOnWorkspaceAction,true);
-      };
-      const coachObserver = new MutationObserver(function(){
-        if(!coach.isConnected){cleanCharacterListener();coachObserver.disconnect();}
-      });
-      coachObserver.observe(document.body,{childList:true,subtree:true});
-      if(target && target !== pageItem && target !== heading){
-        target.addEventListener("click",function onGuideTargetClick(){
-          target.removeEventListener("click",onGuideTargetClick);
-          if(!coach.isConnected) return;
-          coach.classList.add("ct-tour-character-away");
-          p.textContent = "Nice — you tried the real control. Take a moment to look at what opened. Shadow will stay here to guide you, while the character steps aside so you can focus on the page. When you're ready, choose Next lesson. Don't save anything unless you mean to.";
-          status.textContent = "Feature explored · Lesson " + (index+1) + " of " + steps.length;
-          target.classList.remove("ct-tour-focus");
-        },{once:true});
+    if (!user || !window.CleanTrackNavigation) return;
+    const role = String(user.role || "employee").toLowerCase();
+    const pages = window.CleanTrackNavigation.getMenu(role);
+    if (!pages.length) return;
+    let index = Math.max(0, Math.min(Number(startIndex) || 0, pages.length - 1));
+    let panel = null;
+    let mountedPage = "";
+    const descriptions = {
+      home: ["Organisation home","Your organisation’s starting point. Use this page to orient yourself and reach the main areas available to your role."],
+      dashboard: ["Organisation dashboard","A high-level view of organisation activity and operational status. Review the available summaries before opening the detailed pages."],
+      staff: ["Staff directory","Manage the people who have access to the organisation. Review staff records and use the available personnel actions."],
+      personnel: ["Personnel","Review the staff relevant to your supervisory role, their details and the personnel actions available on this page."],
+      invitations: ["Invitations","Manage invitations and the joining process for people being added to the organisation."],
+      teams: ["Teams","Organise staff into teams and review the team information and controls available to your role."],
+      inventory: ["Inventory","Manage assets, procurement, stock, locations, transfers, requests, maintenance and inventory reporting."],
+      locations: ["Locations","Manage the organisation’s physical sites and the location details used by operational workflows."],
+      zones: ["Zones","Define and maintain operational areas within locations so work can be associated with the correct place."],
+      operations: ["Operations","Review and manage operational work, assignments, schedules and the work controls available to your role."],
+      reviews: ["Logs and review queue","Inspect submitted work records, review their details and take the available follow-up or decision actions."],
+      analytics: ["Analytics","Explore the operational metrics and visual summaries available to your organisation."],
+      reports: ["Reports","Prepare and export reports using the reporting options available on this page."],
+      announcements: ["Announcements and alerts","Read organisation updates and review the announcement or alert controls available to your role."],
+      audit: ["Audit trail and activity","Review recorded activity and the history available for your account or organisation."],
+      settings: ["Settings","Review your profile, preferences, and the settings that are available to your account."],
+      "org-settings": ["Organisation settings","Maintain organisation-level details and configuration exposed to administrators."],
+      billing: ["Billing","Review the organisation’s billing information and available billing controls."],
+      meetings: ["Meetings","View and manage meeting information and the meeting actions available to your role."],
+      inspections: ["Inspections and quality","Use the inspection and quality workflows available to your role, including any templates, schedules or reports shown here."],
+      workspace: ["My workspace","Your supervisory starting point. Review the work overview and the workspace information relevant to your team."],
+      incidents: ["Incidents and issues","Review reported incidents, urgent issues and their recorded status, then use the available follow-up actions."],
+      handovers: ["Shift handover","Review and record shift handover information using the controls available on this page."],
+      sites: ["Sites and zones","Review the sites and operational areas relevant to your team."],
+      "team-channel": ["Team channel","Read and send work-related team updates using the communication controls available here."],
+      performance: ["Performance arena","Review the team performance information and comparisons presented on this page."],
+      "performance-analysis": ["Performance analysis","Explore the performance analysis available to your role and the evidence behind the displayed results."],
+      "my-desk": ["My desk","Your personal starting point for assigned work, updates and information requiring your attention."],
+      "my-tasks": ["My work","Review the operations assigned to you, open an item to read its instructions and use its available work controls."],
+      "my-history": ["Work history","Revisit completed work and review the recorded status and details available for each item."],
+      "incident-reports": ["Incident reports","Submit and review incident information using the reporting controls available to staff."],
+      announcements: ["Announcements","Read updates published by your organisation and check for information relevant to your work."],
+      skills: ["My skills","Review the skills information and any skill-related actions available to your account."]
+    };
+    function clearPanel(){ if(panel && panel.isConnected) panel.remove(); panel=null; }
+    function describeCurrentPage(){
+      const page = pages[index];
+      const content = document.getElementById("page-content");
+      if(!content) return;
+      const pageId = page.id;
+      const copy = descriptions[pageId] || [page.label, "This page contains the "+page.label.toLowerCase()+" tools available to your role. Review the visible sections and controls to understand the actions supported here."];
+      const headings = Array.from(content.querySelectorAll("h1,h2,h3,h4,[role='heading']"))
+        .filter(el=>el.offsetParent!==null && !el.closest(".ct-page-guide"))
+        .map(el=>(el.innerText||el.textContent||"").trim()).filter(Boolean);
+      const controls = Array.from(content.querySelectorAll("button,[role='button'],input[type='button'],input[type='submit']"))
+        .filter(el=>el.offsetParent!==null && !el.disabled && !el.closest(".ct-page-guide"))
+        .map(el=>(el.innerText||el.value||el.getAttribute("aria-label")||el.title||"").trim())
+        .filter(Boolean);
+      panel=document.createElement("section");
+      panel.className="ct-page-guide";
+      panel.setAttribute("aria-label","Page guide");
+      panel.innerHTML='<div class="ct-page-guide-top"><div><span class="ct-page-guide-kicker">MECHNAR PAGE GUIDE · '+(index+1)+' / '+pages.length+'</span><h2></h2><p class="ct-page-guide-description"></p></div><button type="button" class="ct-page-guide-close" aria-label="Close page guide" title="Close guide">×</button></div><div class="ct-page-guide-details"></div><div class="ct-page-guide-footer"><button type="button" class="ct-page-guide-prev">Previous page</button><span class="ct-page-guide-count"></span><button type="button" class="ct-page-guide-next">Next page</button></div>';
+      panel.querySelector("h2").textContent=copy[0];
+      panel.querySelector(".ct-page-guide-description").textContent=copy[1];
+      const details=panel.querySelector(".ct-page-guide-details");
+      const sections=document.createElement("div");
+      sections.className="ct-page-guide-section";
+      const sh=document.createElement("h3");sh.textContent="What’s on this page";
+      const sp=document.createElement("p");
+      sp.textContent=headings.length ? headings.slice(0,12).join(" · ") : "The page is still loading its content, or it has no visible section headings.";
+      sections.append(sh,sp);
+      const actions=document.createElement("div");actions.className="ct-page-guide-section";
+      const ah=document.createElement("h3");ah.textContent="Available actions";
+      const ap=document.createElement("p");
+      ap.textContent=controls.length ? Array.from(new Set(controls)).slice(0,14).join(" · ") : "No active page actions are currently visible.";
+      actions.append(ah,ap);
+      details.append(sections,actions);
+      panel.querySelector(".ct-page-guide-count").textContent=page.label+" · "+(index+1)+" of "+pages.length;
+      panel.querySelector(".ct-page-guide-prev").disabled=index===0;
+      panel.querySelector(".ct-page-guide-next").textContent=index===pages.length-1?"Finish":"Next page";
+      panel.querySelector(".ct-page-guide-close").addEventListener("click",clearPanel);
+      panel.querySelector(".ct-page-guide-prev").addEventListener("click",()=>move(-1));
+      panel.querySelector(".ct-page-guide-next").addEventListener("click",()=>index===pages.length-1?clearPanel():move(1));
+      const styleId="ct-page-guide-style";
+      if(!document.getElementById(styleId)){
+        const style=document.createElement("style");style.id=styleId;
+        style.textContent=".ct-page-guide{position:relative;z-index:4;width:100%;margin:0 0 22px;padding:20px 22px;border:1px solid var(--border,#393442);border-left:3px solid #8e70c8;border-radius:12px;background:var(--surface,#17171d);color:var(--text,#f4f1f8);box-sizing:border-box}.ct-page-guide-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.ct-page-guide-kicker{font-size:10px;letter-spacing:.14em;font-weight:800;color:#b49ade}.ct-page-guide h2{font-size:19px;margin:6px 0}.ct-page-guide-description{margin:0;line-height:1.55;opacity:.82;max-width:900px}.ct-page-guide-close{flex:0 0 34px;width:34px;height:34px;border:1px solid var(--border,#454052);border-radius:8px;background:transparent;color:inherit;font-size:22px;cursor:pointer}.ct-page-guide-details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.ct-page-guide-section{min-width:0;padding:12px 14px;border:1px solid var(--border,#34313c);border-radius:9px}.ct-page-guide-section h3{font-size:12px;margin:0 0 7px}.ct-page-guide-section p{font-size:12px;line-height:1.55;margin:0;opacity:.76;overflow-wrap:anywhere}.ct-page-guide-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:15px}.ct-page-guide-footer button{padding:9px 13px;border:1px solid var(--border,#454052);border-radius:8px;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}.ct-page-guide-footer button:disabled{opacity:.35;cursor:default}.ct-page-guide-footer .ct-page-guide-next{background:#f1eff5;color:#17131d;border-color:#f1eff5;font-weight:700}.ct-page-guide-count{font-size:11px;opacity:.62;text-align:center}@media(max-width:700px){.ct-page-guide{padding:15px}.ct-page-guide-details{grid-template-columns:1fr}.ct-page-guide-footer{flex-wrap:wrap}.ct-page-guide-count{order:3;width:100%}}";
+        document.head.appendChild(style);
       }
+      content.insertBefore(panel,content.firstChild);
+      mountedPage=pageId;
     }
-    function draw(){
-      progress.replaceChildren();
-      steps.forEach(function(_,i){const dot=document.createElement("span");dot.className="ct-setup-dot"+(i<=index?" active":"");progress.appendChild(dot)});
-      const step=steps[index];box.replaceChildren();
-      const h=document.createElement("h3");h.textContent=step[0];
-      const p=document.createElement("p");p.textContent=step[1];
-      const detail=document.createElement("p");detail.textContent="Why this matters: CleanTrack connects people, places and actual work. Understanding this area helps you avoid missed assignments, disconnected zones or incomplete work records.";
-      const hint=document.createElement("p");hint.textContent="Choose “Show me this page” to open the real page and highlight its navigation item. Then explore the page and return for the next lesson.";
-      box.append(h,p,detail,hint);
-      meta.textContent="Lesson "+(index+1)+" of "+steps.length+" · Role: "+String(user.role||"employee")+" · You can skip at any time";
-      actions.replaceChildren();
-      const skip=document.createElement("button");skip.textContent="Skip tutorial";skip.addEventListener("click",finish);
-      const back=document.createElement("button");back.textContent="Back";back.disabled=index===0;back.addEventListener("click",function(){if(index>0){index--;draw()}});
-      const show=document.createElement("button");show.textContent="Show me this page";show.addEventListener("click",function(){const target=step[2];if(!target){showCoach(step);return;}const moved=navigation.setActivePage(target);if(!moved){p.textContent="This page isn't available to your current role. Continue to the next lesson or skip the tutorial.";return;}window.setTimeout(function(){showCoach(step)},300)});
-      const next=document.createElement("button");next.className="primary";next.textContent=index===steps.length-1?"Finish tutorial":"Next lesson";next.addEventListener("click",function(){if(index<steps.length-1){index++;draw()}else finish()});
-      actions.append(skip,back,show,next);
+    function move(delta){
+      const nextIndex=Math.max(0,Math.min(pages.length-1,index+delta));
+      if(nextIndex===index)return;
+      index=nextIndex;
+      const moved=window.CleanTrackNavigation.setActivePage(pages[index].id);
+      if(!moved)return;
+      clearPanel();
+      window.setTimeout(describeCurrentPage,420);
     }
-    draw();
+    const selected=pages[index];
+    const active=window.CleanTrackNavigation.getActivePage();
+    if(active===selected.id){describeCurrentPage();return;}
+    if(!window.CleanTrackNavigation.setActivePage(selected.id))return;
+    window.setTimeout(describeCurrentPage,420);
   }
   function maybeShowFirstSetup(user){try{if(user&&localStorage.getItem(setupKey(user,"pending"))==="1"&&localStorage.getItem(setupKey(user,"completed"))!=="1")window.setTimeout(function(){showSetupGuide(user)},80)}catch(_){}}
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) showSetupGuide(user); } });
