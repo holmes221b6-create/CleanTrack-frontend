@@ -195,7 +195,7 @@
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
     window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,showForPage:page=>renderPageDiscovery(page),openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false)}};
-    loadManifest();
+    loadManifest().then(()=>{const page=activePage();if(page)renderPageDiscovery(page)});
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
