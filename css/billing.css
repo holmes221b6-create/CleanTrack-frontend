@@ -20,3 +20,43 @@
 .ct-billing-method p{font-size:.78rem;line-height:1.5;color:#aeb4c0;margin:0}
 .ct-billing-method-state{grid-column:2;font-size:.7rem;color:#d0d0d0;font-weight:800;letter-spacing:.02em}
 @media(max-width:720px){.ct-billing-methods{grid-template-columns:1fr}}
+
+
+/* Business billing redesign inspired by the supplied plan-comparison reference. */
+.ct-billing{gap:18px}
+.ct-billing-hero{display:flex;justify-content:center;text-align:center;padding:34px 24px 26px;border:0;border-radius:0;background:transparent}
+.ct-billing-hero>div{width:100%;display:flex;align-items:center;flex-direction:column;gap:0}
+.ct-billing-hero h2{font-size:clamp(1.8rem,3vw,2.35rem);letter-spacing:-.04em;margin:0 0 9px}
+.ct-billing-hero p:not(.ct-billing-eyebrow){max-width:680px;text-align:center}
+.ct-billing-hero-icon{display:none}
+.ct-billing-account-switch{display:inline-flex;gap:4px;margin-top:22px;padding:5px;border:1px solid #29405c;border-radius:999px;background:#09172a}
+.ct-billing-account-switch span{min-width:112px;padding:10px 20px;border-radius:999px;color:#aab8cb;font-size:.86rem;font-weight:750}
+.ct-billing-account-switch span.is-selected{background:#203a59;color:#fff;box-shadow:0 2px 8px #0003}
+.ct-billing-current,.ct-billing-section{background:#0d1c32;border-color:#203d5e;border-radius:15px}
+.ct-billing-current h3,.ct-billing-section h3{color:#f5f7fb}
+.ct-billing-muted{color:#aebbd0}
+.ct-billing-plans{gap:18px;align-items:stretch}
+.ct-billing-plan{padding:24px;border:1px solid #29415e;border-radius:22px;background:#0b192d;min-height:100%;box-shadow:0 8px 24px #00000012}
+.ct-billing-plan.premium{border:1.5px solid #3474bd;background:linear-gradient(155deg,#10223b 0%,#183653 48%,#244968 100%)}
+.ct-billing-plan-top{align-items:center}
+.ct-billing-plan-kicker{color:#9db0c8;letter-spacing:.1em}
+.ct-billing-plan h4{font-size:1.45rem;margin-top:9px}
+.ct-billing-plan-label{border-color:#38516f;background:#132944;color:#dce8f8;border-radius:999px;padding:6px 10px}
+.ct-billing-plan.premium .ct-billing-plan-label{border-color:#4c83bb;background:#173b61;color:#e5f1ff}
+.ct-billing-price{font-size:1.8rem;letter-spacing:-.035em;margin:23px 0 8px}
+.ct-billing-price span{font-size:.85rem;letter-spacing:0;color:#b5c2d4}
+.ct-billing-plan ul{gap:13px;margin:23px 0 25px}
+.ct-billing-plan li{font-size:.88rem;color:#e0e8f3;padding-left:27px}
+.ct-billing-plan li:before{content:"✓";color:#83baff;font-size:1rem}
+.ct-billing-btn{border-radius:999px;min-height:46px}
+.ct-billing-btn.primary{background:#1677df;border-color:#1677df;color:white}
+.ct-billing-btn.primary:hover:not(:disabled){background:#2688ef}
+.ct-billing-btn.secondary{background:#101f33;border-color:#35506e;color:#e2eaf5}
+.ct-billing-interval{border-color:#29415e;background:#09172a;border-radius:999px}
+.ct-billing-interval button.is-selected{background:#203a59;box-shadow:none}
+.ct-billing-form input,.ct-billing-form textarea{background:#09172a;border-color:#29415e}
+.ct-billing-method,.ct-billing-provider,.ct-billing-empty{background:#0b192d;border-color:#29415e}
+.ct-billing-method-icon{background:#132944;border-color:#35516f}
+.ct-billing-alert{background:#132944;border-color:#35516f}
+.ct-billing-empty{border-style:solid}
+@media(max-width:720px){.ct-billing-hero{padding:22px 10px}.ct-billing-plan{padding:20px}.ct-billing-account-switch{width:min(100%,320px)}.ct-billing-account-switch span{flex:1;min-width:0}}
