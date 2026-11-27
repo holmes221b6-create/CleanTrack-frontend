@@ -201,7 +201,7 @@
     try { seen = JSON.parse(localStorage.getItem(key) || "[]"); if (!Array.isArray(seen)) seen = []; } catch (_) { seen = []; }
     const release = SHADOW_FEATURE_RELEASES.find(function(item) { return item && item.id && !seen.includes(item.id); });
     if (!release) return;
-    // Setup Guide and welcome-back have priority. Retry after they close so a new
+    // Guide and welcome-back have priority. Retry after they close so a new
     // feature notice is queued instead of silently skipped during the overlay race.
     if (document.querySelector(".ct-shadow-welcome-back,.ct-shadow-feature-announcement,.ct-tour-coach")) {
       if (!window.__cleanTrackShadowReleaseRetry) window.__cleanTrackShadowReleaseRetry = 0;
@@ -595,29 +595,44 @@
   function mountPageSetupGuide(pageId){
     const content=getElement("page-content");
     const user=auth.getCurrentUser();
-    if(!content||!user||!pageId)return;
-    content.querySelectorAll(".ct-page-setup-trigger").forEach(node=>node.remove());
+    if(!content||!user||!pageId||!window.CleanTrackNavigation)return;
     const menu=window.CleanTrackNavigation.getMenu(user.role);
     const pageIndex=menu.findIndex(item=>item.id===pageId);
     if(pageIndex<0)return;
     const page=menu[pageIndex];
-    const trigger=document.createElement("div");
+    let trigger=content.querySelector('.ct-page-setup-trigger[data-guide-page="'+pageId+'"]');
+    if(trigger&&trigger.isConnected)return;
+    trigger=document.createElement("div");
     trigger.className="ct-page-setup-trigger";
+    trigger.dataset.guidePage=pageId;
     const label=document.createElement("span");
-    label.textContent="Need a walkthrough of "+page.label+"?";
+    label.textContent=page.label+" · Guide";
     const button=document.createElement("button");
     button.type="button";
-    button.textContent="Setup Guide";
+    button.textContent="Guide";
     button.addEventListener("click",()=>showSetupGuide(user,pageIndex));
     trigger.append(label,button);
-    const pageRoot = content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner") || content.firstElementChild || content;
-    const pageHeading = pageRoot.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
-    if(pageHeading && pageHeading.parentElement===pageRoot) pageHeading.insertAdjacentElement("afterend",trigger);
+    const pageRoot=content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||content.firstElementChild||content;
+    const heading=pageRoot.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
+    if(heading&&heading.parentElement===pageRoot)heading.insertAdjacentElement("afterend",trigger);
     else pageRoot.insertBefore(trigger,pageRoot.firstChild);
+  }
+  let guideObserver=null;
+  function observePageForGuide(pageId){
+    const content=getElement("page-content");
+    if(!content)return;
+    if(guideObserver)guideObserver.disconnect();
+    mountPageSetupGuide(pageId);
+    guideObserver=new MutationObserver(()=>{
+      const user=auth.getCurrentUser();
+      if(!user)return;
+      if(!content.querySelector('.ct-page-setup-trigger[data-guide-page="'+pageId+'"]'))mountPageSetupGuide(pageId);
+    });
+    guideObserver.observe(content,{childList:true,subtree:true});
   }
   window.addEventListener("cleantrack:navigate",function(event){
     const pageId=event.detail&&event.detail.page;
-    window.setTimeout(()=>mountPageSetupGuide(pageId),500);
+    if(pageId)window.setTimeout(()=>observePageForGuide(pageId),250);
   });
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
   function showUnauthenticatedLayout() {
