@@ -568,8 +568,34 @@
     if(!window.CleanTrackNavigation.setActivePage(selected.id))return;
     window.setTimeout(describeCurrentPage,420);
   }
-  function maybeShowFirstSetup(user){try{if(user&&localStorage.getItem(setupKey(user,"pending"))==="1"&&localStorage.getItem(setupKey(user,"completed"))!=="1")window.setTimeout(function(){showSetupGuide(user)},80)}catch(_){}}
-  window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) showSetupGuide(user); } });
+  // Setup guidance is opt-in and contextual. Never force the tour into the
+  // role's default workspace during login or first-run onboarding.
+  function maybeShowFirstSetup(user){ return false; }
+  function mountPageSetupGuide(pageId){
+    const content=getElement("page-content");
+    const user=auth.getCurrentUser();
+    if(!content||!user||!pageId)return;
+    content.querySelectorAll(".ct-page-setup-trigger").forEach(node=>node.remove());
+    const menu=window.CleanTrackNavigation.getMenu(user.role);
+    const pageIndex=menu.findIndex(item=>item.id===pageId);
+    if(pageIndex<0)return;
+    const page=menu[pageIndex];
+    const trigger=document.createElement("div");
+    trigger.className="ct-page-setup-trigger";
+    const label=document.createElement("span");
+    label.textContent="Need a walkthrough of "+page.label+"?";
+    const button=document.createElement("button");
+    button.type="button";
+    button.textContent="Setup Guide";
+    button.addEventListener("click",()=>showSetupGuide(user,pageIndex));
+    trigger.append(label,button);
+    content.insertBefore(trigger,content.firstChild);
+  }
+  window.addEventListener("cleantrack:navigate",function(event){
+    const pageId=event.detail&&event.detail.page;
+    window.setTimeout(()=>mountPageSetupGuide(pageId),500);
+  });
+  window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
   function showUnauthenticatedLayout() {
     // Do not let a late startup callback return an authenticated user to auth.
     const signedInUser = auth.getCurrentUser && auth.getCurrentUser();
