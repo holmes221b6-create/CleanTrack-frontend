@@ -602,6 +602,7 @@
       button.type="button";
       button.textContent="Guide";
       button.setAttribute("aria-label",pages[index].label+" guide");
+      Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
       button.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();showSetupGuide(user,index);});
       return true;
     }
