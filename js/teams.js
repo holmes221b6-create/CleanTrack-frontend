@@ -751,8 +751,11 @@ async function renderSupervisorTeams(container){
   const dateControls=el("div","ct-team-performance-controls");
   const endInput=input(iso(new Date()),"end_date","date"),startDefault=new Date();startDefault.setDate(startDefault.getDate()-55);
   const startInput=input(iso(startDefault),"start_date","date");
-  const refreshPerformance=button("Refresh","ct-team-btn ct-team-btn--primary");
-  dateControls.append(field("From",startInput),field("To",endInput),refreshPerformance);
+  const refreshPerformance=button("↻ Refresh performance","ct-team-btn ct-team-btn--primary");
+  const dateFields=el("div","ct-team-performance-date-fields");
+  dateFields.append(field("From",startInput),field("To",endInput));
+  const refreshRow=el("div","ct-team-performance-refresh-row");refreshRow.append(refreshPerformance);
+  dateControls.append(dateFields,refreshRow);
   perfHeader.append(perfIntro,dateControls);perf.append(perfHeader);
   const perfStatus=el("p","ct-team-muted ct-team-performance-status","Loading real team performance…");
   const perfContent=el("div","ct-team-performance-content");
