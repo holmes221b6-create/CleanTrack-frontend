@@ -1873,9 +1873,27 @@ function bindNavigation() {
   if (window.__cleanTrackNavigationBound) return;
   window.__cleanTrackNavigationBound = true;
   window.addEventListener("cleantrack:navigate", function (event) {
-    if (event.detail && event.detail.page) {
-      renderPage(event.detail.page);
-    }
+    if (!event.detail || !event.detail.page) return;
+    const pageId = event.detail.page;
+    Promise.resolve().then(function () {
+      return renderPage(pageId);
+    }).catch(function (error) {
+      console.error("MECHNAR page render failed:", pageId, error);
+      const content = getElement("page-content");
+      if (!content) return;
+      content.replaceChildren();
+      const panel = document.createElement("section");
+      panel.className = "ct-page-render-recovery";
+      panel.setAttribute("role", "alert");
+      panel.innerHTML = '<h2></h2><p>This page could not finish loading. Your workspace and navigation are still available.</p><button type="button" class="ct-page-render-retry">Retry page</button>';
+      panel.querySelector("h2").textContent = (getElement("page-title") && getElement("page-title").textContent) || "Workspace";
+      panel.querySelector(".ct-page-render-retry").addEventListener("click", function () {
+        renderPage(pageId).catch(function (retryError) {
+          console.error("MECHNAR page retry failed:", pageId, retryError);
+        });
+      });
+      content.appendChild(panel);
+    });
   });
 
   document.addEventListener("click", function (event) {
@@ -2435,6 +2453,13 @@ function bindNavigation() {
       if (launchRequested && launchDelayElapsed) finishLaunch();
     }
   }
+
+  (function installPageRecoveryStyles(){
+    if(document.getElementById("ct-page-render-recovery-style"))return;
+    const style=document.createElement("style");style.id="ct-page-render-recovery-style";
+    style.textContent=".ct-page-render-recovery{max-width:760px;margin:42px auto;padding:28px 30px;border:1px solid var(--border-color,#34445d);border-radius:14px;background:var(--panel-bg,#101d30);color:var(--text-color,#edf2fa)}.ct-page-render-recovery h2{margin:0 0 10px}.ct-page-render-recovery p{color:var(--muted-text,#aab7c9);line-height:1.6}.ct-page-render-retry{margin-top:12px;padding:10px 18px;border:1px solid #5279a6;border-radius:8px;background:#17385c;color:#fff;font-weight:650;cursor:pointer}";
+    document.head.appendChild(style);
+  })();
 
   window.CleanTrackApp = Object.freeze({
     start: start,
