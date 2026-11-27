@@ -27,31 +27,34 @@ async function renderInventory(container){
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
  const toolbar=$("div","mt-toolbar mt-inventory-toolbar"),search=input("search","","search"),searchWrap=$("form","mt-inventory-search");
- search.placeholder="Search item, SKU, supplier, location or request";search.setAttribute("aria-label","Search inventory");
- const searchButton=btn("Search",null,true);searchButton.type="submit";searchWrap.append(search,searchButton);toolbar.append(searchWrap);
+ search.placeholder="Search item, SKU, supplier, location, request or transfer";search.setAttribute("aria-label","Search all inventory records");
+ const searchButton=btn("Search",null,true);searchButton.type="submit";searchWrap.append(search,searchButton);
+ const toolbarTop=$("div","mt-inventory-toolbar-top");
+ const moreToggle=btn("More actions",()=>{const expanded=toolbar.classList.toggle("is-actions-expanded");moreToggle.setAttribute("aria-expanded",String(expanded))});
+ moreToggle.classList.add("mt-inventory-more-toggle");moreToggle.setAttribute("aria-expanded","true");
+ toolbarTop.append(searchWrap,moreToggle);
  const toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");
  const isSupervisor=role()==="supervisor";
  if(isSupervisor){
-  toolbarActions.append(
-   btn("+ Register item",()=>itemPanel(null),true),
-   btn("Record stock movement",()=>movementPicker()),
-   btn("New request",()=>requestPanel()),
-   btn("Export CSV",exportItemsCsv),
-   btn("Refresh",load)
-  );
-  const more=$("details","mt-inventory-more");
-  const summary=$("summary","mt-inventory-more-toggle","More actions");
-  const menu=$("div","mt-inventory-more-menu");
-  [["Record purchase",()=>purchasePanel()],["Upload invoice",()=>invoicePanel()],["Receive stock",()=>movementPicker("receipt")],["Record consumption",()=>movementPicker("consumption")],["Create transfer",()=>transferPanel()]].forEach(([label,action])=>menu.append(btn(label,()=>{more.open=false;action()})));
-  more.append(summary,menu);toolbarActions.append(more);
-  toolbar.classList.add("mt-inventory-toolbar--consolidated");
+  [
+   ["+ Register item",()=>itemPanel(null),true],
+   ["Record purchase",()=>purchasePanel()],
+   ["Upload invoice",()=>invoicePanel()],
+   ["Record stock movement",()=>movementPicker()],
+   ["Receive stock",()=>movementPicker("receipt")],
+   ["Record consumption",()=>movementPicker("consumption")],
+   ["Create transfer",()=>transferPanel()],
+   ["New request",()=>requestPanel()],
+   ["Export items CSV",exportItemsCsv],
+   ["Refresh",load]
+  ].forEach(([label,action,primary])=>toolbarActions.append(btn(label,action,!!primary)));
  }else{
   if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
   toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
  }
- toolbar.append(toolbarActions);root.append(toolbar);
- searchWrap.addEventListener("submit",e=>{e.preventDefault();draw()});
- search.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();draw()}});
+ toolbar.append(toolbarTop,toolbarActions);root.append(toolbar);
+ searchWrap.addEventListener("submit",e=>{e.preventDefault();drawSearchResults()});
+ search.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();drawSearchResults()}});
  const tabs=$("nav","mt-inventory-tabs"),content=$("div","mt-content");let activeContent=content;root.append(tabs,content);
  const views=[["overview","Overview"],["items","Items & assets"],["procurement","Procurement"],["stock","Stock control"],["locations","Locations"],["transfers","Transfers"],["requests","Requests"],["maintenance","Maintenance"],["analytics","Analytics"],["forecast","Forecast"],["history","Movement history"]];
  views.forEach(([id,label])=>{const b=btn(label,()=>openViewPanel(id,label));b.dataset.view=id;tabs.append(b)});
@@ -71,6 +74,37 @@ async function renderInventory(container){
  }
  function metric(label,value,sub,action){const b=btn("",action);b.className="mt-stat mt-stat-action";b.append($("span","mt-muted",label),$("strong","",String(value)),$("small","mt-muted",sub));return b}
  function openViewPanel(id,label){state.view=id;const body=$("div","mt-content");panel(label,"Inventory workspace · "+label,body);activeContent=body;draw()}
+ function drawSearchResults(){
+  const q=search.value.trim().toLowerCase();
+  if(!q){draw();return}
+  const groups=[
+   ["Items & assets",state.items],["Requests",state.requests],["Purchases",state.purchases],
+   ["Suppliers",state.suppliers],["Transfers",state.transfers],["Stock locations",state.locations],
+   ["Maintenance",state.maintenance]
+  ];
+  const matches=[];
+  const searchable=value=>{
+   if(value===null||value===undefined)return "";
+   if(typeof value==="object")return Object.values(value).map(searchable).join(" ");
+   return String(value);
+  };
+  groups.forEach(([label,records])=>(records||[]).forEach(record=>{
+   if(searchable(record).toLowerCase().includes(q)){
+    const title=record.name||record.item_name||record.supplier_name||record.description||record.invoice_number||record.reference||record.id||label;
+    const detail=Object.entries(record).filter(([key,value])=>value!==null&&value!==undefined&&typeof value!=="object"&&!["id","created_at","updated_at"].includes(key)).slice(0,5).map(([key,value])=>key.replaceAll("_"," ")+": "+value).join(" · ");
+    matches.push([label,title,detail||"Matching record"]);
+   }
+  }));
+  tabs.querySelectorAll("button").forEach(b=>b.classList.remove("is-active"));
+  activeContent.replaceChildren();
+  const heading=$("section","mt-section");
+  heading.append($("h2","","Search results"),$("p","mt-muted",matches.length+" matching record"+(matches.length===1?"":"s")+" for “"+search.value.trim()+"”"));
+  activeContent.append(heading);
+  if(!matches.length){activeContent.append($("p","mt-empty","No inventory records matched that search. Try an item name, SKU, supplier, location or request reference."));return}
+  const byType=new Map();
+  matches.forEach(row=>{if(!byType.has(row[0]))byType.set(row[0],[]);byType.get(row[0]).push(row.slice(1))});
+  byType.forEach((rows,label)=>activeContent.append(tableSection(label,["Record","Matching details"],rows)));
+ }
  function draw(){
   tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("is-active",b.dataset.view===state.view));
   activeContent.replaceChildren();const q=search.value.trim().toLowerCase();
