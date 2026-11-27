@@ -159,9 +159,11 @@
     return true;
   }
   function renderPageDiscovery(page){
-    const host=document.getElementById("page-content")||document.getElementById("workspace-view");
+    const host=page==="teams"
+      ? (document.querySelector(".ct-team-fullscreen-pagebody")||document.getElementById("page-content")||document.getElementById("workspace-view"))
+      : (document.getElementById("page-content")||document.getElementById("workspace-view"));
     if(!host)return;
-    host.querySelectorAll(".mn-page-discovery").forEach(node=>node.remove());
+    host.querySelectorAll(":scope > .mn-page-discovery").forEach(node=>node.remove());
     const updates=unseen(page).filter(update=>update.page!=="all");
     if(!updates.length)return;
     const banner=document.createElement("section");banner.className="mn-page-discovery";
@@ -171,14 +173,11 @@
     const description=document.createElement("p");description.textContent=updates.length===1?(updates[0].description||"Explore the latest improvement on this page."):"Explore the latest improvements introduced on this page.";
     copy.append(eyebrow,heading,description);
     const actions=document.createElement("div");actions.className="mn-page-discovery-actions";
-    updates.forEach(update=>{
-      const explore=document.createElement("button");explore.type="button";explore.className="mn-page-discovery-explore";explore.textContent=updates.length===1?"Explore Features":"Explore "+update.feature;
-      explore.addEventListener("click",()=>navigateToFeature(update));
-      const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-page-discovery-dismiss";dismiss.textContent="Dismiss";
-      dismiss.addEventListener("click",()=>{acknowledge(update);renderPageDiscovery(page)});
-      actions.append(explore,dismiss);
-    });
-    banner.append(copy,actions);host.prepend(banner);
+    const explore=document.createElement("button");explore.type="button";explore.className="mn-page-discovery-explore";explore.textContent="Explore Features";
+    explore.addEventListener("click",()=>showUpdates(page));
+    const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-page-discovery-dismiss";dismiss.textContent="Dismiss";
+    dismiss.addEventListener("click",()=>{updates.forEach(acknowledge);banner.remove()});
+    actions.append(explore,dismiss);banner.append(copy,actions);host.prepend(banner);
   }
   function activePage(){
     const nav=window.CleanTrackNavigation;
@@ -189,8 +188,8 @@
     decorate();new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
     // Do not observe page-content mutations here: rendering the discovery banner
     // mutates that same node and would create an endless MutationObserver loop.
-    window.addEventListener("cleantrack:navigate",event=>{const page=event.detail?.page;if(page)loadManifest().then(()=>setTimeout(()=>renderPageDiscovery(page),350));});
-    root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>{renderPageDiscovery(page);showUpdates(page)},350));});
+    window.addEventListener("cleantrack:navigate",event=>{const page=event.detail?.page;if(page)loadManifest().then(()=>setTimeout(()=>renderPageDiscovery(page),650));});
+    root.addEventListener("click",e=>{const button=e.target.closest(".nav-item[data-page]");if(!button)return;const page=button.dataset.page;loadManifest().then(()=>setTimeout(()=>renderPageDiscovery(page),650));});
     window.addEventListener("storage",decorate);
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
