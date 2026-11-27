@@ -50,3 +50,8 @@
 
 /* Keep the rotating light completely still during the app-icon-only intro. */
 #cleantrack-launch-splash.ct-launch-title-active::before{opacity:1;animation-play-state:running}
+
+/* The CTA must remain a real, clickable control above decorative animation layers. */
+#cleantrack-launch-splash .ct-launch-begin{z-index:20!important;display:block!important;visibility:hidden;pointer-events:none;cursor:pointer!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent;}
+#cleantrack-launch-splash.ct-launch-title-active .ct-launch-begin{visibility:visible!important;pointer-events:auto!important;}
+#cleantrack-launch-splash.ct-launch-preparing .ct-launch-begin{visibility:visible!important;pointer-events:none!important;}
