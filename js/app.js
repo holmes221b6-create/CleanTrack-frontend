@@ -676,39 +676,30 @@
       const labels={personnel:"Personnel",teams:"Teams",performance:"Performance",workspace:"Workspace"};
       const user=auth.getCurrentUser();
       const pages=window.CleanTrackNavigation?.getMenu(user?.role)||[];
-      const pageLabel=pages.find(item=>item.id===pageId)?.label||labels[pageId]||String(pageId).replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+      const pageLabel=pages.find(item=>item.id===pageId)?.label||labels[pageId]||String(pageId).replace(/[-_]/g," ").replace(/\\b\\w/g,c=>c.toUpperCase());
       button.type="button";
       button.textContent="Guide";
       button.setAttribute("aria-label",pageLabel+" guide");
       button.dataset.mechnarGuidePage=pageId;
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
+      // Bind directly to the actual button in capture phase. This does not
+      // depend on a document-level delegated selector or bubbling handlers.
+      if(button.dataset.mechnarGuideBound!=="true"){
+        button.dataset.mechnarGuideBound="true";
+        button.addEventListener("click",function(event){
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
+          const contextRoot=root?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||root||button.closest("#page-content")||document.getElementById("page-content")||document.body;
+          const currentUser=auth.getCurrentUser()||{role:"supervisor"};
+          try{showContextualPageGuide(currentUser,pageId,contextRoot);}
+          catch(error){console.error("MECHNAR page guide failed:",error);}
+        },true);
+      }
       return true;
     }
   });
-  // One delegated handler services every Guide button, including buttons
-  // created inside dynamically-mounted Personnel, Teams and Performance
-  // workspaces. Capture phase avoids nested workspace handlers swallowing it.
-  if(!document.documentElement.dataset.mechnarGuideDelegation){
-    document.documentElement.dataset.mechnarGuideDelegation="active";
-    document.addEventListener("click",function(event){
-      const button=event.target?.closest?.("button[data-mechnar-guide-page],.ct-page-setup-trigger button,.mn-personnel-guide,.pa-fullscreen-guide,.ct-team-fullscreen-guide");
-      if(!button)return;
-      let pageId=button.dataset.mechnarGuidePage||button.closest(".ct-page-setup-trigger")?.dataset.guidePage;
-      const panelRoot=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
-      if(!pageId){
-        if(button.matches(".mn-personnel-guide"))pageId="personnel";
-        else if(button.matches(".pa-fullscreen-guide"))pageId="performance";
-        else if(button.matches(".ct-team-fullscreen-guide"))pageId="teams";
-      }
-      if(!pageId)return;
-      event.preventDefault();
-      event.stopPropagation();
-      const user=auth.getCurrentUser()||{role:"supervisor"};
-      const contextRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||panelRoot||button.closest("#page-content")||document.getElementById("page-content")||document.body;
-      try{showContextualPageGuide(user,pageId,contextRoot);}
-      catch(error){console.error("MECHNAR page guide failed:",error);}
-    },true);
-  }
   // Maintain exactly one in-page Guide control per rendered route.
   // Do not attach to the instant-loading skeleton: wait until real page content
   // exists, then reuse/move the existing trigger rather than creating another.
