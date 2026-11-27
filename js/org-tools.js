@@ -26,7 +26,7 @@ async function renderInventory(container){
  if(role()==="supervisor")root.classList.add("mt-inventory-page--supervisor");
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
- const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
+ const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
  if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
  toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
  toolbar.append(toolbarActions);root.append(toolbar);
