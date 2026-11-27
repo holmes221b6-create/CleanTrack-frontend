@@ -36,12 +36,12 @@
       button.classList.toggle("has-whats-new",pending);
     });
   }
-  function showUpdates(page){
+  function showUpdates(page,selectedUpdates){
     // The release announcement is shown once per update and per user/org.
     // The guided walkthrough itself is launched only by the explicit Explore
     // Features action. Closing the announcement does not acknowledge the update.
     const shown=presented();
-    const list=unseen(page).filter(update=>!shown.includes(update.id));
+    const pending=unseen(page);\n    const list=selectedUpdates?selectedUpdates.filter(update=>pending.some(item=>item.id===update.id)):pending.filter(update=>!shown.includes(update.id));
     if(!list.length)return;
     savePresented([...shown,...list.map(update=>update.id)]);
     document.getElementById("mn-whats-new-overlay")?.remove();
@@ -159,25 +159,20 @@
     return true;
   }
   function renderPageDiscovery(page){
-    const host=page==="teams"
-      ? (document.querySelector(".ct-team-fullscreen-pagebody")||document.getElementById("page-content")||document.getElementById("workspace-view"))
-      : (document.getElementById("page-content")||document.getElementById("workspace-view"));
-    if(!host)return;
-    host.querySelectorAll(":scope > .mn-page-discovery").forEach(node=>node.remove());
-    const updates=unseen(page).filter(update=>update.page!=="all");
-    if(!updates.length)return;
-    const banner=document.createElement("section");banner.className="mn-page-discovery";
-    const copy=document.createElement("div");copy.className="mn-page-discovery-copy";
-    const eyebrow=document.createElement("span");eyebrow.className="mn-page-discovery-kicker";eyebrow.textContent="NEW IN THIS WORKSPACE";
-    const heading=document.createElement("strong");heading.textContent=updates.length===1?updates[0].feature:updates.length+" new features available";
-    const description=document.createElement("p");description.textContent=updates.length===1?(updates[0].description||"Explore the latest improvement on this page."):"Explore the latest improvements introduced on this page.";
-    copy.append(eyebrow,heading,description);
-    const actions=document.createElement("div");actions.className="mn-page-discovery-actions";
-    const explore=document.createElement("button");explore.type="button";explore.className="mn-page-discovery-explore";explore.textContent="Explore Features";
-    explore.addEventListener("click",()=>showUpdates(page));
-    const dismiss=document.createElement("button");dismiss.type="button";dismiss.className="mn-page-discovery-dismiss";dismiss.textContent="Dismiss";
-    dismiss.addEventListener("click",()=>{updates.forEach(acknowledge);banner.remove()});
-    actions.append(explore,dismiss);banner.append(copy,actions);host.prepend(banner);
+    const updates=unseen(page).filter(update=>update.page!=="all"&&update.target);
+    updates.forEach(update=>{
+      let target=null;
+      try{target=document.querySelector(update.target)}catch(_){}
+      if(!target||!target.getClientRects().length)return;
+      if(target.querySelector(':scope > .mn-feature-discovery-trigger[data-update-id="'+CSS.escape(update.id)+'"]'))return;
+      const trigger=document.createElement("button");
+      trigger.type="button";trigger.className="mn-feature-discovery-trigger";
+      trigger.dataset.updateId=update.id;
+      trigger.textContent="New · Explore feature";
+      trigger.setAttribute("aria-label","Explore "+update.feature);
+      trigger.addEventListener("click",()=>showUpdates(page,[update]));
+      target.append(trigger);
+    });
   }
   function activePage(){
     const nav=window.CleanTrackNavigation;
@@ -194,7 +189,7 @@
     ["cleantrack:login","cleantrack:session-restored"].forEach(event=>window.addEventListener(event,()=>loadManifest()));
     window.addEventListener("cleantrack:logout",decorate);
     window.MechnarWhatsNew={refresh:()=>loadManifest(),pendingFor:page=>unseen(page).length,showForPage:page=>renderPageDiscovery(page),openFeature:id=>{const update=RELEASE_UPDATES.find(x=>x.id===id);return update?navigateToFeature(update):Promise.resolve(false)}};
-    loadManifest().then(()=>{const page=activePage();if(page)renderPageDiscovery(page)});
+    loadManifest();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
