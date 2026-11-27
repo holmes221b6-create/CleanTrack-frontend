@@ -192,3 +192,6 @@ html[data-theme="light"] .mp-page-back{background:#fff;color:#252332;border-colo
 #mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-track{background:rgba(120,100,145,.12)!important}
 #mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-thumb{background:rgba(174,139,220,.72)!important;border-radius:8px!important}
 #mechnar-personnel-overlay .mp-messages::-webkit-scrollbar-thumb:hover{background:rgba(194,164,231,.95)!important}
+
+/* Keep the contextual Guide control inside the Personnel workspace header, beside chat controls. */
+#mechnar-personnel-overlay .mn-personnel-top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;min-width:0!important}#mechnar-personnel-overlay .mn-personnel-top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:9px!important;margin-left:auto!important;flex:0 0 auto!important}#mechnar-personnel-overlay .mn-personnel-guide{position:static!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:34px!important;margin:0!important;white-space:nowrap!important;flex:0 0 auto!important}
