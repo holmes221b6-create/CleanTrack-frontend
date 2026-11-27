@@ -941,7 +941,7 @@ async function renderSupervisorTeams(container){
    console.error("[Teams] Supervisor workspace load failed:",e);
   }
  };
- loadOwn();
+ await loadOwn();
 }
 
 async function render(container){
