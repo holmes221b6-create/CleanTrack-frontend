@@ -2241,24 +2241,49 @@ function bindNavigation() {
       if (launchFinished || !splash || !splash.isConnected || !launchReady || !launchDelayElapsed) return;
       launchFinished = true;
 
-      // Prepare the correct destination UNDER the splash before fading it.
-      // Otherwise the default auth markup is exposed during the 520ms exit
-      // transition, causing a login-page flash before the authenticated app.
-      if (launchUser) {
-        try {
-          const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
-          sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
-          sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
-        } catch (_) {}
-        showAuthenticatedLayout(launchUser);
-      } else {
-        showUnauthenticatedLayout();
+      // Never leave the user trapped behind the splash if a workspace widget
+      // throws during its first render. Reveal the authenticated shell first,
+      // then let the page renderer report/recover from its own error.
+      try {
+        if (launchUser) {
+          try {
+            const greetingIdentity = String(launchUser?.id ?? launchUser?.email ?? "current").toLowerCase();
+            sessionStorage.setItem("mechnar.workspace-greeting-pending." + greetingIdentity, "1");
+            sessionStorage.removeItem("mechnar.workspace-greeting-shown." + greetingIdentity);
+          } catch (_) {}
+          showAuthenticatedLayout(launchUser);
+        } else {
+          showUnauthenticatedLayout();
+        }
+      } catch (layoutError) {
+        console.error("MECHNAR launch layout initialization failed:", layoutError);
+        // A partially initialized authenticated layout must not remain hidden.
+        if (launchUser) {
+          setVisible(getElement("auth-view"), false);
+          const workspace = getElement("workspace-view");
+          if (workspace) {
+            setVisible(workspace, true);
+            workspace.removeAttribute("aria-busy");
+          }
+          const pageContent = getElement("page-content");
+          if (pageContent && !pageContent.childNodes.length) {
+            pageContent.textContent = "Your workspace could not finish loading. Refresh MECHNAR to try again.";
+          }
+        } else {
+          setVisible(getElement("workspace-view"), false);
+          showUnauthenticatedLayout();
+        }
+      } finally {
+        // The launch layer is always dismissed after the user has activated it.
+        splash.classList.add("ct-launch-exiting");
+        window.setTimeout(function () {
+          if (splash.isConnected) splash.remove();
+        }, 520);
+        // A transition failure or reduced-motion override must not strand it.
+        window.setTimeout(function () {
+          if (splash.isConnected) splash.remove();
+        }, 1100);
       }
-
-      splash.classList.add("ct-launch-exiting");
-      window.setTimeout(function () {
-        splash.remove();
-      }, 520);
     };
     // Create audio only after a real user gesture. Some browsers keep an
     // AudioContext created during page load permanently suspended on first play.
