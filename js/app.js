@@ -2230,8 +2230,10 @@ function bindNavigation() {
     const splash = document.getElementById("cleantrack-launch-splash");
     let launchUser = null, launchReady = false, launchRequested = false, launchDelayElapsed = false;
     let launchEntryPending = false;
+    let launchFinished = false;
     const finishLaunch = function () {
-      if (!splash || !splash.isConnected || !launchReady || !launchDelayElapsed) return;
+      if (launchFinished || !splash || !splash.isConnected || !launchReady || !launchDelayElapsed) return;
+      launchFinished = true;
 
       // Prepare the correct destination UNDER the splash before fading it.
       // Otherwise the default auth markup is exposed during the 520ms exit
@@ -2318,8 +2320,9 @@ function bindNavigation() {
     };
     const enterApplication = function () {
       if (launchEntryPending || !splash || !splash.isConnected) return;
-      // Do not allow the icon-only intro to be skipped; entry begins on the animated title screen.
-      if (!splash.classList.contains("ct-launch-title-active")) return;
+      // The visible CTA is the authority to begin. Do not block entry on an
+      // animation class: reduced-motion, slow rendering or CSS timing must not
+      // leave the user trapped on the launch screen.
       launchEntryPending = true;
       splash.classList.add("ct-launch-preparing");
       const beginButton = splash.querySelector(".ct-launch-begin");
@@ -2363,6 +2366,15 @@ function bindNavigation() {
       });
     }
     setLoading(false);
+    // A slow or stalled session-restore request must never trap the user behind
+    // the launch animation. After the grace period, continue to sign-in; a
+    // normal restore that completes sooner still opens the authenticated app.
+    const launchAuthFallback = window.setTimeout(function () {
+      if (launchReady || !splash || !splash.isConnected) return;
+      launchReady = true;
+      launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || null;
+      if (launchRequested && launchDelayElapsed) finishLaunch();
+    }, 6500);
     try {
       const restoredUser = await auth.restoreSession();
       launchUser = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser || null;
@@ -2370,7 +2382,8 @@ function bindNavigation() {
       state.error = error.message;
       launchUser = null;
     } finally {
-      launchReady = true;
+      window.clearTimeout(launchAuthFallback);
+      if (!launchReady) launchReady = true;
       if (launchRequested && launchDelayElapsed) finishLaunch();
     }
   }
