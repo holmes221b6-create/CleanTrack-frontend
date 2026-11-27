@@ -370,13 +370,23 @@
       document.head.appendChild(style);
     }
     document.body.appendChild(overlay);
+    let finished = false;
+    const finishLoading = function () {
+      if (finished) return;
+      finished = true;
+      overlay.remove();
+      window.__MECHNAR_TEAMS_LOADING__ = false;
+      window.removeEventListener("mechnar:teams-ready", finishLoading);
+      window.clearTimeout(fallbackTimer);
+    };
+    window.addEventListener("mechnar:teams-ready", finishLoading);
+    // Keep the loading screen visible until the Teams module has finished its
+    // data request and mounted the complete workspace, not merely until routing starts.
+    const fallbackTimer = window.setTimeout(finishLoading, 45000);
     window.setTimeout(function () {
-      try { setActivePage("teams"); }
-      finally {
-        overlay.remove();
-        window.__MECHNAR_TEAMS_LOADING__ = false;
-      }
-    }, 0);
+      const navigated = setActivePage("teams");
+      if (!navigated) finishLoading();
+    }, 80);
   }, true);
 
   document.addEventListener("DOMContentLoaded", ensureBackButton);
