@@ -602,3 +602,135 @@
     white-space:normal !important;
   }
 }
+
+
+/* Inventory workspace refinement — compact search and deliberate action hierarchy. */
+.mt-inventory-page .mt-inventory-toolbar{
+  display:grid !important;
+  grid-template-columns:minmax(260px,1fr) auto !important;
+  align-items:center !important;
+  gap:14px !important;
+  margin:18px 0 20px !important;
+  padding:14px !important;
+  border:1px solid rgba(160,140,190,.18) !important;
+  border-radius:12px !important;
+  background:linear-gradient(135deg,rgba(35,29,45,.82),rgba(20,19,29,.92)) !important;
+}
+.mt-inventory-page .mt-inventory-search{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+}
+.mt-inventory-page .mt-inventory-search>.mt-input{
+  flex:1 1 auto !important;
+  width:100% !important;
+  max-width:none !important;
+  min-height:40px !important;
+  padding:9px 13px !important;
+  border-radius:8px !important;
+  background:rgba(8,10,16,.72) !important;
+}
+.mt-inventory-page .mt-inventory-search>.mt-btn{
+  flex:0 0 auto !important;
+  min-width:78px !important;
+  min-height:40px !important;
+  padding:8px 16px !important;
+}
+.mt-inventory-page .mt-inventory-action-group{
+  display:flex !important;
+  flex-flow:row wrap !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:6px !important;
+  width:auto !important;
+  max-width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.mt-inventory-page .mt-inventory-action-group>.mt-btn{
+  flex:0 0 auto !important;
+  min-width:0 !important;
+  min-height:38px !important;
+  padding:8px 12px !important;
+  border:1px solid rgba(171,151,195,.26) !important;
+  border-radius:8px !important;
+  background:rgba(154,137,177,.075) !important;
+  font-size:11px !important;
+}
+.mt-inventory-page .mt-inventory-action-group>.mt-btn-primary{
+  background:#8976a8 !important;
+  border-color:#a18bbf !important;
+  color:#fff !important;
+}
+.mt-inventory-page .mt-inventory-action-group>.mt-btn:hover{
+  background:rgba(154,137,177,.17) !important;
+  border-color:#a18bbf !important;
+}
+.mt-inventory-page .mt-inventory-more{
+  position:relative;
+  flex:0 0 auto;
+}
+.mt-inventory-page .mt-inventory-more-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:8px 13px;
+  border:1px solid rgba(171,151,195,.3);
+  border-radius:8px;
+  background:rgba(154,137,177,.075);
+  color:#e4dced;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  list-style:none;
+  white-space:nowrap;
+}
+.mt-inventory-page .mt-inventory-more-toggle::-webkit-details-marker{display:none}
+.mt-inventory-page .mt-inventory-more-toggle::after{content:"⌄";margin-left:9px;color:#c9b6df}
+.mt-inventory-page .mt-inventory-more[open] .mt-inventory-more-toggle{border-color:#a18bbf;background:rgba(154,137,177,.16)}
+.mt-inventory-page .mt-inventory-more-menu{
+  position:absolute;
+  z-index:30;
+  top:calc(100% + 7px);
+  right:0;
+  display:grid;
+  gap:4px;
+  min-width:205px;
+  padding:7px;
+  border:1px solid rgba(171,151,195,.3);
+  border-radius:10px;
+  background:#211b2a;
+  box-shadow:0 16px 38px #0008;
+}
+.mt-inventory-page .mt-inventory-more-menu>.mt-btn{
+  justify-content:flex-start;
+  width:100%;
+  min-height:36px;
+  border:0;
+  background:transparent;
+  text-align:left;
+}
+.mt-inventory-page .mt-inventory-more-menu>.mt-btn:hover{background:rgba(154,137,177,.16)}
+.mt-inventory-page .mt-inventory-tabs{margin-top:12px}
+.mt-inventory-page .mt-stats{margin-top:18px}
+.mt-inventory-page .mt-inventory-tabs>.mt-btn{min-height:38px}
+@media(max-width:980px){
+ .mt-inventory-page .mt-inventory-toolbar{grid-template-columns:1fr !important}
+ .mt-inventory-page .mt-inventory-action-group{justify-content:flex-start !important}
+}
+@media(max-width:560px){
+ .mt-inventory-page .mt-inventory-toolbar{padding:10px !important}
+ .mt-inventory-page .mt-inventory-search{flex-wrap:nowrap}
+ .mt-inventory-page .mt-inventory-action-group{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+ .mt-inventory-page .mt-inventory-action-group>.mt-btn{width:100% !important}
+ .mt-inventory-page .mt-inventory-more{grid-column:1/-1}
+ .mt-inventory-page .mt-inventory-more-toggle{width:100%}
+}
