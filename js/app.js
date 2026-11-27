@@ -670,6 +670,9 @@
   // Setup guidance is opt-in and contextual. Never force the tour into the
   // role's default workspace during login or first-run onboarding.
   function maybeShowFirstSetup(user){ return false; }
+  // DOM clones copy data attributes but not event listeners. Track actual
+  // bound elements by identity so a cloned Guide button is always rebound.
+  const pageGuideBoundButtons = new WeakSet();
   window.MechnarPageGuide = Object.freeze({
     attach: function(button,pageId){
       if(!button||!pageId)return false;
@@ -684,7 +687,8 @@
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
       // Bind directly to the actual button in capture phase. This does not
       // depend on a document-level delegated selector or bubbling handlers.
-      if(button.dataset.mechnarGuideBound!=="true"){
+      if(!pageGuideBoundButtons.has(button)){
+        pageGuideBoundButtons.add(button);
         button.dataset.mechnarGuideBound="true";
         button.addEventListener("click",function(event){
           event.preventDefault();
