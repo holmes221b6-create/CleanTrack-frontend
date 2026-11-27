@@ -620,6 +620,7 @@
     trigger=document.createElement("div");
     trigger.className="ct-page-setup-trigger";
     trigger.dataset.guidePage="workspace";
+    trigger.style.cssText="display:flex!important;justify-content:flex-end!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;margin:0 0 14px!important;";
     const button=document.createElement("button");
     button.type="button";
     button.textContent="Guide";
@@ -629,10 +630,7 @@
     if(heading&&heading.parentElement===page)heading.insertAdjacentElement("afterend",trigger);
     else page.insertBefore(trigger,page.firstChild);
   }
-  window.addEventListener("cleantrack:navigate",function(event){
-    const pageId=event.detail&&event.detail.page;
-    if(pageId==="workspace")window.setTimeout(()=>mountPageSetupGuide(pageId),350);
-  });
+  // The Workspace guide is mounted by renderPage after the real page DOM is ready.
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
   function showUnauthenticatedLayout() {
     // Do not let a late startup callback return an authenticated user to auth.
@@ -1083,6 +1081,7 @@
     if (cachedView) {
       pageViewCache.delete(pageId);
       pageContent.replaceChildren(cachedView);
+      if (pageId === "workspace") mountPageSetupGuide(pageId);
       const savedScroll = pageScrollCache.get(pageId);
       requestAnimationFrame(() => {
         if (savedScroll) {
@@ -1475,6 +1474,7 @@
       });
 
       pageContent.appendChild(grid);
+      if (pageId === "workspace") mountPageSetupGuide(pageId);
       return;
     }
     
@@ -2427,9 +2427,11 @@ function bindNavigation() {
     // Give normal restoration time to finish; on network timeout, use only the
     // same-day cached identity when a saved auth token still exists.
     let restoreTimer = null;
+    let sessionRestorePromise = null;
     try {
+      sessionRestorePromise = auth.restoreSession();
       const restoredUser = await Promise.race([
-        auth.restoreSession(),
+        sessionRestorePromise,
         new Promise(function (resolve) {
           restoreTimer = window.setTimeout(function () { resolve(null); }, 7000);
         })
@@ -2451,6 +2453,23 @@ function bindNavigation() {
       if (restoreTimer) window.clearTimeout(restoreTimer);
       launchReady = true;
       if (launchRequested && launchDelayElapsed) finishLaunch();
+      // If the launch timeout revealed a cached identity before auth/me
+      // completed, the first route dispatch may have been rejected because
+      // Navigation requires CleanTrackAuth.currentUser. Retry routing once
+      // the real session restoration settles; do not leave a topbar-only shell.
+      if (sessionRestorePromise) {
+        sessionRestorePromise.then(function (restoredUser) {
+          const activeUser = (auth.getCurrentUser && auth.getCurrentUser()) || restoredUser;
+          if (!activeUser) return;
+          const defaultPage = navigation.getDefaultPage(activeUser.role);
+          if (defaultPage && navigation.getActivePage() !== defaultPage) {
+            launchUser = activeUser;
+            showAuthenticatedLayout(activeUser);
+          }
+        }).catch(function (error) {
+          console.warn("MECHNAR delayed session restoration failed:", error);
+        });
+      }
     }
   }
 
