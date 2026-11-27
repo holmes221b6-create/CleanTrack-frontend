@@ -23,6 +23,7 @@ function stats(items){const n=$("div","mt-stats");items.forEach(([k,v])=>{const 
 async function renderInventory(container){
  const root=shell(container,"OPERATIONS RESOURCES","Inventory","A unified inventory control centre for assets, procurement, stock, locations and demand.");
   root.classList.add("mt-inventory-page");
+ if(role()==="supervisor")root.classList.add("mt-inventory-page--supervisor");
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
  const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
