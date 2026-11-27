@@ -543,3 +543,62 @@
     width:auto !important;
   }
 }
+
+
+/* Supervisor Inventory: one full-width action dock below search, with all actions kept together. */
+.mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:10px !important;
+  width:100% !important;
+}
+.mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-input{
+  width:100% !important;
+  max-width:none !important;
+  flex:0 0 auto !important;
+}
+.mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-inventory-action-group{
+  display:flex !important;
+  flex:0 0 auto !important;
+  flex-flow:row wrap !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  align-self:stretch !important;
+  gap:4px !important;
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:6px !important;
+  border:1px solid rgba(171,145,201,.34) !important;
+  border-radius:10px !important;
+  background:rgba(30,23,39,.96) !important;
+}
+.mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-inventory-action-group>.mt-btn{
+  display:inline-flex !important;
+  flex:1 1 150px !important;
+  width:auto !important;
+  min-width:130px !important;
+  min-height:40px !important;
+  margin:0 !important;
+  padding:9px 13px !important;
+  border:1px solid rgba(171,145,195,.22) !important;
+  border-radius:7px !important;
+  white-space:nowrap !important;
+  text-align:center !important;
+}
+.mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-inventory-action-group>.mt-btn+.mt-btn{
+  border-left:1px solid rgba(171,145,195,.22) !important;
+}
+@media(max-width:700px){
+  .mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-inventory-action-group{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+  }
+  .mt-inventory-page--supervisor>.mt-inventory-toolbar--consolidated>.mt-inventory-action-group>.mt-btn{
+    min-width:0 !important;
+    width:100% !important;
+    white-space:normal !important;
+  }
+}
