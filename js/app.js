@@ -607,45 +607,75 @@
       return true;
     }
   });
-  // Mount one contextual Guide control inside the currently rendered page.
-  // A page-content observer handles async page modules as well as the first
-  // Workspace render; navigation back to a page is not required to reveal it.
+  // Maintain exactly one in-page Guide control per rendered route.
+  // Do not attach to the instant-loading skeleton: wait until real page content
+  // exists, then reuse/move the existing trigger rather than creating another.
   let pageGuideObserver = null;
+  let pageGuideMountFrame = 0;
   function mountPageSetupGuide(pageId){
     const content=getElement("page-content"),user=auth.getCurrentUser();
     if(!content||!user||!window.CleanTrackNavigation)return;
     const role=String(user.role||"").toLowerCase();
-    // These supervisor routes render their own full-screen workspace and have
-    // a Guide control in that workspace's own header.
     if(role==="supervisor"&&["personnel","performance"].includes(pageId))return;
+    if(content.querySelector(".mn-instant-page-frame"))return;
     const page=content.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||content.firstElementChild||content;
     if(!page||page.closest(".ct-page-guide-overlay"))return;
     const key=String(pageId||"current");
-    let trigger=page.querySelector(':scope > .ct-page-setup-trigger[data-guide-page="'+key+'"]');
-    if(trigger)return;
-    trigger=document.createElement("div");
-    trigger.className="ct-page-setup-trigger";
+    // Deduplicate triggers across the whole page-content tree, including
+    // cached/restored DOM. Reuse the first one so a second navigation cannot
+    // stack another Guide button.
+    const triggers=Array.from(content.querySelectorAll(".ct-page-setup-trigger"));
+    let trigger=triggers.shift()||null;
+    triggers.forEach(node=>node.remove());
+    if(trigger && !trigger.isConnected) trigger=null;
+    if(!trigger){
+      trigger=document.createElement("div");
+      trigger.className="ct-page-setup-trigger";
+      const button=document.createElement("button");
+      button.type="button";
+      button.textContent="Guide";
+      window.MechnarPageGuide.attach(button,pageId);
+      trigger.append(button);
+    } else {
+      trigger.dataset.guidePage=key;
+      const buttons=trigger.querySelectorAll("button");
+      if(buttons.length>1)Array.from(buttons).slice(1).forEach(node=>node.remove());
+      const button=trigger.querySelector("button");
+      if(button){
+        button.replaceWith(button.cloneNode(true));
+        const cleanButton=trigger.querySelector("button");
+        cleanButton.textContent="Guide";
+        window.MechnarPageGuide.attach(cleanButton,pageId);
+      }
+    }
     trigger.dataset.guidePage=key;
     trigger.style.cssText="display:flex!important;justify-content:flex-end!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;margin:0 0 14px!important;position:relative!important;z-index:2!important;";
-    const button=document.createElement("button");
-    button.type="button";
-    button.textContent="Guide";
-    window.MechnarPageGuide.attach(button,pageId);
-    trigger.append(button);
     const heading=page.querySelector(":scope > h1,:scope > .page-header,:scope > .mt-page-header,:scope > header");
-    if(heading&&heading.parentElement===page)heading.insertAdjacentElement("afterend",trigger);
-    else page.insertBefore(trigger,page.firstChild);
+    if(heading&&heading.parentElement===page){
+      if(trigger.parentElement!==page||trigger.previousElementSibling!==heading)heading.insertAdjacentElement("afterend",trigger);
+    }else if(trigger.parentElement!==page||trigger!==page.firstElementChild){
+      page.insertBefore(trigger,page.firstChild);
+    }
   }
   function watchPageGuideMounts(pageId){
     const content=getElement("page-content");
     if(!content)return;
     if(pageGuideObserver)pageGuideObserver.disconnect();
-    mountPageSetupGuide(pageId);
+    if(pageGuideMountFrame)cancelAnimationFrame(pageGuideMountFrame);
     pageGuideObserver=new MutationObserver(()=>{
       if(state.currentPage!==pageId)return;
-      mountPageSetupGuide(pageId);
+      if(pageGuideMountFrame)cancelAnimationFrame(pageGuideMountFrame);
+      pageGuideMountFrame=requestAnimationFrame(()=>{
+        pageGuideMountFrame=0;
+        if(state.currentPage===pageId)mountPageSetupGuide(pageId);
+      });
     });
     pageGuideObserver.observe(content,{childList:true,subtree:true});
+    // Existing cached content is already rendered; freshly-rendered routes
+    // will be mounted by the observer when their real DOM is appended.
+    if(!content.querySelector(".mn-instant-page-frame")&&content.children.length){
+      pageGuideMountFrame=requestAnimationFrame(()=>{pageGuideMountFrame=0;if(state.currentPage===pageId)mountPageSetupGuide(pageId);});
+    }
   }
   // The Workspace guide is mounted by renderPage after the real page DOM is ready.
   window.CleanTrackSetupGuide = Object.freeze({ open: function(){ const user = auth.getCurrentUser(); if (user) { const page=window.CleanTrackNavigation.getActivePage(); const menu=window.CleanTrackNavigation.getMenu(user.role); const index=menu.findIndex(item=>item.id===page); showSetupGuide(user,Math.max(0,index)); } } });
