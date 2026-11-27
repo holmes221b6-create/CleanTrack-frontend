@@ -672,22 +672,28 @@
   function maybeShowFirstSetup(user){ return false; }
   window.MechnarPageGuide = Object.freeze({
     attach: function(button,pageId){
-      const user=auth.getCurrentUser();
-      if(!button||!user||!pageId||!window.CleanTrackNavigation)return false;
-      const pages=window.CleanTrackNavigation.getMenu(user.role);
-      const page=pages.find(item=>item.id===pageId);
-      const contextualLabels={personnel:"Personnel",teams:"Teams",performance:"Performance",workspace:"Workspace"};
-      const pageLabel=page?.label||contextualLabels[pageId];
+      if(!button||!pageId)return false;
+      const labels={personnel:"Personnel",teams:"Teams",performance:"Performance",workspace:"Workspace"};
+      const initialUser=auth.getCurrentUser();
+      const pages=window.CleanTrackNavigation?.getMenu(initialUser?.role)||[];
+      const pageLabel=pages.find(item=>item.id===pageId)?.label||labels[pageId];
       if(!pageLabel)return false;
       button.type="button";
       button.textContent="Guide";
       button.setAttribute("aria-label",pageLabel+" guide");
+      button.dataset.mechnarGuidePage=pageId;
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
+      // Bind once even if the authenticated user object is not ready when the
+      // workspace constructs its header. Resolve the user only on click.
+      if(button.dataset.mechnarGuideBound==="true")return true;
+      button.dataset.mechnarGuideBound="true";
       button.addEventListener("click",function(event){
-        event.preventDefault();event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
+        const userNow=auth.getCurrentUser()||initialUser||{role:"supervisor"};
         const panelRoot=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
-        const contentRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||panelRoot||button.closest("#page-content")||document.getElementById("page-content");
-        showContextualPageGuide(user,pageId,contentRoot);
+        const contentRoot=panelRoot?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||panelRoot||button.closest("#page-content")||document.getElementById("page-content")||document.body;
+        showContextualPageGuide(userNow,pageId,contentRoot);
       });
       return true;
     }
