@@ -27,8 +27,26 @@ async function renderInventory(container){
  const canManage=["admin","supervisor"].includes(role());
  const state={items:[],requests:[],purchases:[],suppliers:[],transfers:[],locations:[],maintenance:[],analytics:null,view:"overview"};
  const toolbar=$("div","mt-toolbar"),search=input("search","","search"),toolbarActions=$("div","mt-toolbar-actions mt-inventory-action-group");search.placeholder="Search inventory, SKU, supplier, location or request";toolbar.append(search);
- if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
- toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
+ const isSupervisor=role()==="supervisor";
+ if(isSupervisor){
+  // Keep every Supervisor overview action in one shared toolbar group.
+  toolbarActions.append(
+   btn("+ Register item",()=>itemPanel(null),true),
+   btn("Record purchase",()=>purchasePanel()),
+   btn("Upload invoice",()=>invoicePanel()),
+   btn("Record stock movement",()=>movementPicker()),
+   btn("Receive stock",()=>movementPicker("receipt")),
+   btn("Record consumption",()=>movementPicker("consumption")),
+   btn("Create transfer",()=>transferPanel()),
+   btn("New request",()=>requestPanel()),
+   btn("Export items CSV",exportItemsCsv),
+   btn("Refresh",load)
+  );
+  toolbar.classList.add("mt-inventory-toolbar--consolidated");
+ }else{
+  if(canManage)toolbarActions.append(btn("+ Register item",()=>itemPanel(null),true),btn("Record stock movement",()=>movementPicker()));
+  toolbarActions.append(btn("New request",()=>requestPanel()),btn("Export items CSV",exportItemsCsv),btn("Refresh",load));
+ }
  toolbar.append(toolbarActions);root.append(toolbar);
  const tabs=$("nav","mt-inventory-tabs"),content=$("div","mt-content");let activeContent=content;root.append(tabs,content);
  const views=[["overview","Overview"],["items","Items & assets"],["procurement","Procurement"],["stock","Stock control"],["locations","Locations"],["transfers","Transfers"],["requests","Requests"],["maintenance","Maintenance"],["analytics","Analytics"],["forecast","Forecast"],["history","Movement history"]];
@@ -77,9 +95,11 @@ async function renderInventory(container){
   metrics.append(metric("OPEN REQUESTS",open.length,"Awaiting fulfilment or review",()=>openRequestList(open)));
   metrics.append(metric("OVER MAXIMUM",over.length,"Above preferred stock ceiling",()=>openListPanel("Overstock items",over)));
   activeContent.append(metrics);
-  const quick=$("div","mt-actions");
-  [["Register item",()=>itemPanel(null)],["Record purchase",()=>purchasePanel()],["Upload invoice",()=>invoicePanel()],["Receive stock",()=>movementPicker("receipt")],["Record consumption",()=>movementPicker("consumption")],["Create transfer",()=>transferPanel()]].forEach(([t,f])=>{if(canManage||!["Register item","Record purchase","Upload invoice","Receive stock","Record consumption","Create transfer"].includes(t))quick.append(btn(t,f))});
-  activeContent.append(quick);
+  if(!isSupervisor){
+   const quick=$("div","mt-actions");
+   [["Register item",()=>itemPanel(null)],["Record purchase",()=>purchasePanel()],["Upload invoice",()=>invoicePanel()],["Receive stock",()=>movementPicker("receipt")],["Record consumption",()=>movementPicker("consumption")],["Create transfer",()=>transferPanel()]].forEach(([t,f])=>{if(canManage||!["Register item","Record purchase","Upload invoice","Receive stock","Record consumption","Create transfer"].includes(t))quick.append(btn(t,f))});
+   activeContent.append(quick);
+  }
   activeContent.append(tableSection("Recently registered items",["Item","Category","On hand","Min / Max","Location",""],state.items.slice().sort((a,b)=>b.id-a.id).slice(0,8).map(x=>[x.name,x.category,x.quantity+" "+x.unit,x.minimum_quantity+" / "+(x.maximum_quantity||"—"),x.storage_location||"Unassigned",btn("Open",()=>itemDetails(x))])));
   activeContent.append(tableSection("Recent requests",["Item","Quantity","Status","Requested",""],state.requests.slice(0,5).map(x=>[x.item_name,x.quantity,x.status,new Date(x.created_at).toLocaleDateString(),btn("Open",()=>requestDetails(x))])));
  }
