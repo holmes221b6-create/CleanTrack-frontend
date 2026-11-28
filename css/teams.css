@@ -1207,3 +1207,14 @@ html[data-theme="light"] .ct-team-fullscreen-shell .ct-bi-workspace :is(.ct-bi-s
 .ct-team-performance-refresh-row{display:flex;justify-content:flex-end;width:100%}
 .ct-team-performance-refresh-row .ct-team-btn{min-width:170px;margin:0}
 @media(max-width:620px){.ct-team-performance-controls{width:100%;min-width:0}.ct-team-performance-date-fields{display:grid;grid-template-columns:1fr 1fr}.ct-team-performance-refresh-row .ct-team-btn{width:100%}}
+
+
+/* Admin Team overview opens in its own centred panel. */
+#page-content .ct-team-manager .ct-team-overview-overlay{position:fixed;inset:0;z-index:2147482000;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(5,5,9,.78);backdrop-filter:blur(7px)}
+#page-content .ct-team-manager .ct-team-overview-overlay[hidden]{display:none!important}
+#page-content .ct-team-manager .ct-team-overview-dialog{width:min(1080px,96vw);max-height:min(88vh,900px);overflow:auto;border:1px solid #514566;border-radius:16px;background:#0d0d13;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:22px}
+#page-content .ct-team-manager .ct-team-overview-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+#page-content .ct-team-manager .ct-team-overview-dialog-head h2{margin:0;color:#c5a8ff;font-size:1.35rem}
+#page-content .ct-team-manager .ct-team-overview-close{width:40px;min-width:40px;padding:0;font-size:1.5rem}
+#page-content .ct-team-manager .ct-team-overview-dialog-content .ct-team-section-heading:first-child{display:none}
+@media(max-width:640px){#page-content .ct-team-manager .ct-team-overview-overlay{padding:10px}#page-content .ct-team-manager .ct-team-overview-dialog{width:100%;max-height:94vh;padding:15px}}
