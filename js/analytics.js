@@ -45,21 +45,34 @@ const d=dates(7),from=$("input","ct-analytics3-input"),to=$("input","ct-analytic
 const fromField=W("From",from),toField=W("To",to);
 const bucket=SEL("bucket",[["day","Day"],["week","Week"],["month","Month"],["quarter","Quarter"],["year","Year"]]);bucket.value="day";
 const team=SEL("team_ids",[],true),location=SEL("location_ids",[],true),zone=SEL("zone_ids",[],true),employee=SEL("employee_ids",[],true),type=SEL("task_type",[],false);
-const filterPanel=$("details","ct-analytics3-filter-panel ct-analytics3-filter-details");
+const filterPanel=$("section","ct-analytics3-filter-panel ct-analytics3-filter-details");
 const rangeSummary=$("span","ct-analytics3-filter-summary-range","Last 7 days");
-const filterSummary=$("summary","ct-analytics3-filter-summary");
-filterSummary.append($("span","ct-analytics3-filter-summary-title","Date range & filters"),rangeSummary,$("span","ct-analytics3-filter-summary-chevron","⌄"));
-filterPanel.append(filterSummary,$("h2","","Refine your analytics"),$("p","ct-analytics3-muted","Choose a date range and optionally narrow the report by team, location, zone, employee, or operation type."));
+const filterLauncher=B("Date range & filters","ct-analytics3-button ct-analytics3-button-secondary ct-analytics3-filter-launcher",openFilters);
+const filterLauncherRange=$("span","ct-analytics3-filter-launcher-range","Last 7 days");filterLauncher.appendChild(filterLauncherRange);
+const filterOverlay=$("div","ct-analytics3-filter-overlay");filterOverlay.hidden=true;filterOverlay.setAttribute("role","presentation");
+const filterDialog=$("div","ct-analytics3-filter-dialog");filterDialog.setAttribute("role","dialog");filterDialog.setAttribute("aria-modal","true");filterDialog.setAttribute("aria-label","Date range and analytics filters");
+const filterDialogHead=$("div","ct-analytics3-filter-dialog-head"),filterDialogTitle=$("div","");
+filterDialogTitle.append($("p","ct-analytics3-eyebrow","REPORT CONFIGURATION"),$("h2","","Refine your analytics"));
+const closeFilters=B("×","ct-analytics3-filter-close",closeFilterDialog);closeFilters.setAttribute("aria-label","Close filters");
+filterDialogHead.append(filterDialogTitle,closeFilters);filterDialog.appendChild(filterDialogHead);
+filterOverlay.appendChild(filterDialog);page.appendChild(filterOverlay);
+function openFilters(){filterOverlay.hidden=false;closeFilters.focus();}
+function closeFilterDialog(){filterOverlay.hidden=true;filterLauncher.focus();}
+filterOverlay.addEventListener("click",e=>{if(e.target===filterOverlay)closeFilterDialog();});
+filterDialog.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();closeFilterDialog();}});
 function refreshRangeControls(){
  const custom=range.value==="custom";
  fromField.hidden=toField.hidden=!custom;
- rangeSummary.textContent=custom?("Custom · "+readableDate(from.value)+" – "+readableDate(to.value)):"Last "+range.value+" days";
+ const label=custom?("Custom · "+readableDate(from.value)+" – "+readableDate(to.value)):"Last "+range.value+" days";
+ rangeSummary.textContent=label;filterLauncherRange.textContent=label;
 }
 const fg=$("div","ct-analytics3-filter-grid");
 fg.append(W("Date range",range),fromField,toField,W("Trend interval",bucket),W("Teams",team,"Choose multiple teams to compare."),W("Locations",location),W("Zones",zone),W("Employees",employee),W("Operation type",type));
-const apply=B("Apply filters","ct-analytics3-button ct-analytics3-primary",load),reset=B("Reset filters","ct-analytics3-button ct-analytics3-secondary",()=>{range.value="7";const x=dates(7);from.value=x.start;to.value=x.end;bucket.value="day";[team,location,zone,employee].forEach(n=>Array.from(n.options).forEach(o=>o.selected=false));type.value="";refreshRangeControls();load();});
-const fb=$("div","ct-analytics3-filter-actions");fb.append(apply,reset);filterPanel.append(fg,fb);page.appendChild(filterPanel);
-range.addEventListener("change",()=>{if(range.value==="custom"){filterPanel.open=true;refreshRangeControls();return;}const x=dates(Number(range.value));from.value=x.start;to.value=x.end;refreshRangeControls();load();});
+const apply=B("Apply filters","ct-analytics3-button ct-analytics3-primary",()=>{closeFilterDialog();load();}),reset=B("Reset filters","ct-analytics3-button ct-analytics3-secondary",()=>{range.value="7";const x=dates(7);from.value=x.start;to.value=x.end;bucket.value="day";[team,location,zone,employee].forEach(n=>Array.from(n.options).forEach(o=>o.selected=false));type.value="";refreshRangeControls();load();});
+const fb=$("div","ct-analytics3-filter-actions");fb.append(apply,reset);
+filterPanel.append($("p","ct-analytics3-muted","Choose a date range and optionally narrow the report by team, location, zone, employee, or operation type."),fg,fb);
+filterDialog.appendChild(filterPanel);page.appendChild(filterLauncher);
+range.addEventListener("change",()=>{if(range.value==="custom"){refreshRangeControls();return;}const x=dates(Number(range.value));from.value=x.start;to.value=x.end;refreshRangeControls();load();});
 [from,to].forEach(n=>n.addEventListener("change",refreshRangeControls));
 refreshRangeControls();
 const status=$("p","ct-analytics3-status","Loading organization analytics…");status.setAttribute("role","status");status.setAttribute("aria-live","polite");page.appendChild(status);
