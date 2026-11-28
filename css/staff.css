@@ -32,7 +32,15 @@
 .ct-staff-sidebar{position:relative;top:auto;align-self:start;padding:15px}
 .ct-staff-side-list{max-height:none;overflow:visible;overscroll-behavior:auto}
 .ct-staff-side-empty{display:block;position:static;transform:none;animation:none;float:none;clear:both;width:100%;min-height:0;margin:8px 0 0;padding:12px 10px;border:1px solid #203b5e;border-radius:9px;background:#0b1729;color:#a9bdd8;line-height:1.5}
-.ct-staff-page{--text:#e7eef9;--text-secondary:#a9bdd8;--text-muted:#8298b8;--surface:#0d1b30;--surface-raised:#142744;--bg-elevated:#081426;--border:#1d3555;--border-strong:#2b4b73;--primary:#7ca9e8;--primary-contrast:#071426;--success:#64cba5;--warning:#e8bd70;--danger:#f08091;color:#e7eef9;background:linear-gradient(145deg,#081426 0%,#0b1b31 52%,#050c17 100%);border:1px solid #1a3150;border-radius:14px;padding:18px clamp(12px,1.8vw,24px) 38px}
+.ct-staff-page{--text:#eeeeF2;--text-secondary:#b0adb8;--text-muted:#85818d;--surface:#111014;--surface-raised:#1a181e;--bg-elevated:#0a090c;--border:#29262f;--border-strong:#3b3643;--primary:#a78bfa;--primary-contrast:#100b1c;--success:#65c99a;--warning:#e6bd70;--danger:#ed8292;color:#eeeeF2!important;background:#080709!important;border:1px solid #211e25!important;border-radius:14px;padding:18px clamp(12px,1.8vw,24px) 38px}
+.ct-staff-page .ct-staff-kpi,.ct-staff-page .ct-staff-card,.ct-staff-page .ct-staff-sidebar{background:#111014!important;border-color:#29262f!important;box-shadow:0 8px 24px rgb(0 0 0 / 38%)}
+.ct-staff-page .ct-staff-directory-row,.ct-staff-page .ct-staff-profile-metric{background:#0b0a0d!important;border-color:#29262f!important}
+.ct-staff-page .ct-staff-input{background:#09080b!important;border-color:#37323e!important;color:#eeeeF2!important}
+.ct-staff-page .ct-staff-button{background:#1a181e!important;border-color:#3b3643!important;color:#eeeeF2!important}
+.ct-staff-page .ct-staff-button--primary{background:#59418b!important;border-color:#795bb5!important;color:#fff!important}
+.ct-staff-page .ct-staff-side-filter.is-active,.ct-staff-page .ct-staff-side-item:hover,.ct-staff-page .ct-staff-side-item.is-selected{background:#211c2a!important;border-color:#55436f!important}
+.ct-staff-page .ct-staff-avatar{background:#292034!important;color:#c4adf5!important}
+.ct-staff-page .ct-staff-side-empty{background:#0b0a0d!important;border-color:#302b36!important;color:#b0adb8!important}
 .ct-staff-page .ct-staff-kpi,.ct-staff-page .ct-staff-card,.ct-staff-page .ct-staff-sidebar{background:#0d1b30;border-color:#1d3555;box-shadow:0 8px 24px rgb(0 0 0 / 22%)}
 .ct-staff-page .ct-staff-directory-row,.ct-staff-page .ct-staff-profile-metric{background:#091629;border-color:#203b5e}
 .ct-staff-page .ct-staff-input{background:#081426;border-color:#29486e;color:#e7eef9}
