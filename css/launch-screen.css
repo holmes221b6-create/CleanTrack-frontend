@@ -55,3 +55,8 @@
 #cleantrack-launch-splash .ct-launch-begin{z-index:20!important;display:block!important;visibility:hidden;pointer-events:none;cursor:pointer!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent;}
 #cleantrack-launch-splash.ct-launch-title-active .ct-launch-begin{visibility:visible!important;pointer-events:auto!important;}
 #cleantrack-launch-splash.ct-launch-preparing .ct-launch-begin{visibility:visible!important;pointer-events:none!important;}
+
+/* The first MECHNAR brand-mark animation is strictly non-interactive. */
+#cleantrack-launch-splash.ct-launch-screen{cursor:default}
+#cleantrack-launch-splash .ct-launch-icon-stage{pointer-events:none!important;user-select:none!important}
+#cleantrack-launch-splash.ct-launch-title-active{cursor:pointer}
