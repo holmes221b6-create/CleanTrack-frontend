@@ -1235,16 +1235,18 @@
     if (teamsOverlay) teamsOverlay.remove();
     const token = ++teamsOpenToken;
     teamsPreviousPage = previousPage && previousPage !== "teams" ? previousPage : "workspace";
+    if (!document.getElementById("mechnar-teams-overlay-style")) {
+      const style = document.createElement("style");
+      style.id = "mechnar-teams-overlay-style";
+      style.textContent = '#mechnar-teams-overlay{position:fixed!important;inset:0!important;z-index:2147483002!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-teams-overlay .mn-teams-top{height:58px;min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015)}#mechnar-teams-overlay .mn-teams-top>div{display:flex;flex-direction:column;gap:2px}#mechnar-teams-overlay .mn-teams-top span{font-size:10px;letter-spacing:.18em;color:#a98be8;font-weight:800}#mechnar-teams-overlay .mn-teams-top strong{font-size:16px}#mechnar-teams-overlay .mn-teams-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-teams-overlay .mn-teams-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0}#mechnar-teams-overlay .mn-teams-content>*{max-width:none!important}#mechnar-teams-overlay .mn-teams-loading{height:100%;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text-primary,#f4f0f8)}#mechnar-teams-overlay .mn-teams-loading small{opacity:.65;font-size:12px}#mechnar-teams-overlay .mn-teams-spinner{width:30px;height:30px;border:3px solid rgba(169,139,232,.2);border-top-color:#a98be8;border-radius:50%;animation:mnTeamsSpin .8s linear infinite}@keyframes mnTeamsSpin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){#mechnar-teams-overlay .mn-teams-spinner{animation:none}}';
+      document.head.appendChild(style);
+    }
     const overlay = document.createElement("section");
     overlay.id = "mechnar-teams-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-label", "Teams");
-    overlay.innerHTML = '<header class="mn-teams-top"><div><span>MECHNAR</span><strong>Teams</strong></div><button type="button" class="mn-teams-close" aria-label="Close Teams" title="Back to workspace">×</button></header><div class="mn-teams-content"></div>';
-    const style = document.createElement("style");
-    style.dataset.mechnarTeamsOverlay = "true";
-    style.textContent = '#mechnar-teams-overlay{position:fixed!important;inset:0!important;z-index:2147483002!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-teams-overlay .mn-teams-top{height:58px;min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015)}#mechnar-teams-overlay .mn-teams-top>div{display:flex;flex-direction:column;gap:2px}#mechnar-teams-overlay .mn-teams-top span{font-size:10px;letter-spacing:.18em;color:#a98be8;font-weight:800}#mechnar-teams-overlay .mn-teams-top strong{font-size:16px}#mechnar-teams-overlay .mn-teams-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-teams-overlay .mn-teams-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0}#mechnar-teams-overlay .mn-teams-content>*{max-width:none!important}';
-    document.head.appendChild(style);
+    overlay.innerHTML = '<header class="mn-teams-top"><div><span>MECHNAR</span><strong>Teams</strong></div><button type="button" class="mn-teams-close" aria-label="Close Teams" title="Back to workspace">×</button></header><div class="mn-teams-content"><div class="mn-teams-loading" role="status" aria-live="polite"><span class="mn-teams-spinner" aria-hidden="true"></span><strong>Working on it</strong><small>Opening Teams</small></div></div>';
     document.body.appendChild(overlay);
     teamsOverlay = overlay;
     overlay.querySelector(".mn-teams-close").addEventListener("click", closeTeamsOverlay);
@@ -1252,6 +1254,9 @@
       if (event.key === "Escape" && teamsOverlay === overlay) closeTeamsOverlay();
     });
     const content = overlay.querySelector(".mn-teams-content");
+    // Let the full-screen panel paint before the Teams module starts its data requests.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (token !== teamsOpenToken || teamsOverlay !== overlay) return;
     try {
       if (window.CleanTrackTeams && typeof window.CleanTrackTeams.render === "function") {
         await window.CleanTrackTeams.render(content);
