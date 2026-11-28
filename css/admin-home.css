@@ -514,41 +514,35 @@
 }
 
  
-/* Admin Home: restore vertical scrolling for the full dashboard workspace.
-   Keep scrolling inside the workspace main column so the sidebar and toolbar
-   remain fixed, while the entire Home page can be reached. */
-html body #workspace-view:has(#page-content .ct-home-welcome) {
-  height: 100vh;
-  height: 100dvh;
-  min-height: 0;
-  overflow: hidden;
+
+/* Admin Home: use normal document scrolling.
+   The previous fixed-height/overflow-hidden workspace trapped the page and
+   prevented wheel, touch and trackpad scrolling from reaching lower sections. */
+html:has(#workspace-view #page-content .ct-home-welcome),
+html:has(#workspace-view #page-content .ct-home-welcome) body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
-html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell {
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-main {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
-}
+html body #workspace-view:has(#page-content .ct-home-welcome),
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell,
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-main,
 html body #workspace-view:has(#page-content .ct-home-welcome) #page-content,
 html body #workspace-view:has(#page-content .ct-home-welcome) .page-content {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  height: auto;
-  overflow-x: hidden;
-  overflow-y: auto !important;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) {
+  min-height: 100vh !important;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell {
+  min-height: 100vh !important;
 }
 html body #workspace-view:has(#page-content .ct-home-welcome) #page-content {
-  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  flex: 1 0 auto !important;
+  padding-bottom: 48px !important;
+  touch-action: pan-y !important;
 }
