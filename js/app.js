@@ -183,15 +183,10 @@
   
   
 
-  // Add a release entry here whenever a user-visible CleanTrack feature/control is shipped.
-  // Each account sees each release once; bump the id for a genuinely new or materially changed feature.
-  const SHADOW_FEATURE_RELEASES = [
-    {
-      id: "notification-promotional-email-settings-2026-10-v1",
-      title: "You control promotional emails now",
-      message: "A new option has been added in Settings → Notifications: “Promotional emails and product updates.” Turn it on if you want CleanTrack feature news, product updates and offers. Turn it off whenever you prefer not to receive promotional email. Save your notification settings to keep your choice."
-    },
-  ];
+  // Shadow's What's New announcement is release-only.
+  // Keep this list empty during normal operation. Add an entry only when a
+  // new MECHNAR version is actually shipped; each account sees each release once.
+  const SHADOW_FEATURE_RELEASES = [];
 
   function showShadowFeatureAnnouncement(user) {
     if (!user || !SHADOW_FEATURE_RELEASES.length) return;
@@ -248,7 +243,7 @@
     avatar.setAttribute("role", "img");
     const shadowImage = document.createElement("img");
     shadowImage.className = "ct-shadow-reference-image";
-    shadowImage.src = "https://raw.githubusercontent.com/holmes221b6-create/CleanTrack-frontend/main/assets/shadow-character-imu.svg?v=1";
+    shadowImage.src = "assets/shadow-character-imu.svg?v=4";
     shadowImage.alt = "Shadow";
     shadowImage.draggable = false;
     avatar.appendChild(shadowImage);
