@@ -700,7 +700,19 @@
     [["Total staff","total"],["Supervisors","supervisors"],["Employees","employees"],["Active staff","active"],["Inactive staff","inactive"],["Pending invites","pending"],["Termination pending","termination"]].forEach(function(pair){
       const item=el("article","ct-staff-kpi");item.append(el("span","",pair[0]),el("strong","","—"));item.querySelector("strong").dataset.staffStat=pair[1];stats.appendChild(item);
     });
-    pageRoot.appendChild(stats);
+    const statsLauncher=button("Staff overview","ct-staff-button ct-staff-stats-launcher",openStaffStats);
+    statsLauncher.setAttribute("aria-haspopup","dialog");
+    const statsOverlay=el("div","ct-staff-stats-overlay");statsOverlay.hidden=true;
+    const statsDialog=el("section","ct-staff-stats-dialog");statsDialog.setAttribute("role","dialog");statsDialog.setAttribute("aria-modal","true");statsDialog.setAttribute("aria-label","Staff overview");
+    const statsHead=el("div","ct-staff-stats-head"),statsTitle=el("div");
+    statsTitle.append(el("p","ct-staff-eyebrow","PEOPLE AND ACCESS"),el("h2","","Staff overview"));
+    const statsClose=button("×","ct-staff-stats-close",closeStaffStats);statsClose.setAttribute("aria-label","Close staff overview");
+    statsHead.append(statsTitle,statsClose);statsDialog.append(statsHead,stats);statsOverlay.appendChild(statsDialog);
+    function openStaffStats(){statsOverlay.hidden=false;statsClose.focus();}
+    function closeStaffStats(){statsOverlay.hidden=true;statsLauncher.focus();}
+    statsOverlay.addEventListener("click",function(event){if(event.target===statsOverlay)closeStaffStats();});
+    statsDialog.addEventListener("keydown",function(event){if(event.key==="Escape"){event.preventDefault();closeStaffStats();}});
+    pageRoot.append(statsLauncher,statsOverlay);
 
     const layout=el("div","ct-staff-layout");
     const sidebar=el("aside","ct-staff-sidebar");
