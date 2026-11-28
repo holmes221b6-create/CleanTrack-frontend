@@ -188,7 +188,7 @@
     overlay.className="mw-activity-overlay";
     overlay.hidden=true;
     overlay.innerHTML='<section class="mw-activity-dialog" role="dialog" aria-modal="true" aria-labelledby="mw-activity-dialog-title"><header class="mw-activity-dialog-head"><div><span class="mw-eyebrow">TEAM TIMELINE</span><h2 id="mw-activity-dialog-title">Activity History</h2><p>Recorded activity across your team operations.</p></div><button type="button" class="mw-activity-close" data-mw-activity-close aria-label="Close activity history">×</button></header><div class="mw-activity-dialog-body">'+(activity.length?'<div class="mw-activity-list">'+activity.map(renderActivityItem).join("")+'</div>':empty("No operation activity has been recorded."))+'</div></section>';
-    root.appendChild(overlay);
+    document.body.appendChild(overlay);
     const close=()=>{overlay.hidden=true;trigger.focus();};
     trigger.addEventListener("click",()=>{overlay.hidden=false;overlay.querySelector("[data-mw-activity-close]")?.focus();});
     overlay.querySelector("[data-mw-activity-close]").addEventListener("click",close);
