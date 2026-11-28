@@ -29,7 +29,17 @@
 .ct-staff-notice.is-error{color:var(--danger,#ff7f91)}
 .ct-staff-notice.is-info{color:var(--info,#79c8ff)}
 .ct-staff-layout{display:grid;grid-template-columns:minmax(220px,270px) minmax(0,1fr);gap:16px;align-items:start}
-.ct-staff-sidebar{position:sticky;top:88px;padding:15px}
+.ct-staff-sidebar{position:relative;top:auto;align-self:start;padding:15px}
+.ct-staff-side-list{max-height:none;overflow:visible;overscroll-behavior:auto}
+.ct-staff-side-empty{display:block;position:static;transform:none;animation:none;float:none;clear:both;width:100%;min-height:0;margin:8px 0 0;padding:12px 10px;border:1px solid #203b5e;border-radius:9px;background:#0b1729;color:#a9bdd8;line-height:1.5}
+.ct-staff-page{--text:#e7eef9;--text-secondary:#a9bdd8;--text-muted:#8298b8;--surface:#0d1b30;--surface-raised:#142744;--bg-elevated:#081426;--border:#1d3555;--border-strong:#2b4b73;--primary:#7ca9e8;--primary-contrast:#071426;--success:#64cba5;--warning:#e8bd70;--danger:#f08091;color:#e7eef9;background:linear-gradient(145deg,#081426 0%,#0b1b31 52%,#050c17 100%);border:1px solid #1a3150;border-radius:14px;padding:18px clamp(12px,1.8vw,24px) 38px}
+.ct-staff-page .ct-staff-kpi,.ct-staff-page .ct-staff-card,.ct-staff-page .ct-staff-sidebar{background:#0d1b30;border-color:#1d3555;box-shadow:0 8px 24px rgb(0 0 0 / 22%)}
+.ct-staff-page .ct-staff-directory-row,.ct-staff-page .ct-staff-profile-metric{background:#091629;border-color:#203b5e}
+.ct-staff-page .ct-staff-input{background:#081426;border-color:#29486e;color:#e7eef9}
+.ct-staff-page .ct-staff-button{background:#142744;border-color:#2b4b73;color:#e7eef9}
+.ct-staff-page .ct-staff-button--primary{background:#315b91;border-color:#4779b6;color:#fff}
+.ct-staff-page .ct-staff-side-filter.is-active,.ct-staff-page .ct-staff-side-item:hover,.ct-staff-page .ct-staff-side-item.is-selected{background:#142b49;border-color:#345982}
+.ct-staff-page .ct-staff-avatar{background:#183252;color:#a9c9f5}
 .ct-staff-sidebar h2,.ct-staff-card h2,.ct-staff-invite-card h2{font-size:1.12rem;margin:0 0 5px}
 .ct-staff-side-filters{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:15px 0 12px}
 .ct-staff-side-filter{display:flex;align-items:center;justify-content:center;min-height:33px;padding:6px 7px;border:1px solid var(--border,#29374d);border-radius:8px;background:transparent;color:var(--text-secondary,#a9b8cc);font:inherit;font-size:.73rem;font-weight:700;cursor:pointer}
