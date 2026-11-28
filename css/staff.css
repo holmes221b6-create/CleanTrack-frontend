@@ -173,3 +173,56 @@
   .ct-staff-page .ct-staff-stats-dialog { max-height:92vh; padding:15px; }
   .ct-staff-page .ct-staff-stats-dialog .ct-staff-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+
+/* Supervisor selector spans the Staff workspace instead of occupying a narrow sidebar. */
+.ct-staff-page .ct-staff-layout {
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+.ct-staff-page .ct-staff-sidebar {
+  width:100%!important;
+  min-width:0!important;
+  position:static!important;
+  padding:18px 20px!important;
+}
+.ct-staff-page .ct-staff-side-filters {
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin:14px 0!important;
+}
+.ct-staff-page .ct-staff-side-filter {
+  flex:0 0 auto!important;
+  min-width:105px;
+}
+.ct-staff-page .ct-staff-side-list {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+  gap:9px!important;
+  width:100%!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+.ct-staff-page .ct-staff-side-empty {
+  grid-column:1/-1!important;
+  width:100%!important;
+  min-height:56px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:14px 16px!important;
+  margin:8px 0 0!important;
+}
+.ct-staff-page .ct-staff-main {
+  width:100%!important;
+  min-width:0!important;
+}
+@media(max-width:600px) {
+  .ct-staff-page .ct-staff-sidebar { padding:14px!important; }
+  .ct-staff-page .ct-staff-side-filters { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+  .ct-staff-page .ct-staff-side-filter { min-width:0; }
+  .ct-staff-page .ct-staff-side-list { grid-template-columns:1fr!important; }
+}
