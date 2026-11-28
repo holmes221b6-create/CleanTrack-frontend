@@ -2400,6 +2400,35 @@ function bindNavigation() {
     }
 
     state.started = true;
+
+    // A signed-in session is valid only for the local calendar day on which
+    // the user authenticated. If MECHNAR remains open across midnight, reload
+    // into the launch screen; auth.restoreSession() will reject yesterday's
+    // token and show the login view after Tap to Begin.
+    if(!window.__MECHNAR_DAY_ROLLOVER_GUARD__){
+      window.__MECHNAR_DAY_ROLLOVER_GUARD__=true;
+      const localDay=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+      const openedDay=localDay();
+      let rolloverReloading=false;
+      const reloadAtDayChange=()=>{
+        if(rolloverReloading||localDay()===openedDay)return;
+        rolloverReloading=true;
+        window.location.reload();
+      };
+      const scheduleMidnightCheck=()=>{
+        const now=new Date();
+        const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,1,0);
+        window.setTimeout(()=>{
+          reloadAtDayChange();
+          scheduleMidnightCheck();
+        },Math.max(1000,midnight.getTime()-now.getTime()));
+      };
+      scheduleMidnightCheck();
+      document.addEventListener("visibilitychange",()=>{if(!document.hidden)reloadAtDayChange();});
+      window.addEventListener("focus",reloadAtDayChange);
+      window.addEventListener("pageshow",reloadAtDayChange);
+    }
+
     // Keep optional page/UI initializers from aborting the launch flow.
     [
       bindFooterHelp,
