@@ -1138,6 +1138,8 @@
   let pageFrameNode = null;
   let pageRenderSequence = 0;
 
+  // Page navigation does not show an artificial loading skeleton.
+  // Data-backed modules may still fetch their required records on first visit.
   function beginInstantPageFrame(container, pageId) {
     if (pageFrameObserver) {
       pageFrameObserver.disconnect();
@@ -1145,36 +1147,7 @@
     }
     if (pageFrameNode) pageFrameNode.remove();
     pageFrameNode = null;
-    const sequence = ++pageRenderSequence;
-
-    // Teams intentionally retains its existing loading-first experience.
-    if (pageId === "teams") return sequence;
-
-    const frame = document.createElement("section");
-    frame.className = "mn-instant-page-frame";
-    frame.setAttribute("aria-label", "Opening page");
-    frame.setAttribute("aria-busy", "true");
-    frame.innerHTML = '<div class="mn-frame-heading"><i></i><b></b></div>' +
-      '<div class="mn-frame-toolbar"><i></i><i></i><i></i></div>' +
-      '<div class="mn-frame-metrics"><i></i><i></i><i></i><i></i></div>' +
-      '<div class="mn-frame-content"><i></i><i></i><i></i></div>';
-    container.appendChild(frame);
-    pageFrameNode = frame;
-
-    // Remove the frame as soon as the real page starts rendering. For modules
-    // that fetch before rendering, it remains visible instead of a blank page.
-    pageFrameObserver = new MutationObserver(function() {
-      if (sequence !== pageRenderSequence) return;
-      const hasRealContent = Array.from(container.children).some(node => node !== frame);
-      if (hasRealContent) {
-        frame.remove();
-        if (pageFrameObserver) pageFrameObserver.disconnect();
-        pageFrameObserver = null;
-        pageFrameNode = null;
-      }
-    });
-    pageFrameObserver.observe(container, { childList: true });
-    return sequence;
+    return ++pageRenderSequence;
   }
 
   let settingsOverlay = null;
