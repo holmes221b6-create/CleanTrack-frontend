@@ -1117,6 +1117,54 @@
     return sequence;
   }
 
+  let settingsOverlay = null;
+  let settingsOpenToken = 0;
+  let settingsPreviousPage = null;
+
+  function closeSettingsOverlay(){
+    settingsOpenToken++;
+    if(settingsOverlay)settingsOverlay.remove();
+    settingsOverlay=null;
+    const previous=settingsPreviousPage||"workspace";
+    settingsPreviousPage=null;
+    if(window.CleanTrackNavigation)window.CleanTrackNavigation.setActivePage(previous);
+  }
+
+  async function openSettingsOverlay(previousPage){
+    if(settingsOverlay)return;
+    settingsPreviousPage=previousPage&&previousPage!=="settings"?previousPage:"workspace";
+    const token=++settingsOpenToken;
+    const overlay=document.createElement("section");
+    overlay.id="mechnar-settings-overlay";
+    overlay.className="mn-settings-overlay";
+    overlay.setAttribute("role","dialog");
+    overlay.setAttribute("aria-modal","true");
+    overlay.setAttribute("aria-label","Settings");
+    overlay.innerHTML='<header class="mn-settings-top"><div class="mn-settings-heading"><span class="mn-settings-kicker">MECHNAR</span><h1>Settings</h1></div><button type="button" class="mn-settings-close" aria-label="Close Settings" title="Back to workspace">×</button></header><div class="mn-settings-body" id="mechnar-settings-content"><div class="mn-settings-loading" role="status">Opening settings…</div></div>';
+    document.body.appendChild(overlay);
+    settingsOverlay=overlay;
+    const close=overlay.querySelector(".mn-settings-close");
+    close.addEventListener("click",closeSettingsOverlay);
+    overlay.addEventListener("keydown",function(event){if(event.key==="Escape"){event.preventDefault();closeSettingsOverlay();}});
+    const content=overlay.querySelector("#mechnar-settings-content");
+    try{
+      if(window.CleanTrackSettings&&typeof window.CleanTrackSettings.render==="function"){
+        await window.CleanTrackSettings.render(content);
+      }else{
+        content.textContent="Settings could not load. Refresh MECHNAR and try again.";
+      }
+      if(token!==settingsOpenToken||!overlay.isConnected)return;
+      const inner=content.querySelector(".ct-settings-page");
+      if(inner){
+        const header=inner.querySelector(".ct-settings-header");
+        if(header)header.hidden=true;
+      }
+    }catch(error){
+      console.error("MECHNAR settings failed to open:",error);
+      content.textContent="Settings could not load. Please try again.";
+    }
+  }
+
   let personnelOverlay = null;
   let personnelOpenToken = 0;
   let personnelPreviousPage = null;
@@ -1238,6 +1286,20 @@
 
   async function renderPage(pageId) {
     const previousPage = state.currentPage;
+    if(pageId==="settings"){
+      state.currentPage="settings";
+      const menuElement=getElement("workspace-navigation");
+      if(menuElement&&window.CleanTrackNavigation)window.CleanTrackNavigation.renderMenu(menuElement);
+      if(window.CleanTrackPreferences)window.CleanTrackPreferences.applyTheme();
+      if(!settingsOverlay)await openSettingsOverlay(previousPage);
+      return;
+    }
+    if(settingsOverlay){
+      settingsOpenToken++;
+      settingsOverlay.remove();
+      settingsOverlay=null;
+      settingsPreviousPage=null;
+    }
     if (pageId === "personnel" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
       if (previousPage && previousPage !== "personnel") personnelPreviousPage = previousPage;
       state.currentPage = pageId;
@@ -1373,14 +1435,6 @@
       return;
     }
 
-    if (pageId === "settings") {
-      if (window.CleanTrackSettings && typeof window.CleanTrackSettings.render === "function") {
-        await window.CleanTrackSettings.render(pageContent);
-      } else {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Settings could not load. Refresh and try again." }));
-      }
-      return;
-    }
     if (["staff", "employee"].includes(String(user?.role || "").toLowerCase()) && pageId === "incident-reports") {
       if (window.MechnarStaffIncidents && typeof window.MechnarStaffIncidents.render === "function") {
         window.MechnarStaffIncidents.render(pageContent);
