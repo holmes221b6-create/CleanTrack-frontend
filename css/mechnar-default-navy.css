@@ -189,3 +189,18 @@ html[data-theme="default"] #cleantrack-launch-splash .ct-splash-owner {
 /* Keep the reference image's restrained blue edge and readable contrast on small screens. */
 html[data-theme="default"] hr { border-color: #203d5e !important; }
 html[data-theme="default"] ::selection { background: #315d87 !important; color: #fff !important; }
+
+
+/* FINAL OVERRIDE: every primary page title must use the same purple as Staff.
+   This intentionally comes after the generic light-text rules above. */
+html[data-theme="default"] body #page-content h1,
+html[data-theme="default"] body #page-content .page-header h1,
+html[data-theme="default"] body #page-content .mt-page-header h1,
+html[data-theme="default"] body #page-content [data-page-root] > h1,
+html[data-theme="default"] body #page-content .mt-page > h1,
+html[data-theme="default"] body #page-content .mt-page-content > h1,
+html[data-theme="default"] body #page-content .page-view > h1,
+html[data-theme="default"] body #page-content .page-content-inner > h1 {
+  color: #c5a8ff !important;
+  -webkit-text-fill-color: #c5a8ff !important;
+}
