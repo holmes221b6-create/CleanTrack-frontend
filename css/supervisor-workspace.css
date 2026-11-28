@@ -157,3 +157,61 @@ html[data-theme="light"] .mw-scheduled-dialog{background:#fff;color:#202532;bord
 .mw-scheduled-toolbar{display:flex;gap:12px;align-items:flex-end;padding:14px 24px;border-bottom:1px solid var(--border,#393946)}.mw-scheduled-search{display:flex;flex-direction:column;gap:6px;flex:1;color:var(--text-secondary,#999);font-size:11px}.mw-scheduled-search input{min-height:36px;padding:8px 10px;border:1px solid var(--border,#393946);border-radius:8px;background:var(--surface-raised,#20202a);color:inherit;font:inherit}.mw-scheduled-create{height:36px;white-space:nowrap;border:1px solid #7668a5;border-radius:8px;padding:0 13px;background:#7668a5;color:white;font-weight:650;cursor:pointer}
 .mw-scheduled-create-overlay[hidden]{display:none!important}.mw-scheduled-create-overlay{position:fixed;inset:0;z-index:12001;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,5,10,.75);backdrop-filter:blur(4px)}.mw-scheduled-create-dialog{width:min(760px,calc(100vw - 30px));max-height:92vh;display:flex;flex-direction:column;overflow:auto;border:1px solid var(--border,#393946);border-radius:14px;background:var(--surface,#15151d);color:var(--text-primary,#eee);box-shadow:0 22px 70px #0008}.mw-scheduled-create-dialog>header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border,#393946)}.mw-scheduled-create-dialog h2{margin:4px 0;font-size:19px}.mw-scheduled-create-dialog header button{width:32px;height:32px;border:1px solid var(--border,#393946);border-radius:8px;background:transparent;color:inherit;font-size:21px}.mw-scheduled-create-dialog form{padding:18px 22px}.mw-scheduled-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mw-scheduled-form-grid>label{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:11px;color:var(--text-secondary,#999);position:relative}.mw-scheduled-form-grid input,.mw-scheduled-form-grid select,.mw-scheduled-form-grid textarea{width:100%;box-sizing:border-box;min-height:36px;padding:8px 10px;border:1px solid var(--border,#393946);border-radius:8px;background:var(--surface-raised,#20202a);color:inherit;font:inherit;font-size:12px}.mw-scheduled-wide{grid-column:1/-1}.mw-scheduled-date-field input{padding-right:38px}.mw-scheduled-date-icon{position:absolute;right:12px;bottom:10px;pointer-events:none}.mw-scheduled-recurrence{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mw-scheduled-recurrence label{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--text-secondary,#999)}.mw-scheduled-create-dialog form>p{color:#e59c9c;font-size:12px}.mw-scheduled-create-dialog footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.mw-scheduled-create-dialog footer button{padding:9px 14px;border:1px solid var(--border,#393946);border-radius:8px;background:transparent;color:inherit;cursor:pointer}.mw-scheduled-create-dialog footer .mw-scheduled-save{background:#7668a5;border-color:#7668a5;color:#fff}.html[data-theme="light"] .mw-scheduled-create-dialog{background:#fff;color:#202532}
 @media(max-width:600px){.mw-scheduled-toolbar{padding:12px 16px;align-items:stretch;flex-direction:column}.mw-scheduled-form-grid{grid-template-columns:1fr}.mw-scheduled-wide,.mw-scheduled-recurrence{grid-column:1}.mw-scheduled-create-dialog form{padding:14px}.mw-scheduled-create-dialog>header{padding:14px}}
+
+
+/* Scheduled Operations dialog: keep the header fixed and make the records
+   region the independently scrollable flex child. */
+.mw-scheduled-dialog{
+  height:min(82vh,820px);
+  max-height:calc(100dvh - 32px);
+  min-height:0;
+  overflow:hidden;
+}
+.mw-scheduled-list{
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  touch-action:pan-y;
+}
+.mw-scheduled-toolbar{flex:none}
+.mw-scheduled-head{flex:none}
+.mw-scheduled-overlay{overflow:hidden;overscroll-behavior:contain}
+@media(max-width:600px){
+  .mw-scheduled-dialog{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)}
+  .mw-scheduled-list{padding-bottom:max(18px,env(safe-area-inset-bottom))}
+}
+
+/* Supervisor Insights: consistent hierarchy, readable metrics and clear states. */
+.mn-insights{width:100%;box-sizing:border-box}
+.mn-insights-head{padding:4px 0 18px;border-bottom:1px solid var(--border,#383241);margin-bottom:18px}
+.mn-insights-head h1{font-weight:760;letter-spacing:-.035em}
+.mn-insights-sub{max-width:680px}
+.mn-insights-controls select{min-width:118px}
+.mn-insights-controls button{cursor:pointer;font-weight:650}
+.mn-insights-controls button:hover{border-color:#9b70d8}
+.mn-insights-kpi{box-shadow:0 5px 18px #0000000a}
+.mn-insights-kpi strong{letter-spacing:-.035em}
+.mn-insights-panel{box-shadow:0 5px 18px #00000008}
+.mn-insights-panel h2{font-weight:730;letter-spacing:-.015em}
+.mn-insights-table-wrap{width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.mn-insights-table{min-width:480px}
+.mn-insights-heat-cell{min-height:62px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.mn-insights-data-note{display:flex;flex-direction:column;gap:6px;padding:15px 17px;margin:0 0 15px;border:1px solid rgba(167,123,227,.35);border-left:3px solid #a77be3;border-radius:10px;background:rgba(167,123,227,.07);line-height:1.5}
+.mn-insights-data-note strong{font-size:13px}
+.mn-insights-data-note span{font-size:12px;color:var(--text-secondary,#aaa5b8)}
+.mn-insights-status{display:flex;flex-direction:column;gap:8px}
+.mn-insights-status strong{font-size:14px;color:inherit}
+.mn-insights-status span{font-size:12px}
+.mn-insights-retry{align-self:flex-start;margin-top:4px;padding:8px 13px;border:1px solid var(--border,#393342);border-radius:8px;background:var(--surface-raised,#24202d);color:inherit;font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+.mn-insights-retry:hover{border-color:#a77be3}
+@media(max-width:700px){
+ .mn-insights-head{align-items:flex-start}
+ .mn-insights-controls{width:100%;justify-content:flex-start}
+ .mn-insights-controls select{flex:1}
+ .mn-insights-table-wrap{margin:0 -2px}
+}
