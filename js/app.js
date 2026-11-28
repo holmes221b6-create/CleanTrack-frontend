@@ -1217,6 +1217,54 @@
     }
   }
 
+
+  let teamsOverlay = null;
+  let teamsPreviousPage = null;
+  let teamsOpenToken = 0;
+
+  function closeTeamsOverlay() {
+    teamsOpenToken++;
+    if (teamsOverlay) teamsOverlay.remove();
+    teamsOverlay = null;
+    const previous = teamsPreviousPage || "workspace";
+    teamsPreviousPage = null;
+    if (window.CleanTrackNavigation) window.CleanTrackNavigation.setActivePage(previous);
+  }
+
+  async function openTeamsOverlay(previousPage) {
+    if (teamsOverlay) teamsOverlay.remove();
+    const token = ++teamsOpenToken;
+    teamsPreviousPage = previousPage && previousPage !== "teams" ? previousPage : "workspace";
+    const overlay = document.createElement("section");
+    overlay.id = "mechnar-teams-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "Teams");
+    overlay.innerHTML = '<header class="mn-teams-top"><div><span>MECHNAR</span><strong>Teams</strong></div><button type="button" class="mn-teams-close" aria-label="Close Teams" title="Back to workspace">×</button></header><div class="mn-teams-content"></div>';
+    const style = document.createElement("style");
+    style.dataset.mechnarTeamsOverlay = "true";
+    style.textContent = '#mechnar-teams-overlay{position:fixed!important;inset:0!important;z-index:2147483002!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-teams-overlay .mn-teams-top{height:58px;min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015)}#mechnar-teams-overlay .mn-teams-top>div{display:flex;flex-direction:column;gap:2px}#mechnar-teams-overlay .mn-teams-top span{font-size:10px;letter-spacing:.18em;color:#a98be8;font-weight:800}#mechnar-teams-overlay .mn-teams-top strong{font-size:16px}#mechnar-teams-overlay .mn-teams-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-teams-overlay .mn-teams-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0}#mechnar-teams-overlay .mn-teams-content>*{max-width:none!important}';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+    teamsOverlay = overlay;
+    overlay.querySelector(".mn-teams-close").addEventListener("click", closeTeamsOverlay);
+    overlay.addEventListener("keydown", event => {
+      if (event.key === "Escape" && teamsOverlay === overlay) closeTeamsOverlay();
+    });
+    const content = overlay.querySelector(".mn-teams-content");
+    try {
+      if (window.CleanTrackTeams && typeof window.CleanTrackTeams.render === "function") {
+        await window.CleanTrackTeams.render(content);
+      } else {
+        content.textContent = "Teams could not load. Refresh the application and try again.";
+      }
+    } catch (error) {
+      console.error("MECHNAR Teams panel failed to load:", error);
+      content.textContent = "Teams could not load. Refresh the application and try again.";
+    }
+    if (token === teamsOpenToken && teamsOverlay === overlay) overlay.querySelector(".mn-teams-close").focus();
+  }
+
   let personnelOverlay = null;
   let personnelOpenToken = 0;
   let personnelPreviousPage = null;
@@ -1351,6 +1399,21 @@
       settingsOverlay.remove();
       settingsOverlay=null;
       settingsPreviousPage=null;
+    }
+    if (pageId === "teams" && ["admin", "supervisor"].includes(String(auth.getCurrentUser()?.role || "").toLowerCase())) {
+      if (previousPage && previousPage !== "teams") teamsPreviousPage = previousPage;
+      state.currentPage = pageId;
+      const menuElement = getElement("workspace-navigation");
+      if (menuElement && window.CleanTrackNavigation) window.CleanTrackNavigation.renderMenu(menuElement);
+      if (window.CleanTrackPreferences) window.CleanTrackPreferences.applyTheme();
+      await openTeamsOverlay(previousPage);
+      return;
+    }
+    if (pageId !== "teams" && teamsOverlay) {
+      teamsOpenToken++;
+      teamsOverlay.remove();
+      teamsOverlay = null;
+      teamsPreviousPage = null;
     }
     if (pageId === "personnel" && String(auth.getCurrentUser()?.role || "").toLowerCase() === "supervisor") {
       if (previousPage && previousPage !== "personnel") personnelPreviousPage = previousPage;
