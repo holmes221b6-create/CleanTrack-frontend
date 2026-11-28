@@ -1074,6 +1074,8 @@
     }, true);
   }
 
+  bindMechnarLegalLinks();
+
   function bindFooterHelp() {
     const footer = getElement("app-footer");
     const dialog = getElement("app-modal");
