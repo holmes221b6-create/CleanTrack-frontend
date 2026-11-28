@@ -270,7 +270,7 @@
       }
 
       button.addEventListener("click", function () {
-        if (item.id !== "teams") setActivePage(item.id);
+        setActivePage(item.id);
       });
       return button;
     }
