@@ -410,7 +410,10 @@ html[data-theme="black"] #cleantrack-launch-splash{
   }catch(e){console.warn("MECHNAR tap sound unavailable",e);}
  }
  function begin(event){
-  if(requested||!splash.isConnected)return;
+  // Phase one is a passive brand animation. Only the second, explicit
+  // TAP TO BEGIN screen accepts input or plays the launch sound.
+  if(!splash.isConnected||!splash.classList.contains("ct-launch-title-active"))return;
+  if(requested)return;
   if(event&&event.button===2)return;
   requested=true;
   if(event&&event.cancelable)event.preventDefault();
@@ -442,7 +445,7 @@ html[data-theme="black"] #cleantrack-launch-splash{
  splash.addEventListener("click",begin,true);
  splash.addEventListener("touchstart",begin,{capture:true,passive:false});
  window.addEventListener("keydown",function(event){
-  if(splash.isConnected&&(event.key==="Enter"||event.key===" ")&&!event.altKey&&!event.ctrlKey&&!event.metaKey){event.preventDefault();begin(event);}
+  if(splash.isConnected&&splash.classList.contains("ct-launch-title-active")&&(event.key==="Enter"||event.key===" ")&&!event.altKey&&!event.ctrlKey&&!event.metaKey){event.preventDefault();begin(event);}
  });
 })();
 </script>
