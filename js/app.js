@@ -1035,6 +1035,45 @@
     }
   }
 
+  let mechnarLegalOverlay = null;
+  function closeMechnarLegal() {
+    if (mechnarLegalOverlay) mechnarLegalOverlay.remove();
+    mechnarLegalOverlay = null;
+  }
+  function openMechnarLegal(url, title) {
+    if (mechnarLegalOverlay) mechnarLegalOverlay.remove();
+    const overlay = document.createElement("section");
+    overlay.id = "mechnar-legal-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", title);
+    overlay.style.cssText = "position:fixed;inset:0;z-index:2147483600;background:var(--bg,#101018);display:flex;flex-direction:column;color:var(--text,#f4f1fa);";
+    overlay.innerHTML = '<header style="height:58px;flex:0 0 58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border,rgba(255,255,255,.14));"><strong>MECHNAR · '+title+'</strong><button type="button" aria-label="Close '+title+'" style="width:40px;height:40px;border:1px solid var(--border);border-radius:10px;background:transparent;color:inherit;font-size:24px;cursor:pointer">×</button></header><iframe title="'+title+'" style="width:100%;height:100%;border:0;background:var(--bg,#101018)" src="'+url+'"></iframe>';
+    document.body.appendChild(overlay);
+    mechnarLegalOverlay = overlay;
+    overlay.querySelector("header button").addEventListener("click", closeMechnarLegal);
+    overlay.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); closeMechnarLegal(); } });
+    const frame = overlay.querySelector("iframe");
+    frame.addEventListener("load", () => {
+      try {
+        const doc = frame.contentDocument;
+        doc.querySelectorAll("[data-mechnar-legal-close]").forEach(link => link.addEventListener("click", event => { event.preventDefault(); closeMechnarLegal(); }));
+      } catch (_) {}
+    });
+  }
+  function bindMechnarLegalLinks() {
+    if (document.documentElement.dataset.mechnarLegalBound === "true") return;
+    document.documentElement.dataset.mechnarLegalBound = "true";
+    document.addEventListener("click", event => {
+      const link = event.target.closest('a[href*="legal/terms.html"],a[href*="legal/privacy.html"]');
+      if (!link) return;
+      event.preventDefault();
+      const isTerms = link.href.includes("terms.html");
+      const path = link.getAttribute("href");
+      openMechnarLegal(path, isTerms ? "Terms of Service" : "Privacy Policy");
+    }, true);
+  }
+
   function bindFooterHelp() {
     const footer = getElement("app-footer");
     const dialog = getElement("app-modal");
