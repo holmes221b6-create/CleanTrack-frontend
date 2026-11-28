@@ -1,75 +1,109 @@
-/* Independent scrolling for the actual workspace markup:
-   #workspace-view.workspace-layout > #sidebar.sidebar + .workspace-main */
+/* Workspace scroll isolation — full viewport layout.
+   Fixed positioning prevents parent/main wrappers from shrinking the workspace
+   to content width. Sidebar and content are the only vertical scroll regions. */
 @media (min-width: 761px) {
   html, body, #app {
+    width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
   }
   body:has(#workspace-view:not([hidden])) {
     height: 100dvh !important;
     overflow: hidden !important;
   }
   #workspace-view.workspace-layout:not([hidden]) {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1 !important;
     display: grid !important;
-    grid-template-columns: 226px minmax(0, 1fr) !important;
-    width: 100% !important;
+    grid-template-columns: 230px minmax(0, 1fr) !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
     height: 100dvh !important;
     min-height: 0 !important;
     max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
     align-items: stretch !important;
   }
   #workspace-view > #sidebar.sidebar {
     position: relative !important;
-    top: auto !important;
-    align-self: stretch !important;
-    width: 100% !important;
+    inset: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 230px !important;
+    min-width: 230px !important;
+    max-width: 230px !important;
     height: 100% !important;
     min-height: 0 !important;
     max-height: 100% !important;
+    margin: 0 !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior: contain !important;
+    overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box !important;
   }
   #workspace-view > .workspace-main {
+    display: block !important;
     position: relative !important;
     width: 100% !important;
-    height: 100% !important;
     min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
     min-height: 0 !important;
     max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior: contain !important;
+    overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box !important;
   }
   #workspace-view > .workspace-main > #page-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
     min-height: 100% !important;
     height: auto !important;
     overflow: visible !important;
+    box-sizing: border-box !important;
   }
 }
 @media (max-width: 760px) {
-  /* Preserve the existing mobile drawer and normal document scrolling. */
-  body:has(#workspace-view:not([hidden])) {
+  /* Keep the existing responsive drawer and document flow on mobile. */
+  html, body, #app {
+    width: 100% !important;
     height: auto !important;
+    min-height: 100% !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
   }
   #workspace-view.workspace-layout:not([hidden]) {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: 100vh !important;
     max-height: none !important;
     overflow: visible !important;
   }
   #workspace-view > #sidebar.sidebar {
-    height: 100vh !important;
-    max-height: 100vh !important;
+    height: calc(100dvh - var(--header-height, 64px)) !important;
+    max-height: calc(100dvh - var(--header-height, 64px)) !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
   }
   #workspace-view > .workspace-main {
+    width: 100% !important;
     height: auto !important;
     min-height: 100vh !important;
     max-height: none !important;
