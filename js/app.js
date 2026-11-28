@@ -1391,6 +1391,14 @@
 
   async function renderPage(pageId) {
     const previousPage = state.currentPage;
+    if (pageId === "org-settings") {
+      const currentUser = auth.getCurrentUser();
+      if (String(currentUser?.role || "").toLowerCase() !== "admin") return;
+      if (window.CleanTrackOrganizationSettings?.openPanel) {
+        await window.CleanTrackOrganizationSettings.openPanel();
+      }
+      return;
+    }
     if(pageId==="settings"){
       state.currentPage="settings";
       const menuElement=getElement("workspace-navigation");
@@ -1725,18 +1733,6 @@
       return;
     }
 
-    if (pageId === "org-settings") {
-      if (String(user?.role || "").toLowerCase() !== "admin") {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organization Settings are available to Admin users only." }));
-        return;
-      }
-      if (window.CleanTrackOrganizationSettings && typeof window.CleanTrackOrganizationSettings.render === "function") {
-        await window.CleanTrackOrganizationSettings.render(pageContent);
-      } else {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Organization Settings could not load. Refresh and try again." }));
-      }
-      return;
-    }
 
     if (pageId === "invitations") {
       if (String(user?.role || "").toLowerCase() !== "admin") {
