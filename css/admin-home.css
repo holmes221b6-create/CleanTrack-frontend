@@ -566,3 +566,44 @@ html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shel
   overflow-x: hidden !important;
   overflow-y: visible !important;
 }
+
+
+/* Organization code guidance opens in the shared centered dialog, never inline. */
+#page-content .ct-home-code-top { position:relative; }
+#page-content .ct-home-code-info-button {
+  flex:0 0 28px;
+  width:28px;
+  height:28px;
+  min-width:28px;
+  padding:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #77718f;
+  border-radius:50%;
+  background:transparent;
+  color:#c9b8ff;
+  font:600 14px/1 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+#page-content .ct-home-code-info-button:hover {
+  background:rgba(151,112,255,.14);
+  border-color:#b49aff;
+  transform:translateY(-1px);
+}
+#page-content .ct-home-code-info-button:focus-visible {
+  outline:2px solid #b49aff;
+  outline-offset:3px;
+}
+#modal-content .ct-home-code-info-panel { max-width:620px; }
+#modal-content .ct-home-code-info-panel > p { margin:0 0 18px; line-height:1.65; }
+#modal-content .ct-home-code-info-list {
+  display:grid;
+  gap:13px;
+  margin:0;
+  padding-left:22px;
+  line-height:1.65;
+  color:var(--text-primary,#e8e5ef);
+}
+#modal-content .ct-home-code-info-list li { padding-left:4px; }
