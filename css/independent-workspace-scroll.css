@@ -1,54 +1,43 @@
-/* Desktop workspace: keep the application in normal document flow.
-   The main element is the full-width parent; the workspace itself owns the
-   two independent scroll regions. Avoid fixed positioning here. */
+/* MECHNAR desktop workspace: detach the authenticated shell from parent
+   layout constraints so it always occupies the viewport. Each column scrolls
+   independently; the document and outer app shell do not scroll. */
 @media (min-width: 761px) {
   html, body {
     width: 100% !important;
     height: 100% !important;
-    min-height: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
   }
   body:has(#workspace-view:not([hidden])) {
-    height: 100dvh !important;
-    overflow: hidden !important;
-  }
-  #main-content:has(#workspace-view:not([hidden])) {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    height: 100dvh !important;
-    min-height: 0 !important;
-    max-height: 100dvh !important;
-    margin: 0 !important;
-    padding: 0 !important;
     overflow: hidden !important;
   }
   #workspace-view.workspace-layout:not([hidden]) {
-    position: relative !important;
-    inset: auto !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100 !important;
     display: grid !important;
     grid-template-columns: 230px minmax(0, 1fr) !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
     height: 100dvh !important;
+    min-width: 0 !important;
     min-height: 0 !important;
-    max-height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     align-items: stretch !important;
   }
-  #workspace-view > #sidebar.sidebar {
+  #workspace-view.workspace-layout:not([hidden]) > #sidebar.sidebar {
     position: relative !important;
     inset: auto !important;
     transform: none !important;
-    visibility: visible !important;
     display: flex !important;
     flex-direction: column !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     width: 230px !important;
     min-width: 230px !important;
     max-width: 230px !important;
@@ -58,13 +47,14 @@
     margin: 0 !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
-    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain !important;
     box-sizing: border-box !important;
   }
-  #workspace-view > .workspace-main {
-    display: block !important;
+  #workspace-view.workspace-layout:not([hidden]) > .workspace-main {
     position: relative !important;
+    display: block !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
@@ -75,8 +65,7 @@
     padding: 0 !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
-    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain !important;
     box-sizing: border-box !important;
   }
   #workspace-view > .workspace-main > #page-content {
@@ -91,18 +80,12 @@
   }
 }
 @media (max-width: 760px) {
+  /* Keep the existing mobile document flow and navigation drawer. */
   html, body {
     width: 100% !important;
     height: auto !important;
     min-height: 100% !important;
     overflow-x: hidden !important;
-  }
-  #main-content:has(#workspace-view:not([hidden])) {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    max-height: none !important;
-    overflow: visible !important;
   }
   #workspace-view.workspace-layout:not([hidden]) {
     position: relative !important;
