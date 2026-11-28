@@ -257,9 +257,9 @@
 #page-content .ct-home-code-rules { margin-top:22px; padding-top:18px; border-top:1px solid #292c36; }
 #page-content .ct-home-code-rules h3 { margin:0 0 10px; color:#dcd8e7 !important; font-size:12px; }
 #page-content .ct-home-code-rules ul { display:grid; gap:8px; margin:0; padding-left:19px; color:#9290a0; font-size:11px; line-height:1.6; }
-#page-content .ct-home-directory { position:relative; overflow:visible; }
-#page-content .ct-home-directory .ct-home-section-heading { margin-bottom:15px; }
-#page-content .ct-home-member-search-wrap {
+#modal-content .ct-home-directory { position:relative; overflow:visible; }
+#modal-content .ct-home-directory .ct-home-section-heading { margin-bottom:15px; }
+#modal-content .ct-home-member-search-wrap {
   display:flex;
   align-items:center;
   gap:10px;
@@ -270,24 +270,24 @@
   background:#0b0f14;
   color:#9c96ac;
 }
-#page-content .ct-home-member-search-wrap:focus-within { border-color:#695a90; box-shadow:0 0 0 3px rgb(109 95 152 / 15%); }
-#page-content .ct-home-member-search-icon { font-size:22px; line-height:1; }
-#page-content .ct-home-member-search {
+#modal-content .ct-home-member-search-wrap:focus-within { border-color:#695a90; box-shadow:0 0 0 3px rgb(109 95 152 / 15%); }
+#modal-content .ct-home-member-search-icon { font-size:22px; line-height:1; }
+#modal-content .ct-home-member-search {
   width:100%; min-width:0; height:42px;
   padding:0;
   border:0 !important; outline:0; box-shadow:none !important;
   background:transparent !important; color:#e9e7ef !important;
   font:inherit; font-size:12px;
 }
-#page-content .ct-home-member-search::placeholder { color:#706c7f !important; }
-#page-content .ct-home-member-search-button { flex:0 0 auto; min-height:32px; padding:7px 13px; white-space:nowrap; }
+#modal-content .ct-home-member-search::placeholder { color:#706c7f !important; }
+#modal-content .ct-home-member-search-button { flex:0 0 auto; min-height:32px; padding:7px 13px; white-space:nowrap; }
 @media (max-width:520px) {
-  #page-content .ct-home-member-search-wrap { flex-wrap:wrap; padding:8px 10px; }
-  #page-content .ct-home-member-search { flex:1 1 calc(100% - 36px); }
-  #page-content .ct-home-member-search-button { flex:1 1 100%; }
+  #modal-content .ct-home-member-search-wrap { flex-wrap:wrap; padding:8px 10px; }
+  #modal-content .ct-home-member-search { flex:1 1 calc(100% - 36px); }
+  #modal-content .ct-home-member-search-button { flex:1 1 100%; }
 }
-#page-content .ct-home-member-count { margin:9px 0 0; color:#777485; font-size:10px; }
-#page-content .ct-home-member-results {
+#modal-content .ct-home-member-count { margin:9px 0 0; color:#777485; font-size:10px; }
+#modal-content .ct-home-member-results {
   display:grid;
   gap:5px;
   margin-top:9px;
@@ -296,7 +296,7 @@
   border-radius:11px;
   background:#0c1017;
 }
-#page-content .ct-home-member-results[hidden] { display:none; }
+#modal-content .ct-home-member-results[hidden] { display:none; }
 #page-content .ct-home-member-group-label {
   padding:7px 8px 3px;
   color:#797486;
@@ -351,8 +351,8 @@
 }
 #page-content .ct-home-member-arrow { color:#777485; font-size:12px; }
 #page-content .ct-home-member-empty { padding:12px 9px; color:#9290a0; font-size:11px; }
-#page-content .ct-home-directory-hint { margin-top:12px; }
-#page-content .ct-home-inline-error { margin-top:10px; color:#d78b9b; font-size:11px; }
+#modal-content .ct-home-directory-hint { margin-top:12px; }
+#modal-content .ct-home-inline-error { margin-top:10px; color:#d78b9b; font-size:11px; }
 #page-content .ct-home-member-detail { display:grid; gap:16px; color:#dcd8e7; }
 #page-content .ct-home-member-detail-top { display:flex; align-items:center; gap:12px; padding-bottom:15px; border-bottom:1px solid #292c36; }
 #page-content .ct-home-member-detail-top h3 { margin:0 0 3px; color:#e9e7ef !important; font-size:16px; }
@@ -404,13 +404,13 @@
 
 
 /* Organization directory: searchable, filterable and performance-aware */
-#page-content .ct-home-member-filters {
+#modal-content .ct-home-member-filters {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin: 16px 0 10px;
 }
-#page-content .ct-home-member-filter {
+#modal-content .ct-home-member-filter {
   display: grid;
   gap: 7px;
   min-width: 0;
@@ -419,7 +419,7 @@
   font-weight: 650;
   letter-spacing: .02em;
 }
-#page-content .ct-home-filter-select {
+#modal-content .ct-home-filter-select {
   width: 100%;
   min-width: 0;
   min-height: 42px;
@@ -431,15 +431,15 @@
   font: inherit;
   font-size: 13px;
 }
-#page-content .ct-home-filter-select option {
+#modal-content .ct-home-filter-select option {
   background: #211f2b;
   color: #f4f2fa;
 }
-#page-content .ct-home-member-filters [data-ct-member-filter="ranking"],
-#page-content .ct-home-member-filters [data-ct-member-filter="sort"] {
+#modal-content .ct-home-member-filters [data-ct-member-filter="ranking"],
+#modal-content .ct-home-member-filters [data-ct-member-filter="sort"] {
   grid-column: span 2;
 }
-#page-content .ct-home-member-results {
+#modal-content .ct-home-member-results {
   display: grid;
   gap: 8px;
   margin-top: 10px;
@@ -503,12 +503,12 @@
   margin-top: 2px;
 }
 @media (max-width: 1000px) {
-  #page-content .ct-home-member-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  #page-content .ct-home-member-filters [data-ct-member-filter="ranking"],
-  #page-content .ct-home-member-filters [data-ct-member-filter="sort"] { grid-column: span 1; }
+  #modal-content .ct-home-member-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #modal-content .ct-home-member-filters [data-ct-member-filter="ranking"],
+  #modal-content .ct-home-member-filters [data-ct-member-filter="sort"] { grid-column: span 1; }
 }
 @media (max-width: 560px) {
-  #page-content .ct-home-member-filters { grid-template-columns: minmax(0, 1fr); }
+  #modal-content .ct-home-member-filters { grid-template-columns: minmax(0, 1fr); }
   #page-content .ct-home-member-badges { align-items: end; }
   #page-content .ct-home-member-context { max-width: 55vw; }
 }
@@ -607,3 +607,11 @@ html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shel
   color:var(--text-primary,#e8e5ef);
 }
 #modal-content .ct-home-code-info-list li { padding-left:4px; }
+
+
+/* Organization Directory is rendered inside the shared centered modal. */
+#modal-content .ct-home-directory-dialog { width:100%; }
+#modal-content .ct-home-directory { margin:0; }
+#modal-content .ct-home-directory .ct-home-section-heading { margin-top:0; }
+#modal-content .ct-home-directory .ct-home-member-filters { margin-top:16px; }
+#modal-content .ct-home-directory .ct-home-directory-hint { margin-bottom:0; }
