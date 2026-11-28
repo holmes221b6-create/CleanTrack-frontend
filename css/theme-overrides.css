@@ -2316,3 +2316,15 @@ html[data-theme="light"] #page-content [class*="hero"] .btn-primary {
   box-shadow: none !important;
   transform: none !important;
 }
+
+/* MECHNAR scroll recovery: restore page scrolling without disabling
+   independent scroll regions inside drawers, dialogs, tables and sidebars. */
+html,body{min-height:100%!important;height:auto!important}
+body{overflow-x:hidden!important;overflow-y:auto!important}
+#app{min-height:100vh!important;height:auto!important;overflow:visible!important}
+#workspace-view{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important}
+#workspace-view .ct-workspace-shell{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important;align-items:stretch}
+#workspace-view .ct-workspace-main{height:auto!important;min-height:calc(100vh - 62px)!important;max-height:none!important;overflow:visible!important;min-width:0}
+#workspace-view #page-content,#workspace-view .page-content,#page-content{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;overflow-x:clip!important;overflow-y:visible!important}
+#workspace-view .ct-sidebar{position:sticky!important;top:0!important;height:100vh!important;max-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain}
+#workspace-view .ct-workspace-toolbar{position:sticky!important;top:0!important;z-index:50!important}
