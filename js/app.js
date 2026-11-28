@@ -719,8 +719,52 @@
       return true;
     }
   });
-  // No global click interception: each Guide button opens its own page's
-  // guide through the direct listener installed by MechnarPageGuide.attach().
+  // Global delegated fallback is intentional: several MECHNAR workspaces
+  // render their own Guide controls, and some replace toolbar DOM after load.
+  // A document capture listener survives those re-renders and handles buttons
+  // even when a module forgot to call attach() on its newly-created element.
+  if(!window.__MECHNAR_GUIDE_CAPTURE_V4__){
+    window.__MECHNAR_GUIDE_CAPTURE_V4__=true;
+    document.addEventListener("click",function(event){
+      const target=event.target;
+      const button=target&&typeof target.closest==="function"
+        ?target.closest("button,a,[role='button'],.ct-page-setup-trigger")
+        :null;
+      if(!button)return;
+      const label=String(button.getAttribute("aria-label")||button.textContent||"").trim();
+      const marked=button.matches("[data-mechnar-guide-page],.mn-personnel-guide,.ct-team-fullscreen-guide,.ct-page-setup-trigger button")||
+        /(^|\\s)guide($|\\s)/i.test(label);
+      if(!marked)return;
+      const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
+      const pageContent=button.closest("#page-content")||document.getElementById("page-content");
+      let pageId=button.dataset.mechnarGuidePage||button.closest("[data-guide-page]")?.dataset.guidePage;
+      if(!pageId){
+        if(root?.id==="mechnar-personnel-overlay"||button.classList.contains("mn-personnel-guide"))pageId="personnel";
+        else if(root?.id==="mechnar-performance-arena-overlay")pageId="performance";
+        else if(root?.classList.contains("ct-team-fullscreen-shell")||button.classList.contains("ct-team-fullscreen-guide"))pageId="teams";
+        else pageId=state.currentPage||navigation.getActivePage?.();
+      }
+      if(!pageId)return;
+      // The page guide owns this click; prevent competing menu actions.
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      const hostRoot=root||pageContent;
+      const contextRoot=root
+        ?(root.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody,[data-page-root],.page-content-inner")||root)
+        :(pageContent?.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||pageContent);
+      const user=auth.getCurrentUser?.()||{role:"supervisor"};
+      if(!hostRoot||!contextRoot||!hostRoot.isConnected||!contextRoot.isConnected){
+        console.error("MECHNAR guide: could not resolve the page container",{pageId,button});
+        return;
+      }
+      try{
+        showContextualPageGuide(user,pageId,contextRoot,hostRoot);
+      }catch(error){
+        console.error("MECHNAR guide failed to open:",error);
+      }
+    },true);
+  }
 
   // Maintain exactly one in-page Guide control per rendered route.
   // Do not attach to the instant-loading skeleton: wait until real page content
