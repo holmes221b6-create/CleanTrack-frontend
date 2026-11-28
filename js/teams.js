@@ -52,7 +52,18 @@ function rollupTrend(){
  return [...weeks.values()].sort((a,b)=>a.week_start.localeCompare(b.week_start)).map(x=>({...x,compliance_rate:x.due_dated_completions?Math.round(x.on_time/x.due_dated_completions*1000)/10:null}));
 }
 function renderInsights(){
- const wrap=root.querySelector("[data-team-insights]");if(!wrap)return;wrap.replaceChildren();
+ const host=root.querySelector("[data-team-insights]");if(!host)return;host.replaceChildren();
+ const launcher=button("Team overview","ct-team-btn ct-team-btn--quiet",()=>{overlay.hidden=false;close.focus()});
+ launcher.setAttribute("aria-haspopup","dialog");
+ const overlay=el("div","ct-team-overview-overlay");overlay.hidden=true;
+ const dialog=el("section","ct-team-overview-dialog");dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label","Team overview");
+ const bar=el("div","ct-team-overview-dialog-head");bar.append(el("h2","","Team overview"));
+ const close=button("×","ct-team-btn ct-team-overview-close",()=>{overlay.hidden=true;launcher.focus()});close.setAttribute("aria-label","Close team overview");bar.append(close);
+ const wrap=el("div","ct-team-overview-dialog-content");
+ dialog.append(bar,wrap);overlay.append(dialog);
+ overlay.addEventListener("click",e=>{if(e.target===overlay){overlay.hidden=true;launcher.focus()}});
+ dialog.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();overlay.hidden=true;launcher.focus()}});
+ host.append(launcher,overlay);
  const activeTeams=teams.filter(t=>String(t.status||"active")!=="archived");
  const total=(key)=>activeTeams.reduce((n,t)=>n+Number(t[key]||0),0);
  const totalMembers=total("member_count"),locations=total("location_count"),zones=total("zone_count"),tasks=total("task_count"),activeTasks=total("active_task_count"),overdue=total("overdue_task_count");
