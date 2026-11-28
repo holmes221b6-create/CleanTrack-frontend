@@ -615,3 +615,35 @@ html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shel
 #modal-content .ct-home-directory .ct-home-section-heading { margin-top:0; }
 #modal-content .ct-home-directory .ct-home-member-filters { margin-top:16px; }
 #modal-content .ct-home-directory .ct-home-directory-hint { margin-bottom:0; }
+
+
+/* Organization Directory launcher is a standalone action, not a settings card. */
+#page-content .ct-home-directory-action {
+  display:flex;
+  justify-content:flex-start;
+  margin:0 0 18px;
+}
+#page-content .ct-home-directory-launch-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:40px;
+  padding:10px 18px;
+  border:1px solid #75649d;
+  border-radius:8px;
+  background:rgba(126,96,190,.12);
+  color:#d9ccff;
+  font:600 13px/1.2 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+#page-content .ct-home-directory-launch-button:hover {
+  background:rgba(126,96,190,.22);
+  border-color:#a58bd8;
+  transform:translateY(-1px);
+}
+#page-content .ct-home-directory-launch-button:focus-visible {
+  outline:2px solid #b49aff;
+  outline-offset:3px;
+}
