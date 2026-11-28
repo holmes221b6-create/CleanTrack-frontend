@@ -522,7 +522,6 @@
     errorMessage.dataset.ctMemberError = "true";
     errorMessage.hidden = true;
     directory.appendChild(errorMessage);
-    directory.appendChild(el("p", "ct-home-muted ct-home-directory-hint", "Members with task history are ranked by compliance. Members without eligible task records remain unranked; no score is invented."));
     search.addEventListener("input", () => renderMemberResults(directoryRoot, search.value));
     filterGrid.querySelectorAll("select").forEach(select => {
       select.addEventListener("change", () => {
