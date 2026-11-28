@@ -186,6 +186,14 @@ html[data-theme="light"] .mw-scheduled-dialog{background:#fff;color:#202532;bord
   .mw-scheduled-list{padding-bottom:max(18px,env(safe-area-inset-bottom))}
 }
 
+
+/* Scheduled operations: fixed-height flex dialog with a genuinely scrollable list. */
+.mw-scheduled-dialog{box-sizing:border-box;height:min(82dvh,820px);max-height:calc(100dvh - 32px);min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.mw-scheduled-head,.mw-scheduled-toolbar{flex:0 0 auto}
+.mw-scheduled-list{flex:1 1 0%;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.mw-scheduled-overlay{position:fixed;inset:0;overflow:hidden;overscroll-behavior:contain}
+@media(max-width:600px){.mw-scheduled-dialog{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)}}
+
 /* Supervisor Insights: consistent hierarchy, readable metrics and clear states. */
 .mn-insights{width:100%;box-sizing:border-box}
 .mn-insights-head{padding:4px 0 18px;border-bottom:1px solid var(--border,#383241);margin-bottom:18px}
