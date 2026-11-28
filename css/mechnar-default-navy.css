@@ -92,14 +92,24 @@ html[data-theme="default"] #page-content .report-history-panel {
   border-color: #203d5e !important;
   color: #e8eef8 !important;
 }
+/* Consistent purple hierarchy for page and section headings across the workspace. */
 html[data-theme="default"] #page-content h1,
 html[data-theme="default"] #page-content h2,
 html[data-theme="default"] #page-content h3,
-html[data-theme="default"] #page-content h4,
+html[data-theme="default"] #page-content h4 {
+  color: #c5a8ff !important;
+}
 html[data-theme="default"] #page-content label,
 html[data-theme="default"] #page-content strong,
 html[data-theme="default"] #page-content th {
   color: #e8eef8 !important;
+}
+html[data-theme="default"] #page-content .eyebrow,
+html[data-theme="default"] #page-content .page-eyebrow,
+html[data-theme="default"] #page-content .section-eyebrow,
+html[data-theme="default"] #page-content [class*="eyebrow"],
+html[data-theme="default"] #page-content [class*="kicker"] {
+  color: #b99afc !important;
 }
 html[data-theme="default"] #page-content p,
 html[data-theme="default"] #page-content small,
