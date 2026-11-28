@@ -1,41 +1,36 @@
-/* Correct independent scrolling for the real MECHNAR DOM:
+/* Independent scrolling for the actual workspace markup:
    #workspace-view.workspace-layout > #sidebar.sidebar + .workspace-main */
-@media (min-width: 801px) {
-  html, body {
+@media (min-width: 761px) {
+  html, body, #app {
     height: 100% !important;
     min-height: 0 !important;
-    overflow: hidden !important;
   }
   body:has(#workspace-view:not([hidden])) {
     height: 100dvh !important;
     overflow: hidden !important;
   }
-  #workspace-view.workspace-layout {
+  #workspace-view.workspace-layout:not([hidden]) {
     display: grid !important;
-    grid-template-columns: var(--sidebar-width, 260px) minmax(0, 1fr) !important;
+    grid-template-columns: 226px minmax(0, 1fr) !important;
     width: 100% !important;
-    height: calc(100dvh - var(--header-height, 72px)) !important;
+    height: 100dvh !important;
     min-height: 0 !important;
-    max-height: calc(100dvh - var(--header-height, 72px)) !important;
+    max-height: 100dvh !important;
     overflow: hidden !important;
     align-items: stretch !important;
   }
   #workspace-view > #sidebar.sidebar {
     position: relative !important;
-    inset: auto !important;
-    transform: none !important;
-    visibility: visible !important;
+    top: auto !important;
     align-self: stretch !important;
-    width: auto !important;
+    width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
     max-height: 100% !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
+    overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
   }
   #workspace-view > .workspace-main {
     position: relative !important;
@@ -46,28 +41,38 @@
     max-height: 100% !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
+    overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch;
-    scrollbar-gutter: stable;
   }
-  #workspace-view .workspace-main > #page-content {
+  #workspace-view > .workspace-main > #page-content {
     min-height: 100% !important;
     height: auto !important;
     overflow: visible !important;
   }
 }
-@media (max-width: 800px) {
+@media (max-width: 760px) {
+  /* Preserve the existing mobile drawer and normal document scrolling. */
   body:has(#workspace-view:not([hidden])) {
+    height: auto !important;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
-  #workspace-view.workspace-layout {
-    min-height: calc(100dvh - var(--header-height, 64px)) !important;
+  #workspace-view.workspace-layout:not([hidden]) {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
   #workspace-view > #sidebar.sidebar {
-    overscroll-behavior-y: contain !important;
-    -webkit-overflow-scrolling: touch;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
   }
   #workspace-view > .workspace-main {
-    min-height: calc(100dvh - var(--header-height, 64px)) !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
