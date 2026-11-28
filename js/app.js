@@ -639,6 +639,25 @@
     };
 
     let slides=guide[pageId]||[["Purpose","This page provides the "+label.toLowerCase()+" functions available to your role.","Use it to complete the workflow associated with this area.",["Review the information shown on the page.","Open the relevant record or section before taking action.","Use the controls provided for your account."]],["Using this page","Work through the available actions and verify the result after saving or submitting.",["Use search and filters to find the correct record where available.","Open a record to review details before changing it.","If an action is unavailable, your role may not have permission."]]];
+    // Older guide entries used [heading, paragraph, bullets], while newer
+    // entries use [heading, paragraph, supporting paragraph, bullets].
+    // Normalize both formats before rendering so a missing bullets array
+    // can never crash the entire guide.
+    if(!Array.isArray(slides)||!slides.length)slides=[["Page overview","Use the controls on this page to complete the workflow available to your role.",["Review the page information.","Open the relevant record.","Use the available actions and confirm the result."]]];
+    slides=slides.map((item,index)=>{
+      const data=Array.isArray(item)?item:[];
+      const bullets=Array.isArray(data[3])?data[3]:(Array.isArray(data[2])?data[2]:[]);
+      return [
+        String(data[0]||"Guide section "+(index+1)),
+        String(data[1]||"Follow the instructions on this page to complete the relevant workflow."),
+        typeof data[2]==="string"?data[2]:"",
+        bullets.length?bullets.map(value=>String(value)):[
+          "Review the information and controls available in this section.",
+          "Open the relevant record before making changes.",
+          "Confirm the result after completing an action."
+        ]
+      ];
+    });
     if(pageId==="operations"&&(role==="employee"||role==="staff"))slides=[["Purpose","Operations shown to staff are the work assignments allocated to you or your team.","Use this page to understand the work, its location and its expected completion.",["Open an assigned operation to read its instructions.","Check due date, priority and location.","Use available progress or completion controls."]],["Working through assignments","Complete work according to its instructions and keep the recorded status accurate.",["Follow listed steps and requirements.","Add notes or evidence when requested.","Submit completion only after the work is finished."]]];
     if(pageId==="inspections"&&(role==="staff"||role==="employee"))slides=[["Purpose","This inspection area is available to staff who have Team Leader access.","Use it to complete assigned quality inspections and submit results to your supervisor.",["Open the inspection assigned or scheduled for you.","Review the template and each inspection criterion.","Record findings and submit the inspection."]],["Submitting an inspection","Be specific when recording a failed check or quality concern so the supervisor can follow up.",["Complete each required criterion.","Add notes where a result needs explanation.","Submit the completed inspection for supervisor review."]]];
 
@@ -649,7 +668,7 @@
     const title=document.createElement("h2");title.textContent=label+" Guide";const intro=document.createElement("p");intro.className="ct-page-guide-description";intro.textContent="A practical walkthrough of this page and how to use its features.";
     titleWrap.append(kicker,title,intro);const close=document.createElement("button");close.type="button";close.className="ct-page-guide-close";close.textContent="×";close.setAttribute("aria-label","Close guide");header.append(titleWrap,close);
     const viewport=document.createElement("div");viewport.className="ct-guide-slide-viewport";const track=document.createElement("div");track.className="ct-guide-slide-track";let slideIndex=0;
-    slides.forEach((data,n)=>{const slide=document.createElement("article");slide.className="ct-guide-slide";slide.setAttribute("aria-label","Slide "+(n+1));const h=document.createElement("h3");h.textContent=data[0];const p=document.createElement("p");p.className="ct-guide-slide-copy";p.textContent=data[1];const extra=document.createElement("p");extra.className="ct-guide-slide-extra";extra.textContent=data[2]||"";const list=document.createElement("ul");list.className="ct-guide-bullet-list";data[3].forEach(item=>{const li=document.createElement("li");li.textContent=item;list.append(li);});slide.append(h,p,extra,list);track.append(slide);});
+    slides.forEach((data,n)=>{const slide=document.createElement("article");slide.className="ct-guide-slide";slide.setAttribute("aria-label","Slide "+(n+1));const h=document.createElement("h3");h.textContent=data[0];const p=document.createElement("p");p.className="ct-guide-slide-copy";p.textContent=data[1];const extra=document.createElement("p");extra.className="ct-guide-slide-extra";extra.textContent=data[2]||"";extra.hidden=!data[2];const list=document.createElement("ul");list.className="ct-guide-bullet-list";(Array.isArray(data[3])?data[3]:[]).forEach(item=>{const li=document.createElement("li");li.textContent=item;list.append(li);});slide.append(h,p);if(data[2])slide.append(extra);slide.append(list);track.append(slide);});
     viewport.append(track);const footer=document.createElement("div");footer.className="ct-guide-slide-footer";const prev=document.createElement("button");prev.type="button";prev.className="ct-guide-nav ct-guide-prev";prev.textContent="← Previous";
     const progress=document.createElement("div");progress.className="ct-guide-progress";const count=document.createElement("span");count.className="ct-guide-slide-count";const dots=document.createElement("div");dots.className="ct-guide-dots";slides.forEach(()=>{const dot=document.createElement("span");dot.className="ct-guide-dot";dots.append(dot);});progress.append(count,dots);
     const next=document.createElement("button");next.type="button";next.className="ct-guide-nav ct-guide-next";next.textContent="Next →";footer.append(prev,progress,next);dialog.append(header,viewport,footer);overlay.append(dialog);
