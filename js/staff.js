@@ -730,6 +730,8 @@
     const dtitle=el("div");dtitle.append(el("h2","","Supervisor directory"),el("p","ct-staff-muted","Use the filters to narrow results. Select one or more records for bulk actions."));
     dhead.append(dtitle,button("Refresh","ct-staff-button",function(){loadData(false).catch(function(e){notice(pageRoot,e.message||"Could not refresh staff.","error");});}));
     directory.appendChild(dhead);
+    /* Keep the supervisor status selector inside the Supervisor directory. */
+    directory.appendChild(sidebar);
     searchControl=el("input","ct-staff-input");searchControl.type="search";searchControl.placeholder="Search supervisor name, email, team, location or zone";searchControl.setAttribute("aria-label","Search supervisor directory");
     directory.appendChild(searchControl);
     const filters=el("div","ct-staff-filters");
@@ -743,7 +745,7 @@
     const profileCard=el("section","ct-staff-card ct-staff-profile-card");
     profileCard.append(el("h2","","Supervisor details"),el("p","ct-staff-muted","Profile, team, workload, shared employees, and audit history."));
     profileHost=el("div","ct-staff-profile-host");profileCard.appendChild(profileHost);main.appendChild(profileCard);
-    layout.append(sidebar,main);pageRoot.appendChild(layout);
+    layout.appendChild(main);pageRoot.appendChild(layout);
 
     const invite=el("section","ct-staff-invite-card");
     const inviteCopy=el("div");inviteCopy.append(el("p","ct-staff-eyebrow","GROW YOUR TEAM"),el("h2","","Invite supervisors"),el("p","ct-staff-muted","Open your phone’s share sheet for SMS, WhatsApp, or other apps. The shared join link creates a request; it does not bypass approval."));
