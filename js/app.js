@@ -669,9 +669,30 @@
   // Setup guidance is opt-in and contextual. Never force the tour into the
   // role's default workspace during login or first-run onboarding.
   function maybeShowFirstSetup(user){ return false; }
-  // DOM clones copy data attributes but not event listeners. Track actual
-  // bound elements by identity so a cloned Guide button is always rebound.
+  // Guide controls are bound directly to their actual button elements.
+  // This is essential for independent full-screen workspaces such as Personnel:
+  // those controls are outside #page-content and must open inside their own panel.
   const pageGuideBoundButtons = new WeakSet();
+  function openMechnarPageGuide(button){
+    if(!button||!button.isConnected)return false;
+    const pageId=button.dataset.mechnarGuidePage;
+    if(!pageId)return false;
+    const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
+    const pageContent=button.closest("#page-content")||document.getElementById("page-content");
+    const hostRoot=root||pageContent;
+    const contextRoot=root
+      ?(root.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||root)
+      :(pageContent?.querySelector("[data-page-root],.mt-page,.mt-page-content,.page-view,.page-content-inner")||pageContent);
+    const currentUser=auth&&typeof auth.getCurrentUser==="function"?auth.getCurrentUser():null;
+    if(!hostRoot||!hostRoot.isConnected||!contextRoot||!contextRoot.isConnected)return false;
+    try{
+      showContextualPageGuide(currentUser||{role:"supervisor"},pageId,contextRoot,hostRoot);
+      return true;
+    }catch(error){
+      console.error("MECHNAR page guide click failed:",error);
+      return false;
+    }
+  }
   window.MechnarPageGuide = Object.freeze({
     attach: function(button,pageId){
       if(!button||!pageId)return false;
@@ -684,44 +705,22 @@
       button.setAttribute("aria-label",pageLabel+" guide");
       button.dataset.mechnarGuidePage=pageId;
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
-      // Clicks are handled once by the document-level capture delegate below.
-      // Do not attach a second per-button listener: that caused inconsistent
-      // behaviour when page modules replaced or cloned their Guide controls.
-      pageGuideBoundButtons.add(button);
+      // Attach once to this concrete DOM node. If a renderer clones or
+      // replaces it, attach() is called on the new node and binds that node too.
+      if(!pageGuideBoundButtons.has(button)){
+        button.addEventListener("click",function(event){
+          event.preventDefault();
+          event.stopPropagation();
+          openMechnarPageGuide(button);
+        });
+        pageGuideBoundButtons.add(button);
+      }
       button.dataset.mechnarGuideBound="true";
       return true;
     }
   });
-  // One document-level capture handler is the source of truth for Guide
-  // clicks. It also covers buttons replaced by page renderers, cached DOM,
-  // and controls created after the initial route mount.
-  if(!window.__MECHNAR_PAGE_GUIDE_DELEGATE__){
-    window.__MECHNAR_PAGE_GUIDE_DELEGATE__=true;
-    document.addEventListener("click",function(event){
-      const target=event.target;
-      const button=target&&typeof target.closest==="function"
-        ?target.closest("[data-mechnar-guide-page]")
-        :null;
-      if(!button)return;
-      const pageId=button.dataset.mechnarGuidePage;
-      if(!pageId)return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
-      const pageContent=button.closest("#page-content")||document.getElementById("page-content");
-      const hostRoot=root||pageContent;
-      const contextRoot=root?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||pageContent||root;
-      try{
-        const currentUser=auth&&typeof auth.getCurrentUser==="function"
-          ?auth.getCurrentUser()
-          :null;
-        showContextualPageGuide(currentUser||{role:"supervisor"},pageId,contextRoot,hostRoot);
-      }catch(error){
-        console.error("MECHNAR page guide click failed:",error);
-      }
-    },true);
-  }
+  // No global click interception: each Guide button opens its own page's
+  // guide through the direct listener installed by MechnarPageGuide.attach().
 
   // Maintain exactly one in-page Guide control per rendered route.
   // Do not attach to the instant-loading skeleton: wait until real page content
