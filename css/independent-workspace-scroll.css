@@ -1,8 +1,8 @@
-/* Workspace scroll isolation — full viewport layout.
-   Fixed positioning prevents parent/main wrappers from shrinking the workspace
-   to content width. Sidebar and content are the only vertical scroll regions. */
+/* Desktop workspace: keep the application in normal document flow.
+   The main element is the full-width parent; the workspace itself owns the
+   two independent scroll regions. Avoid fixed positioning here. */
 @media (min-width: 761px) {
-  html, body, #app {
+  html, body {
     width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
@@ -13,14 +13,26 @@
     height: 100dvh !important;
     overflow: hidden !important;
   }
+  #main-content:has(#workspace-view:not([hidden])) {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
   #workspace-view.workspace-layout:not([hidden]) {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 1 !important;
+    position: relative !important;
+    inset: auto !important;
     display: grid !important;
     grid-template-columns: 230px minmax(0, 1fr) !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
     height: 100dvh !important;
     min-height: 0 !important;
     max-height: 100dvh !important;
@@ -70,8 +82,8 @@
   #workspace-view > .workspace-main > #page-content {
     display: block !important;
     width: 100% !important;
-    max-width: none !important;
     min-width: 0 !important;
+    max-width: none !important;
     min-height: 100% !important;
     height: auto !important;
     overflow: visible !important;
@@ -79,16 +91,23 @@
   }
 }
 @media (max-width: 760px) {
-  /* Keep the existing responsive drawer and document flow on mobile. */
-  html, body, #app {
+  html, body {
     width: 100% !important;
     height: auto !important;
     min-height: 100% !important;
     overflow-x: hidden !important;
   }
+  #main-content:has(#workspace-view:not([hidden])) {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
   #workspace-view.workspace-layout:not([hidden]) {
     position: relative !important;
     inset: auto !important;
+    display: block !important;
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
