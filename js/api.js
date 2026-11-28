@@ -189,24 +189,64 @@
     return "/" + String(path || "").replace(/^\/+/, "");
   }
 
-  function get(path, options = {}) {
-    return request(path, { ...options, method: "GET" });
+  // Short-lived, in-memory GET cache. It avoids repeating identical reads
+  // during rapid page changes while ensuring writes immediately invalidate it.
+  // Cache keys include the active access token so one signed-in account can
+  // never reuse another account's response in the same browser tab.
+  const GET_CACHE_TTL = 5000;
+  const getCache = new Map();
+  const getInFlight = new Map();
+
+  function activeToken() {
+    try {
+      return window.CleanTrackAuth?.getAuthToken?.() ||
+        window.sessionStorage.getItem("cleantrack_token") || "";
+    } catch (_) { return ""; }
   }
 
-  function post(path, body, options = {}) {
-    return request(path, { ...options, method: "POST", body });
+  function clearGetCache() {
+    getCache.clear();
+    getInFlight.clear();
   }
 
-  function put(path, body, options = {}) {
-    return request(path, { ...options, method: "PUT", body });
+  async function get(path, options = {}) {
+    const key = activeToken() + "::" + normalizePath(path);
+    const now = Date.now();
+    const cached = getCache.get(key);
+    if (cached && now - cached.time < GET_CACHE_TTL) return cached.data;
+    if (getInFlight.has(key)) return getInFlight.get(key);
+
+    const pending = request(path, { ...options, method: "GET" }).then(data => {
+      getCache.set(key, { time: Date.now(), data });
+      while (getCache.size > 100) getCache.delete(getCache.keys().next().value);
+      return data;
+    }).finally(() => getInFlight.delete(key));
+    getInFlight.set(key, pending);
+    return pending;
   }
 
-  function patch(path, body, options = {}) {
-    return request(path, { ...options, method: "PATCH", body });
+  async function post(path, body, options = {}) {
+    const result = await request(path, { ...options, method: "POST", body });
+    clearGetCache();
+    return result;
   }
 
-  function del(path, options = {}) {
-    return request(path, { ...options, method: "DELETE" });
+  async function put(path, body, options = {}) {
+    const result = await request(path, { ...options, method: "PUT", body });
+    clearGetCache();
+    return result;
+  }
+
+  async function patch(path, body, options = {}) {
+    const result = await request(path, { ...options, method: "PATCH", body });
+    clearGetCache();
+    return result;
+  }
+
+  async function del(path, options = {}) {
+    const result = await request(path, { ...options, method: "DELETE" });
+    clearGetCache();
+    return result;
   }
 
 
