@@ -512,3 +512,43 @@
   #page-content .ct-home-member-badges { align-items: end; }
   #page-content .ct-home-member-context { max-width: 55vw; }
 }
+
+ 
+/* Admin Home: restore vertical scrolling for the full dashboard workspace.
+   Keep scrolling inside the workspace main column so the sidebar and toolbar
+   remain fixed, while the entire Home page can be reached. */
+html body #workspace-view:has(#page-content .ct-home-welcome) {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) #page-content,
+html body #workspace-view:has(#page-content .ct-home-welcome) .page-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) #page-content {
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
