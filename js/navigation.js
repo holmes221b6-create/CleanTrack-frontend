@@ -51,6 +51,7 @@
       { id: "sites", label: "Sites & Zones", icon: "⌖" },
       { id: "team-channel", label: "Team Channel", icon: "▤" },
       { id: "meetings", label: "Meetings", icon: "◉" },
+      { id: "insights", label: "Insights", icon: "◫" },
       { id: "performance", label: "Performance Arena", icon: "▥" },
       { id: "performance-analysis", label: "Performance Analysis", icon: "◫" },
       { id: "reports", label: "Reports", icon: "▧" },
