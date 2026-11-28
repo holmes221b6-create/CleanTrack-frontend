@@ -465,6 +465,13 @@
     content.replaceChildren();
     const directoryRoot = el("div", "ct-home-directory-dialog");
     content.appendChild(directoryRoot);
+    // Open the dialog before loading directory data so the click always produces
+    // immediate visible feedback; the results populate inside the open panel.
+    if (typeof dialog.showModal === "function") {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
     const directory = el("section", "ct-home-panel ct-home-directory");
     const directoryHeader = el("div", "ct-home-section-heading");
     directoryHeader.append(el("p", "ct-home-kicker", "ORGANIZATION DIRECTORY"));
@@ -637,12 +644,14 @@
     header.append(el("h2", "", "Organizational settings"));
     header.append(el("p", "ct-home-muted", "Manage your organization profile, people structure, and access."));
     settings.appendChild(header);
+    const directoryAction = el("div", "ct-home-directory-action");
+    directoryAction.appendChild(button("⌕  Find a member", "ct-home-directory-launch-button", () => openOrganizationDirectory()));
+    settings.appendChild(directoryAction);
     const grid = el("div", "ct-home-settings-grid");
     grid.append(
       makeSettingCard("◇", "Organization settings", "Organization profile, membership, policies, audit trail, and lifecycle controls.", () => go("org-settings"), "Manage organization"),
       makeSettingCard("♧", "Teams and roles", "Organize members into teams and review the roles available to your organization.", () => go("teams"), "Manage teams"),
-      makeSettingCard("⚿", "Access and permissions", "Review account access and make sure people have the right responsibilities.", () => go("staff"), "Manage access"),
-      makeSettingCard("⌕", "Organization Directory", "Search approved members and review their organization details and work performance.", () => openOrganizationDirectory(), "Find a member")
+      makeSettingCard("⚿", "Access and permissions", "Review account access and make sure people have the right responsibilities.", () => go("staff"), "Manage access")
     );
     settings.appendChild(grid);
     root.appendChild(settings);
