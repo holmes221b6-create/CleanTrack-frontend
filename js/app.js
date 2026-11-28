@@ -1365,6 +1365,66 @@
     }, 1800);
   }
 
+  let staffOverlay = null;
+  let staffOpenToken = 0;
+  let staffPreviousPage = null;
+
+  function closeStaffOverlay() {
+    staffOpenToken++;
+    if (staffOverlay) staffOverlay.remove();
+    staffOverlay = null;
+    const previous = staffPreviousPage || "home";
+    staffPreviousPage = null;
+    if (window.CleanTrackNavigation && window.CleanTrackNavigation.getActivePage() === "staff") {
+      window.CleanTrackNavigation.setActivePage(previous);
+    }
+  }
+
+  async function openStaffOverlay(previousPage) {
+    if (staffOverlay) staffOverlay.remove();
+    const token = ++staffOpenToken;
+    staffPreviousPage = previousPage && previousPage !== "staff" ? previousPage : "home";
+    if (!document.getElementById("mechnar-staff-overlay-style")) {
+      const style = document.createElement("style");
+      style.id = "mechnar-staff-overlay-style";
+      style.textContent = '#mechnar-staff-overlay{position:fixed!important;inset:0!important;z-index:2147483003!important;display:flex!important;flex-direction:column!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-width:0!important;min-height:0!important;background:var(--app-bg,#0b0a0e)!important;color:var(--text-primary,#f4f0f8)!important;overflow:hidden!important}#mechnar-staff-overlay .mn-staff-top{height:56px;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border-color,rgba(160,140,190,.22));background:var(--surface-1,#111015);font-size:15px;font-weight:650}#mechnar-staff-overlay .mn-staff-close{width:38px;height:38px;border:1px solid var(--border-color,rgba(160,140,190,.3));border-radius:9px;background:transparent;color:inherit;font-size:27px;line-height:1;cursor:pointer}#mechnar-staff-overlay .mn-staff-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}#mechnar-staff-overlay .mn-staff-spinner{width:38px;height:38px;border:3px solid rgba(174,151,220,.2);border-top-color:#a98be8;border-right-color:#8060bd;border-radius:50%;animation:mnStaffSpin .82s linear infinite}#mechnar-staff-overlay .mn-staff-loading small{font-size:12px;opacity:.65}#mechnar-staff-overlay .mn-staff-content{display:block;flex:1 1 auto;min-width:0;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px 22px 36px}#mechnar-staff-overlay .mn-staff-content>*{max-width:none!important}@keyframes mnStaffSpin{to{transform:rotate(360deg)}}@media(max-width:600px){#mechnar-staff-overlay .mn-staff-top{padding:0 14px}#mechnar-staff-overlay .mn-staff-content{padding:12px}}@media(prefers-reduced-motion:reduce){#mechnar-staff-overlay .mn-staff-spinner{animation:none}}';
+      document.head.appendChild(style);
+    }
+    const overlay=document.createElement("section");
+    overlay.id="mechnar-staff-overlay";
+    overlay.setAttribute("role","dialog");
+    overlay.setAttribute("aria-modal","true");
+    overlay.setAttribute("aria-label","Staff");
+    overlay.innerHTML='<header class="mn-staff-top"><span>Staff</span><button type="button" class="mn-staff-close" aria-label="Close Staff" title="Back to workspace">×</button></header><div class="mn-staff-loading" role="status" aria-live="polite"><span class="mn-staff-spinner" aria-hidden="true"></span><strong>Opening Staff</strong><small>Loading organisation records…</small></div><div class="mn-staff-content" hidden></div>';
+    document.body.appendChild(overlay);
+    staffOverlay=overlay;
+    overlay.querySelector(".mn-staff-close").addEventListener("click",closeStaffOverlay);
+    overlay.addEventListener("keydown",event=>{if(event.key==="Escape"&&staffOverlay===overlay)closeStaffOverlay();});
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    if(token!==staffOpenToken||staffOverlay!==overlay)return;
+    const loading=overlay.querySelector(".mn-staff-loading");
+    const content=overlay.querySelector(".mn-staff-content");
+    try {
+      const user=auth.getCurrentUser();
+      if(String(user?.role||"").toLowerCase()!=="admin") {
+        content.textContent="Staff administration is available to organization Admins only.";
+      } else if(window.CleanTrackStaff&&typeof window.CleanTrackStaff.render==="function") {
+        await window.CleanTrackStaff.render(content);
+      } else {
+        content.textContent="The Staff module could not load. Refresh MECHNAR and try again.";
+      }
+    } catch(error) {
+      console.error("MECHNAR Staff panel failed to load:",error);
+      content.textContent="Staff could not load. Check your connection and try again.";
+    } finally {
+      if(token===staffOpenToken&&staffOverlay===overlay) {
+        loading.remove();
+        content.hidden=false;
+        overlay.querySelector(".mn-staff-close").focus();
+      }
+    }
+  }
+
   // Keep recently visited workspaces mounted off-screen. Returning to a page
   // restores its live DOM, form state, scroll position and event handlers
   // instead of rebuilding the workspace and repeating its API requests.
@@ -1919,15 +1979,8 @@
     }
 
     if (pageId === "staff") {
-      if (String(user?.role || "").toLowerCase() !== "admin") {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "Staff administration is available to organization Admins only." }));
-        return;
-      }
-      if (window.CleanTrackStaff && typeof window.CleanTrackStaff.render === "function") {
-        await window.CleanTrackStaff.render(pageContent);
-      } else {
-        pageContent.appendChild(Object.assign(document.createElement("p"), { textContent: "The Staff module could not load. Refresh and try again." }));
-      }
+      if (String(user?.role || "").toLowerCase() !== "admin") return;
+      await openStaffOverlay(previousPage);
       return;
     }
 
