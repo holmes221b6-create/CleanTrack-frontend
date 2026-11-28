@@ -730,8 +730,9 @@
     const dtitle=el("div");dtitle.append(el("h2","","Supervisor directory"),el("p","ct-staff-muted","Use the filters to narrow results. Select one or more records for bulk actions."));
     dhead.append(dtitle,button("Refresh","ct-staff-button",function(){loadData(false).catch(function(e){notice(pageRoot,e.message||"Could not refresh staff.","error");});}));
     directory.appendChild(dhead);
-    /* Keep the supervisor status selector inside the Supervisor directory. */
-    directory.appendChild(sidebar);
+    /* Place the supervisor heading, filters and selector directly inside the directory.
+       Avoid nesting the old sidebar layout container inside the directory. */
+    while (sidebar.firstChild) directory.appendChild(sidebar.firstChild);
     searchControl=el("input","ct-staff-input");searchControl.type="search";searchControl.placeholder="Search supervisor name, email, team, location or zone";searchControl.setAttribute("aria-label","Search supervisor directory");
     directory.appendChild(searchControl);
     const filters=el("div","ct-staff-filters");
