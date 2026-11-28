@@ -2,8 +2,7 @@
   "use strict";
   const selectors = [
     ".mt-overlay", ".modal-backdrop", "#app-modal[open]", ".app-modal[open]",
-    ".filter-modal:not([hidden])", ".filter-panel:not([hidden])",
-    ".filter-dialog:not([hidden])", '[role="dialog"][aria-modal="true"]'
+    ".filter-modal:not([hidden])", '[role="dialog"][aria-modal="true"]'
   ];
   let locked = false, savedScrollY = 0, previous = null, frame = 0;
   function visible(el) {
