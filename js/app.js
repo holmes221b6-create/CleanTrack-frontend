@@ -891,11 +891,11 @@
 
     const role = String(user?.role || "").toLowerCase();
     const labels = {
-      admin: "Admin Guide",
-      supervisor: "Supervisor Guide",
-      employee: "Employee Guide"
+      admin: "MECHNAR Admin Guide",
+      supervisor: "MECHNAR Supervisor Guide",
+      employee: "MECHNAR Staff Guide"
     };
-    guide.textContent = labels[role] || "Getting Started Guide";
+    guide.textContent = labels[role] || "MECHNAR Getting Started Guide";
     guide.dataset.guideRole = role || "guest";
   }
 
@@ -908,96 +908,112 @@
     const user = auth.getCurrentUser();
     const role = String(user?.role || "").toLowerCase();
     const roleTitle = {
-      admin: "Admin Guide",
-      supervisor: "Supervisor Guide",
-      employee: "Employee Guide"
+      admin: "MECHNAR Admin Guide",
+      supervisor: "MECHNAR Supervisor Guide",
+      employee: "MECHNAR Staff Guide"
     }[role] || "Getting Started Guide";
 
     content.replaceChildren();
 
     if (action === "center") {
-      titleElement.textContent = "Help Center";
+      titleElement.textContent = "MECHNAR Help Center";
+      const roleIntro = {
+        admin: "Administrator support: organisation configuration, access control, operational oversight and reporting.",
+        supervisor: "Supervisor support: team coordination, personnel, assigned operations, reviews, incidents and quality follow-up.",
+        employee: "Staff support: assigned operations, work instructions, completion records, incidents and workplace updates.",
+        guest: "MECHNAR account access, registration and organisation onboarding."
+      }[role] || "MECHNAR account access and product guidance.";
       content.innerHTML = `
         <div class="ct-help-dialog">
-          <p class="ct-help-lead">Find your way around CleanTrack and get help with everyday work.</p>
+          <p class="ct-help-lead">MECHNAR Help Center</p>
+          <p>${roleIntro}</p>
           <section class="ct-help-topic">
-            <h3>Finding your workspace</h3>
-            <p>Use the left navigation to open the sections available to your account. On smaller screens, use the three-line menu button to open navigation.</p>
+            <h3>Find your workspace</h3>
+            <p>Use the navigation to open the MECHNAR modules enabled for your account. On smaller screens, use the menu button to open navigation.</p>
           </section>
           <section class="ct-help-topic">
-            <h3>Roles and access</h3>
-            <p>Your role determines which tools and actions are available. If a section is missing or you need access, contact your workspace administrator.</p>
+            <h3>Roles and permissions</h3>
+            <p>MECHNAR displays features according to your assigned role and organisation permissions. Ask your organisation administrator if you need access to a module.</p>
           </section>
           <section class="ct-help-topic">
-            <h3>Tasks and records</h3>
-            <p>Open the task or operations area available to your role to review work. Follow the instructions shown for each task and record evidence when requested.</p>
+            <h3>Operational records</h3>
+            <p>Use the relevant MECHNAR module to review operations, records, submissions or incidents. Check the details and status after completing an action.</p>
           </section>
           <div class="ct-help-dialog-actions">
             <button type="button" class="ct-help-action-button" data-help-open="guide">Open ${roleTitle}</button>
-            <button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact Support</button>
+            <button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact MECHNAR Support</button>
           </div>
         </div>`;
     } else if (action === "guide") {
       titleElement.textContent = roleTitle;
       const guideContent = {
         admin: `
-          <p class="ct-help-lead">Manage your organization and keep operations accountable.</p>
+          <p class="ct-help-lead">Administrator guide · Configure the organisation and govern its MECHNAR operations.</p>
           <ol>
-            <li><strong>Set up the workspace.</strong> Check organization details, locations, and zones.</li>
-            <li><strong>Manage people.</strong> Review staff and invitations, and confirm that each person has the correct access.</li>
-            <li><strong>Plan work.</strong> Create and organize tasks or operations, with clear ownership and timing.</li>
-            <li><strong>Review execution.</strong> Check task progress, submitted evidence, and items that need attention.</li>
-            <li><strong>Monitor performance.</strong> Use the dashboard, reports, logs, and audit trail to follow up on exceptions.</li>
+            <li><strong>Establish the organisation.</strong> Review organisation settings, locations and zones so operational records use the correct structure.</li>
+            <li><strong>Control access.</strong> Manage staff accounts, invitations, teams and role/designation permissions. Verify access before approving changes.</li>
+            <li><strong>Plan and govern operations.</strong> Create operational work, set ownership and timing, and monitor execution across the organisation.</li>
+            <li><strong>Review accountability.</strong> Inspect submitted records and review decisions; follow up on overdue work, incidents and unresolved exceptions.</li>
+            <li><strong>Measure performance.</strong> Use Analytics, Reports and the audit trail to understand trends, investigate results and retain an accountable record.</li>
+            <li><strong>Coordinate organisation-wide activity.</strong> Use announcements and administrator meetings to communicate decisions and changes to supervisors.</li>
           </ol>
-          <p class="ct-help-note">Only grant access appropriate to each person's responsibilities. Server-side permissions determine what actions are allowed.</p>`,
+          <p class="ct-help-note">Use administrator-level actions only when authorised. MECHNAR permissions and organisation boundaries govern access to records and actions.</p>`,
         supervisor: `
-          <p class="ct-help-lead">Coordinate the team, review work, and follow up on exceptions.</p>
+          <p class="ct-help-lead">Supervisor guide · Turn the organisation's operational plan into coordinated team execution.</p>
           <ol>
-            <li><strong>Check today's work.</strong> Open the workspace and operations areas available to you.</li>
-            <li><strong>Coordinate coverage.</strong> Review personnel, sites, zones, and assigned responsibilities.</li>
-            <li><strong>Follow progress.</strong> Watch for pending, delayed, or incomplete work and raise issues early.</li>
-            <li><strong>Review submissions.</strong> Use the review queue to check records or evidence when that function is available to your account.</li>
-            <li><strong>Report blockers.</strong> Escalate missing access, unclear instructions, or site issues to your administrator.</li>
+            <li><strong>Start at your Workspace.</strong> Review current operational activity, alerts and items requiring follow-up before assigning attention.</li>
+            <li><strong>Coordinate personnel.</strong> Open Personnel to review the staff relevant to your supervision, understand assignments and identify coverage gaps.</li>
+            <li><strong>Manage operations.</strong> Use Operations Management and the work queue to review schedules, assign or reassign work where permitted, and track due dates and progress.</li>
+            <li><strong>Review submitted work.</strong> Open the Review Queue, inspect the submitted details and evidence, then approve, reject or request resubmission using the available review actions.</li>
+            <li><strong>Handle incidents and quality.</strong> Monitor Incidents and urgent alerts, follow the incident lifecycle, and use Inspections and Quality workflows to identify and escalate problems.</li>
+            <li><strong>Keep the team informed.</strong> Use Team Channel, Meetings and handover tools for operational coordination. Escalate organisation-level issues or requests to the Admin.</li>
+            <li><strong>Track outcomes.</strong> Use performance views and reports available to your role to identify recurring delays, workload issues and areas needing corrective action.</li>
           </ol>`,
         employee: `
-          <p class="ct-help-lead">Use your workspace to understand assigned work and keep your records up to date.</p>
+          <p class="ct-help-lead">Staff guide · Understand your assigned work, complete it correctly and keep your records accurate.</p>
           <ol>
-            <li><strong>Start with My Desk or My Tasks.</strong> Review the work and instructions available to you.</li>
-            <li><strong>Complete the task as instructed.</strong> Follow site procedures and any timing or safety requirements.</li>
-            <li><strong>Record completion accurately.</strong> Add requested evidence or notes when the task flow provides those options.</li>
-            <li><strong>Check your history.</strong> Review prior activity and announcements available to your account.</li>
-            <li><strong>Ask for help early.</strong> Contact your supervisor if an instruction is unclear or a task cannot be completed.</li>
+            <li><strong>Begin at My Desk.</strong> Check your current assignments, notices and items that need your attention at the start of your shift.</li>
+            <li><strong>Open My Work.</strong> Select an assigned operation and read its instructions, location, due date and any requirements before starting.</li>
+            <li><strong>Update work status accurately.</strong> Use the available start, progress and completion actions at the correct stage. Do not mark work complete before it is finished.</li>
+            <li><strong>Submit required details.</strong> Add notes or evidence when the operation asks for them, then check the recorded status or confirmation.</li>
+            <li><strong>Report problems promptly.</strong> Use Incident Reports for workplace issues and provide clear details about what happened and where. Use urgent reporting options when immediate attention is needed.</li>
+            <li><strong>Stay informed.</strong> Check Announcements and Meetings for organisation updates, and use Work History to review previously recorded assignments.</li>
+            <li><strong>Ask your supervisor.</strong> Raise unclear instructions, blocked work, incorrect assignments or access problems with your supervisor rather than changing records outside your permissions.</li>
           </ol>`,
         guest: `
-          <p class="ct-help-lead">Get started with your CleanTrack workspace.</p>
+          <p class="ct-help-lead">MECHNAR account guide · Sign in and connect to your organisation.</p>
           <ol>
-            <li>Sign in with your work account, or complete registration if your organization allows it.</li>
-            <li>Choose the role and organization details you were given by your organization.</li>
-            <li>After signing in, use the navigation to find the tools available to your account.</li>
-            <li>If you cannot access your workspace, contact your organization administrator.</li>
+            <li>Sign in using the account registered for MECHNAR, or complete registration if enabled.</li>
+            <li>Select the role and organisation details provided by your organisation.</li>
+            <li>Submit an organisation join request when required and wait for an authorised administrator to approve it.</li>
+            <li>After access is granted, use the navigation and role-specific guide to learn your available modules.</li>
+            <li>For organisation access or membership issues, contact your organisation administrator.</li>
           </ol>`
       };
-      content.innerHTML = `<div class="ct-help-dialog">${guideContent[role] || guideContent.guest}<div class="ct-help-dialog-actions"><button type="button" class="ct-help-secondary-button" data-help-open="center">Help Center</button><button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact Support</button></div></div>`;
+      content.innerHTML = `<div class="ct-help-dialog">${guideContent[role] || guideContent.guest}<div class="ct-help-dialog-actions"><button type="button" class="ct-help-secondary-button" data-help-open="center">Help Center</button><button type="button" class="ct-help-secondary-button" data-help-open="contact">Contact MECHNAR Support</button></div></div>`;
     } else if (action === "contact") {
-      titleElement.textContent = "Contact Support";
+      titleElement.textContent = "Contact MECHNAR Support";
       const replyEmail = user?.email || "";
       const accountName = user?.name || "";
       const org = user?.organization_name || user?.organizationName || user?.organization?.name || (typeof user?.organization === "string" ? user.organization : "");
+      const activePage = window.CleanTrackNavigation?.getActivePage?.() || "Not available";
+      const roleLabel = {admin:"Admin",supervisor:"Supervisor",employee:"Staff"}[role] || "Guest";
       content.innerHTML = `
         <div class="ct-help-dialog">
-          <p class="ct-help-lead">Prepare a support request with the details needed to investigate your issue.</p>
-          <p class="ct-help-note">The support email address has not been configured in this workspace. When your email app opens, enter your organization's support contact or ask your workspace administrator for it. The message will not be sent automatically.</p>
+          <p class="ct-help-lead">MECHNAR Product Support</p>
+          <p>Describe the issue you are experiencing in MECHNAR. Your account role, organisation and current module will be included to help support staff understand the context.</p>
+          <p class="ct-help-note">The MECHNAR support destination has not yet been configured. This form prepares a support email draft; it does not send a request automatically. Contact your organisation administrator for immediate organisation-specific assistance.</p>
           <form id="ct-support-form" class="ct-support-form">
             <label for="ct-support-name">Your name</label>
             <input id="ct-support-name" name="name" type="text" autocomplete="name" required>
             <label for="ct-support-email">Reply-to email</label>
             <input id="ct-support-email" name="email" type="email" autocomplete="email" required>
             <label for="ct-support-subject">Subject</label>
-            <input id="ct-support-subject" name="subject" type="text" maxlength="120" value="CleanTrack support request" required>
-            <label for="ct-support-message">What do you need help with?</label>
-            <textarea id="ct-support-message" name="message" rows="4" maxlength="3000" required placeholder="Describe what happened and which page you were using."></textarea>
+            <input id="ct-support-subject" name="subject" type="text" maxlength="120" value="MECHNAR support request" required>
+            <label for="ct-support-message">Describe your MECHNAR issue</label>
+            <textarea id="ct-support-message" name="message" rows="4" maxlength="3000" required placeholder="What happened? Which MECHNAR page or action were you using?"></textarea>
             <div class="ct-help-dialog-actions">
-              <button type="submit" class="ct-help-action-button">Prepare email</button>
+              <button type="submit" class="ct-help-action-button">Prepare support email</button>
               <button type="button" class="ct-help-secondary-button" data-help-open="center">Help Center</button>
             </div>
           </form>
@@ -1012,15 +1028,18 @@
           event.preventDefault();
           const formData = new FormData(supportForm);
           const body = [
+            "Product: MECHNAR",
             "Name: " + String(formData.get("name") || ""),
             "Reply-to email: " + String(formData.get("email") || ""),
-            "Role: " + (role || "guest"),
+            "Role: " + roleLabel,
             "Organization: " + (typeof org === "string" && org ? org : "Not available"),
+            "MECHNAR module: " + activePage,
             "",
             "Issue:",
             String(formData.get("message") || "")
           ].join("\n");
-          const mailto = "mailto:?subject=" + encodeURIComponent(String(formData.get("subject") || "CleanTrack support request")) + "&body=" + encodeURIComponent(body);
+          const subject = String(formData.get("subject") || "MECHNAR support request");
+          const mailto = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
           window.location.href = mailto;
         });
       }
