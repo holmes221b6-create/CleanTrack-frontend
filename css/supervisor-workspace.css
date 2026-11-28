@@ -215,3 +215,36 @@ html[data-theme="light"] .mw-scheduled-dialog{background:#fff;color:#202532;bord
  .mn-insights-controls select{flex:1}
  .mn-insights-table-wrap{margin:0 -2px}
 }
+
+
+/* Insights is a full page, not an inner scrolling card. Keep one scroll owner
+   at #page-content so the user can reach both the top and bottom reliably. */
+#workspace-view #page-content:has(.mn-insights){
+  box-sizing:border-box;
+  height:calc(100dvh - 58px);
+  min-height:0;
+  max-height:calc(100dvh - 58px);
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  scroll-behavior:auto;
+}
+#workspace-view #page-content:has(.mn-insights) > .mn-insights{
+  min-height:100%;
+  height:auto;
+  overflow:visible;
+  padding-top:18px;
+  padding-bottom:48px;
+}
+@media(max-width:760px){
+  #workspace-view #page-content:has(.mn-insights){
+    height:calc(100dvh - 58px);
+    max-height:calc(100dvh - 58px);
+  }
+  #workspace-view #page-content:has(.mn-insights) > .mn-insights{
+    padding-top:14px;
+    padding-bottom:max(36px,env(safe-area-inset-bottom));
+  }
+}
