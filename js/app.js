@@ -680,22 +680,11 @@
       button.setAttribute("aria-label",pageLabel+" guide");
       button.dataset.mechnarGuidePage=pageId;
       Object.assign(button.style,{minHeight:"32px",padding:"5px 13px",border:"1px solid rgba(145,169,202,.42)",borderRadius:"7px",background:"#142b46",color:"#edf3fc",font:"600 12px inherit",cursor:"pointer",whiteSpace:"nowrap"});
-      // Bind directly to the actual button in capture phase. This does not
-      // depend on a document-level delegated selector or bubbling handlers.
-      if(!pageGuideBoundButtons.has(button)){
-        pageGuideBoundButtons.add(button);
-        button.dataset.mechnarGuideBound="true";
-        button.addEventListener("click",function(event){
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          const root=button.closest("#mechnar-personnel-overlay,#mechnar-performance-arena-overlay,.ct-team-fullscreen-shell");
-          const contextRoot=root?.querySelector(".mn-personnel-content,.pa-fullscreen-content,.ct-team-fullscreen-pagebody")||root||button.closest("#page-content")||document.getElementById("page-content")||document.body;
-          const currentUser=auth.getCurrentUser()||{role:"supervisor"};
-          try{showContextualPageGuide(currentUser,pageId,contextRoot);}
-          catch(error){console.error("MECHNAR page guide failed:",error);}
-        },true);
-      }
+      // Clicks are handled once by the document-level capture delegate below.
+      // Do not attach a second per-button listener: that caused inconsistent
+      // behaviour when page modules replaced or cloned their Guide controls.
+      pageGuideBoundButtons.add(button);
+      button.dataset.mechnarGuideBound="true";
       return true;
     }
   });
@@ -763,10 +752,10 @@
       if(buttons.length>1)Array.from(buttons).slice(1).forEach(node=>node.remove());
       const button=trigger.querySelector("button");
       if(button){
-        button.replaceWith(button.cloneNode(true));
-        const cleanButton=trigger.querySelector("button");
-        cleanButton.textContent="Guide";
-        window.MechnarPageGuide.attach(cleanButton,pageId);
+        // Reuse the existing DOM node. Replacing it on every observer pass
+        // created a MutationObserver loop and intermittently lost click handlers.
+        button.textContent="Guide";
+        window.MechnarPageGuide.attach(button,pageId);
       }
     }
     trigger.dataset.guidePage=key;
