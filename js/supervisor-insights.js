@@ -51,9 +51,10 @@ function style(){
  `;document.head.appendChild(s);
 }
 function svgLine(rows){
- const w=720,h=230,p=28,values=rows.map(r=>Number(r.compliance_pct)).filter(Number.isFinite);
- if(!values.length)return '<div class="mn-insights-status">There is not enough completed work history to draw a compliance trend yet.</div>';
- const points=rows.map((r,i)=>({x:p+(rows.length<2?0:i*(w-p*2)/(rows.length-1)),y:h-p-(Math.max(0,Math.min(100,Number(r.compliance_pct)||0))/100)*(h-p*2),v:Number(r.compliance_pct)||0,label:r.period}));
+ const w=720,h=230,p=28;
+ const validRows=rows.filter(r=>r.compliance_pct!==null&&r.compliance_pct!==undefined&&Number.isFinite(Number(r.compliance_pct)));
+ if(!validRows.length)return '<div class="mn-insights-status">No completed operations were recorded in this period, so a compliance trend cannot be calculated yet.</div>';
+ const points=validRows.map((r,i)=>({x:p+(validRows.length<2?0:i*(w-p*2)/(validRows.length-1)),y:h-p-(Math.max(0,Math.min(100,Number(r.compliance_pct)||0))/100)*(h-p*2),v:Number(r.compliance_pct)||0,label:r.period}));
  const path=points.map((q,i)=>(i?"L":"M")+q.x.toFixed(1)+" "+q.y.toFixed(1)).join(" ");
  const grid=[0,25,50,75,100].map(v=>{const y=h-p-(v/100)*(h-p*2);return '<line x1="'+p+'" y1="'+y+'" x2="'+(w-p)+'" y2="'+y+'" stroke="currentColor" opacity=".12"/><text x="3" y="'+(y+4)+'" fill="currentColor" opacity=".55" font-size="10">'+v+'</text>';}).join("");
  const dots=points.map(q=>'<circle cx="'+q.x+'" cy="'+q.y+'" r="3.5" fill="#a77be3"><title>'+safe(q.label)+': '+q.v+'%</title></circle>').join("");
@@ -100,14 +101,16 @@ async function render(container){
    const center=$("div","mn-insights-donut-center");center.append($("strong","",fmt(total)),$("span","","Total operations"));donut.appendChild(center);
    const legend=$("div","mn-insights-legend");[[ "#a77be3","Completed",done ],["#d17b86","Missed",missed],["#51475f","Other",pending]].forEach(([c,l,v])=>{const row=$("div","");const dot=$("i","mn-insights-dot");dot.style.background=c;row.append(dot,document.createTextNode(l+" · "+fmt(v)));legend.appendChild(row);});donutWrap.append(donut,legend);donutPanel.appendChild(donutWrap);
    panels.append(trendPanel,donutPanel);
+   const dataNote=$("div","mn-insights-data-note");
+   if(total===0){dataNote.append($("strong","","No operations found in this reporting period"),$("span","","There are no operations assigned to your team within the selected dates. Try 90 days, or check that operations are assigned to your team, its locations or zones. MECHNAR will not generate placeholder figures."));}
    const staffPanel=$("section","mn-insights-panel");staffPanel.style.marginTop="14px";staffPanel.append($("h2","","Staff Performance Ranking"),$("p","mn-insights-muted","Ranked using recorded completion rate. Staff without completed work remain unranked."));
    const table=$("table","mn-insights-table"),thead=$("thead",""),tr=$("tr","");["Staff","Completed / Total","Compliance"].forEach(x=>tr.appendChild($("th","",x)));thead.appendChild(tr);table.appendChild(thead);
    const tbody=$("tbody","");staff.forEach(person=>{const row=$("tr","");row.append($("td","",person.name||"Staff"),$("td","",fmt(person.completed)+" / "+fmt(person.total_tasks)),$("td","",pct(person.compliance_pct)));tbody.appendChild(row);});if(!staff.length){const row=$("tr","");const cell=$("td","","No staff performance records are available for this period.");cell.colSpan=3;row.appendChild(cell);tbody.appendChild(row);}table.appendChild(tbody);staffPanel.appendChild(table);
    const heat=$("section","mn-insights-panel");heat.style.marginTop="14px";heat.append($("h2","","Zone Miss Heatmap"),$("p","mn-insights-muted","Zones within your assigned team's locations, ordered by missed operations."));
    const heatGrid=$("div","mn-insights-heat");zones.forEach(z=>{const n=Number(z.missed_count)||0;const severity=n===0?"Low":n<=2?"Medium":n<=5?"High":"Critical";const cell=$("div","mn-insights-heat-cell");cell.append($("strong","",z.name||"Zone"),$("span","",(z.location_name||"Location")+" · "+severity+" · "+n+" missed"));heatGrid.appendChild(cell);});if(!zones.length)heatGrid.appendChild($("div","mn-insights-status","No zone-level task records are available for your assigned team."));heat.appendChild(heatGrid);
    const foot=$("p","mn-insights-muted","Data scope: "+(Array.isArray(data.teams)&&data.teams.length?data.teams.join(", "):"your assigned team")+" · "+range.value+" days. Metrics reflect recorded operations only.");
-   page.replaceChildren(head,kpis,panels,staffPanel,heat,foot);
-  }catch(error){if(token!==request)return;status.className="mn-insights-status mn-insights-error";status.textContent=error?.message||"Team insights could not be loaded. Please try again.";}
+   page.replaceChildren(head,kpis,...(total===0?[dataNote]:[]),panels,staffPanel,heat,foot);
+  }catch(error){if(token!==request)return;status.className="mn-insights-status mn-insights-error";status.replaceChildren($("strong","","Insights could not be loaded"),$("span","",(error?.message||"The server could not return your team records.")+((error?.status===401||error?.status===403)?" Check that you are signed in with an active Supervisor account assigned to one active team.":" Check the backend terminal for the matching request error.")));const retry=$("button","mn-insights-retry","Try again");retry.type="button";retry.addEventListener("click",load);status.appendChild(retry);}
  }
  range.addEventListener("change",load);refresh.addEventListener("click",load);await load();
 }
