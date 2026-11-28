@@ -1540,6 +1540,15 @@
       return;
     }
 
+    if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "insights") {
+      if (window.MechnarSupervisorInsights && typeof window.MechnarSupervisorInsights.render === "function") {
+        await window.MechnarSupervisorInsights.render(pageContent);
+      } else {
+        pageContent.textContent = "Insights could not load. Refresh the application and try again.";
+      }
+      return;
+    }
+
     if (String(user?.role || "").toLowerCase() === "supervisor" && pageId === "performance") {
       if (window.MechnarPerformanceArena && typeof window.MechnarPerformanceArena.render === "function") {
         window.MechnarPerformanceArena.render(pageContent);
