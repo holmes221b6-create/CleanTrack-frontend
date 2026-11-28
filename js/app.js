@@ -1134,6 +1134,25 @@
     if(settingsOverlay)return;
     settingsPreviousPage=previousPage&&previousPage!=="settings"?previousPage:"workspace";
     const token=++settingsOpenToken;
+    if(!document.getElementById("mn-settings-overlay-style")){
+      const style=document.createElement("style");
+      style.id="mn-settings-overlay-style";
+      style.textContent=`
+        #mechnar-settings-overlay{position:fixed;inset:0;z-index:2147482500;display:flex;flex-direction:column;overflow:auto;background:var(--bg,#101018);color:var(--text,#f4f1fa);padding:clamp(14px,2.5vw,30px);box-sizing:border-box}
+        #mechnar-settings-overlay .mn-settings-top{width:min(100%,1440px);margin:0 auto 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 0 18px;border-bottom:1px solid var(--border,rgba(255,255,255,.14))}
+        #mechnar-settings-overlay .mn-settings-kicker{display:block;font-size:.7rem;letter-spacing:.2em;font-weight:800;color:var(--primary);margin-bottom:4px}
+        #mechnar-settings-overlay .mn-settings-heading h1{margin:0;font-size:clamp(1.5rem,3vw,2.1rem)}
+        #mechnar-settings-overlay .mn-settings-close{width:42px;height:42px;flex:0 0 42px;border:1px solid var(--border-strong,var(--border));border-radius:11px;background:var(--bg-elevated,var(--surface));color:var(--text);font-size:1.6rem;cursor:pointer}
+        #mechnar-settings-overlay .mn-settings-body{width:min(100%,1440px);margin:0 auto;flex:1;min-height:0}
+        #mechnar-settings-overlay .ct-settings-page{width:100%;max-width:1200px;margin:0 auto;padding:0 0 42px}
+        #mechnar-settings-overlay .ct-settings-header{display:none}
+        #mechnar-settings-overlay .ct-settings-layout{align-items:start}
+        #mechnar-settings-overlay .ct-settings-nav{top:18px}
+        #mechnar-settings-overlay .mn-settings-loading{padding:30px;text-align:center;color:var(--text-secondary)}
+        @media(max-width:760px){#mechnar-settings-overlay{padding:12px}#mechnar-settings-overlay .ct-settings-layout{grid-template-columns:minmax(0,1fr);gap:14px}#mechnar-settings-overlay .ct-settings-nav{position:static;display:flex;overflow-x:auto;gap:6px}#mechnar-settings-overlay .ct-settings-nav-item{flex:0 0 auto;white-space:nowrap}#mechnar-settings-overlay .ct-settings-grid{grid-template-columns:minmax(0,1fr)}}
+      `;
+      document.head.appendChild(style);
+    }
     const overlay=document.createElement("section");
     overlay.id="mechnar-settings-overlay";
     overlay.className="mn-settings-overlay";
