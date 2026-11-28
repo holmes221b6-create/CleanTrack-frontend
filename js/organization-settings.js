@@ -565,5 +565,22 @@
     return refresh();
   }
 
-  window.CleanTrackOrganizationSettings = Object.freeze({ render });
+  async function openPanel() {
+    const dialog = document.getElementById("app-modal");
+    const title = document.getElementById("modal-title");
+    const content = document.getElementById("modal-content");
+    if (!dialog || !title || !content) return false;
+
+    title.textContent = "Organization Settings";
+    content.replaceChildren();
+    if (typeof dialog.showModal === "function") {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+    await render(content);
+    return true;
+  }
+
+  window.CleanTrackOrganizationSettings = Object.freeze({ render, openPanel });
 })();
