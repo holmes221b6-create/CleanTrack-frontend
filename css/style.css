@@ -1752,3 +1752,43 @@ html body #workspace-view .sidebar-brand img.ct-logo-symbol {
 @media(prefers-reduced-motion:reduce){
   #workspace-view.mn-workspace-entering{animation:none!important;will-change:auto}
 }
+
+
+/* Sidebar navigation: keep the full menu independently scrollable on desktop
+   and mobile, without relying on the page/body scroll container. */
+html body #workspace-view #sidebar,
+html body #workspace-view .sidebar,
+html body #workspace-navigation {
+  min-height: 0 !important;
+  max-height: calc(100vh - var(--header-height)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #514566 transparent;
+}
+html body #workspace-view #sidebar {
+  align-self: start;
+}
+html body #workspace-view #sidebar .sidebar-nav,
+html body #workspace-view #sidebar .nav-list {
+  min-height: 0;
+  flex: 0 0 auto;
+}
+@media (min-width: 801px) {
+  html body #workspace-view #sidebar {
+    position: sticky !important;
+    top: var(--header-height) !important;
+    height: calc(100vh - var(--header-height)) !important;
+  }
+}
+@media (max-width: 800px) {
+  html body #workspace-view #sidebar {
+    position: fixed !important;
+    top: var(--header-height) !important;
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+}
