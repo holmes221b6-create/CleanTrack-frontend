@@ -455,6 +455,111 @@
     return panel;
   }
 
+  async function openOrganizationDirectory() {
+    const dialog = document.getElementById("app-modal");
+    const title = document.getElementById("modal-title");
+    const content = document.getElementById("modal-content");
+    if (!dialog || !title || !content) return;
+
+    title.textContent = "Organization Directory";
+    content.replaceChildren();
+    const directoryRoot = el("div", "ct-home-directory-dialog");
+    content.appendChild(directoryRoot);
+    const directory = el("section", "ct-home-panel ct-home-directory");
+    const directoryHeader = el("div", "ct-home-section-heading");
+    directoryHeader.append(el("p", "ct-home-kicker", "ORGANIZATION DIRECTORY"));
+    directoryHeader.append(el("h2", "", "Find a member"));
+    directoryHeader.append(el("p", "ct-home-muted", "Search approved members and combine location, team, zone, role, and work-performance filters. Performance ranks use actual task records for the selected period."));
+    directory.appendChild(directoryHeader);
+
+    const searchWrap = el("div", "ct-home-member-search-wrap");
+    const searchIcon = el("span", "ct-home-member-search-icon", "⌕");
+    const search = el("input", "ct-home-member-search");
+    search.type = "search";
+    search.placeholder = "Search names, emails, roles, teams, zones, locations…";
+    search.setAttribute("aria-label", "Search members of this organization");
+    search.autocomplete = "off";
+    search.setAttribute("aria-controls", "ct-home-member-results");
+    search.dataset.ctMemberSearch = "true";
+    const searchButton = button("Search", "ct-home-button ct-home-button--primary ct-home-member-search-button", () => {
+      renderMemberResults(directoryRoot, search.value);
+      search.focus();
+    });
+    searchButton.setAttribute("aria-label", "Search organization members");
+    searchWrap.append(searchIcon, search, searchButton);
+    directory.appendChild(searchWrap);
+
+    const filterGrid = el("div", "ct-home-member-filters");
+    [
+      ["role", "Role"], ["location", "Location"], ["team", "Team"], ["zone", "Zone"],
+      ["ranking", "Performance ranking"], ["period", "Rank period"], ["sort", "Sort results"]
+    ].forEach(([key, label]) => {
+      const field = el("label", "ct-home-member-filter");
+      field.append(el("span", "", label));
+      const select = el("select", "ct-home-filter-select");
+      select.dataset.ctMemberFilter = key;
+      select.setAttribute("aria-label", label);
+      field.appendChild(select);
+      filterGrid.appendChild(field);
+    });
+    directory.appendChild(filterGrid);
+
+    const resultInfo = el("p", "ct-home-member-count", "Loading organization members…");
+    resultInfo.dataset.ctMemberCount = "true";
+    directory.appendChild(resultInfo);
+    const results = el("div", "ct-home-member-results");
+    results.dataset.ctMemberResults = "true";
+    results.id = "ct-home-member-results";
+    directory.appendChild(results);
+    const errorMessage = el("p", "ct-home-inline-error", "");
+    errorMessage.dataset.ctMemberError = "true";
+    errorMessage.hidden = true;
+    directory.appendChild(errorMessage);
+    directory.appendChild(el("p", "ct-home-muted ct-home-directory-hint", "Members with task history are ranked by compliance. Members without eligible task records remain unranked; no score is invented."));
+    search.addEventListener("input", () => renderMemberResults(directoryRoot, search.value));
+    filterGrid.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", () => {
+        if (select.dataset.ctMemberFilter === "period") loadDirectoryMembers(directoryRoot, true);
+        else renderMemberResults(directoryRoot, search.value);
+      });
+    });
+    search.addEventListener("keydown", event => {
+      const items = Array.from(results.querySelectorAll("button"));
+      const active = items.findIndex(item => item.getAttribute("aria-selected") === "true");
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        if (!items.length) return;
+        event.preventDefault();
+        const next = event.key === "ArrowDown" ? (active + 1) % items.length : (active <= 0 ? items.length - 1 : active - 1);
+        items.forEach((item, index) => item.setAttribute("aria-selected", String(index === next)));
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        renderMemberResults(directoryRoot, search.value);
+        const selected = items.find(item => item.getAttribute("aria-selected") === "true") || items[0];
+        if (selected) selected.click();
+      } else if (event.key === "Escape") {
+        results.hidden = true;
+      }
+    });
+    directoryRoot.appendChild(directory);
+
+    try {
+      const options = await API.get("organizations/directory-options");
+      directoryOptions = {
+        locations: Array.isArray(options.locations) ? options.locations : [],
+        teams: Array.isArray(options.teams) ? options.teams : [],
+        zones: Array.isArray(options.zones) ? options.zones : []
+      };
+    } catch (error) {
+      directoryOptions = { locations: [], teams: [], zones: [] };
+      const warning = directoryRoot.querySelector("[data-ct-member-error]");
+      if (warning) {
+        warning.hidden = false;
+        warning.textContent = "Filter options could not be loaded: " + (error.message || "request failed");
+      }
+    }
+    await loadDirectoryMembers(directoryRoot, true);
+  }
+
   async function render(root) {
     if (!root) return;
     rootElement = root;
@@ -536,105 +641,13 @@
     grid.append(
       makeSettingCard("◇", "Organization settings", "Organization profile, membership, policies, audit trail, and lifecycle controls.", () => go("org-settings"), "Manage organization"),
       makeSettingCard("♧", "Teams and roles", "Organize members into teams and review the roles available to your organization.", () => go("teams"), "Manage teams"),
-      makeSettingCard("⚿", "Access and permissions", "Review account access and make sure people have the right responsibilities.", () => go("staff"), "Manage access")
+      makeSettingCard("⚿", "Access and permissions", "Review account access and make sure people have the right responsibilities.", () => go("staff"), "Manage access"),
+      makeSettingCard("⌕", "Organization Directory", "Search approved members and review their organization details and work performance.", () => openOrganizationDirectory(), "Find a member")
     );
     settings.appendChild(grid);
     root.appendChild(settings);
     root.appendChild(renderCodePanel(root, currentOrganization));
 
-    const directory = el("section", "ct-home-panel ct-home-directory");
-    const directoryHeader = el("div", "ct-home-section-heading");
-    directoryHeader.append(el("p", "ct-home-kicker", "ORGANIZATION DIRECTORY"));
-    directoryHeader.append(el("h2", "", "Find a member"));
-    directoryHeader.append(el("p", "ct-home-muted", "Search approved members and combine location, team, zone, role, and work-performance filters. Performance ranks use actual task records for the selected period."));
-    directory.appendChild(directoryHeader);
-
-    const searchWrap = el("div", "ct-home-member-search-wrap");
-    const searchIcon = el("span", "ct-home-member-search-icon", "⌕");
-    const search = el("input", "ct-home-member-search");
-    search.type = "search";
-    search.placeholder = "Search names, emails, roles, teams, zones, locations…";
-    search.setAttribute("aria-label", "Search members of this organization");
-    search.autocomplete = "off";
-    search.setAttribute("aria-controls", "ct-home-member-results");
-    search.dataset.ctMemberSearch = "true";
-    const searchButton = button("Search", "ct-home-button ct-home-button--primary ct-home-member-search-button", () => {
-      renderMemberResults(root, search.value);
-      search.focus();
-    });
-    searchButton.setAttribute("aria-label", "Search organization members");
-    searchWrap.append(searchIcon, search, searchButton);
-    directory.appendChild(searchWrap);
-
-    const filterGrid = el("div", "ct-home-member-filters");
-    [
-      ["role", "Role"], ["location", "Location"], ["team", "Team"], ["zone", "Zone"],
-      ["ranking", "Performance ranking"], ["period", "Rank period"], ["sort", "Sort results"]
-    ].forEach(([key, label]) => {
-      const field = el("label", "ct-home-member-filter");
-      field.append(el("span", "", label));
-      const select = el("select", "ct-home-filter-select");
-      select.dataset.ctMemberFilter = key;
-      select.setAttribute("aria-label", label);
-      field.appendChild(select);
-      filterGrid.appendChild(field);
-    });
-    directory.appendChild(filterGrid);
-
-    const resultInfo = el("p", "ct-home-member-count", "Loading organization members…");
-    resultInfo.dataset.ctMemberCount = "true";
-    directory.appendChild(resultInfo);
-    const results = el("div", "ct-home-member-results");
-    results.dataset.ctMemberResults = "true";
-    results.id = "ct-home-member-results";
-    directory.appendChild(results);
-    const errorMessage = el("p", "ct-home-inline-error", "");
-    errorMessage.dataset.ctMemberError = "true";
-    errorMessage.hidden = true;
-    directory.appendChild(errorMessage);
-    directory.appendChild(el("p", "ct-home-muted ct-home-directory-hint", "Members with task history are ranked by compliance. Members without eligible task records remain unranked; no score is invented."));
-    search.addEventListener("input", () => renderMemberResults(root, search.value));
-    filterGrid.querySelectorAll("select").forEach(select => {
-      select.addEventListener("change", () => {
-        if (select.dataset.ctMemberFilter === "period") loadDirectoryMembers(root, true);
-        else renderMemberResults(root, search.value);
-      });
-    });
-    search.addEventListener("keydown", event => {
-      const items = Array.from(results.querySelectorAll("button"));
-      const active = items.findIndex(item => item.getAttribute("aria-selected") === "true");
-      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        if (!items.length) return;
-        event.preventDefault();
-        const next = event.key === "ArrowDown" ? (active + 1) % items.length : (active <= 0 ? items.length - 1 : active - 1);
-        items.forEach((item, index) => item.setAttribute("aria-selected", String(index === next)));
-      } else if (event.key === "Enter") {
-        event.preventDefault();
-        renderMemberResults(root, search.value);
-        const selected = items.find(item => item.getAttribute("aria-selected") === "true") || items[0];
-        if (selected) selected.click();
-      } else if (event.key === "Escape") {
-        results.hidden = true;
-      }
-    });
-    root.appendChild(directory);
-
-    try {
-      const options = await API.get("organizations/directory-options");
-      directoryOptions = {
-        locations: Array.isArray(options.locations) ? options.locations : [],
-        teams: Array.isArray(options.teams) ? options.teams : [],
-        zones: Array.isArray(options.zones) ? options.zones : []
-      };
-    } catch (error) {
-      directoryOptions = { locations: [], teams: [], zones: [] };
-      const warning = root.querySelector("[data-ct-member-error]");
-      if (warning) {
-        warning.hidden = false;
-        warning.textContent = "Filter options could not be loaded: " + (error.message || "request failed");
-      }
-    }
-    await loadDirectoryMembers(root, true);
   }
 
   window.CleanTrackAdminHome = Object.freeze({ render: render });
