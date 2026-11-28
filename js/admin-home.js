@@ -648,7 +648,7 @@
     settings.appendChild(directoryAction);
     const grid = el("div", "ct-home-settings-grid");
     grid.append(
-      makeSettingCard("◇", "Organization settings", "Organization profile, membership, policies, audit trail, and lifecycle controls.", () => go("org-settings"), "Manage organization"),
+      makeSettingCard("◇", "Organization settings", "Organization profile, membership, policies, audit trail, and lifecycle controls.", () => window.CleanTrackOrganizationSettings?.openPanel(), "Manage organization"),
       makeSettingCard("♧", "Teams and roles", "Organize members into teams and review the roles available to your organization.", () => go("teams"), "Manage teams"),
       makeSettingCard("⚿", "Access and permissions", "Review account access and make sure people have the right responsibilities.", () => go("staff"), "Manage access")
     );
