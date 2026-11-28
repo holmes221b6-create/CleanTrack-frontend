@@ -337,3 +337,10 @@
 @media(max-width:1150px){.pa-dock{max-width:65vw}.pa-dock-pane{flex-basis:255px;min-width:225px;max-width:275px}}
 @media(max-width:850px){.pa-dock{max-width:100%;gap:8px}.pa-dock-pane{flex:1 0 250px;min-width:240px;min-height:400px}.pa-dock-pane .pa-dock-body{padding:13px}}
 @media(max-width:520px){.pa-dock-tabs{flex-basis:58px}.pa-dock-toggle{font-size:9px}.pa-dock-pane{flex-basis:235px;min-width:225px}}
+
+/* Fullscreen host sizing: reserve enough width for all three independent drawers. */
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr) minmax(0,72vw)!important}
+#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-dock{width:auto!important;max-width:72vw!important;min-width:0!important;gap:10px!important}
+#mechnar-performance-arena-overlay .pa-root .pa-dock-pane{flex:1 1 285px!important;min-width:210px!important;max-width:310px!important}
+@media(max-width:1100px){#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr) minmax(0,70vw)!important}#mechnar-performance-arena-overlay .pa-root .pa-dock-pane{flex-basis:230px!important;min-width:190px!important}}
+@media(max-width:850px){#mechnar-performance-arena-overlay .pa-root>.pa-workspace{grid-template-columns:minmax(0,1fr)!important}#mechnar-performance-arena-overlay .pa-root>.pa-workspace>.pa-dock{width:100%!important;max-width:100%!important}}
