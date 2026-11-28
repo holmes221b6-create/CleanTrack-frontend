@@ -546,3 +546,23 @@ html body #workspace-view:has(#page-content .ct-home-welcome) #page-content {
   padding-bottom: 48px !important;
   touch-action: pan-y !important;
 }
+
+/* Admin Home: make the navigation rail span the complete dashboard height.
+   The page now uses document scrolling, so the sidebar must stretch with the
+   grid row instead of being capped at one viewport (100vh). */
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell {
+  align-items: stretch !important;
+  min-height: 100vh !important;
+  height: auto !important;
+}
+html body #workspace-view:has(#page-content .ct-home-welcome) > .ct-workspace-shell > .ct-sidebar,
+html body #workspace-view:has(#page-content .ct-home-welcome) .ct-workspace-shell > .ct-sidebar {
+  position: relative !important;
+  top: auto !important;
+  align-self: stretch !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
