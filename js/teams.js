@@ -220,8 +220,9 @@ async function download(id,format){
 }
 
 async function renderSupervisorTeams(container){
- let user=AUTH?.getCurrentUser?.();
- try{const fresh=await API.get("auth/me");if(fresh?.user){user=Object.assign(user||{},fresh.user);}}catch(_){}
+ // The authenticated user is already available when the route is opened.
+ // Do not block the Teams workspace on a second auth/me request.
+ const user=AUTH?.getCurrentUser?.()||{};
  const shell=el("section","ct-team-fullscreen-shell");
  shell.setAttribute("role","region");shell.setAttribute("aria-label","Teams workspace");
  const topbar=el("header","ct-team-fullscreen-topbar");
@@ -233,7 +234,7 @@ async function renderSupervisorTeams(container){
 
  const topActions=el("div","ct-team-fullscreen-topactions");
  const who=el("span","ct-team-fullscreen-user",user?.name||user?.email||"Supervisor");
- const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{document.removeEventListener("cleantrack:personnel-profile-updated",syncPersonnelAvatar);shell.remove();document.documentElement.classList.remove("ct-team-workspace-open");document.body.classList.remove("ct-team-workspace-open");window.CleanTrackNavigation?.setActivePage("workspace")});
+ const closeWorkspace=button("×","ct-team-fullscreen-close",()=>{document.removeEventListener("cleantrack:personnel-profile-updated",syncPersonnelAvatar);window.CleanTrackNavigation?.setActivePage(window.CleanTrackNavigation?.getDefaultPage(user?.role)||"home")});
  closeWorkspace.type="button";closeWorkspace.setAttribute("aria-label","Close Teams workspace");closeWorkspace.title="Close Teams workspace";
  const guideButton=button("Guide","ct-team-fullscreen-guide");
  window.MechnarPageGuide?.attach(guideButton,"teams");
