@@ -643,16 +643,22 @@
     const note=document.createElement("span");note.className="ct-page-guide-count";note.textContent="Help for "+(page?.label||pageId);
     footer.append(note);
     dialog.append(header,details,footer);overlay.append(dialog);
-    // Mount the guide INSIDE the workspace/overlay where its Guide button
-    // lives. This keeps Personnel, Performance Arena and team fullscreen help
-    // attached to their own panel instead of escaping to the app-level layer.
+    // The main Workspace guide must use a viewport-level fixed overlay so
+    // it stays centred on screen and is never pushed below the page content.
+    // Independent full-screen modules keep their guide mounted within their
+    // own panel so they cannot escape into the main application.
+    const pageContent = document.getElementById("page-content");
     const host = hostRoot && hostRoot.isConnected ? hostRoot :
-      (contextRoot && contextRoot.isConnected ? contextRoot : document.getElementById("page-content"));
+      (contextRoot && contextRoot.isConnected ? contextRoot : pageContent);
     if(!host) return;
+    const isMainWorkspace = host === pageContent;
     const previousHostPosition = host.style.position;
-    const hostComputedPosition = window.getComputedStyle(host).position;
-    if(hostComputedPosition === "static") host.style.position = "relative";
-    overlay.style.cssText = "position:absolute!important;inset:0!important;z-index:2147483005!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;background:rgba(2,7,15,.78)!important;backdrop-filter:blur(5px)!important;box-sizing:border-box!important;";
+    if(!isMainWorkspace && window.getComputedStyle(host).position === "static") {
+      host.style.position = "relative";
+    }
+    overlay.style.cssText = isMainWorkspace
+      ? "position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:2147483005!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;background:rgba(2,7,15,.78)!important;backdrop-filter:blur(5px)!important;box-sizing:border-box!important;"
+      : "position:absolute!important;inset:0!important;z-index:2147483005!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;background:rgba(2,7,15,.78)!important;backdrop-filter:blur(5px)!important;box-sizing:border-box!important;";
     const previousOverflow=document.body.style.overflow;
     const onGuideKeydown=(event)=>{
       if(event.key==="Escape"){event.preventDefault();restoreGuide();}
@@ -661,10 +667,10 @@
       if(!overlay.isConnected)return;
       overlay.remove();
       document.body.style.overflow=previousOverflow;
-      if(host.isConnected && host.style.position === "relative" && previousHostPosition !== "relative") host.style.position=previousHostPosition;
+      if(!isMainWorkspace && host.isConnected && host.style.position === "relative" && previousHostPosition !== "relative") host.style.position=previousHostPosition;
       document.removeEventListener("keydown",onGuideKeydown,true);
     };
-    host.append(overlay);
+    (isMainWorkspace ? document.body : host).append(overlay);
     document.body.style.overflow="hidden";
     document.addEventListener("keydown",onGuideKeydown,true);
     overlay.addEventListener("click",event=>{if(event.target===overlay)restoreGuide();});
